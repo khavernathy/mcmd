@@ -1,2 +1,3 @@
 # mcmd
-monte carlo and molecular dynamics simulation software
+This is a Monte Carlo / Molecular Dynamics Simulation software.
+
