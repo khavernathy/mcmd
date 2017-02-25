@@ -199,7 +199,7 @@ void thole_amatrix(System &system) {
 void thole_field(System &system) {
     // wolf thole field.
 
-    double OneOverSqrtPi = 1.0/M_PI;
+    double OneOverSqrtPi = 1.0/sqrt(M_PI);
     int p; //dimensionality
     double r, rr; //r and 1/r (reciprocal of r)
     double R = system.constants.cutoff;
