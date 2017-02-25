@@ -1,0 +1,16 @@
+ATOM   1  Ne  Ne1  M  1  0.0   0.0   0.0   default 0
+ATOM   2  Ne  Ne1  M  2  2.96   0.0   0.0   default 0
+ATOM   3  Ne  ne1  M  3  4 0.0 0.0 default 0
+ATOM   4  Ne  ne1  M  4  24 12 8 default 0
+ATOM   5  Ne  n2e  M  5  24 2  2  default 0
+ATOM   6  Ne  n42  M  6  1 12 12 default 0
+ATOM   7  Ne  n2   M  7  1  14  2 default 0
+ATOM   8  Ne  n42  M  8  44  4  4 default 0
+ATOM   9  Ne  n42  M  9  20 20 20 default 0
+ATOM  10  Ne  n1   M  10  4 4 42 default 0
+ATOM  11  Ne  n13  M  11  14 -2.3 -4.2 default 0
+ATOM  12  Ne  n13  M  12 -8.41 -8.4 -8.3 default 0
+ATOM  13  Ne  n33  M  13 -50 -50 -50 default  0
+ATOM  14  Ne  n13  M  14 -12.0 -0.424 14.0 default 0
+ATOM  15  Ne  n31  M  15 7.8888 8.13333 -30.13 default 0
+ATOM  16  Ne  n31  M  16 0.3133  -24.24 -30.2 default 0

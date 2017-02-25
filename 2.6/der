@@ -1,0 +1,268 @@
+A[0][3] = 0.477026
+A[0][4] = 0.188171
+A[0][5] = -0.045161
+A[1][3] = 0.188171
+A[1][4] = 0.817530
+A[1][5] = 0.020042
+A[2][3] = -0.045161
+A[2][4] = 0.020042
+A[2][5] = 0.896227
+
+setting A_matrix[3][0] = A_matrix[0][3] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[3][1] = A_matrix[0][4] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[3][2] = A_matrix[0][5] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[4][0] = A_matrix[1][3] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[4][1] = A_matrix[1][4] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[4][2] = A_matrix[1][5] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[5][0] = A_matrix[2][3] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[5][1] = A_matrix[2][4] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+setting A_matrix[5][2] = A_matrix[2][5] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=1
+A[0][6] = 0.476744
+A[0][7] = 0.186150
+A[0][8] = -0.047795
+A[1][6] = 0.186150
+A[1][7] = 0.820360
+A[1][8] = 0.020928
+A[2][6] = -0.047795
+A[2][7] = 0.020928
+A[2][8] = 0.896496
+
+setting A_matrix[6][0] = A_matrix[0][6] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[6][1] = A_matrix[0][7] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[6][2] = A_matrix[0][8] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[7][0] = A_matrix[1][6] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[7][1] = A_matrix[1][7] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[7][2] = A_matrix[1][8] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[8][0] = A_matrix[2][6] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[8][1] = A_matrix[2][7] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+setting A_matrix[8][2] = A_matrix[2][8] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=2
+A[0][9] = 0.493156
+A[0][10] = 0.185921
+A[0][11] = -0.045844
+A[1][9] = 0.185921
+A[1][10] = 0.831133
+A[1][11] = 0.020282
+A[2][9] = -0.045844
+A[2][10] = 0.020282
+A[2][11] = 0.908388
+
+setting A_matrix[9][0] = A_matrix[0][9] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[9][1] = A_matrix[0][10] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[9][2] = A_matrix[0][11] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[10][0] = A_matrix[1][9] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[10][1] = A_matrix[1][10] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[10][2] = A_matrix[1][11] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[11][0] = A_matrix[2][9] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[11][1] = A_matrix[2][10] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+setting A_matrix[11][2] = A_matrix[2][11] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=3
+A[0][12] = 0.491027
+A[0][13] = 0.185737
+A[0][14] = -0.045798
+A[1][12] = 0.185737
+A[1][13] = 0.830190
+A[1][14] = 0.020201
+A[2][12] = -0.045798
+A[2][13] = 0.020201
+A[2][14] = 0.907135
+
+setting A_matrix[12][0] = A_matrix[0][12] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[12][1] = A_matrix[0][13] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[12][2] = A_matrix[0][14] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[13][0] = A_matrix[1][12] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[13][1] = A_matrix[1][13] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[13][2] = A_matrix[1][14] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[14][0] = A_matrix[2][12] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[14][1] = A_matrix[2][13] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+setting A_matrix[14][2] = A_matrix[2][14] = 0.000000 at 3*N = 45, i=0, j=0, k=0, l=4
+A[0][15] = -0.000226
+A[0][16] = 0.000482
+A[0][17] = -0.000280
+A[1][15] = 0.000482
+A[1][16] = -0.000015
+A[1][17] = 0.000225
+A[2][15] = -0.000280
+A[2][16] = 0.000225
+A[2][17] = 0.000242
+
+setting A_matrix[15][0] = A_matrix[0][15] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[15][1] = A_matrix[0][16] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[15][2] = A_matrix[0][17] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[16][0] = A_matrix[1][15] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[16][1] = A_matrix[1][16] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[16][2] = A_matrix[1][17] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[17][0] = A_matrix[2][15] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[17][1] = A_matrix[2][16] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+setting A_matrix[17][2] = A_matrix[2][17] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=0
+A[0][18] = -0.000235
+A[0][19] = 0.000469
+A[0][20] = -0.000257
+A[1][18] = 0.000469
+A[1][19] = -0.000013
+A[1][20] = 0.000203
+A[2][18] = -0.000257
+A[2][19] = 0.000203
+A[2][20] = 0.000247
+
+setting A_matrix[18][0] = A_matrix[0][18] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[18][1] = A_matrix[0][19] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[18][2] = A_matrix[0][20] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[19][0] = A_matrix[1][18] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[19][1] = A_matrix[1][19] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[19][2] = A_matrix[1][20] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[20][0] = A_matrix[2][18] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[20][1] = A_matrix[2][19] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+setting A_matrix[20][2] = A_matrix[2][20] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=1
+A[0][21] = -0.000216
+A[0][22] = 0.000494
+A[0][23] = -0.000303
+A[1][21] = 0.000494
+A[1][22] = -0.000018
+A[1][23] = 0.000249
+A[2][21] = -0.000303
+A[2][22] = 0.000249
+A[2][23] = 0.000234
+
+setting A_matrix[21][0] = A_matrix[0][21] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[21][1] = A_matrix[0][22] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[21][2] = A_matrix[0][23] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[22][0] = A_matrix[1][21] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[22][1] = A_matrix[1][22] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[22][2] = A_matrix[1][23] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[23][0] = A_matrix[2][21] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[23][1] = A_matrix[2][22] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+setting A_matrix[23][2] = A_matrix[2][23] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=2
+A[0][24] = -0.000235
+A[0][25] = 0.000470
+A[0][26] = -0.000257
+A[1][24] = 0.000470
+A[1][25] = -0.000013
+A[1][26] = 0.000203
+A[2][24] = -0.000257
+A[2][25] = 0.000203
+A[2][26] = 0.000247
+
+setting A_matrix[24][0] = A_matrix[0][24] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[24][1] = A_matrix[0][25] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[24][2] = A_matrix[0][26] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[25][0] = A_matrix[1][24] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[25][1] = A_matrix[1][25] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[25][2] = A_matrix[1][26] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[26][0] = A_matrix[2][24] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[26][1] = A_matrix[2][25] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+setting A_matrix[26][2] = A_matrix[2][26] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=3
+A[0][27] = -0.000216
+A[0][28] = 0.000493
+A[0][29] = -0.000303
+A[1][27] = 0.000493
+A[1][28] = -0.000018
+A[1][29] = 0.000248
+A[2][27] = -0.000303
+A[2][28] = 0.000248
+A[2][29] = 0.000234
+
+setting A_matrix[27][0] = A_matrix[0][27] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[27][1] = A_matrix[0][28] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[27][2] = A_matrix[0][29] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[28][0] = A_matrix[1][27] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[28][1] = A_matrix[1][28] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[28][2] = A_matrix[1][29] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[29][0] = A_matrix[2][27] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[29][1] = A_matrix[2][28] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+setting A_matrix[29][2] = A_matrix[2][29] = 0.000000 at 3*N = 45, i=0, j=0, k=1, l=4
+A[0][30] = 0.000014
+A[0][31] = -0.000111
+A[0][32] = 0.000446
+A[1][30] = -0.000111
+A[1][31] = 0.000290
+A[1][32] = 0.000157
+A[2][30] = 0.000446
+A[2][31] = 0.000157
+A[2][32] = -0.000304
+
+setting A_matrix[30][0] = A_matrix[0][30] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[30][1] = A_matrix[0][31] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[30][2] = A_matrix[0][32] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[31][0] = A_matrix[1][30] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[31][1] = A_matrix[1][31] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[31][2] = A_matrix[1][32] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[32][0] = A_matrix[2][30] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[32][1] = A_matrix[2][31] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+setting A_matrix[32][2] = A_matrix[2][32] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=0
+A[0][33] = 0.000024
+A[0][34] = -0.000096
+A[0][35] = 0.000435
+A[1][33] = -0.000096
+A[1][34] = 0.000291
+A[1][35] = 0.000140
+A[2][33] = 0.000435
+A[2][34] = 0.000140
+A[2][35] = -0.000314
+
+setting A_matrix[33][0] = A_matrix[0][33] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[33][1] = A_matrix[0][34] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[33][2] = A_matrix[0][35] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[34][0] = A_matrix[1][33] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[34][1] = A_matrix[1][34] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[34][2] = A_matrix[1][35] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[35][0] = A_matrix[2][33] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[35][1] = A_matrix[2][34] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+setting A_matrix[35][2] = A_matrix[2][35] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=1
+A[0][36] = 0.000005
+A[0][37] = -0.000126
+A[0][38] = 0.000455
+A[1][36] = -0.000126
+A[1][37] = 0.000287
+A[1][38] = 0.000174
+A[2][36] = 0.000455
+A[2][37] = 0.000174
+A[2][38] = -0.000292
+
+setting A_matrix[36][0] = A_matrix[0][36] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[36][1] = A_matrix[0][37] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[36][2] = A_matrix[0][38] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[37][0] = A_matrix[1][36] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[37][1] = A_matrix[1][37] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[37][2] = A_matrix[1][38] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[38][0] = A_matrix[2][36] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[38][1] = A_matrix[2][37] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+setting A_matrix[38][2] = A_matrix[2][38] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=2
+A[0][39] = 0.000023
+A[0][40] = -0.000096
+A[0][41] = 0.000435
+A[1][39] = -0.000096
+A[1][40] = 0.000291
+A[1][41] = 0.000140
+A[2][39] = 0.000435
+A[2][40] = 0.000140
+A[2][41] = -0.000314
+
+setting A_matrix[39][0] = A_matrix[0][39] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[39][1] = A_matrix[0][40] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[39][2] = A_matrix[0][41] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[40][0] = A_matrix[1][39] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[40][1] = A_matrix[1][40] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[40][2] = A_matrix[1][41] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[41][0] = A_matrix[2][39] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[41][1] = A_matrix[2][40] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+setting A_matrix[41][2] = A_matrix[2][41] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=3
+A[0][42] = 0.000005
+A[0][43] = -0.000126
+A[0][44] = 0.000455
+A[1][42] = -0.000126
+A[1][43] = 0.000287
+A[1][44] = 0.000173
+A[2][42] = 0.000455
+A[2][43] = 0.000173
+A[2][44] = -0.000292
+
+setting A_matrix[42][0] = A_matrix[0][42] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[42][1] = A_matrix[0][43] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[42][2] = A_matrix[0][44] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[43][0] = A_matrix[1][42] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[43][1] = A_matrix[1][43] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[43][2] = A_matrix[1][44] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[44][0] = A_matrix[2][42] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[44][1] = A_matrix[2][43] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+setting A_matrix[44][2] = A_matrix[2][44] = 0.000000 at 3*N = 45, i=0, j=0, k=2, l=4
+
+
