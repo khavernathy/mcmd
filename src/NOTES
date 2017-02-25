@@ -1,0 +1,32 @@
+--> MC Currently fully supporting NPT,NVT, uVT.
+--> MD supporting NVT, basically
+--> NO POLARIZATION
+
+PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:
+    -> gcc compiler 6.2.0 (circe)
+    -> gcc compiler 4.9.3 (stampede)
+
+To compile (so far)
+g++ main.cpp -lm -o my_executable -I. -std=c++11
+
+To run
+./t
+
+------------------------------------------
+
+-> make averages moving
+
+    -> ALSO write .pdb traj (or just restart.pdb) with BOX included
+
+-> include more-than-static polarization energy
+	-> right now I just use V = -0.5 sum{u.E}
+
+-> add rotation to MD displacements
+    --> Added but a bit dysfunctional. 
+        Mols tend to rotate into oblivion (lose rigidity) and 
+        explode so I have a cap of 0.1 rad/fs now.
+
+--> Use GPU for MD force calculations? (add option)
+
+--> Phast2 needs definite fix. Units probably wrong.
+
