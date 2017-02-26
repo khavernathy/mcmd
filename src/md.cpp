@@ -237,7 +237,6 @@ void integrate(System &system, double dt) {
                 "x", system.molecules[j].ang_pos[0] * 180.0/M_PI); 
                 for (int n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedx[n] + system.molecules[j].com[n];
-                //system.molecules[j].calc_center_of_mass();
 
                 // ROTATE IN Y
                 double* rotatedy = rotatePoint(system, 
@@ -247,7 +246,6 @@ void integrate(System &system, double dt) {
                 "y", system.molecules[j].ang_pos[1] * 180.0/M_PI); 
                 for (int n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedy[n] + system.molecules[j].com[n];
-                //system.molecules[j].calc_center_of_mass();
 
                 // ROTATE IN Z
                 double* rotatedz = rotatePoint(system, 
@@ -257,7 +255,6 @@ void integrate(System &system, double dt) {
                 "z", system.molecules[j].ang_pos[2] * 180.0/M_PI); 
                 for (int n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
-                //system.molecules[j].calc_center_of_mass(); 
             } // end loop over atoms i 
             } // end if rotations allowed and >1 atom
         // */
