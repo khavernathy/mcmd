@@ -249,7 +249,7 @@ class Molecule {
         void calc_ang_pos(double dt) {
             for (int n=0; n<3; n++) {
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
-                if (ang_pos[n] > 0.05) ang_pos[n] = 0.05; // SET THE ROTATION CAP -- rad/fs
+                if (ang_pos[n] > 0.02) ang_pos[n] = 0.02; // SET THE ROTATION CAP -- rad/fs
             }
         }
 
