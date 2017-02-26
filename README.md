@@ -26,8 +26,6 @@ TODO
 	-> right now I just use V = -0.5 sum{u.E}
 -> add rotation to MD displacements
     --> Added but a bit dysfunctional. 
-        Mols tend to rotate into oblivion (lose rigidity) and 
-        explode so I have a cap of 0.1 rad/fs now.
-        They still disform. Maybe shouldn't do com() after xyz rot.
+    --> maybe torque is calc'd wrong. should be local force on atoms or somethign
 --> Use GPU for MD force calculations? (add option)
 --> Phast2 needs definite fix. Units probably wrong.

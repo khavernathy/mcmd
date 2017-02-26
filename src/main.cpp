@@ -418,7 +418,8 @@ int main(int argc, char **argv) {
             printf("MOLECULAR DYNAMICS\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-            printf("Temperature: %.5f K\n",system.constants.temp);
+            printf("ENSEMBLE: %s\n",system.constants.ensemble.c_str());
+            printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nKE(equipartition) = %.3f K\nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm\n", 

@@ -3,11 +3,12 @@ name			    mcmd_development
 mode	 		    md ! mc or md
 checkpoints_option  off
 
-md_rotations on
 		
 input_atoms 8h2bssp.pdb  ! PDB ONLY 
 potential_form 		ljes   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
+
+
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
 x_length	15	25.699  47.005  60    27.4876  150.97371 !  in A   
@@ -23,6 +24,8 @@ radial_counterpart  H2G   ! element name to get distance of w/centroid
 radial_file         radialdist.dat 
 
 temperature 273.15 
+pressure 1.0
+ensemble nvt
 
 ! MOLECULAR DYNAMICS ONLY ===============================
 md_dt			    0.2  ! fs
