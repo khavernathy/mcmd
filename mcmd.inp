@@ -7,8 +7,8 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es  on
 rd_lrc              on	
-input_atoms	 pdbs/8h2bssp.pdb  pdbs/mof5_h2bssp.pdb   ! PDB ONLY 
-potential_form 		ljespolar   !ljespolar 	!phast2    !!lj
+input_atoms	 pdbs/mof5_h2bssp.pdb   ! PDB ONLY 
+potential_form 		ljes   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
@@ -18,16 +18,16 @@ z_length	25.669    60    27.4876  150.97371
 
 
 ! radial distribution option
-radial_dist         off   ! turns on/off radial distribution function. off for speed-up
+radial_dist         on   ! turns on/off radial distribution function. off for speed-up
 radial_bin_size     0.1  ! in A
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
-radial_centroid     Cu   ! element name
+radial_centroid     ZN   ! element name
 radial_counterpart  H2G   ! element name to get distance of w/centroid
 radial_file         radialdist.dat 
 
 
 ! MONTE CARLO ONLY ======================================
-ensemble		nvt      uvt   !nvt   npt   
+ensemble		uvt   nvt      uvt   !nvt   npt   
 
 mc_corrtime		    10
 finalstep		    1000000
