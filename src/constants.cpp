@@ -49,7 +49,7 @@ class Constants {
 		double cutoff;
 
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs^2. User can set. Will be random +- up to this num.
-        double v_RMS = 0.0; // root-mean-square velocity for homogenous gases, based on T and molar mass.
+        double v_init = 0.0; // initial velocity for homogenous gases, based on T and molar mass.
         double md_dt=0.1, md_ft; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
 		map <string,double> sig_override;

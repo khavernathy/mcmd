@@ -342,8 +342,8 @@ int main(int argc, char **argv) {
     } else {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
-        double v_RMS = sqrt(3.0 * system.constants.R * system.constants.temp / (system.proto.mass*system.constants.NA)) / 1e5; // A/fs
-        double v_component = sqrt(v_RMS*v_RMS / 3.0);
+        double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / (M_PI*system.proto.mass*system.constants.NA)) / 1e5; // A/fs
+        double v_component = sqrt(v_init*v_init / 3.0);
 
         double pm = 0;
         for (int i=0; i<system.molecules.size(); i++) {
@@ -355,8 +355,8 @@ int main(int argc, char **argv) {
                 system.molecules[i].vel[n] = v_component * pm;
             }
         }
-        printf("Computed initial velocities from temperature: v_RMS = %f A/fs\n",v_RMS);
-        system.constants.v_RMS = v_RMS;
+        printf("Computed initial velocities from temperature: v_init = %f A/fs\n",v_init);
+        system.constants.v_init = v_init;
     } 
      // end initial velocities
 
@@ -404,6 +404,9 @@ int main(int argc, char **argv) {
             double Klin = ETarray[5];
             double Krot = ETarray[6];
 
+            // PRESSURE
+            double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
+
 			// PRINT OUTPUT
 			std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
 			time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin_steps).count()) /1000000.0;
@@ -418,7 +421,10 @@ int main(int argc, char **argv) {
             printf("Temperature: %.5f K\n",system.constants.temp);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nKE(equipartition) = %.3f K\nEmergent T: %.3f K; Average v = %.5f A/fs; v_RMS = %.5f A/fs\n", KE, Klin, Krot, PE, TE, Ek, Temp, v_avg, system.constants.v_RMS);			
+			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nKE(equipartition) = %.3f K\nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm\n", 
+            KE, Klin, Krot, PE, TE, Ek, 
+            Temp, v_avg, system.constants.v_init,
+            pressure);			
 
 			printf("--------------------\n\n");
 		}
