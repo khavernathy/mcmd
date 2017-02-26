@@ -224,7 +224,8 @@ int main(int argc, char **argv) {
 			double total_attempts = system.stats.insert_attempts + system.stats.remove_attempts + system.stats.displace_attempts + system.stats.volume_attempts + system.stats.rotate_attempts;
 
 			// PRINT MAIN OUTPUT
-			printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
+			printf("MONTE CARLO\n");
+            printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
 			printf("ENSEMBLE: %s\n",system.constants.ensemble.c_str());
 			printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%\n",t,finalstep,progress);
@@ -410,6 +411,8 @@ int main(int argc, char **argv) {
 			double progress = (((float)count_md_steps)/(float)total_steps*100);
 			double ETA = ((time_elapsed*(float)total_steps/(float)count_md_steps) - time_elapsed)/60.0;
 			double ETA_hrs = ETA/60.0;
+       
+            printf("MOLECULAR DYNAMICS\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("Temperature: %.5f K\n",system.constants.temp);
