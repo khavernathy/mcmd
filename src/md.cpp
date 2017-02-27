@@ -13,7 +13,9 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
     double v_sum=0.0, avg_v = 0.0;
 	double T=0.0;
-	//long unsigned int size = system.atoms.size();
+	
+
+    // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
     for (int j=0; j<system.molecules.size(); j++) {
        if (system.constants.md_mode == "molecular") {
             double vsq = 0, wsq = 0;
@@ -45,12 +47,17 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             }
         }
 
-        // iteratively sum potential
-        for (int i=0; i<system.molecules[j].atoms.size(); i++) V_total += system.molecules[j].atoms[i].V;
-		//total energy
-		// iteratively sum total energy
-	//}
-	}
+        // iteratively sum ROTATIONAL POTENTIAL
+        for (int n=0; n<3; n++) {
+            V_total += -system.molecules[j].torque[n] * system.molecules[j].d_theta[n];
+            //printf("rot pot: %e\n", -system.molecules[j].torque[n] * system.molecules[j].d_theta[n]);
+        }
+
+        // iteratively sum LINEAR POTENTIAL
+        for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+            V_total += system.molecules[j].atoms[i].V;
+        }
+    }
 
     avg_v = v_sum / system.molecules.size(); // A/fs
     K_total = K_total / system.constants.kb * 1e10; // convert to K 
@@ -78,13 +85,12 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     scale_v = sqrt(scale_v)*1e-5; // converted to A/fs
     
 
-    printf("dT/dt: %f;  T_change: %f;  prod: %f; scale_v: %f\n\n", dTdt, T_change,prod,scale_v);
+    //printf("dT/dt: %f;  T_change: %f;  prod: %f; scale_v: %f\n\n", dTdt, T_change,prod,scale_v);
     // END NVT THERMOSTAT
     }
-
-    system.constants.prevtemp = T; // reset the system previous temp.
-
-
+    
+    // reset temperature for NVT thermostat
+    system.constants.prevtemp = T;
 
 	static double output[5];
 	output[0] = K_total;

@@ -221,18 +221,13 @@ fclose(f);
 
 /* WRITE RUNNING ENERGY AVERAGE EVERY CORRTIME */
 void writeThermo(System &system, double TE, double LKE, double RKE, double PE, double density, double temp, double pressure, int step) {
-	ofstream myfile;
-	myfile.open (system.constants.thermo_output, ios_base::app);
-	myfile << to_string(step) + " ";
-    myfile << to_string(TE) + " ";
-    myfile << to_string(LKE) + " ";
-    myfile << to_string(RKE) + " ";
-    myfile << to_string(PE) + " ";
-    myfile << to_string(density) + " ";
-    myfile << to_string(temp) + " ";
-    myfile << to_string(pressure) + " ";
-    myfile << "\n";
-	myfile.close();
+    FILE *f = fopen(system.constants.thermo_output.c_str(), "a");
+    if (f == NULL) { printf("Error opening thermo data file!\n"); exit(1); }
+
+    fprintf(f, "%i  %f  %f  %f  %f  %f  %f  %f\n", 
+        step, TE, LKE, RKE, PE, density, temp, pressure);
+
+    fclose(f);
 }
 
 

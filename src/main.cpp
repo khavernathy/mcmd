@@ -82,6 +82,11 @@ int main(int argc, char **argv) {
 	remove( system.constants.restart_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() );
 
+    // Prep thermo output file
+    FILE *f = fopen(system.constants.thermo_output.c_str(), "w");
+    fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K)  #density(g/mL) #temp(K) #pres(atm)\n");
+    fclose(f);
+
 	// write initial XYZ for first frame.
    //	writeXYZ(system,system.constants.output_traj,0);
 
@@ -422,7 +427,7 @@ int main(int argc, char **argv) {
             // WRITE OUTPUT FILES 
 			writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
             frame++;
-            writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, t); 
+            writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, count_md_steps); 
             writePDB(system,system.constants.restart_pdb);	
             if (system.stats.radial_dist == "on") {
                 radialDist(system);
