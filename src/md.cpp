@@ -207,10 +207,10 @@ void calculateForces(System &system, string model, double dt) {
             } // end loop l
 		    } // end loop k 
             } // end loop j
-        // atomic forces are done, so now compile molecular values
+        // atomic forces are done, so now calc molecular values
         system.molecules[i].calc_force();
-        if (system.constants.md_rotations == "on" && system.molecules[i].atoms.size() > 1) system.molecules[i].calc_torque();
-        //if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_rotations(dt);
+        if (system.constants.md_rotations == "on" && system.molecules[i].atoms.size() > 1) 
+            system.molecules[i].calc_torque();
     } // end loop i
 //printf("count: %i\n",countem);
 }
