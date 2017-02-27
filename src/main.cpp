@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
             }
         }
         printf("Computed initial velocities from temperature: v_init = %f A/fs\n",v_init);
-        system.constants.v_init = v_init;
+        system.constants.md_init_vel = v_init;
     } 
      // end initial velocities
 
@@ -424,7 +424,7 @@ int main(int argc, char **argv) {
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nKE(equipartition) = %.3f K\nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm\n", 
             KE, Klin, Krot, PE, TE, Ek, 
-            Temp, v_avg, system.constants.v_init,
+            Temp, v_avg, system.constants.md_init_vel,
             pressure);			
 
 			printf("--------------------\n\n");

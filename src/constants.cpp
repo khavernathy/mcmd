@@ -23,8 +23,7 @@ class Constants {
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
-        string md_rotations="on"; // MD only.
-		string rd_lrc="on"; // long range corrections for LJ RD
+        string rd_lrc="on"; // long range corrections for LJ RD
         string ewald_es="off"; // ewald method for electrostatic potential calculation.
         string pdb_long="off"; // on would force long coordinate/charge output
         map <string,double> masses; // mass database for defaults.
@@ -48,8 +47,8 @@ class Constants {
 		double x_length,y_length,z_length,x_max,y_max,z_max,x_min,y_min,z_min; // box parameters, in A
 		double cutoff;
 
-        double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs^2. User can set. Will be random +- up to this num.
-        double v_init = 0.0; // initial velocity for homogenous gases, based on T and molar mass.
+        string md_rotations="on"; // MD only.
+        double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_dt=0.1, md_ft; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
 		map <string,double> sig_override;
@@ -241,8 +240,11 @@ class Molecule {
         }
 
         // linear velocity
-        void calc_vel(double dt) {
-            for (int n=0; n<3; n++) vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
+        void calc_vel(double dt, double max) {
+            for (int n=0; n<3; n++) {
+                vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
+                if (vel[n] > max) vel[n] = max; // apply the cap
+            }
         }
    
         // angular position // in rad

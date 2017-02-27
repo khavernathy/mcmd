@@ -257,7 +257,6 @@ void integrate(System &system, double dt) {
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
             } // end loop over atoms i 
             } // end if rotations allowed and >1 atom
-        // */
             } // end if movable molecule
         } // end for molecules j
     } // end if molecular motion
@@ -358,7 +357,7 @@ void integrate(System &system, double dt) {
             else if (system.constants.md_mode == "molecular") {
                 // linear
                 system.molecules[j].calc_acc();
-                system.molecules[j].calc_vel(dt);
+                system.molecules[j].calc_vel(dt, system.constants.md_init_vel);
     
                 // rotational
                 if (system.constants.md_rotations == "on") {
