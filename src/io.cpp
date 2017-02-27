@@ -220,21 +220,21 @@ fclose(f);
 }
 
 /* WRITE RUNNING ENERGY AVERAGE EVERY CORRTIME */
-void writeEnergy(System &system, double energy, int step) {
+void writeThermo(System &system, double TE, double LKE, double RKE, double PE, double density, double temp, double pressure, int step) {
 	ofstream myfile;
-	myfile.open (system.constants.energy_output, ios_base::app);
-	myfile << to_string(step) + " " + to_string(energy) + "\n";
+	myfile.open (system.constants.thermo_output, ios_base::app);
+	myfile << to_string(step) + " ";
+    myfile << to_string(TE) + " ";
+    myfile << to_string(LKE) + " ";
+    myfile << to_string(RKE) + " ";
+    myfile << to_string(PE) + " ";
+    myfile << to_string(density) + " ";
+    myfile << to_string(temp) + " ";
+    myfile << to_string(pressure) + " ";
+    myfile << "\n";
 	myfile.close();
 }
 
-
-/* WRITE RUNNING DENSITY AVERAGE EVERY CORRTIME */
-void writeDensity(System &system, double density, int step) {
-	ofstream myfile;
-	myfile.open (system.constants.density_output, ios_base::app);
-	myfile << to_string(step) + " " + to_string(density) + "\n";
-	myfile.close();
-}
 
 
 /* READ INPUT FILE PARAMETERS AND OPTIONS */
@@ -294,13 +294,9 @@ void readInput(System &system, char* filename) {
 				system.constants.restart_pdb = lc[1].c_str();
 				std::cout << "Got restart output file = " << lc[1].c_str(); printf("\n");
 			
-			} else if (!strcasecmp(lc[0].c_str(), "energy_output")) {
-				system.constants.energy_output = lc[1].c_str();
-				std::cout << "Got energy output file = " << lc[1].c_str(); printf("\n");
-			
-			} else if (!strcasecmp(lc[0].c_str(), "density_output")) {
-				system.constants.density_output = lc[1].c_str();
-				std::cout << "Got density output file = " << lc[1].c_str(); printf("\n");
+			} else if (!strcasecmp(lc[0].c_str(), "thermo_output")) {
+				system.constants.thermo_output = lc[1].c_str();
+				std::cout << "Got thermo output file = " << lc[1].c_str(); printf("\n");
 			
 			} else if (!strcasecmp(lc[0].c_str(), "stepsize")) {
 				system.constants.stepsize = atoi(lc[1].c_str());

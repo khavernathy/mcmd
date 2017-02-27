@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 // =================  GET TOTAL ENERGY AND EMERGENT TEMPERATURE FROM SYSTEM STATE ===========================
-double * calculateEnergyAndTemp(System &system) { // the * is to return an array of doubles as a pointer, not just one double
+double * calculateEnergyAndTemp(System &system, double currtime) { // the * is to return an array of doubles as a pointer, not just one double
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
     double v_sum=0.0, avg_v = 0.0;
@@ -52,7 +52,7 @@ double * calculateEnergyAndTemp(System &system) { // the * is to return an array
 	//}
 	}
 
-    avg_v = v_sum / system.molecules.size();
+    avg_v = v_sum / system.molecules.size(); // A/fs
     K_total = K_total / system.constants.kb * 1e10; // convert to K 
     Klin = Klin / system.constants.kb * 1e10;
     Krot = Krot / system.constants.kb * 1e10;
@@ -64,7 +64,27 @@ double * calculateEnergyAndTemp(System &system) { // the * is to return an array
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto.mass * M_PI / 8.0 / system.constants.kb;
 
-    //printf("Temperature: %4.2fK ",T); 
+    if (system.constants.ensemble == "nvt") {
+    // NVT THERMOSTAT: Berendsen :: https://en.wikipedia.org/wiki/Berendsen_thermostat 
+    double dTdt = (T - system.constants.prevtemp)/(system.constants.md_dt);
+    double tau = system.constants.md_thermostat_constant;
+    double T_change = T - system.constants.prevtemp;
+    double prod = tau*dTdt;
+    // set new velocity according to thermostat
+    double scale_v = 8.0*system.constants.kb/system.proto.mass/M_PI;
+    scale_v *= (T_change/tau * currtime) - 
+                (T_change/tau * (currtime-system.constants.md_dt)) + 
+                (system.constants.prevtemp);
+    scale_v = sqrt(scale_v)*1e-5; // converted to A/fs
+    
+
+    printf("dT/dt: %f;  T_change: %f;  prod: %f; scale_v: %f\n\n", dTdt, T_change,prod,scale_v);
+    // END NVT THERMOSTAT
+    }
+
+    system.constants.prevtemp = T; // reset the system previous temp.
+
+
 
 	static double output[5];
 	output[0] = K_total;

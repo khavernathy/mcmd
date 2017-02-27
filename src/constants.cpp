@@ -17,8 +17,9 @@ class Constants {
         string atom_file; // input atoms .pdb file
         string output_traj="traj.xyz"; // system trajectory in xyz 
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
-        string energy_output="energy.dat"; // logs energy average as f'n of step
-        string density_output="density.dat"; // logs avg. density as f'n of step
+        string thermo_output="thermo.dat"; // a file for all thermodynamic info
+        //string energy_output="energy.dat"; // logs energy average as f'n of step
+        //string density_output="density.dat"; // logs avg. density as f'n of step
         string volume_change_option; // kind of useless now but used for NPT,
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
@@ -33,6 +34,7 @@ class Constants {
 		map <string,double> polars; // polarizability database for defaults. Defined below
 		double volume; // in A^3
         double temp=0.0; //273.15; // in K
+        double prevtemp = 0.0; // previous temp for NVT MD thermostat
         double pres=1.0; // in atm
         double volume_change=2.5; // a factor used in volume change BF, mpmc default 2.5
         double vcp_factor=1.0; // a factor used in probability for volume change. this / num_sorbates is good per Frenkel
@@ -47,17 +49,20 @@ class Constants {
 		double x_length,y_length,z_length,x_max,y_max,z_max,x_min,y_min,z_min; // box parameters, in A
 		double cutoff;
 
+        // MD STUFF
         string md_rotations="on"; // MD only.
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_dt=0.1, md_ft; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
-		map <string,double> sig_override;
+		double md_thermostat_constant = 0.0001; // in fs
+
+        map <string,double> sig_override;
         map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
 	
     	int total_atoms=0; // actual sites, not "atoms" persay
         int old_total_atoms =0; // for use in resizing thole matrix in uvt
 
-        double total_energy=0.0; // for NVE, in K, user defined
+        double total_energy=0.0; // for MC NVE, in K, user defined
 
         int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
         double initial_energy=0.0; // "" ""

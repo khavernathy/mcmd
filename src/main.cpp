@@ -78,8 +78,8 @@ int main(int argc, char **argv) {
     // END MOLECULE PRINTOUT
 
 	// clobber files 
-	remove( system.constants.output_traj.c_str() ); remove( system.constants.energy_output.c_str() );
-	remove( system.constants.density_output.c_str() ); remove( system.constants.restart_pdb.c_str() );
+	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
+	remove( system.constants.restart_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() );
 
 	// write initial XYZ for first frame.
@@ -281,9 +281,7 @@ int main(int argc, char **argv) {
 			writeXYZ(system,system.constants.output_traj,frame,t,0);
             frame++;
             writePDB(system, system.constants.restart_pdb);
-			writeEnergy(system,energy_average,t); 
-			if (system.constants.ensemble == "npt" || "uvt") // density only changes for npt/uvt
-				writeDensity(system,density_average*1000.0,t);
+			writeThermo(system, energy_average, 0.0, 0.0, energy_average, density_average*1000, system.constants.temp, system.constants.pres, t);
             if (system.stats.radial_dist == "on") {
                 radialDist(system);
                 writeRadialDist(system);		
@@ -326,7 +324,7 @@ int main(int argc, char **argv) {
     
         // write initial XYZ
         writeXYZ(system,system.constants.output_traj, 1, 0, 0);	
-        int frame = 2;
+        int frame = 2; // weird way to initialize but it works for the output file.
 
 	    // assign initial velocities
     double randv; double DEFAULT = 99999.99;
@@ -384,17 +382,9 @@ int main(int argc, char **argv) {
 		integrate(system,dt);
 		
 		if (count_md_steps % system.constants.md_corrtime == 0) {  // print every x steps 
-			// WRITE OUTPUT FILES 
-			writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
-            frame++;
-		    writePDB(system,system.constants.restart_pdb);	
-            if (system.stats.radial_dist == "on") {
-                radialDist(system);
-                writeRadialDist(system);
-            }	
-	
+				
             // get KE and PE and T at this step.
-            double* ETarray = calculateEnergyAndTemp(system);
+            double* ETarray = calculateEnergyAndTemp(system, t);
             double KE = ETarray[0];
             double PE = ETarray[1];
             double TE = KE+PE;
@@ -428,6 +418,16 @@ int main(int argc, char **argv) {
             pressure);			
 
 			printf("--------------------\n\n");
+
+            // WRITE OUTPUT FILES 
+			writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
+            frame++;
+            writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, t); 
+            writePDB(system,system.constants.restart_pdb);	
+            if (system.stats.radial_dist == "on") {
+                radialDist(system);
+                writeRadialDist(system);
+            }
 		}
 		count_md_steps++;
 	} // end MD timestep loop
