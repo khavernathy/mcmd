@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
 			// PRINT MAIN OUTPUT
 			printf("MONTE CARLO\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
-			printf("ENSEMBLE: %s\n",system.constants.ensemble.c_str());
+			printf("ENSEMBLE: %s; T = %.3f; P = %.3f\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
 			printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%\n",t,finalstep,progress);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
