@@ -45,8 +45,6 @@ void readInAtoms(System &system, string filename) {
 
 			//temporary class instance current_atom
 			Atom current_atom;
-            //master_index++;
-            //current_atom.master_index = master_index;
 			current_atom.name = myvector[2];
             // I have a database of defaults in constants.cpp
             // Those defaults will load unless the input column is there

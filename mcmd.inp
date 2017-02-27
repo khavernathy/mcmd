@@ -6,15 +6,15 @@ name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es  on
-rd_lrc              on	
-input_atoms	restart.pdb   pdbs/50ne.pdb   ! PDB ONLY 
+rd_lrc              on
+input_atoms	 restart.pdb  pdbs/100he.pdb    restart.pdb   pdbs/50ne.pdb   ! PDB ONLY 
 potential_form 		lj   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
-x_length	125.669  60    27.4876  150.97371 !  in A   
-y_length    125.669  47.005  60    27.4876  150.97371
-z_length	125.669    60    27.4876  150.97371
+x_length	15.669  60    27.4876  150.97371 !  in A   
+y_length    15.669  47.005  60    27.4876  150.97371
+z_length	15.669    60    27.4876  150.97371
 
 
 ! radial distribution option
@@ -29,9 +29,9 @@ radial_file         radialdist.dat
 ! MONTE CARLO ONLY ======================================
 ensemble		npt   
 
-mc_corrtime		    1000
+mc_corrtime		    200
 finalstep		    1000000
-temperature 	    273.15   !77.0  ! K
+temperature 	    4   273.15   !77.0  ! K
 pressure		    1.0     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
