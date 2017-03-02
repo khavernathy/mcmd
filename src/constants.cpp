@@ -50,6 +50,7 @@ class Constants {
 		double cutoff;
 
         // MD STUFF
+        string md_pbc="on"; // PBC in molecular dynamics. default on.
         string md_rotations="on"; // MD only.
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_dt=0.1, md_ft; // MD timestep and final time, in fs

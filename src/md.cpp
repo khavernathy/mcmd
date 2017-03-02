@@ -141,14 +141,16 @@ void calculateForces(System &system, string model, double dt) {
 				dy = system.molecules[i].atoms[j].pos[1] - system.molecules[k].atoms[l].pos[1];
 				dz = system.molecules[i].atoms[j].pos[2] - system.molecules[k].atoms[l].pos[2];
 				
-                // apply 1/2 box cutoff:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
+                // apply 1/2 box cutoff if NVT / NVE:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
+                if (system.constants.md_pbc == "on") {
                 if (dx > system.constants.x_max) { dx = dx - system.constants.x_length; }
                 if (dx < system.constants.x_min) { dx = dx + system.constants.x_length; }
                 if (dy > system.constants.y_max) { dy = dy - system.constants.y_length; }
                 if (dy < system.constants.y_min) { dy = dy + system.constants.y_length; }
                 if (dz > system.constants.z_max) { dz = dz - system.constants.z_length; }
                 if (dz < system.constants.z_min) { dz = dz + system.constants.z_length; }
-	
+	            }
+
 				rsq = dx*dx + dy*dy + dz*dz;
 				r6 = rsq*rsq*rsq;
 				r = sqrt(rsq);
@@ -299,6 +301,7 @@ void integrate(System &system, double dt) {
     // END POSITION CHANGES
 
     // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
+    if (system.constants.md_pbc == "on") {
     for (int j=0; j<system.molecules.size(); j++) {
     if (system.molecules[j].MF == "M") {
     for (int i=0; i<system.molecules[j].atoms.size(); i++) {
@@ -361,6 +364,7 @@ void integrate(System &system, double dt) {
 	} // end loop i atoms
     } // end if movable
 	} // end loop j molecules
+    } // end if PBC
    
     // 2) GET NEW C.O.M. for new positions.
     for (int j=0; j<system.molecules.size(); j++) system.molecules[j].calc_center_of_mass();
