@@ -11,7 +11,7 @@ PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:
     -> gcc compiler 4.9.3 (stampede)
 
 To compile:
-g++ main.cpp -lm -o my_executable -I. -std=c++11
+g++ main.cpp -lm -o ../t -I. -std=c++11
 
 To run
 ./my_executable
