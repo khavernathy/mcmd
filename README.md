@@ -14,13 +14,16 @@ To compile:
 g++ main.cpp -lm -o ../t -I. -std=c++11
 
 To run
-./my_executable
+./my_executable myinput.inp
 
 ------------------------------------------
 
 TODO
 
--> make averages moving
+-> make universal unit-cell
+-> make correct pressure calculator (Frenkel method, check MPMC to compare)
+-> make correct thermostat for NVT dynamics
+-> make averages moving MC
 -> write .pdb traj (or just restart.pdb) with BOX included
 -> include more-than-static polarization energy
 	-> right now I just use V = -0.5 sum{u.E}
@@ -28,4 +31,5 @@ TODO
     --> Added but a bit dysfunctional. 
     --> maybe torque is calc'd wrong. should be local force on atoms or somethign
 --> Use GPU for MD force calculations? (add option)
---> Phast2 needs definite fix. Units probably wrong.
+    --> Use GPU for polarization routine (later)
+--> Implement Phast2 model?
