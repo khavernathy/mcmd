@@ -282,10 +282,10 @@ int main(int argc, char **argv) {
 				system.stats.displace_accepts/total_accepts*100, 
 				system.stats.rotate_accepts/total_accepts*100, 
 				system.stats.volume_change_accepts/total_accepts*100);
-			printf("RD avg =              %.4f K  (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",lj_average,system.constants.lj,system.constants.lj_lrc, system.constants.lj_self_lrc);
-			printf("ES avg =              %.4f K  (real = %.4f, recip = %.4f, self = %.4f)\n",es_average,system.constants.coulombic_real, system.constants.coulombic_reciprocal, system.constants.coulombic_self);
-			printf("Polar avg =           %.4f K\n",polar_average);
-			printf("Total potential avg = %.4f K\n",energy_average);
+			printf("RD avg =              %.5f K  (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",lj_average,system.constants.lj,system.constants.lj_lrc, system.constants.lj_self_lrc);
+			printf("ES avg =              %.5f K  (real = %.4f, recip = %.4f, self = %.4f)\n",es_average,system.constants.coulombic_real, system.constants.coulombic_reciprocal, system.constants.coulombic_self);
+			printf("Polar avg =           %.5f K\n",polar_average);
+			printf("Total potential avg = %.5f K\n",energy_average);
 			printf("Volume avg  = %.2f A^3 = %.2f nm^3\n",volume_average,volume_average/1000.0);
 			printf("Density avg = %.6f g/mL = %6f g/L \n",density_average,density_average*1000.0); 
 			printf("wt %% = %.4f %%; wt %% ME = %.4f %% \n",wt_percent_average, wt_percent_ME_average);
