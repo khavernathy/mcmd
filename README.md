@@ -28,8 +28,9 @@ TODO
 -> include more-than-static polarization energy  
 	-> right now I just use V = -0.5 sum{u.E}  
 -> add rotation to MD displacements  
-    --> Added but a bit dysfunctional.   
-    --> maybe torque is calc'd wrong. should be local force on atoms or something  
---> Use GPU for MD force calculations? (add option)  
-    --> Use GPU for polarization routine (later)  
---> Implement Phast2 model?  
+    -> Added but a bit dysfunctional.   
+    -> maybe torque is calc'd wrong. should be local force on atoms or something  
+-> Use GPU for MD force calculations? (add option)  
+    -> Use GPU for polarization routine (later)  
+-> Implement Phast2 model?  
+-> Include Qst to MC

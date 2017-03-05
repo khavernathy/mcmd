@@ -12,7 +12,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
     double v_sum=0.0, avg_v = 0.0;
-	double T=0.0;
+	double T=0.0, pressure=0;
 	
 
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
@@ -71,28 +71,34 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto.mass * M_PI / 8.0 / system.constants.kb;
 
-    if (system.constants.ensemble == "nvt") {
-    // NVT THERMOSTAT: Berendsen :: https://en.wikipedia.org/wiki/Berendsen_thermostat 
-    double dTdt = (T - system.constants.prevtemp)/(system.constants.md_dt);
-    double tau = system.constants.md_thermostat_constant;
-    double T_change = T - system.constants.prevtemp;
-    double prod = tau*dTdt;
-    // set new velocity according to thermostat
-    double scale_v = 8.0*system.constants.kb/system.proto.mass/M_PI;
-    scale_v *= (T_change/tau * currtime) - 
-                (T_change/tau * (currtime-system.constants.md_dt)) + 
-                (system.constants.prevtemp);
-    scale_v = sqrt(scale_v)*1e-5; // converted to A/fs
-    
+    /*if (system.constants.ensemble == "nvt") {
+		// NVT THERMOSTAT: Berendsen :: https://en.wikipedia.org/wiki/Berendsen_thermostat 
+		double dTdt = (T - system.constants.prevtemp)/(system.constants.md_dt);
+		double tau = system.constants.md_thermostat_constant;
+		double T_change = T - system.constants.prevtemp;
+		double prod = tau*dTdt;
+		// set new velocity according to thermostat
+		double scale_v = 8.0*system.constants.kb/system.proto.mass/M_PI;
+		scale_v *= (T_change/tau * currtime) - 
+		            (T_change/tau * (currtime-system.constants.md_dt)) + 
+		            (system.constants.prevtemp);
+		scale_v = sqrt(scale_v)*1e-5; // converted to A/fs
+		
 
-    //printf("dT/dt: %f;  T_change: %f;  prod: %f; scale_v: %f\n\n", dTdt, T_change,prod,scale_v);
-    // END NVT THERMOSTAT
-    }
+		//printf("dT/dt: %f;  T_change: %f;  prod: %f; scale_v: %f\n\n", dTdt, T_change,prod,scale_v);
+		// END NVT THERMOSTAT
+    
+		// get emergent PRESSURE for NVT Frenkel p84
+        pressure= system.stats.count_movables/system.constants.volume * system.constants.kb * system.constants.temp; // rho * k_b  * T
+        double fsfp = system.constants.kb * (system.constants.force_sum_for_pressure / system.constants.MM_interactions); // force sum for pressure, calc'ed during force function in MD  
+        pressure += (1.0/(3.0*system.constants.volume)) * fsfp;
+        pressure *= 1e27 * system.constants.JL2ATM; // to atm  
+    }*/
     
     // reset temperature for NVT thermostat
-    system.constants.prevtemp = T;
+    //system.constants.prevtemp = T;
 
-	static double output[5];
+	static double output[8];
 	output[0] = K_total;
     output[1] = V_total;
 	output[2] = T;
@@ -100,15 +106,20 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     output[4] = Ek;
     output[5] = Klin;
     output[6] = Krot;
+    output[7] = pressure;
 	return output;
 }
 
 // ================ GET FORCES ON ATOMS ===============================
 void calculateForces(System &system, string model, double dt) {
-	// loop through all atoms
+	
+    // initialize variable for pressure calc in NVT
+    system.constants.force_sum_for_pressure = 0;
+    system.constants.MM_interactions = 0;
+    // loop through all atoms
 	for (int j=0; j <system.molecules.size(); j++) {
 	for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
-		// initialize force and potential to zero.
+		// initialize stuff
 		system.molecules[j].atoms[i].force[0] = 0.0;
 		system.molecules[j].atoms[i].force[1] = 0.0;
 		system.molecules[j].atoms[i].force[2] = 0.0;
@@ -124,6 +135,7 @@ void calculateForces(System &system, string model, double dt) {
 		for (int k = 0; k<system.molecules.size(); k++) { // use k=i+1 to neglect intramolec
 		for (int l = 0; l<system.molecules[k].atoms.size(); l++) {
         if (k>i || (k==i && l>j)) { // the 1/2 n^2 - n matrix of atomic interaction
+
                 //countem++;
                 // check for mixing rules
 				eps = system.molecules[i].atoms[j].eps;
@@ -167,7 +179,7 @@ void calculateForces(System &system, string model, double dt) {
 				uy = dy/r;
 				uz = dz/r;
 				
-				// Lennard-Jones force calculations
+				// Lennard-Jones force calculations in K/A
 				double fx,fy,fz;
 				fx = 24.0*dx*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
 				fy = 24.0*dy*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));  //   (2*pow(sig,12)*pow(r,-14) - pow(sig,6) * pow(r,-8));
@@ -181,13 +193,13 @@ void calculateForces(System &system, string model, double dt) {
 				system.molecules[k].atoms[l].force[1] -= fy;
 				system.molecules[k].atoms[l].force[2] -= fz;
 
-				// LJ Potential
+				// LJ Potential in K
                 if (i != k)
 				    system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
 
 				if (model == "ljes" || model == "ljespolar") {
 			
-				// Coulomb's law electrostatic force. Overwrite fx,fy,fz
+				// Coulomb's law electrostatic force. Overwrite fx,fy,fz in K/A
 				fx = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * ux;
 				fy = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * uy;
 				fz = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * uz;	
@@ -200,11 +212,13 @@ void calculateForces(System &system, string model, double dt) {
                 system.molecules[k].atoms[l].force[1] -= fy;
                 system.molecules[k].atoms[l].force[2] -= fz;
 				
-                //Coulombic potential
+                //Coulombic potential in K
                 if (i != k)
 				    system.molecules[i].atoms[j].V += ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/r);
         
 				} // end coulombic addition
+
+
             } // end if not self
             } // end loop l
 		    } // end loop k 
@@ -213,7 +227,30 @@ void calculateForces(System &system, string model, double dt) {
         system.molecules[i].calc_force();
         if (system.constants.md_rotations == "on" && system.molecules[i].atoms.size() > 1) 
             system.molecules[i].calc_torque();
+
+
+        // also compute force * r dot products for pressure calc in NVT
+        /*if (system.constants.ensemble == "nvt") {
+            for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                for (int k=0; k<system.molecules.size(); k++) {
+                    for (int l=0; l<system.molecules[k].atoms.size(); l++) {
+                        if (k>i || (k==i && l>j)) {
+                           if (system.molecules[i].MF == "M" && system.molecules[k].MF == "M") {
+                                double* dist = getDistanceXYZ(system, i,j,k,l);
+                                for (int n=0; n<3; n++) {
+                                    system.constants.force_sum_for_pressure += system.molecules[i].atoms[j].force[n] * dist[n];
+                                    system.constants.force_sum_for_pressure += system.molecules[k].atoms[l].force[n] * dist[n];
+                                    system.constants.MM_interactions += 2;
+                                }
+                            }     
+                        } 
+                    }
+                }
+            }
+        } // end if NVT
+        */
     } // end loop i
+
 //printf("count: %i\n",countem);
 }
 

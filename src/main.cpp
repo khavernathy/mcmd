@@ -398,9 +398,10 @@ int main(int argc, char **argv) {
             double Ek = ETarray[4];
             double Klin = ETarray[5];
             double Krot = ETarray[6];
+            double pressure = ETarray[7]; // only good for NVT. Frenkel p84
 
-            // PRESSURE
-            double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
+            // PRESSURE (my pathetic nRT/V method)
+            //double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
 
 			// PRINT OUTPUT
 			std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();

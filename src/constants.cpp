@@ -9,7 +9,9 @@ using namespace std;
 class Constants {
 	public:
 		Constants();
-		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED, DEBYE2SKA; // all defined below.
+		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
+            ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED, 
+            DEBYE2SKA, JL2ATM; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md" 
         string checkpoints_option="off"; // enables checkpoints for debuggin
@@ -56,6 +58,8 @@ class Constants {
         double md_dt=0.1, md_ft; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
 		double md_thermostat_constant = 0.0001; // in fs
+        double force_sum_for_pressure = 0; // K/A, for computing pressure in NVT MD
+        int MM_interactions = 0; // counts the M-M interactions for averaging force sum
 
         map <string,double> sig_override;
         map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
@@ -351,6 +355,7 @@ Constants::Constants() {
     TORQUE2REDUCED = kb * 1e-30 * 1e20; // K -> kg A^2 / fs^2
     FORCE2REDUCED = kb * 1e-30 * 1e20; // K/A -> kg A/fs^2
     DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
+    JL2ATM = 0.00986923297; // J/L to atm
 
 	// MASS VALUES g/mol -> kg/particle
 	masses["HB"] = 2.016*cM; // buch model	h2
