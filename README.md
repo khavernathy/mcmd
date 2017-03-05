@@ -23,7 +23,6 @@ TODO
 -> make universal unit-cell  
 -> make correct pressure calculator (Frenkel method, check MPMC to compare)  
 -> make correct thermostat for NVT dynamics  
--> make averages moving MC  
 -> write .pdb traj (or just restart.pdb) with BOX included  
 -> include more-than-static polarization energy  
 	-> right now I just use V = -0.5 sum{u.E}  
@@ -33,4 +32,3 @@ TODO
 -> Use GPU for MD force calculations? (add option)  
     -> Use GPU for polarization routine (later)  
 -> Implement Phast2 model?  
--> Include Qst to MC
