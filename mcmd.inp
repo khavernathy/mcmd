@@ -4,11 +4,11 @@
 
 name			    mcmd_development
 mode	 		    mc ! mc or md
-checkpoints_option  off
+checkpoints_option  on
 ewald_es            on
 rd_lrc              on
-input_atoms	        pdbs/mof5+h2.pdb    ! PDB ONLY 
-potential_form 		ljes   !ljespolar 	!phast2    !!lj
+input_atoms	        pdbs/mof5_h2bssp.pdb   pdbs/mof5+h2.pdb    ! PDB ONLY 
+potential_form 		ljespolar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
@@ -29,10 +29,10 @@ radial_file         radialdist.dat
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt   
 
-mc_corrtime	        200
+mc_corrtime	        50
 finalstep		    5000000
 temperature 	    77   !77.0  ! K
-pressure		    1.0     ! atm
+pressure		    0.5     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
 rotate_prob         0.5

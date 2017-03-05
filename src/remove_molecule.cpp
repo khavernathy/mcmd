@@ -9,7 +9,7 @@
 
 
 void removeMolecule(System &system, string model) {
-    system.checkpoint("starting removeMolecule");
+    //system.checkpoint("starting removeMolecule");
     system.stats.remove_attempts++;
     
     if ((int)system.stats.count_movables == 1) // IMPORTANT: CANCEL THE DELETE IF ONLY 1 MOVABLE MOLECULE LEFT
@@ -19,7 +19,7 @@ void removeMolecule(System &system, string model) {
     double* old_potentials = getTotalPotential(system, model);
     double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2];
 
-    system.checkpoint("getting random movable.");
+    //system.checkpoint("getting random movable.");
     // select random movable molecule
     string movable="notyet";
     int randm = -1;
@@ -29,7 +29,7 @@ void removeMolecule(System &system, string model) {
             movable = system.molecules[randm].MF;
     }
     //printf("The molecule id to be deleted is %i\n",randm);
-    system.checkpoint("random movable selected.");
+    //system.checkpoint("random movable selected.");
 
     // save a copy of this moleucule.
     Molecule tmp_molecule = system.molecules[randm];
@@ -71,6 +71,6 @@ void removeMolecule(System &system, string model) {
         //printf("put molecule id=%i back.\n",randm);
 	    //printf("The re-added molecule has .ID = %i\n",system.molecules[(int)(system.molecules.size()-1)].ID);
 	}	 // end boltz accept/reject
-system.checkpoint("done with removeMolecule");
+    //system.checkpoint("done with removeMolecule");
 return;
 }

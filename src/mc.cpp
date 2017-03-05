@@ -100,7 +100,7 @@ void runMonteCarloStep(System &system, string model) {
 		double IRP = system.constants.insert_factor;  
 		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
 		if (ranf < IRP) {
-            system.checkpoint("doing an add or remove.");
+            //system.checkpoint("doing an add or remove.");
 			// we're going to do an add/remove now.
 			double ranf2 = (double)rand() / (double)RAND_MAX; // 0->1
 			// ADD A MOLECULE
@@ -118,7 +118,7 @@ void runMonteCarloStep(System &system, string model) {
 	
 	// DISPLACE / ROTATE (for all: NPT, uVT, NVT, NVE); NVE has special BoltzFact tho.
 	// make sure it's a movable molecule
-	system.checkpoint("starting displace/rotate..");
+	//system.checkpoint("starting displace/rotate..");
     string movable="notyet";
     int randm = -1;
     while (movable != "M") {
@@ -127,7 +127,7 @@ void runMonteCarloStep(System &system, string model) {
             movable = system.molecules[randm].MF;
     }
                
-	system.checkpoint("Got the random molecule.");
+	//system.checkpoint("Got the random molecule.");
 	
 	double old_V=0.0; double new_V=0.0;
 
@@ -301,6 +301,6 @@ void runMonteCarloStep(System &system, string model) {
 
 	
 	} // end displace/rotate (all ensembles)
-	system.checkpoint("done with displace/rotate");
+	//system.checkpoint("done with displace/rotate");
     return; // done with move, so exit MC step	
 }
