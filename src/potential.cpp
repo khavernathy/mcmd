@@ -18,7 +18,6 @@ double * getTotalPotential(System &system, string model) {
     //printf("STARTING POTENTIAL FUNCTION AGAIN.\n\n");
 
     // initializers     	
-	double potential = 0.0;
     double total_rd=0.0; double total_es = 0.0; double total_polar=0.0;
 
     // get all the potentials.
