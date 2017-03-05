@@ -103,7 +103,12 @@ int main(int argc, char **argv) {
     int frame = 1;
     int stepsize = system.constants.stepsize;
     int finalstep = system.constants.finalstep;
-    int corrtime = system.constants.mc_corrtime; // print output every x steps, change volume etc.
+    int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
+
+    // AVERAGE INITIALIZERS FOR OUTPUT
+    double current_Nsq_sum=0; double Nsq_average=0; // for qst
+    double current_NU_sum=0; double NU_average = 0; // for qst
+    double current_qst_sum=0; double qst_average = 0;
 
     double current_lj_sum=0.0; double current_es_sum=0.0; double lj_average=0.0; double es_average=0.0; double current_polar_sum=0.0; double polar_average=0.0;
     double current_energy_sum=0.0; double current_density_sum=0.0; double current_volume_sum=0.0; double current_z_sum = 0.0;
@@ -111,7 +116,9 @@ int main(int argc, char **argv) {
     double current_Nmov_sum=0.0; double Nmov_average=0.0;
     double current_wt_percent_sum=0.0; double wt_percent_average=0.0;
     double current_wt_percent_ME_sum=0.0; double wt_percent_ME_average=0.0;
+    // END AVERAGE INITIALIZERS
 
+    // RESIZE A MATRIX IF POLAR IS ACTIVE
     if (system.constants.potential_form == "ljespolar") {
         system.constants.old_total_atoms = system.constants.total_atoms;
         int N = 3 * system.constants.total_atoms;
@@ -121,7 +128,6 @@ int main(int argc, char **argv) {
         }
     }
 
-
     // begin timing for steps "begin_steps"
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();	
 	
@@ -130,7 +136,7 @@ int main(int argc, char **argv) {
 	for (int t=0; t <= finalstep; t+=stepsize) {
 		system.checkpoint("New step starting."); //printf("Step %i\n",t);	
 
-				// DO MC STEP BRAH
+				// DO MC STEP
                 if (t>0) {
 				    runMonteCarloStep(system,system.constants.potential_form);
                     system.constants.old_total_atoms = system.constants.total_atoms;
@@ -153,8 +159,6 @@ int main(int argc, char **argv) {
             double progress = (((float)t)/finalstep*100);
             double ETA = ((time_elapsed*finalstep/t) - time_elapsed)/60.0;
             double ETA_hrs = ETA/60.0;
-
-
 
 			// BOLTZMANN AVERAGES
 			double bf_avg = (system.stats.insert_bf_sum + system.stats.remove_bf_sum + system.stats.displace_bf_sum + system.stats.volume_change_bf_sum + system.stats.rotate_bf_sum)/5.0/t;
@@ -180,24 +184,45 @@ int main(int argc, char **argv) {
             current_Nmov_sum += system.stats.count_movables;
             if (t==0) system.constants.initial_sorbates = system.stats.count_movables;
             Nmov_average = current_Nmov_sum/corrtime_iter;
-    
 
 			// ENERGY
 			double* potentials = getTotalPotential(system,system.constants.potential_form); //new double[2];
-                                current_energy_sum+=(potentials[0]+potentials[1]+potentials[2]);
-                                if (t==0) system.constants.initial_energy = current_energy_sum;
-                                current_lj_sum += potentials[0];
-                                current_es_sum += potentials[1];
-		                		current_polar_sum += potentials[2];
-                                        lj_average = current_lj_sum/corrtime_iter;
-                                        es_average = current_es_sum/corrtime_iter;
-				                    	polar_average = current_polar_sum/corrtime_iter;
-                                        energy_average = current_energy_sum/corrtime_iter;		
+                double energy=(potentials[0]+potentials[1]+potentials[2]);
+                current_energy_sum += energy;
+                if (t==0) system.constants.initial_energy = current_energy_sum;
+                current_lj_sum += potentials[0];
+                current_es_sum += potentials[1];
+        		current_polar_sum += potentials[2];
+                        lj_average = current_lj_sum/corrtime_iter;
+                        es_average = current_es_sum/corrtime_iter;
+                    	polar_average = current_polar_sum/corrtime_iter;
+                        energy_average = current_energy_sum/corrtime_iter;		
             
-            // FOR CHEMICAL POTENTIAL dE/dN
+            // CHEMICAL POTENTIAL dE/dN
             double chemical_potential = (energy_average - system.constants.initial_energy)
                     / (Nmov_average - system.constants.initial_sorbates);		
             
+            if (system.constants.ensemble != "nve") { // T must be fixed for Qst
+		        // NU (for qst)
+		        current_NU_sum += energy*system.stats.count_movables;
+		        NU_average = current_NU_sum / corrtime_iter;
+
+		        // Nsq (for qst)
+		        current_Nsq_sum += system.stats.count_movables * system.stats.count_movables;
+		        Nsq_average = current_Nsq_sum / corrtime_iter;
+
+		        // Qst
+		        double qst = -(NU_average - Nmov_average * energy_average);
+		        qst /= (Nsq_average - Nmov_average * Nmov_average);
+		        qst += system.constants.temp; 
+                qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
+                
+                if (! std::isnan(qst)) { // qst will def. be NaN for first calculation.
+                    current_qst_sum += qst;
+                    qst_average = current_qst_sum / corrtime_iter;
+                }
+            }
+
 			// VOLUME
 			double volume = system.constants.volume; 
 			current_volume_sum += volume;
@@ -264,6 +289,9 @@ int main(int argc, char **argv) {
 			printf("Volume avg  = %.2f A^3 = %.2f nm^3\n",volume_average,volume_average/1000.0);
 			printf("Density avg = %.6f g/mL = %6f g/L \n",density_average,density_average*1000.0); 
 			printf("wt %% = %.4f %%; wt %% ME = %.4f %% \n",wt_percent_average, wt_percent_ME_average);
+            if (system.constants.ensemble != "nve")
+                printf("Qst = %.5f kJ/mol\n", qst_average);
+
             printf("Chemical potential avg = %.4f K per sorbate molecule \n", chemical_potential); 
             printf("Compressibility factor Z avg = %.6f (for homogeneous gas %s) \n",z_average,system.proto.name.c_str());
 			printf("N_movables avg = %.3f; N_molecules = %i; N_movables = %i; N_sites = %i\n",Nmov_average,(int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
@@ -299,10 +327,12 @@ int main(int argc, char **argv) {
 	} // END MC STEPS LOOP.
 
 	// FINAL EXIT OUTPUT
-	printf("Final box length parameters: \n");
-	printf("x: %.5f\n",system.constants.x_length);
-	printf("y: %.5f\n",system.constants.y_length);
-	printf("z: %.5f\n",system.constants.z_length);
+    if (system.constants.ensemble == "npt") {
+	    printf("Final box length parameters: \n");
+	    printf("x: %.5f\n",system.constants.x_length);
+	    printf("y: %.5f\n",system.constants.y_length);
+	    printf("z: %.5f\n",system.constants.z_length);
+    }
 	printf("Insert accepts:        %i\n", system.stats.insert_accepts);
 	printf("Remove accepts:        %i\n", system.stats.remove_accepts);
 	printf("Displace accepts:      %i\n", system.stats.displace_accepts);
