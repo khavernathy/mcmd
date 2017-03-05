@@ -10,7 +10,7 @@ PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:
     -> gcc compiler 6.2.0 (circe)  
     -> gcc compiler 4.9.3 (stampede)  
 
-To compile:  
+To compile:  (in src dir)
 g++ main.cpp -lm -o ../t -I. -std=c++11  
 
 To run  
