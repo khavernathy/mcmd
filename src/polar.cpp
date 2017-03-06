@@ -69,7 +69,7 @@ void thole_resize_matrices(System &system) {
     N = 3*system.constants.total_atoms;
     dN = N-oldN;
 
-    //printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
+    printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
 
     if(!dN) return;
 
@@ -192,7 +192,8 @@ void thole_amatrix(System &system) {
             } // end p
         } /* end j */
     } /* end i */
-    //print_matrix(N*3, system->A_matrix);
+    print_matrix(system, N*3, system.constants.A_matrix);
+    printf("\n===================================================\n\n");
     return;
 }
 
