@@ -96,6 +96,32 @@ class Constants {
         double lj_self_lrc = 0;
         double lj = 0;
         double total_rd = 0;
+
+/*
+        void calcCutoff() {
+            int i, j, k, p;
+            double MAXVALUE = 1e40; int MAX_VECT_COEF=5;
+			double curr_mag;
+			double short_mag = MAXVALUE;
+			double curr_vec[3];
+
+			if ( pbc->volume <= 0 ) return MAXVALUE;
+
+			for ( i=-MAX_VECT_COEF; i<=MAX_VECT_COEF; i++ ) {
+				for ( j=-MAX_VECT_COEF; j<=MAX_VECT_COEF; j++ ) {
+				    for ( k=-MAX_VECT_COEF; k<=MAX_VECT_COEF; k++ ) {
+				        if ( i == 0 && j == 0 && k == 0 ) continue;
+				        for ( p = 0; p < 3; p++ )
+				            curr_vec[p] = i*pbc->basis[0][p] + j*pbc->basis[1][p] + k*pbc->basis[2][p];
+				        curr_mag = sqrt(dddotprod(curr_vec, curr_vec));
+				        if ( curr_mag < short_mag ) short_mag = curr_mag;
+				    }
+				}
+			}
+			return(0.5*short_mag);
+
+		}
+*/
 };
 
 class Stats {
