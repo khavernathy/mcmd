@@ -41,7 +41,11 @@ void readInAtoms(System &system, string filename) {
 				back_inserter(myvector) // "normally" out_it goes here.
 			);
 	
+            // skip blank lines
             if (myvector.size() != 0) {
+                if (myvector[0] != "ATOM") continue; // skip anything in file that isn't an atom
+                if (myvector[2] == "X" && myvector[3] == "BOX") continue; // skip box vertices
+
 
 			//temporary class instance current_atom
 			Atom current_atom;
@@ -216,18 +220,18 @@ if (f == NULL)
 
 
 
-// =========== BROKEN. CAUSES SEG FAULT SOMEWHERE =============
-        // and draw the box if user desires
-    /*
+    // and draw the box if user desires
     if (system.constants.draw_box_option == "on") {
+
         int i,j,k,p,q,diff,l,m,n;
         int box_labels[2][2][2];
         double box_occupancy[3];
         double box_pos[3];
-        int last_mol_id = system.molecules[system.molecules.size() - 1].PDBID;
-        int last_atom_id = system.molecules[last_mol_id].atoms[system.molecules[last_mol_id].atoms.size() - 1].PDBID;
-        int atom_box = last_atom_id + 1;
-        int molecule_box = last_mol_id + 1;
+        int last_mol_index = system.molecules.size() - 1;
+        int last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+        int last_atom_pdbid = system.molecules[last_mol_index].atoms[system.molecules[last_mol_index].atoms.size() - 1].PDBID;
+        int atom_box = last_atom_pdbid + 1;
+        int molecule_box = last_mol_pdbid + 1;
 
         // draw the box points
         for(i = 0; i < 2; i++) {
@@ -247,6 +251,7 @@ if (f == NULL)
                 box_occupancy[1] = ((double)j) - 0.5;
                 box_occupancy[2] = ((double)k) - 0.5;
 
+                
                 for(p = 0; p < 3; p++)
                     for(q = 0, box_pos[p] = 0; q < 3; q++)
                         box_pos[p] += system.pbc.basis[q][p]*box_occupancy[q];
@@ -295,7 +300,7 @@ if (f == NULL)
         } // i 
 
     } // if draw box is on
-*/
+    // (end drawing the box in .pbd restart)
 
 fclose(f);
 }
