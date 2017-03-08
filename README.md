@@ -21,6 +21,7 @@ To run
 TODO
 
 -> make universal unit-cell  
+    -> Need to make PDB restart output with the box, first.
 -> make correct pressure calculator (Frenkel method, check MPMC to compare)  
 -> make correct thermostat for NVT dynamics  
 -> write .pdb traj (or just restart.pdb) with BOX included  
