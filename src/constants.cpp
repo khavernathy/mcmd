@@ -26,6 +26,7 @@ class Constants {
         //string density_output="density.dat"; // logs avg. density as f'n of step
         string volume_change_option; // kind of useless now but used for NPT,
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
+        //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         string pdb_traj_option="on"; // option to write PDB trajectory (in addition to xyz). default on
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
