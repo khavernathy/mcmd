@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <usefulmath.cpp>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ class Constants {
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
+        string draw_box_option="on"; // option to draw the box for visualization in restart.pdb
         string rd_lrc="on"; // long range corrections for LJ RD
         string ewald_es="off"; // ewald method for electrostatic potential calculation.
         string pdb_long="off"; // on would force long coordinate/charge output
@@ -123,6 +125,191 @@ class Constants {
 		}
 */
 };
+
+class Pbc {
+    public:
+        Pbc();
+
+        double basis[3][3];
+        double reciprocal_basis[3][3];
+		double cutoff;
+        double volume;
+        double a, b, c, alpha, beta, gamma;
+        double box_vertices[8][3];
+            /* structure of box_points
+                0 : -x, -y, -z
+                1 : -x, -y, +z
+                2 : -x, +y, -z
+                3 : -x, +y, +z
+                4 : +x, -y, -z
+                5 : +x, -y, +z
+                6 : +x, +y, -z
+                7 : +x, +y, +z
+            */
+
+        double maxx=0,maxy=0,maxz=0,minx=0,miny=0,minz=0;
+        double lengthx=0, lengthy=0, lengthz=0;
+
+        void printBasis() {
+            printf("basis1 %.5f %.5f %.5f\n", basis[0][0], basis[0][1], basis[0][2]);
+            printf("basis2 %.5f %.5f %.5f\n", basis[1][0], basis[1][1], basis[1][2]);
+            printf("basis3 %.5f %.5f %.5f\n", basis[2][0], basis[2][1], basis[2][2]);
+            printf("Basis vectors: { a = %.5f; b = %.5f; c = %.5f }\n", a, b,c);
+            printf("Basis angles: { α = %8.3lf \tβ = %8.3lf \tγ = %8.3lf }\n", alpha,beta,gamma); 
+        }
+
+        void calcVolume() {
+            double newvolume;
+            newvolume =  basis[0][0]*(basis[1][1]*basis[2][2] - basis[1][2]*basis[2][1]);
+            newvolume += basis[0][1]*(basis[1][2]*basis[2][0] - basis[1][0]*basis[2][2]);
+            newvolume += basis[0][2]*(basis[1][0]*basis[2][1] - basis[2][1]*basis[2][0]);
+            volume = newvolume;
+        }
+
+        void calcCutoff() {
+            double MAXVALUE = 1e40; int MAX_VECT_COEF = 5;
+			int i, j, k, p;
+			double curr_mag;
+			double short_mag = MAXVALUE;
+			double curr_vec[3];
+			if ( volume <= 0 ) cutoff = MAXVALUE;
+    
+            // smallest vector problem
+			for ( i=-MAX_VECT_COEF; i<=MAX_VECT_COEF; i++ ) {
+				for ( j=-MAX_VECT_COEF; j<=MAX_VECT_COEF; j++ ) {
+				    for ( k=-MAX_VECT_COEF; k<=MAX_VECT_COEF; k++ ) {
+				        if ( i == 0 && j == 0 && k == 0 ) continue;
+				        for ( p = 0; p < 3; p++ )
+				            curr_vec[p] = i*basis[0][p] + j*basis[1][p] + k*basis[2][p];
+				            curr_mag = sqrt(
+                                (curr_vec[0] * curr_vec[0]) +
+                                (curr_vec[1] * curr_vec[1]) +
+                                (curr_vec[2] * curr_vec[2])
+                            );
+				        if ( curr_mag < short_mag ) short_mag = curr_mag;
+				    }
+				}
+			}
+			cutoff = 0.5*short_mag;
+        }
+
+        void calcRecip() {
+			double inverse_volume;
+            calcVolume();
+			inverse_volume = 1.0/volume;
+			reciprocal_basis[0][0] = inverse_volume*(basis[1][1]*basis[2][2] - basis[1][2]*basis[2][1]);
+			reciprocal_basis[0][1] = inverse_volume*(basis[0][2]*basis[2][1] - basis[0][1]*basis[2][2]);
+			reciprocal_basis[0][2] = inverse_volume*(basis[0][1]*basis[1][2] - basis[0][2]*basis[1][1]);
+
+			reciprocal_basis[1][0] = inverse_volume*(basis[1][2]*basis[2][0] - basis[1][0]*basis[2][2]);
+			reciprocal_basis[1][1] = inverse_volume*(basis[0][0]*basis[2][2] - basis[0][2]*basis[2][0]);
+			reciprocal_basis[1][2] = inverse_volume*(basis[0][2]*basis[1][0] - basis[0][0]*basis[1][2]);
+
+			reciprocal_basis[2][0] = inverse_volume*(basis[1][0]*basis[2][1] - basis[1][1]*basis[2][0]);
+			reciprocal_basis[2][1] = inverse_volume*(basis[0][1]*basis[2][0] - basis[0][0]*basis[2][1]);
+			reciprocal_basis[2][2] = inverse_volume*(basis[0][0]*basis[1][1] - basis[0][1]*basis[1][0]);
+        }
+
+
+        void calcCarBasis() {
+            // this function is called if normal basis is supplied by user
+            a = sqrt(dddotprod(basis[0], basis[0]));
+            b = sqrt(dddotprod(basis[1], basis[1]));
+            c = sqrt(dddotprod(basis[2], basis[2]));
+            alpha = 180.0/M_PI*acos( dddotprod(basis[1],basis[2]) / sqrt( dddotprod(basis[1], basis[1]) * dddotprod(basis[2], basis[2]) ));
+            beta = 180.0/M_PI*acos( dddotprod(basis[2],basis[0]) / sqrt( dddotprod(basis[0], basis[0]) * dddotprod(basis[2], basis[2]) ) );
+            gamma = 180.0/M_PI*acos( dddotprod(basis[0],basis[1]) / sqrt( dddotprod(basis[1], basis[1]) * dddotprod(basis[0], basis[0]) ) );
+        }
+
+        void calcNormalBasis() {
+                double b0[3] = {0,0,0}; 
+                double b1[3] = {0,0,0}; 
+                double b2[3] = {0,0,0}; 
+ 
+                b0[0] = a; 
+                b0[1] = b*cos(M_PI/180.0 * gamma); 
+                b0[2] = c*cos(M_PI/180.0 * beta); 
+ 
+                b1[0] = 0; 
+                b1[1] = b*sin(M_PI/180.0 * gamma); 
+                b1[2] = ( (0*0 + b*0 + 0*c) - (b0[1]*b0[2]) )/b1[1]; 
+ 
+                b2[0] = 0; 
+                b2[1] = 0; 
+                b2[2] = sqrt( c*c - b0[2]*b0[2] - b1[2]*b1[2] ); 
+ 
+                // I'm transposing it manually 
+                basis[0][0] = b0[0]; 
+                basis[0][1] = b1[0]; 
+                basis[0][2] = b2[0]; 
+ 
+                basis[1][0] = b0[1]; 
+                basis[1][1] = b1[1]; 
+                basis[1][2] = b2[1]; 
+                 
+                basis[2][0] = b0[2]; 
+                basis[2][1] = b1[2]; 
+                basis[2][2] = b2[2]; 
+
+        }
+
+        void calcBoxVertices() {
+			// calculates the 3D points that encompass the crystalline simulation box.
+		    int i,j,k,p,q,count=0;
+		    int box_labels[2][2][2];
+		    double box_occupancy[3];
+		    double box_pos[3];
+
+		    // draw the box points
+		    for(i = 0; i < 2; i++) {
+		        for(j = 0; j < 2; j++) {
+		            for(k = 0; k < 2; k++) {
+
+		                /* box coords */
+		                box_occupancy[0] = ((double)i) - 0.5;
+		                box_occupancy[1] = ((double)j) - 0.5;
+		                box_occupancy[2] = ((double)k) - 0.5;
+
+		                for(p = 0; p < 3; p++) {
+		                    for(q = 0, box_pos[p] = 0; q < 3; q++) {
+		                        box_pos[p] += basis[q][p]*box_occupancy[q];
+                            }
+                        }
+                   
+                        for (int n=0; n<3; n++) 
+                            box_vertices[count][n] = box_pos[n]; // box_points[0 -> 7] will be defined.
+                    
+                        count++;
+		            } // for k
+		        } // for j
+		    } // for i
+        }
+
+        void calcMaxMin() {
+            // re-initialize maximums and minimums
+            maxx=maxy=maxz=minx=miny=minz=0;
+            for (int n=4; n<=7; n++) if (box_vertices[n][0] > maxx) maxx = box_vertices[n][0];
+            for (int n=0; n<=3; n++) if (box_vertices[n][0] < minx) minx = box_vertices[n][0];
+
+            for (int n=2; n<=3; n++) if (box_vertices[n][1] > maxy) maxy=box_vertices[n][1];
+            for (int n=6; n<=7; n++) if (box_vertices[n][1] > maxy) maxy=box_vertices[n][1];
+            for (int n=0;n<=1; n++) if (box_vertices[n][1] < miny) miny = box_vertices[n][1];
+            for (int n=4;n<=5; n++) if (box_vertices[n][1] < miny) miny = box_vertices[n][1];
+
+            for (int n=1; n<=7; n+=2) if (box_vertices[n][2] > maxz) maxz = box_vertices[n][2];
+            for (int n=0; n<=6; n+=2) if (box_vertices[n][2] < minz) minz = box_vertices[n][2];
+
+            lengthx = maxx-minx;
+            lengthy = maxy-miny;
+            lengthz = maxz-minz;
+
+        }
+
+
+ 
+};
+
+Pbc::Pbc() {}
 
 class Stats {
 	public:

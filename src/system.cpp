@@ -10,14 +10,12 @@ using namespace std;
 class System {
 	public:
 		System();
-	//	vector<Atom> atoms;
 		vector<Molecule> molecules; // added 2-5-17
 		Molecule proto;
 		Constants constants;
-		Stats stats;
+		Pbc pbc;
+        Stats stats;
         vector<vector<int>> atommap;
-        //   Averages averages;
-      //  SDs SDs;
 
         // defines the "previous checkpoint time object
         std::chrono::time_point<std::chrono::system_clock> previous_checkpoint = std::chrono::system_clock::now();       

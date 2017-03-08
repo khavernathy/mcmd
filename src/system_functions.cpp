@@ -83,3 +83,72 @@ double * centerOfMass(System &system) {
 }
 
 
+/* CHECK IF ATOM IS IN BOX AND MOVE IT (AND MOLECULE) BACK IN */
+/* MAKING THIS UNIVERSAL FOR ANY UNIT-CELL, NOT JUST alpha=beta=gamma=90 */
+void checkInTheBox(System &system, int i, int j) {
+
+// first the easy systems, alpha=beta=gamma=90
+if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+    if (system.constants.md_mode == "molecular") {
+        if (system.molecules[i].atoms[j].pos[0]  > system.constants.x_max) {
+                for (int k=0; k<system.molecules[i].atoms.size(); k++) {
+                    system.molecules[i].atoms[k].pos[0] -= system.constants.x_length;
+                }
+        }
+        else if (system.molecules[i].atoms[j].pos[0] < system.constants.x_min) {
+                for (int k=0; k<system.molecules[i].atoms.size(); k++) {
+	                system.molecules[i].atoms[k].pos[0] += system.constants.x_length;
+                }
+        }
+
+        if (system.molecules[i].atoms[j].pos[1] > system.constants.y_max) {
+	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
+                    system.molecules[i].atoms[k].pos[1] -= system.constants.y_length;
+                }
+        }
+        else if (system.molecules[i].atoms[j].pos[1] < system.constants.y_min) {
+	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
+                    system.molecules[i].atoms[k].pos[1] += system.constants.y_length;
+                }
+        }
+
+        if (system.molecules[i].atoms[j].pos[2]  > system.constants.z_max) {
+	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
+                    system.molecules[i].atoms[k].pos[2] -= system.constants.z_length;
+                }
+        }
+        else if (system.molecules[i].atoms[j].pos[2] < system.constants.z_min) {
+	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
+                    system.molecules[i].atoms[k].pos[2] += system.constants.z_length;
+                }
+        }	
+    } // end if molecular
+    else if (system.constants.md_mode == "atomic") {
+        if (system.molecules[i].atoms[j].pos[0]  > system.constants.x_max) {
+                    system.molecules[i].atoms[j].pos[0] -= system.constants.x_length;
+        }
+        else if (system.molecules[i].atoms[j].pos[0] < system.constants.x_min) {
+                    system.molecules[i].atoms[j].pos[0] += system.constants.x_length;
+        }
+
+        if (system.molecules[i].atoms[j].pos[1] > system.constants.y_max) {
+                    system.molecules[i].atoms[j].pos[1] -= system.constants.y_length;
+        }
+        else if (system.molecules[i].atoms[j].pos[1] < system.constants.y_min) {
+                    system.molecules[i].atoms[j].pos[1] += system.constants.y_length;
+        }
+
+        if (system.molecules[i].atoms[j].pos[2]  > system.constants.z_max) {
+                    system.molecules[i].atoms[j].pos[2] -= system.constants.z_length;
+        }
+        else if (system.molecules[i].atoms[j].pos[2] < system.constants.z_min) {
+                    system.molecules[i].atoms[j].pos[2] += system.constants.z_length;
+        } 
+    } // end if atomic
+} // end if alpha=beta=gamma=90
+
+// the universal treatment, alpha != beta ?= gamma
+else {
+int a=0;
+}
+} // end pbc function

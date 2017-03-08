@@ -214,6 +214,89 @@ if (f == NULL)
         } // end for atoms
 	} // end for molecules
 
+
+
+// =========== BROKEN. CAUSES SEG FAULT SOMEWHERE =============
+        // and draw the box if user desires
+    /*
+    if (system.constants.draw_box_option == "on") {
+        int i,j,k,p,q,diff,l,m,n;
+        int box_labels[2][2][2];
+        double box_occupancy[3];
+        double box_pos[3];
+        int last_mol_id = system.molecules[system.molecules.size() - 1].PDBID;
+        int last_atom_id = system.molecules[last_mol_id].atoms[system.molecules[last_mol_id].atoms.size() - 1].PDBID;
+        int atom_box = last_atom_id + 1;
+        int molecule_box = last_mol_id + 1;
+
+        // draw the box points
+        for(i = 0; i < 2; i++) {
+            for(j = 0; j < 2; j++) {
+                for(k = 0; k < 2; k++) {
+
+                // make this frozen 
+                fprintf(f, "ATOM  ");
+                fprintf(f, "%5d", atom_box);
+                fprintf(f, " %-4.45s", "X");
+                fprintf(f, " %-3.3s ", "BOX");
+                fprintf(f, "%-1.1s", "F");
+                fprintf(f, " %4d   ", molecule_box);
+
+                // box coords 
+                box_occupancy[0] = ((double)i) - 0.5;
+                box_occupancy[1] = ((double)j) - 0.5;
+                box_occupancy[2] = ((double)k) - 0.5;
+
+                for(p = 0; p < 3; p++)
+                    for(q = 0, box_pos[p] = 0; q < 3; q++)
+                        box_pos[p] += system.pbc.basis[q][p]*box_occupancy[q];
+
+                for(p = 0; p < 3; p++)
+                    if(system.constants.pdb_long != "on")
+                        fprintf(f, "%8.3f", box_pos[p]);
+                    else
+                        fprintf(f, "%11.6f ", box_pos[p]);
+
+                // null interactions 
+                fprintf(f, " %8.4f", 0.0);
+                fprintf(f, " %8.4f", 0.0);
+                fprintf(f, " %8.5f", 0.0);
+                fprintf(f, " %8.5f", 0.0);
+                fprintf(f, " %8.5f", 0.0);
+                fprintf(f, "\n");
+
+                box_labels[i][j][k] = atom_box;
+                ++atom_box;
+
+                } // for k
+            } // for j
+        } // for i
+
+        // and draw the connecting lines
+        for(i = 0; i < 2; i++) {
+            for(j = 0; j < 2; j++) {
+                for(k = 0; k < 2; k++) {
+
+                    for(l = 0; l < 2; l++) {
+                        for(m = 0; m < 2; m++) {
+                            for(n = 0; n < 2; n++) {
+
+                                    diff = fabs(i - l) + fabs(j - m) + fabs(k - n);
+                                    if(diff == 1)
+                                        fprintf(f, "CONECT %4d %4d\n", box_labels[i][j][k], box_labels[l][m][n]);
+
+                            } // n 
+                        } // m 
+                    } // l 
+
+
+                } // k
+            } // j 
+        } // i 
+
+    } // if draw box is on
+*/
+
 fclose(f);
 }
 
@@ -267,18 +350,73 @@ void readInput(System &system, char* filename) {
 				system.constants.ensemble = lc[1].c_str();
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
 			
-			} else if (!strcasecmp(lc[0].c_str(), "x_length")) {
-				system.constants.x_length = atof(lc[1].c_str());
-				std::cout << "Got x_length = " << lc[1].c_str() << " A"; printf("\n");
-			
-			} else if (!strcasecmp(lc[0].c_str(), "y_length")) {
-				system.constants.y_length = atof(lc[1].c_str());
-				std::cout << "Got y_length = " << lc[1].c_str() << " A"; printf("\n");
-			
-			} else if (!strcasecmp(lc[0].c_str(), "z_length")) {
-				system.constants.z_length = atof(lc[1].c_str());
-				std::cout << "Got z_length = " << lc[1].c_str() << " A"; printf("\n");
-			
+            // BASIS STUFF. 
+            // If user inputs x_length, y_length, z_length, assume 90deg. angles
+            } else if (!strcasecmp(lc[0].c_str(), "x_length")) {
+                system.constants.x_length = atof(lc[1].c_str());
+                system.pbc.basis[0][0] = atof(lc[1].c_str());
+                system.pbc.basis[0][1] = 0;
+                system.pbc.basis[0][2] = 0;
+                std::cout << "Got x_length = " << lc[1].c_str() << " A"; printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "y_length")) {
+                system.constants.y_length = atof(lc[1].c_str());
+                system.pbc.basis[1][1] = atof(lc[1].c_str());
+                system.pbc.basis[1][0] = 0;
+                system.pbc.basis[1][2] = 0;
+                std::cout << "Got y_length = " << lc[1].c_str() << " A"; printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "z_length")) {
+                system.constants.z_length = atof(lc[1].c_str());
+                system.pbc.basis[2][2] = atof(lc[1].c_str());
+                system.pbc.basis[2][0] = 0;
+                system.pbc.basis[2][1] = 0;
+                std::cout << "Got z_length = " << lc[1].c_str() << " A"; printf("\n");
+        
+                system.pbc.calcCarBasis();
+    
+            // OR EXACT BASIS INPUT (by vectors)
+            } else if (!strcasecmp(lc[0].c_str(), "basis1")) {
+                for (int n=0; n<3; n++)
+                    system.pbc.basis[0][n] = atof(lc[n+1].c_str());
+                std::cout << "Got basis1 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "basis2")) {
+                for (int n=0; n<3; n++)
+                    system.pbc.basis[1][n] = atof(lc[n+1].c_str());
+
+                std:: cout << "Got basis2 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "basis3")) {
+                for (int n=0; n<3; n++)
+                    system.pbc.basis[2][n] = atof(lc[n+1].c_str());
+
+                std:: cout << "Got basis3 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
+
+                system.pbc.calcCarBasis();
+
+            } else if (!strcasecmp(lc[0].c_str(), "carbasis")) {
+                double a = atof(lc[1].c_str());
+                double b = atof(lc[2].c_str());
+                double c = atof(lc[3].c_str());
+                double alpha = atof(lc[4].c_str());
+                double beta = atof(lc[5].c_str());
+                double gamma = atof(lc[6].c_str());
+
+                system.pbc.a = a;
+                system.pbc.b = b;
+                system.pbc.c = c;
+                system.pbc.alpha = alpha;
+                system.pbc.beta = beta;
+                system.pbc.gamma = gamma;
+
+                system.pbc.calcNormalBasis();
+
+                std::cout << "Got .car basis: a,b,c = " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str(); printf("\n");
+                std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "input_atoms")) {
+                system.constants.atom_file = lc[1].c_str();
+                std::cout << "Got input atoms file name = " << lc[1].c_str(); printf("\n");
+	
 			} else if (!strcasecmp(lc[0].c_str(), "input_atoms")) {
 				system.constants.atom_file = lc[1].c_str();
 				std::cout << "Got input atoms file name = " << lc[1].c_str(); printf("\n");

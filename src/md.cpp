@@ -342,63 +342,8 @@ void integrate(System &system, double dt) {
     for (int j=0; j<system.molecules.size(); j++) {
     if (system.molecules[j].MF == "M") {
     for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-    if (system.constants.md_mode == "molecular") {
-        if (system.molecules[j].atoms[i].pos[0]  > system.constants.x_max) {
-                for (int k=0; k<system.molecules[j].atoms.size(); k++) {
-                    system.molecules[j].atoms[k].pos[0] -= system.constants.x_length;
-                }
-        }
-        else if (system.molecules[j].atoms[i].pos[0] < system.constants.x_min) {
-                for (int k=0; k<system.molecules[j].atoms.size(); k++) {
-	                system.molecules[j].atoms[k].pos[0] += system.constants.x_length;
-                }
-        }
-
-        if (system.molecules[j].atoms[i].pos[1] > system.constants.y_max) {
-	            for (int k=0; k<system.molecules[j].atoms.size(); k++) {
-                    system.molecules[j].atoms[k].pos[1] -= system.constants.y_length;
-                }
-        }
-        else if (system.molecules[j].atoms[i].pos[1] < system.constants.y_min) {
-	            for (int k=0; k<system.molecules[j].atoms.size(); k++) {
-                    system.molecules[j].atoms[k].pos[1] += system.constants.y_length;
-                }
-        }
-
-        if (system.molecules[j].atoms[i].pos[2]  > system.constants.z_max) {
-	            for (int k=0; k<system.molecules[j].atoms.size(); k++) {
-                    system.molecules[j].atoms[k].pos[2] -= system.constants.z_length;
-                }
-        }
-        else if (system.molecules[j].atoms[i].pos[2] < system.constants.z_min) {
-	            for (int k=0; k<system.molecules[j].atoms.size(); k++) {
-                    system.molecules[j].atoms[k].pos[2] += system.constants.z_length;
-                }
-        }// end pbc check	
-        } // end if molecular
-        else if (system.constants.md_mode == "atomic") {
-        if (system.molecules[j].atoms[i].pos[0]  > system.constants.x_max) {
-                    system.molecules[j].atoms[i].pos[0] -= system.constants.x_length;
-        }
-        else if (system.molecules[j].atoms[i].pos[0] < system.constants.x_min) {
-                    system.molecules[j].atoms[i].pos[0] += system.constants.x_length;
-        }
-
-        if (system.molecules[j].atoms[i].pos[1] > system.constants.y_max) {
-                    system.molecules[j].atoms[i].pos[1] -= system.constants.y_length;
-        }
-        else if (system.molecules[j].atoms[i].pos[1] < system.constants.y_min) {
-                    system.molecules[j].atoms[i].pos[1] += system.constants.y_length;
-        }
-
-        if (system.molecules[j].atoms[i].pos[2]  > system.constants.z_max) {
-                    system.molecules[j].atoms[i].pos[2] -= system.constants.z_length;
-        }
-        else if (system.molecules[j].atoms[i].pos[2] < system.constants.z_min) {
-                    system.molecules[j].atoms[i].pos[2] += system.constants.z_length;
-        }// end pbc check 
-        } // end if atomic
-	} // end loop i atoms
+            checkInTheBox(system,j,i);
+    	} // end loop i atoms
     } // end if movable
 	} // end loop j molecules
     } // end if PBC

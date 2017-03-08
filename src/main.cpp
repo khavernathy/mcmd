@@ -25,11 +25,12 @@
 //#include <float.h>
 
 // c++ code files of this program
+// ORDER MATTERS HERE
 #include <constants.cpp>
 #include <system.cpp>
+#include <system_functions.cpp>
 #include <mc.cpp> // this will include potential.cpp, which includes lj, coulombic, polar
 #include <md.cpp>
-#include <system_functions.cpp>
 #include <io.cpp>
 #include <radial_dist.cpp>
 
@@ -56,6 +57,8 @@ int main(int argc, char **argv) {
 	defineBox(system, system.constants.x_length, system.constants.y_length, system.constants.z_length);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
+
+    system.pbc.printBasis();
 
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
 /*    
