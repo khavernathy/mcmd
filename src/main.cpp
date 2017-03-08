@@ -50,13 +50,17 @@ int main(int argc, char **argv) {
 
     // SET UP THE SYSTEM 
 	System system;
-	readInput(system, argv[1]);
+	readInput(system, argv[1]); // executable takes the input file
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
 	centerCoordinates(system);
 	defineBox(system, system.constants.x_length, system.constants.y_length, system.constants.z_length);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
+    system.pbc.calcVolume();
+    system.pbc.calcRecip();
+    system.pbc.calcCutoff();
+    system.pbc.calcBoxVertices();
     system.pbc.printBasis();
 
     // CONFIRM ATOMS AND MOLECULES PRINTOUT

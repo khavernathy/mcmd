@@ -136,7 +136,7 @@ class Pbc {
         double basis[3][3];
         double reciprocal_basis[3][3];
 		double cutoff;
-        double volume;
+        double volume, inverse_volume;
         double a, b, c, alpha, beta, gamma;
         double box_vertices[8][3];
             /* structure of box_points
@@ -162,6 +162,7 @@ class Pbc {
             printf("Box vertices ::\n");
             for (int n=0; n<8; n++)
                 printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
+            printf("Cutoff = %.5f\n", cutoff);
         }
 
         void calcVolume() {
@@ -170,6 +171,7 @@ class Pbc {
             newvolume += basis[0][1]*(basis[1][2]*basis[2][0] - basis[1][0]*basis[2][2]);
             newvolume += basis[0][2]*(basis[1][0]*basis[2][1] - basis[2][1]*basis[2][0]);
             volume = newvolume;
+            inverse_volume = 1.0/volume;
         }
 
         void calcCutoff() {
@@ -200,10 +202,8 @@ class Pbc {
         }
 
         void calcRecip() {
-			double inverse_volume;
-            calcVolume();
-			inverse_volume = 1.0/volume;
-			reciprocal_basis[0][0] = inverse_volume*(basis[1][1]*basis[2][2] - basis[1][2]*basis[2][1]);
+			// assumes volume and inverse_volume are already calc'd
+            reciprocal_basis[0][0] = inverse_volume*(basis[1][1]*basis[2][2] - basis[1][2]*basis[2][1]);
 			reciprocal_basis[0][1] = inverse_volume*(basis[0][2]*basis[2][1] - basis[0][1]*basis[2][2]);
 			reciprocal_basis[0][2] = inverse_volume*(basis[0][1]*basis[1][2] - basis[0][2]*basis[1][1]);
 
