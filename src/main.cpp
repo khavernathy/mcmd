@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 	// disable output buffering (print everything immediately to output)
 	setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.
 
-    // set up our wonderful system
+    // SET UP THE SYSTEM 
 	System system;
 	readInput(system, argv[1]);
 	readInAtoms(system, system.constants.atom_file);
@@ -57,7 +57,6 @@ int main(int argc, char **argv) {
 	defineBox(system, system.constants.x_length, system.constants.y_length, system.constants.z_length);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
-
     system.pbc.printBasis();
 
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
@@ -82,7 +81,7 @@ int main(int argc, char **argv) {
 
 	// clobber files 
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
-	remove( system.constants.restart_pdb.c_str() );
+	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() );
 
     // Prep thermo output file
@@ -90,14 +89,21 @@ int main(int argc, char **argv) {
     fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K)  #density(g/mL) #temp(K) #pres(atm)\n");
     fclose(f);
 
+    // Prep pdb trajectory if needed
+    if (system.constants.pdb_traj_option == "on") {
+        FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
+        fclose(f); 
+    }
+
 	// write initial XYZ for first frame.
    //	writeXYZ(system,system.constants.output_traj,0);
 
     system.checkpoint("Initial protocols complete. Starting MC or MD.");
 
+    // BEGIN MC OR MD ===========================================================
 	// =========================== MONTE CARLO ===================================
 	if (system.constants.mode == "mc") {
-	printf("| ================================== |\n");
+	printf("\n| ================================== |\n");
 	printf("|  BEGINNING MONTE CARLO SIMULATION  |\n");
 	printf("| ================================== |\n\n");
 
@@ -317,11 +323,14 @@ int main(int argc, char **argv) {
 			writeXYZ(system,system.constants.output_traj,frame,t,0);
             frame++;
             writePDB(system, system.constants.restart_pdb);
-			writeThermo(system, energy_average, 0.0, 0.0, energy_average, density_average*1000, system.constants.temp, system.constants.pres, t);
+			if (system.constants.pdb_traj_option == "on")
+                writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);	
+            writeThermo(system, energy_average, 0.0, 0.0, energy_average, density_average*1000, system.constants.temp, system.constants.pres, t);
             if (system.stats.radial_dist == "on") {
                 radialDist(system);
                 writeRadialDist(system);		
-            }	
+            }
+            
 
             // count the corrtime occurences.
             corrtime_iter++;
@@ -408,7 +417,7 @@ int main(int argc, char **argv) {
 	int total_steps = floor(tf/dt);
 	int count_md_steps = 1;
 	
-        printf("| ========================================= |\n");
+        printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
         printf("| ========================================= |\n\n");
 	
@@ -463,6 +472,8 @@ int main(int argc, char **argv) {
             frame++;
             writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, count_md_steps); 
             writePDB(system,system.constants.restart_pdb);	
+            if (system.constants.pdb_traj_option == "on") 
+                writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, count_md_steps);
             if (system.stats.radial_dist == "on") {
                 radialDist(system);
                 writeRadialDist(system);

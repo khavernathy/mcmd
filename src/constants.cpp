@@ -19,12 +19,14 @@ class Constants {
         string ensemble; // "nve", "nvt", "nvp", "uvt"
         string atom_file; // input atoms .pdb file
         string output_traj="traj.xyz"; // system trajectory in xyz 
+        string output_traj_pdb="traj.pdb"; // system trajectory in pdb
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
         //string energy_output="energy.dat"; // logs energy average as f'n of step
         //string density_output="density.dat"; // logs avg. density as f'n of step
         string volume_change_option; // kind of useless now but used for NPT,
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
+        string pdb_traj_option="on"; // option to write PDB trajectory (in addition to xyz). default on
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
         string draw_box_option="on"; // option to draw the box for visualization in restart.pdb
@@ -154,8 +156,11 @@ class Pbc {
             printf("basis1 %.5f %.5f %.5f\n", basis[0][0], basis[0][1], basis[0][2]);
             printf("basis2 %.5f %.5f %.5f\n", basis[1][0], basis[1][1], basis[1][2]);
             printf("basis3 %.5f %.5f %.5f\n", basis[2][0], basis[2][1], basis[2][2]);
-            printf("Basis vectors: { a = %.5f; b = %.5f; c = %.5f }\n", a, b,c);
-            printf("Basis angles: { α = %8.3lf \tβ = %8.3lf \tγ = %8.3lf }\n", alpha,beta,gamma); 
+            printf("Basis vectors: { a = %9.5f; b = %9.5f; c = %9.5f }\n", a, b,c);
+            printf("Basis angles:  { α = %9.5f; β = %9.5f; γ = %9.5f }\n", alpha,beta,gamma); 
+            printf("Box vertices ::\n");
+            for (int n=0; n<8; n++)
+                printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
         }
 
         void calcVolume() {
@@ -305,8 +310,6 @@ class Pbc {
 
         }
 
-
- 
 };
 
 Pbc::Pbc() {}
@@ -335,6 +338,7 @@ class Stats {
 		int rotate_accepts = 0; int rotate_attempts=0;// mpmc doesn't have this but i do
 		int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
         int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
+        int count_frozen_molecules=0; // frozen MOLECULES; normally 1
 
         double polar_iterations=0;
 };

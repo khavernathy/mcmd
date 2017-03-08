@@ -108,8 +108,9 @@ void readInAtoms(System &system, string filename) {
 
 				if (myvector[4] == "M")
 					system.stats.count_movables++;
-                else if (myvector[4] == "F")
-                    system.stats.count_frozens++;
+                else if (myvector[4] == "F") {
+                    system.stats.count_frozen_molecules++; // add +1 frozen molecule
+                }
 
 			}
 					
@@ -122,8 +123,10 @@ void readInAtoms(System &system, string filename) {
 				system.proto.atoms.push_back(current_atom);
                 system.proto.mass += current_atom.m;	
 			}
-			system.constants.total_atoms++;		
-	
+			system.constants.total_atoms++;	// add +1 to master atoms count
+
+            if (myvector[4] == "F")
+                system.stats.count_frozens++; // add +1 to frozen atoms count	
 			// this would print the whole line.
 			//cout << line << '\n';
             } // end if vector size nonzero
@@ -169,6 +172,27 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 
   	myfile.close();
 }
+
+/* WRITE PDB TRAJECTORY (TAKES restart.pdb and appends to trajectory file */
+void writePDBtraj(System &system, string restartfile, string trajfile, int step) {
+    std::ifstream ifile(restartfile.c_str(), std::ios::in);
+    std::ofstream ofile(trajfile.c_str(), std::ios::out | std::ios::app);
+
+    ofile << "REMARK step=" << step << "\n";
+    ofile << "REMARK total_molecules=" << system.molecules.size() << ", total_atoms=" << system.constants.total_atoms << "\n";
+    ofile << "REMARK frozen_molecules=" << system.stats.count_frozen_molecules << ", movable_molecules=" << system.stats.count_movables << "\n";
+    ofile << "REMARK frozen_atoms=" << system.stats.count_frozens << ", movable_atoms=" << (system.constants.total_atoms - system.stats.count_frozens) << "\n";
+
+    if (!ifile.is_open()) {
+        printf("Error opening restart file!\n");
+        exit(1);
+    } else {
+        ofile << ifile.rdbuf(); // append contents of restartfile into trajfile
+    }
+
+    ofile << "ENDMDL\n";
+}
+
 
 /* WRITE PDB RESTART FILE EVERY CORRTIME */
 void writePDB(System &system, string filename) {
@@ -379,7 +403,8 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got z_length = " << lc[1].c_str() << " A"; printf("\n");
         
                 system.pbc.calcCarBasis();
-    
+                system.pbc.calcBoxVertices();    
+
             // OR EXACT BASIS INPUT (by vectors)
             } else if (!strcasecmp(lc[0].c_str(), "basis1")) {
                 for (int n=0; n<3; n++)
@@ -397,6 +422,7 @@ void readInput(System &system, char* filename) {
                 std:: cout << "Got basis3 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
 
                 system.pbc.calcCarBasis();
+                system.pbc.calcBoxVertices();
 
             } else if (!strcasecmp(lc[0].c_str(), "carbasis")) {
                 double a = atof(lc[1].c_str());
@@ -414,6 +440,7 @@ void readInput(System &system, char* filename) {
                 system.pbc.gamma = gamma;
 
                 system.pbc.calcNormalBasis();
+                system.pbc.calcBoxVertices();
 
                 std::cout << "Got .car basis: a,b,c = " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str(); printf("\n");
                 std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");
