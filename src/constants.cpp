@@ -3,7 +3,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <usefulmath.cpp>
 
 using namespace std;
 
@@ -139,6 +138,7 @@ class Pbc {
         double volume, inverse_volume;
         double a, b, c, alpha, beta, gamma;
         double box_vertices[8][3];
+        double A[6], B[6], C[6], D[6]; // these are coefficients for plane equations for PBC
             /* structure of box_points
                 0 : -x, -y, -z
                 1 : -x, -y, +z
@@ -163,6 +163,53 @@ class Pbc {
             for (int n=0; n<8; n++)
                 printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
             printf("Cutoff = %.5f\n", cutoff);
+            for (int n=0; n<6; n++) {
+                printf("Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n", 
+                    n, A[n], B[n], C[n], D[n]);
+            }
+        }
+
+        void calcPlane(int p1index, int p2index, int p3index, int planeIndex) { // 3 points define a plane.
+            double vector1[3], vector2[3];
+        
+            // 1) get 3 points (indexes for box vertices provided in arguments)
+            // 2) make 2 planar vectors AB, AC
+            for (int n=0; n<3; n++) {
+                vector1[n] = box_vertices[p2index][n] - box_vertices[p1index][n];
+                vector2[n] = box_vertices[p3index][n] - box_vertices[p1index][n];
+            }
+
+            double* normal = crossprod(vector1, vector2);
+            A[planeIndex] = normal[0]; 
+            B[planeIndex] = normal[1];
+            C[planeIndex] = normal[2];
+            D[planeIndex] = -dddotprod(normal,box_vertices[p1index]);
+            // Thus the plane equation is Ax + By + Cz + D = 0
+        }
+
+        void calcPlanes() {
+            /* i drew a cube :-)
+                                    The A[6],B[6],C[6],D[6] arrays will be used to make plane equations
+             2 /------------/ 6     0 :   0123 plane (-x) 
+              /|           /|       1 :   4567 plane (+x)
+             / |          / |       2 :   2367 plane (+y)
+          3 |------------|7 |       3 :   0145 plane (-y)
+            |  |         |  |       4 :   1357 plane (+z)
+            |  |---------|--| 4     5 :   0246 plane (-z)
+            | / 0        |  / 
+            |/           | /        The vertices are defined in box_vertices[8][3].
+          1 |____________|/ 5       3 points define a plane, so I'll use the first 3 for the above planes
+
+            */
+          
+            // 3 points and plane index 
+            calcPlane(0,1,2,0); 
+            calcPlane(4,5,6,1);
+            calcPlane(2,3,6,2);
+            calcPlane(0,1,4,3);
+            calcPlane(1,3,5,4);
+            calcPlane(0,2,4,5);
+
         }
 
         void calcVolume() {

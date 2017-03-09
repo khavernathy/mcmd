@@ -26,6 +26,7 @@
 
 // c++ code files of this program
 // ORDER MATTERS HERE
+#include <usefulmath.cpp>
 #include <constants.cpp>
 #include <system.cpp>
 #include <system_functions.cpp>
@@ -61,6 +62,7 @@ int main(int argc, char **argv) {
     system.pbc.calcRecip();
     system.pbc.calcCutoff();
     system.pbc.calcBoxVertices();
+    system.pbc.calcPlanes();
     system.pbc.printBasis();
 
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
