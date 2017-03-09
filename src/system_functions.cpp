@@ -19,8 +19,7 @@ using namespace std;
 
 /* MOVE ALL ATOMS SUCH THAT THEY ARE CENTERED ABOUT 0,0,0 */
 void centerCoordinates(System &system) {
-	int size = system.constants.total_atoms; //system.atoms.size();
-		
+	int size = system.molecules.size();	
 	double xtemp[size];
 	double ytemp[size];
 	double ztemp[size];
@@ -164,17 +163,41 @@ else {
     box_limit[4] = (-system.pbc.D[4] - system.pbc.A[4]*posv[0] - system.pbc.B[4]*posv[1])/system.pbc.C[4]; // -z
     box_limit[5] = (-system.pbc.D[5] - system.pbc.A[5]*posv[0] - system.pbc.B[5]*posv[1])/system.pbc.C[5]; // +z
 
-    printf("box_limit values ::\n");
-    for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
+    //printf("box_limit values ::\n");
+    //for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
 
     if (system.constants.md_mode == "molecular") {
-
-
-
+        if (posv[0] < box_limit[0]) { 
+            for (int k=0; k<system.molecules[i].atoms.size(); k++)
+                system.molecules[i].atoms[k].pos[0] += -2*box_limit[0];
+        }
+        if (posv[0] > box_limit[1]) {
+            for (int k=0; k<system.molecules[i].atoms.size(); k++)
+                system.molecules[i].atoms[k].pos[0] += -2*box_limit[1];
+        }
+        if (posv[1] < box_limit[2]) {
+            for (int k=0; k<system.molecules[i].atoms.size(); k++)
+                system.molecules[i].atoms[k].pos[1] += -2*box_limit[2];
+        }
+        if (posv[1] < box_limit[3]) {
+            for (int k=0; k<system.molecules[i].atoms.size(); k++)
+                system.molecules[i].atoms[k].pos[1] += -2*box_limit[3];
+        }
+        if (posv[2] < box_limit[4]) {
+            for (int k=0; k<system.molecules[i].atoms.size(); k++)
+                system.molecules[i].atoms[k].pos[2] += -2*box_limit[4];
+        }
+        if (posv[2] < box_limit[5]) {
+            for (int k=0; k<system.molecules[i].atoms.size(); k++)
+                system.molecules[i].atoms[k].pos[2] += -2*box_limit[5];
+        }
     } else if (system.constants.md_mode == "atomic") {
-
-
-
+        if (posv[0] < box_limit[0]) system.molecules[i].atoms[j].pos[0] += -2*box_limit[0];
+        if (posv[0] > box_limit[1]) system.molecules[i].atoms[j].pos[0] -= -2*box_limit[1];
+        if (posv[1] < box_limit[2]) system.molecules[i].atoms[j].pos[1] += -2*box_limit[2];
+        if (posv[1] > box_limit[3]) system.molecules[i].atoms[j].pos[1] -= -2*box_limit[3];
+        if (posv[2] < box_limit[4]) system.molecules[i].atoms[j].pos[2] += -2*box_limit[4];
+        if (posv[2] > box_limit[5]) system.molecules[i].atoms[j].pos[2] -= -2*box_limit[5];
     }     
 
 

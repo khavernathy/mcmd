@@ -14,6 +14,8 @@
 
 /* (RE)DEFINE THE BOX LENGTHS */
 void defineBox(System &system, double x, double y, double z) { // takes input in A
+
+
 	system.constants.x_length = x;
 	system.constants.y_length = y;
 	system.constants.z_length = z;

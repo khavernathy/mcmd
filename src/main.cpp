@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
 	centerCoordinates(system);
-	defineBox(system, system.constants.x_length, system.constants.y_length, system.constants.z_length);
+    defineBox(system, system.constants.x_length, system.constants.y_length, system.constants.z_length);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
     system.pbc.calcVolume();
