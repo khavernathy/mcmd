@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
 	// main MC slice
 	int corrtime_iter=1;
 	for (int t=0; t <= finalstep; t+=stepsize) {
-		system.checkpoint("New step starting."); //printf("Step %i\n",t);	
+		system.checkpoint("New MC step starting."); //printf("Step %i\n",t);	
 
 				// DO MC STEP
                 if (t>0) {
@@ -375,7 +375,7 @@ int main(int argc, char **argv) {
             if (system.constants.pdb_traj_option == "on")
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
-	    // assign initial velocities
+	// assign initial velocities
     double randv; double DEFAULT = 99999.99;
     if (system.constants.md_init_vel != DEFAULT) {
         // if user defined

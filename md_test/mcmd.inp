@@ -23,7 +23,7 @@ carbasis 27.1979   27.1979   30.9998 90.0000   90.0000  120.0000
 
       
  ! radial distribution option      
- radial_dist         on   ! turns on/off radial distribution function. off for speedup        
+ radial_dist         off   ! turns on/off radial distribution function. off for speedup        
  radial_bin_size     0.1  ! in A       
  radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)        
  radial_centroid     BR1   ! element name      

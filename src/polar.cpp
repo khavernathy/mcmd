@@ -192,8 +192,8 @@ void thole_amatrix(System &system) {
             } // end p
         } /* end j */
     } /* end i */
-    print_matrix(system, N*3, system.constants.A_matrix);
-    printf("\n===================================================\n\n");
+    //print_matrix(system, N*3, system.constants.A_matrix);
+    //printf("\n===================================================\n\n");
     return;
 }
 

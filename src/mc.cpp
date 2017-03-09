@@ -104,14 +104,16 @@ void changeVolumeMove(System &system) {
 // ================== MAIN MC FUNCTION. HANDLES MOVE TYPES AND BOLTZMANN ACCEPTANCE =================
 // ACCORDING TO DIFFERENT ENSEMBLES
 void runMonteCarloStep(System &system, string model) {
-	//printf("running mc step.\n");
+    system.checkpoint("Entered runMonteCarloStep().");
 
 	// VOLUME MOVE (only NPT)
 	if (system.constants.ensemble == "npt") {
 		double VCP = system.constants.vcp_factor/(double)system.stats.count_movables; // Volume Change Probability
 		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
         	if (ranf < VCP) {
+                    system.checkpoint("doing a volume change move.");
                 	changeVolumeMove(system);
+                    system.checkpoint("done with volume change move.");
 			return; // we tried a volume change, so exit MC step.
 		}
 	}
@@ -127,11 +129,15 @@ void runMonteCarloStep(System &system, string model) {
 			double ranf2 = (double)rand() / (double)RAND_MAX; // 0->1
 			// ADD A MOLECULE
 			if (ranf2 < 0.5) {
+                system.checkpoint("doing molecule add move.");
 				addMolecule(system, model);			
+                system.checkpoint("done with molecule add move.");
 			} // end add
  
 			else { // REMOVE MOLECULE
+                system.checkpoint("doing molecule delete move.");
 				removeMolecule(system, model);
+                system.checkpoint("done with molecule delete move.");
 			} // end add vs. remove		
 		return; // we did the add or remove so exit MC step.
 		} // end doing an add/remove. 
@@ -140,16 +146,15 @@ void runMonteCarloStep(System &system, string model) {
 	
 	// DISPLACE / ROTATE (for all: NPT, uVT, NVT, NVE); NVE has special BoltzFact tho.
 	// make sure it's a movable molecule
-	//system.checkpoint("starting displace/rotate..");
+	system.checkpoint("NOT volume/add/remove :: Starting displace or rotate..");
     string movable="notyet";
     int randm = -1;
     while (movable != "M") {
-            randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozens;
-           // printf("randm: %i\n",randm);
+            randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozen_molecules;
+            //printf("randm: %i\n",randm);
             movable = system.molecules[randm].MF;
-    }
-               
-	//system.checkpoint("Got the random molecule.");
+    }           
+	system.checkpoint("Got the random molecule.");
 	
 	double old_V=0.0; double new_V=0.0;
 
@@ -169,6 +174,7 @@ void runMonteCarloStep(System &system, string model) {
 	if (randRotTrans < system.constants.rotate_prob && system.constants.rotate_option == "on") { // do a rotation
 		
         // ROTATION
+        system.checkpoint("doing a rotation move.");
 		rot_disp_flag = 0; system.stats.rotate_attempts++;
 		double randangle; string plane; 
 		randangle = system.constants.rotate_angle_factor*(double)rand()/(double)RAND_MAX; // angle of rotation from 0 -> rotate_angle_factor
@@ -191,6 +197,7 @@ void runMonteCarloStep(System &system, string model) {
 	else {
 		// DISPLACEMENT
 		rot_disp_flag = 1; system.stats.displace_attempts++;
+        system.checkpoint("doing displacement move.");
 		double randx,randy,randz;
         	randx = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
         	randy = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
@@ -323,6 +330,6 @@ void runMonteCarloStep(System &system, string model) {
 
 	
 	} // end displace/rotate (all ensembles)
-	//system.checkpoint("done with displace/rotate");
+	system.checkpoint("done with displace/rotate");
     return; // done with move, so exit MC step	
 }

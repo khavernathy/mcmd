@@ -148,24 +148,58 @@ void calculateForces(System &system, string model, double dt) {
             
                 //printf("computing interaction of atomID %i and %i\n", system.molecules[i].atoms[j].ID, system.molecules[k].atoms[l].ID);
 				// preliminary calculations (distance between atoms, etc.)
-				double dx,dy,dz,rsq,r,ux,uy,uz,s2,s6,r6, sr, sr2, sr6;
-				dx = system.molecules[i].atoms[j].pos[0] - system.molecules[k].atoms[l].pos[0];
-				dy = system.molecules[i].atoms[j].pos[1] - system.molecules[k].atoms[l].pos[1];
-				dz = system.molecules[i].atoms[j].pos[2] - system.molecules[k].atoms[l].pos[2];
+				double d[3],di[3],f[3],img[3],rsq,r,rimg,rimg2,u[3],s2,s6,r6, sr, sr2, sr6;
+                int n,p,q;
+				for (n=0; n<3; n++) 
+                    d[n] = system.molecules[i].atoms[j].pos[n] - system.molecules[k].atoms[l].pos[n];
 				
-                // apply 1/2 box cutoff if NVT / NVE:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
                 if (system.constants.md_pbc == "on") {
-                    if (dx > system.pbc.cutoff) { dx -= system.pbc.x_length; }
-                    if (dx < -system.pbc.cutoff) { dx += system.pbc.x_length; }
-                    if (dy > system.pbc.cutoff) { dy -= system.pbc.y_length; }
-                    if (dy < -system.pbc.cutoff) { dy += system.pbc.y_length; }
-                    if (dz > system.pbc.cutoff) { dz -= system.pbc.z_length; }
-                    if (dz < -system.pbc.cutoff) { dz += system.pbc.z_length; }
-	            }
+                    // get image r in reciprocal space
+                    /*for (p = 0; p <3 ; p++) {
+                        img[p]=0;
+                        for (q = 0; q < 3; q++) {
+                            img[p] += system.pbc.reciprocal_basis[q][p]*d[q];
+                        }
+                        img[p] = rint(img[p]); // round to integer.
+                    }
 
-				rsq = dx*dx + dy*dy + dz*dz;
+                    // matrix multiply back into real basis
+                    for (p=0; p<3; p++) {
+                        di[p]=0;
+                        for (q=0; q<3; q++) {
+                            di[p] += system.pbc.basis[q][p]*img[q];
+                        }
+                    }
+                    // correct displacement
+                    for (n=0; n<3; n++)
+                        di[n] = d[n] - di[n];
+                    */
+
+                    // pythagorean
+	                rsq = dddotprod(d,d);
+                    //rimg2 = dddotprod(di, di);
+                    r = sqrt(rsq);
+                    //rimg = sqrt(rimg2);
+                } else {
+                    double* distances = getDistanceXYZ(system, i,j,k,l);
+                    r = distances[3];
+                    for (int n=0; n<3; n++) d[n] = distances[n];
+                    rsq = r*r;
+                }
+    
+                // apply 1/2 box cutoff if NVT / NVE:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
+                // NOTE: the r_c cutoff is NOT used in MD at all..
+                if (d[0] < -system.pbc.x_length/2) d[0] += system.pbc.x_length;
+                if (d[0] > system.pbc.x_length/2) d[0] -= system.pbc.x_length;
+                if (d[1] < -system.pbc.y_length/2) d[1] += system.pbc.y_length;
+                if (d[1] > system.pbc.y_length/2) d[1] -= system.pbc.y_length;
+                if (d[2] < -system.pbc.z_length/2) d[2] += system.pbc.z_length;
+                if (d[2] > system.pbc.z_length/2) d[2] -= system.pbc.z_length;
+
+                //printf("r = %f; rimg = %f\n", r, rimg);
+                //printf("d: %f %f %f;\n", d[0],d[1],d[2]); //,di[0],di[1],di[2]);
+
 				r6 = rsq*rsq*rsq;
-				r = sqrt(rsq);
 				s2 = sig*sig;
 				s6 = s2*s2*s2;
     
@@ -174,24 +208,16 @@ void calculateForces(System &system, string model, double dt) {
                     sr2 = sr*sr;    
                     sr6 = sr2*sr2*sr2;
                 }
-
-				ux = dx/r;
-				uy = dy/r;
-				uz = dz/r;
-				
+    
+                for (int n=0; n<3; n++) u[n] = d[n]/r;
+			
+	
 				// Lennard-Jones force calculations in K/A
-				double fx,fy,fz;
-				fx = 24.0*dx*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-				fy = 24.0*dy*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));  //   (2*pow(sig,12)*pow(r,-14) - pow(sig,6) * pow(r,-8));
-				fz = 24.0*dz*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));//    (2*pow(sig,12)*pow(r,-14) - pow(sig,6) * pow(r,-8));
-				
-				system.molecules[i].atoms[j].force[0] += fx;
-				system.molecules[i].atoms[j].force[1] += fy;
-				system.molecules[i].atoms[j].force[2] += fz;
-
-				system.molecules[k].atoms[l].force[0] -= fx;
-				system.molecules[k].atoms[l].force[1] -= fy;
-				system.molecules[k].atoms[l].force[2] -= fz;
+				for (int n=0; n<3; n++) f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                for (int n=0; n<3; n++) {
+                    system.molecules[i].atoms[j].force[n] += f[n];
+				    system.molecules[k].atoms[l].force[n] -= f[n];
+                }
 
 				// LJ Potential in K
                 if (i != k)
@@ -200,22 +226,16 @@ void calculateForces(System &system, string model, double dt) {
 				if (model == "ljes" || model == "ljespolar") {
 			
 				// Coulomb's law electrostatic force. Overwrite fx,fy,fz in K/A
-				fx = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * ux;
-				fy = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * uy;
-				fz = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * uz;	
+                for (int n=0; n<3; n++) 
+                    f[n] = ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/rsq) * u[n];
+                for (int n=0; n<3; n++) {
+                    system.molecules[i].atoms[j].force[n] += f[n];
+                    system.molecules[k].atoms[l].force[n] -= f[n];
+                }
 
-				system.molecules[i].atoms[j].force[0] += fx;
-				system.molecules[i].atoms[j].force[1] += fy;
-                system.molecules[i].atoms[j].force[2] += fz;
-
-                system.molecules[k].atoms[l].force[0] -= fx;
-                system.molecules[k].atoms[l].force[1] -= fy;
-                system.molecules[k].atoms[l].force[2] -= fz;
-				
                 //Coulombic potential in K
                 if (i != k)
 				    system.molecules[i].atoms[j].V += ((system.molecules[i].atoms[j].C*system.constants.E2REDUCED * system.molecules[k].atoms[l].C*system.constants.E2REDUCED)/r);
-        
 				} // end coulombic addition
 
 
@@ -259,7 +279,7 @@ void calculateForces(System &system, string model, double dt) {
 void integrate(System &system, double dt) {
 
     // DEBUG
-    int debug=1;
+    int debug=0;
     if (debug == 1) {
         for (int j=0; j<system.molecules.size(); j++) {
             if (system.constants.md_mode == "molecular") system.molecules[j].printAll();
@@ -339,13 +359,12 @@ void integrate(System &system, double dt) {
 
     // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
     if (system.constants.md_pbc == "on") {
-    for (int j=0; j<system.molecules.size(); j++) {
-    if (system.molecules[j].MF == "M") {
-    for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-            checkInTheBox(system,j,i);
-    	} // end loop i atoms
-    } // end if movable
-	} // end loop j molecules
+        for (int j=0; j<system.molecules.size(); j++) {
+            if (system.molecules[j].MF == "M") {
+                // HEREIN LIES THE PROBLEM.
+                checkInTheBox(system,j);
+            } // end if movable
+	    } // end loop j molecules
     } // end if PBC
    
     // 2) GET NEW C.O.M. for new positions.
