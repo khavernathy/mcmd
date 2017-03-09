@@ -162,7 +162,7 @@ class Pbc {
             printf("Box vertices ::\n");
             for (int n=0; n<8; n++)
                 printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
-            printf("Cutoff = %.5f\n", cutoff);
+            printf("PBC Cutoff = %.5f\n", cutoff);
             for (int n=0; n<6; n++) {
                 printf("Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n", 
                     n, A[n], B[n], C[n], D[n]);

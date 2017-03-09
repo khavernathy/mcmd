@@ -155,12 +155,12 @@ void calculateForces(System &system, string model, double dt) {
 				
                 // apply 1/2 box cutoff if NVT / NVE:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
                 if (system.constants.md_pbc == "on") {
-                if (dx > system.constants.x_max) { dx = dx - system.constants.x_length; }
-                if (dx < system.constants.x_min) { dx = dx + system.constants.x_length; }
-                if (dy > system.constants.y_max) { dy = dy - system.constants.y_length; }
-                if (dy < system.constants.y_min) { dy = dy + system.constants.y_length; }
-                if (dz > system.constants.z_max) { dz = dz - system.constants.z_length; }
-                if (dz < system.constants.z_min) { dz = dz + system.constants.z_length; }
+                    if (dx > system.pbc.cutoff) { dx -= 2*system.pbc.cutoff; }
+                    if (dx < -system.pbc.cutoff) { dx += 2*system.pbc.cutoff; }
+                    if (dy > system.pbc.cutoff) { dy -= 2*system.pbc.cutoff; }
+                    if (dy < -system.pbc.cutoff) { dy += 2*system.pbc.cutoff; }
+                    if (dz > system.pbc.cutoff) { dz -= 2*system.pbc.cutoff; }
+                    if (dz < -system.pbc.cutoff) { dz += 2*system.pbc.cutoff; }
 	            }
 
 				rsq = dx*dx + dy*dy + dz*dz;

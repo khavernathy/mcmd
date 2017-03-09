@@ -28,6 +28,7 @@ if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
 	system.constants.z_min = -system.constants.z_max;
 
     system.constants.cutoff = system.constants.x_max; // a crude method for cutoff but does the job for cubic.
+    system.pbc.cutoff = system.constants.cutoff;
     // need to make basis vector system later.
     system.constants.ewald_alpha = 3.5/system.constants.cutoff; // update ewald_alpha if we have a vol change
 
