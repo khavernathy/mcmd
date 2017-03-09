@@ -166,8 +166,8 @@ else {
     //printf("box_limit values ::\n");
     //for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
 
-
-    // THESE IF CONDITIONS MAY BE BACKWARDS OR SOMETHING
+    // the ifs check the planes right but
+    // CANT JUST MOVE BY dim_length in the case of alpha!=beta!=gamma....
     if (system.constants.md_mode == "molecular") {
         if (posv[0] < box_limit[0]) { 
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
