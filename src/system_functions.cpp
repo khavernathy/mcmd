@@ -88,6 +88,7 @@ double * centerOfMass(System &system) {
 void checkInTheBox(System &system, int i, int j) {
 
 // first the easy systems, alpha=beta=gamma=90
+// saves some time because box limits need not be recomputed
 if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
     if (system.constants.md_mode == "molecular") {
         if (system.molecules[i].atoms[j].pos[0]  > system.constants.x_max) {
@@ -149,6 +150,34 @@ if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
 
 // the universal treatment, alpha != beta ?= gamma
 else {
-int a=0;
+
+    double posv[3]; // // save atoms position vector to variables
+    double box_limit[6]; //-x, +x, -y, +y, -z, +z limits, which are functions of atom position in other dims.
+    for (int n=0; n<3; n++) posv[n] = system.molecules[i].atoms[j].pos[n];
+
+    // find appropriate values for box limits based on atom coordinates.
+    // check in this order: (-x, +x, -y, +y, -z, +z)
+    box_limit[0] = (-system.pbc.D[0] - system.pbc.B[0]*posv[1] - system.pbc.C[0]*posv[2])/system.pbc.A[0]; // -x
+    box_limit[1] = (-system.pbc.D[1] - system.pbc.B[1]*posv[1] - system.pbc.C[1]*posv[2])/system.pbc.A[1]; // +x
+    box_limit[2] = (-system.pbc.D[2] - system.pbc.A[2]*posv[0] - system.pbc.C[2]*posv[2])/system.pbc.B[2]; // -y
+    box_limit[3] = (-system.pbc.D[3] - system.pbc.A[3]*posv[0] - system.pbc.C[3]*posv[2])/system.pbc.B[3]; // +y
+    box_limit[4] = (-system.pbc.D[4] - system.pbc.A[4]*posv[0] - system.pbc.B[4]*posv[1])/system.pbc.C[4]; // -z
+    box_limit[5] = (-system.pbc.D[5] - system.pbc.A[5]*posv[0] - system.pbc.B[5]*posv[1])/system.pbc.C[5]; // +z
+
+    printf("box_limit values ::\n");
+    for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
+
+    if (system.constants.md_mode == "molecular") {
+
+
+
+    } else if (system.constants.md_mode == "atomic") {
+
+
+
+    }     
+
+
+
 }
 } // end pbc function
