@@ -181,7 +181,7 @@ else {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[1] += -2*box_limit[2];
         }
-        if (posv[1] < box_limit[3]) {
+        if (posv[1] > box_limit[3]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[1] += -2*box_limit[3];
         }
@@ -189,7 +189,7 @@ else {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[2] += -2*box_limit[4];
         }
-        if (posv[2] < box_limit[5]) {
+        if (posv[2] > box_limit[5]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[2] += -2*box_limit[5];
         }
