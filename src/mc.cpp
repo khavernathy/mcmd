@@ -13,12 +13,12 @@
 // PHAST2 NOT INCLUDED YET
 
 /* (RE)DEFINE THE BOX LENGTHS */
-void defineBox(System &system, double x, double y, double z) { // takes input in A
+void defineBox(System &system) { // takes input in A
 
+// easy 90 90 90 systems
+if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
 
-	system.constants.x_length = x;
-	system.constants.y_length = y;
-	system.constants.z_length = z;
+    // assumes x_length, y_length, z_length are defined already in system.
 
 	system.constants.x_max = system.constants.x_length/2.0;
 	system.constants.x_min = -system.constants.x_max;
@@ -31,7 +31,20 @@ void defineBox(System &system, double x, double y, double z) { // takes input in
     // need to make basis vector system later.
     system.constants.ewald_alpha = 3.5/system.constants.cutoff; // update ewald_alpha if we have a vol change
 
-	system.constants.volume = x*y*z; // in A^3
+	system.constants.volume = system.constants.x_length * system.constants.y_length * system.constants.z_length; // in A^3
+
+}
+// universal definitions
+else {
+    system.pbc.calcVolume();
+    system.pbc.calcRecip();
+    system.pbc.calcCutoff();
+    system.pbc.calcBoxVertices();
+    system.pbc.calcPlanes();
+    system.pbc.printBasis();
+}
+
+
 }
 
 
@@ -56,7 +69,10 @@ void changeVolumeMove(System &system) {
     double new_volume = exp(log(old_volume) + (ranv-0.5)*system.constants.volume_change);// mpmc default = 2.5
     //double new_volume = 1e-30*new_volume_A3;
     double new_side = pow(new_volume, 1.0/3.0);
-    defineBox(system, new_side, new_side, new_side);
+    system.constants.x_length = new_side;
+    system.constants.y_length = new_side;
+    system.constants.z_length = new_side;
+    defineBox(system);
 
             double* potentials = getTotalPotential(system,system.constants.potential_form);
             new_energy=potentials[0]+potentials[1]+potentials[2]+potentials[3];
@@ -76,7 +92,10 @@ void changeVolumeMove(System &system) {
 		system.stats.volume_change_accepts++;
 	} else {
 		// reject move (move volume back)
-        defineBox(system, old_side, old_side, old_side);
+        system.constants.x_length = old_side;
+        system.constants.y_length = old_side;
+        system.constants.z_length = old_side;
+        defineBox(system);
 	}
 }
 

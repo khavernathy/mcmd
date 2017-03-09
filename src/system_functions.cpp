@@ -19,7 +19,7 @@ using namespace std;
 
 /* MOVE ALL ATOMS SUCH THAT THEY ARE CENTERED ABOUT 0,0,0 */
 void centerCoordinates(System &system) {
-	int size = system.molecules.size();	
+	int size = system.constants.total_atoms;	
 	double xtemp[size];
 	double ytemp[size];
 	double ztemp[size];

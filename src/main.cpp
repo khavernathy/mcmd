@@ -55,16 +55,10 @@ int main(int argc, char **argv) {
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
 	centerCoordinates(system);
-    defineBox(system, system.constants.x_length, system.constants.y_length, system.constants.z_length);
+    defineBox(system);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
-    system.pbc.calcVolume();
-    system.pbc.calcRecip();
-    system.pbc.calcCutoff();
-    system.pbc.calcBoxVertices();
-    system.pbc.calcPlanes();
-    system.pbc.printBasis();
-
+    
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
 /*    
 	for (int b=0; b<system.molecules.size(); b++) {
@@ -90,6 +84,7 @@ int main(int argc, char **argv) {
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() );
 
+    // INITIAL WRITEOUTS
     // Prep thermo output file
     FILE *f = fopen(system.constants.thermo_output.c_str(), "w");
     fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K)  #density(g/mL) #temp(K) #pres(atm)\n");
@@ -100,9 +95,7 @@ int main(int argc, char **argv) {
         FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
         fclose(f); 
     }
-
-	// write initial XYZ for first frame.
-   //	writeXYZ(system,system.constants.output_traj,0);
+    // END INTIAL WRITEOUTS
 
     system.checkpoint("Initial protocols complete. Starting MC or MD.");
 
@@ -336,7 +329,6 @@ int main(int argc, char **argv) {
                 radialDist(system);
                 writeRadialDist(system);		
             }
-            
 
             // count the corrtime occurences.
             corrtime_iter++;
@@ -378,6 +370,10 @@ int main(int argc, char **argv) {
         // write initial XYZ
         writeXYZ(system,system.constants.output_traj, 1, 0, 0);	
         int frame = 2; // weird way to initialize but it works for the output file.
+        // and initial PDB
+        writePDB(system,system.constants.restart_pdb);
+            if (system.constants.pdb_traj_option == "on")
+                writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
 	    // assign initial velocities
     double randv; double DEFAULT = 99999.99;
