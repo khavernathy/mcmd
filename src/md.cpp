@@ -155,12 +155,12 @@ void calculateForces(System &system, string model, double dt) {
 				
                 // apply 1/2 box cutoff if NVT / NVE:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
                 if (system.constants.md_pbc == "on") {
-                    if (dx > system.pbc.cutoff) { dx -= 2*system.pbc.cutoff; }
-                    if (dx < -system.pbc.cutoff) { dx += 2*system.pbc.cutoff; }
-                    if (dy > system.pbc.cutoff) { dy -= 2*system.pbc.cutoff; }
-                    if (dy < -system.pbc.cutoff) { dy += 2*system.pbc.cutoff; }
-                    if (dz > system.pbc.cutoff) { dz -= 2*system.pbc.cutoff; }
-                    if (dz < -system.pbc.cutoff) { dz += 2*system.pbc.cutoff; }
+                    if (dx > system.pbc.cutoff) { dx -= system.pbc.x_length; }
+                    if (dx < -system.pbc.cutoff) { dx += system.pbc.x_length; }
+                    if (dy > system.pbc.cutoff) { dy -= system.pbc.y_length; }
+                    if (dy < -system.pbc.cutoff) { dy += system.pbc.y_length; }
+                    if (dz > system.pbc.cutoff) { dz -= system.pbc.z_length; }
+                    if (dz < -system.pbc.cutoff) { dz += system.pbc.z_length; }
 	            }
 
 				rsq = dx*dx + dy*dy + dz*dz;
@@ -259,13 +259,13 @@ void calculateForces(System &system, string model, double dt) {
 void integrate(System &system, double dt) {
 
     // DEBUG
-    int debug=0;
+    int debug=1;
     if (debug == 1) {
         for (int j=0; j<system.molecules.size(); j++) {
             if (system.constants.md_mode == "molecular") system.molecules[j].printAll();
-        for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-            if (system.constants.md_mode == "atomic") system.molecules[j].atoms[i].printAll();
-        }
+            for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+                if (system.constants.md_mode == "atomic") system.molecules[j].atoms[i].printAll();
+            }
         }
     }
     // END IF DEBUG
