@@ -166,6 +166,8 @@ else {
     //printf("box_limit values ::\n");
     //for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
 
+
+    // THESE IF CONDITIONS MAY BE BACKWARDS OR SOMETHING
     if (system.constants.md_mode == "molecular") {
         if (posv[0] < box_limit[0]) { 
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
@@ -199,8 +201,6 @@ else {
         if (posv[2] < box_limit[4]) system.molecules[i].atoms[j].pos[2] += -2*box_limit[4];
         if (posv[2] > box_limit[5]) system.molecules[i].atoms[j].pos[2] -= -2*box_limit[5];
     }     
-
-
 
 }
 } // end pbc function
