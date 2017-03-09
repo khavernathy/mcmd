@@ -132,6 +132,7 @@ class Pbc {
     public:
         Pbc();
 
+        double x_length, y_length, z_length; // for moving molecules back into box on other side, computing in calcBoxVertices
         double basis[3][3];
         double reciprocal_basis[3][3];
 		double cutoff;
@@ -167,6 +168,7 @@ class Pbc {
                 printf("Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n", 
                     n, A[n], B[n], C[n], D[n]);
             }
+            printf("x_length = %.5f; y_length = %.5f; z_length = %.5f\n", x_length, y_length, z_length);
         }
 
         void calcPlane(int p1index, int p2index, int p3index, int planeIndex) { // 3 points define a plane.
@@ -337,6 +339,10 @@ class Pbc {
 		            } // for k
 		        } // for j
 		    } // for i
+
+            x_length = box_vertices[5][0] - box_vertices[1][0]; // box lengths based on the front-left corner of box
+            y_length = box_vertices[3][1] - box_vertices[1][1]; // kind of crude way but I think it's foolproof..
+            z_length = box_vertices[1][2] - box_vertices[0][2];
         }
 
         void calcMaxMin() {

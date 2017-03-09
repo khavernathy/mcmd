@@ -151,9 +151,12 @@ if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
 else {
 
     double posv[3]; // // save atoms position vector to variables
+    double comv[3]; // center of mass of molecules
     double box_limit[6]; //-x, +x, -y, +y, -z, +z limits, which are functions of atom position in other dims.
-    for (int n=0; n<3; n++) posv[n] = system.molecules[i].atoms[j].pos[n];
-
+    for (int n=0; n<3; n++) {
+        posv[n] = system.molecules[i].atoms[j].pos[n];
+        comv[n] = system.molecules[i].com[n];
+    }
     // find appropriate values for box limits based on atom coordinates.
     // check in this order: (-x, +x, -y, +y, -z, +z)
     box_limit[0] = (-system.pbc.D[0] - system.pbc.B[0]*posv[1] - system.pbc.C[0]*posv[2])/system.pbc.A[0]; // -x
@@ -169,29 +172,29 @@ else {
     // the ifs check the planes right but
     // CANT JUST MOVE BY dim_length in the case of alpha!=beta!=gamma....
     if (system.constants.md_mode == "molecular") {
-        if (posv[0] < box_limit[0]) { 
+        if (comv[0] < box_limit[0]) { 
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[0] += -2*box_limit[0];
         }
-        if (posv[0] > box_limit[1]) {
+        if (comv[0] > box_limit[1]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
-                system.molecules[i].atoms[k].pos[0] += -2*box_limit[1];
+                system.molecules[i].atoms[k].pos[0] -= -2*box_limit[1];
         }
-        if (posv[1] < box_limit[2]) {
+        if (comv[1] < box_limit[2]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[1] += -2*box_limit[2];
         }
-        if (posv[1] > box_limit[3]) {
+        if (comv[1] > box_limit[3]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
-                system.molecules[i].atoms[k].pos[1] += -2*box_limit[3];
+                system.molecules[i].atoms[k].pos[1] -= -2*box_limit[3];
         }
-        if (posv[2] < box_limit[4]) {
+        if (comv[2] < box_limit[4]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
                 system.molecules[i].atoms[k].pos[2] += -2*box_limit[4];
         }
-        if (posv[2] > box_limit[5]) {
+        if (comv[2] > box_limit[5]) {
             for (int k=0; k<system.molecules[i].atoms.size(); k++)
-                system.molecules[i].atoms[k].pos[2] += -2*box_limit[5];
+                system.molecules[i].atoms[k].pos[2] -= -2*box_limit[5];
         }
     } else if (system.constants.md_mode == "atomic") {
         if (posv[0] < box_limit[0]) system.molecules[i].atoms[j].pos[0] += -2*box_limit[0];
