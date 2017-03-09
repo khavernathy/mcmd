@@ -192,10 +192,10 @@ class Pbc {
                                     The A[6],B[6],C[6],D[6] arrays will be used to make plane equations
              2 /------------/ 6     0 :   0123 plane (-x) 
               /|           /|       1 :   4567 plane (+x)
-             / |          / |       2 :   2367 plane (+y)
-          3 |------------|7 |       3 :   0145 plane (-y)
-            |  |         |  |       4 :   1357 plane (+z)
-            |  |---------|--| 4     5 :   0246 plane (-z)
+             / |          / |       2 :   0145 plane (-y)   
+          3 |------------|7 |       3 :   2367 plane (+y)
+            |  |         |  |       4 :   0246 plane (-z) 
+            |  |---------|--| 4     5 :   1357 plane (+z)
             | / 0        |  / 
             |/           | /        The vertices are defined in box_vertices[8][3].
           1 |____________|/ 5       3 points define a plane, so I'll use the first 3 for the above planes
@@ -203,12 +203,13 @@ class Pbc {
             */
           
             // 3 points and plane index 
-            calcPlane(0,1,2,0); 
-            calcPlane(4,5,6,1);
-            calcPlane(2,3,6,2);
-            calcPlane(0,1,4,3);
-            calcPlane(1,3,5,4);
-            calcPlane(0,2,4,5);
+            calcPlane(0,1,2,0); // I'm not sure if I'll ever have a system where the 4th point 
+            calcPlane(4,5,6,1); // results in a different plane than the first 3...
+            calcPlane(0,1,4,2);
+            calcPlane(2,3,6,3);
+            calcPlane(0,2,4,4);
+            calcPlane(1,3,5,5);
+           
 
         }
 
