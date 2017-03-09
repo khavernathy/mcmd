@@ -22,6 +22,7 @@ TODO
 
 -> make universal unit-cell  
     -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON
+-> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT
 -> make correct pressure calculator (Frenkel method, check MPMC to compare)  
 -> make correct thermostat for NVT dynamics  
 -> write .pdb traj (or just restart.pdb) with BOX included  
