@@ -20,12 +20,12 @@ To run
   
 TODO
 
+-> make averages update every step instead of every corrtime..
 -> make universal unit-cell  
     -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON
 -> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT
 -> make correct pressure calculator (Frenkel method, check MPMC to compare)  
 -> make correct thermostat for NVT dynamics  
--> write .pdb traj (or just restart.pdb) with BOX included  
 -> include more-than-static polarization energy  
 	-> right now I just use V = -0.5 sum{u.E}  
 -> add rotation to MD displacements  

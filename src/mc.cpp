@@ -7,10 +7,10 @@
 #include <string>
 #include <stdlib.h>
 #include <potential.cpp>
-#include <add_molecule.cpp>
-#include <remove_molecule.cpp>
-#include <displace_molecule.cpp>
+//#include <distance.cpp>
+#include <rotatepoint.cpp>
 #include <boltzmann.cpp>
+#include <moves.cpp>
 
 // PHAST2 NOT INCLUDED YET
 
@@ -51,7 +51,6 @@ void defineBox(System &system) { // takes input in A
 
 /* CHANGE VOLUME OF SYSTEM BY BOLTZMANN PROB -- FOR NPT */
 void changeVolumeMove(System &system) {
-	// increasing volume will increase energy supplied by external pressure but also allow more room for lower potential among atoms
 	system.stats.volume_attempts++;
 	// generate small randam distance change for volume adjustment
 	double ranf = (double)rand() / (double)RAND_MAX; // for boltz check	
@@ -139,7 +138,7 @@ void runMonteCarloStep(System &system, string model) {
 	} // end if uVT		
 
 	
-	// DISPLACE / ROTATE (for all: NPT, uVT, NVT, NVE); NVE has special BoltzFact tho.
+	// DISPLACE / ROTATE :: final default (for all: NPT, uVT, NVT, NVE); NVE has special BoltzFact tho.
 	// make sure it's a movable molecule
 	system.checkpoint("NOT volume/add/remove :: Starting displace or rotate..");
     displaceMolecule(system, model);
