@@ -23,7 +23,6 @@ double self_lj_lrc(System &system) {
             double sigcut3 = sigcut*sigcut*sigcut;
             double sigcut9 = sigcut3 * sigcut3 * sigcut3;
 
-//            printf("sig= %f, eps= %f, sr = %f, s3 = %f, sr3 = %f, sr9 = %f, V = %f\n", sig, eps, sigcut, sig3, sigcut3, sigcut9, system.constants.volume);
 
             double this_self_lrc = (16.0/3.0)*M_PI*eps*sig3*(sigcut9 - sigcut3)/volume;
             potential += this_self_lrc;
