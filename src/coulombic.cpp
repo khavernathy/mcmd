@@ -92,6 +92,52 @@ double coulombic_real(System &system) {
     return 0.5*potential; // I think it's double counted. Compared to MPMC this is correct. 
 }
 
+void coulombic_real_force(System &system) {
+    
+    double alpha=system.constants.ewald_alpha;
+    double erfc_term; // = erfc(alpha*r);
+    double charge1, charge2, r,rsq;
+    double u[3];
+
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+    for (int k = 0; k < system.molecules.size(); k++) {
+    for (int l = 0; l < system.molecules[k].atoms.size(); l++) {
+    if (!(system.molecules[i].MF =="F" && system.molecules[k].MF =="F") &&
+        !(system.molecules[i].atoms[j].C == 0 || system.molecules[i].atoms[j].C == 0) ) { // don't do frozen-frozen or zero charge
+
+        charge1 = system.molecules[i].atoms[j].C*system.constants.E2REDUCED;
+        charge2 = system.molecules[k].atoms[l].C*system.constants.E2REDUCED;
+
+        // calculate distance between atoms
+        double* distances = getDistanceXYZ(system,i,j,k,l);
+        r = distances[3];
+        rsq = r*r;
+        for (int n=0; n<3; n++) u[n] = distances[n]/r;
+
+        if (r < system.constants.cutoff && (i < k)) { // only pairs and not beyond cutoff
+            erfc_term = erfc(alpha*r);
+            for (int n=0; n<3; n++) {
+                system.molecules[i].atoms[j].force[n] += charge1* charge2 *erfc_term/rsq * u[n];
+                system.molecules[k].atoms[l].force[n] -= charge1* charge2 *erfc_term/rsq * u[n];
+                
+            }
+            system.molecules[i].atoms[j].V += charge1 * charge2 * erfc_term / r;
+        } else if (i == k && j != l) { // self molecule interaction
+            for (int n=0; n<3; n++) {
+                system.molecules[i].atoms[j].force[n] += charge1 * charge2 * erf(alpha*r) / rsq * u[n];
+                system.molecules[k].atoms[l].force[n] -= charge1 * charge2 * erf(alpha*r) / rsq * u[n];
+            }
+            system.molecules[i].atoms[j].V -= (charge1 * charge2 * erf(alpha*r) / r); // negative (intra)
+        }
+
+    } // end if not frozen
+    } // end l
+    } // end k
+    } // end j
+    } // end i 
+}
+
 // Coulombic reciprocal electrostatic energy from Ewald //
 double coulombic_reciprocal(System &system) {   
     system.constants.coulombic_reciprocal=0;
@@ -103,18 +149,9 @@ double coulombic_reciprocal(System &system) {
     alpha = system.constants.ewald_alpha;
     kmax = system.constants.ewald_kmax;   
 
-    // define cubic reciprocals right quick.
-    double inverse_volume = 1.0/system.constants.volume;
-    double reciprocal_basis[3][3];   
-    reciprocal_basis[0][0] = inverse_volume * system.constants.y_length * system.constants.z_length;
-    reciprocal_basis[1][1] = inverse_volume * system.constants.x_length * system.constants.z_length;
-    reciprocal_basis[2][2] = inverse_volume * system.constants.x_length * system.constants.y_length;
-
-    for (int i=0; i<3; i++) {
-        for (int j=0; j<3; j++) {
-            if (i != j) reciprocal_basis[i][j] = 0.0;
-        }
-    }
+   // get recip (current)
+    system.pbc.calcVolume();
+    system.pbc.calcRecip(); 
 
     // fourier sum over a hemisphere (skipping certain points to avoid overcounting the face //
     for (l[0] = 0; l[0] <= kmax; l[0]++) {
@@ -127,7 +164,7 @@ double coulombic_reciprocal(System &system) {
                 // get reciprocal lattice vectors
                 for (p=0; p<3; p++) {
                     for (q=0, k[p] = 0; q < 3; q++) {
-                        k[p] += 2.0*M_PI*reciprocal_basis[p][q] * l[q];
+                        k[p] += 2.0*M_PI*system.pbc.reciprocal_basis[p][q] * l[q];
                     }
                 }
                 k_sq = k[0]*k[0] + k[1]*k[1] + k[2]*k[2];
@@ -154,12 +191,13 @@ double coulombic_reciprocal(System &system) {
         } // end for l[1], m
     } // end for l[0], l
 
-    potential *= 4.0 * M_PI / system.constants.volume;
+    potential *= 4.0 * M_PI / system.pbc.volume;
 
     //printf("coulombic_reciprocal: %f K\n",potential);
  //   system.constants.coulombic_reciprocal = potential; 
    return potential;
 }
+
 
 
 double coulombic_ewald(System &system) {
@@ -184,7 +222,7 @@ double coulombic_ewald(System &system) {
     return potential;
 }
 
-double coulombic(System &system) {
+double coulombic(System &system) { // old super basic coulombic
    // plain old coloumb
    double potential = 0;
    double r, q1, q2;

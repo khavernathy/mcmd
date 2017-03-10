@@ -110,8 +110,8 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	return output;
 }
 
-// ================ GET FORCES ON ATOMS ===============================
-void calculateForces(System &system, string model, double dt) {
+// ================ GET FORCES ON ATOMS ==============================
+/*void calculateForces_OLD(System &system, string model, double dt) {
 	
     // initialize variable for pressure calc in NVT
     system.constants.force_sum_for_pressure = 0;
@@ -250,7 +250,7 @@ void calculateForces(System &system, string model, double dt) {
 
 
         // also compute force * r dot products for pressure calc in NVT
-        /*if (system.constants.ensemble == "nvt") {
+        if (system.constants.ensemble == "nvt") {
             for (int j=0; j<system.molecules[i].atoms.size(); j++) {
                 for (int k=0; k<system.molecules.size(); k++) {
                     for (int l=0; l<system.molecules[k].atoms.size(); l++) {
@@ -268,10 +268,42 @@ void calculateForces(System &system, string model, double dt) {
                 }
             }
         } // end if NVT
-        */
+        
     } // end loop i
 
 //printf("count: %i\n",countem);
+}
+*/
+
+void calculateForces(System &system, string model, double dt) {
+	
+    // initialize variable for pressure calc in NVT
+    system.constants.force_sum_for_pressure = 0;
+    system.constants.MM_interactions = 0;
+    // loop through all atoms
+	for (int j=0; j <system.molecules.size(); j++) {
+	for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
+		// initialize stuff
+		system.molecules[j].atoms[i].force[0] = 0.0;
+		system.molecules[j].atoms[i].force[1] = 0.0;
+		system.molecules[j].atoms[i].force[2] = 0.0;
+		system.molecules[j].atoms[i].V = 0.0;
+	}
+	}
+	
+    if (model == "lj" || model == "ljes" || model == "ljespolar")
+        coulombic_real_force(system);
+    
+    if (model == "ljes" || model == "ljespolar")
+    lj_force(system);
+    
+    // atomic forces are done, so now calc molecular values
+    for (int i=0; i<system.molecules.size(); i++) {
+        system.molecules[i].calc_force();
+        if (system.constants.md_rotations == "on" && system.molecules[i].atoms.size() > 1) 
+            system.molecules[i].calc_torque();
+    }
+
 }
 
 // ==================== MOVE ATOMS MD STYLE =========================
