@@ -1,5 +1,5 @@
-md_test
-md_test/*
+#md_test
+#md_test/*
 thermo*
 restart*
 runlog*
@@ -11,4 +11,4 @@ radialdist*
 src/scratc*
 a
 b
-
+te
