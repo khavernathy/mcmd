@@ -26,6 +26,8 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
             (system.pbc.volume - system.pbc.old_volume)
             - (system.stats.count_movables + 1) * system.constants.temp * 
             log(system.pbc.volume/system.pbc.old_volume))/system.constants.temp);
+            
+            system.stats.volume_change_bf_sum += bf;
             //printf("old_vol: %f; vol: %f\n", system.pbc.old_volume, system.pbc.volume);
         }
     }

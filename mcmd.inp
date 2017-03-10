@@ -18,16 +18,16 @@ z_length   111         25.669 150   15.669    60    27.4876  150.97371
 
 
 ! radial distribution option
-radial_dist         off   ! turns on/off radial distribution function. off for speed-up
+radial_dist         on   ! turns on/off radial distribution function. off for speed-up
 radial_bin_size     0.1  ! in A
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
-radial_centroid     ZN   ! element name
-radial_counterpart  H2G   ! element name to get distance of w/centroid
+radial_centroid     Ne   ! element name
+radial_counterpart  Ne   ! element name to get distance of w/centroid
 radial_file         radialdist.dat 
 
 
 ! MONTE CARLO ONLY ======================================
-ensemble		    npt   uvt
+ensemble		    uvt
 
 mc_corrtime	        200
 finalstep		    5000000
