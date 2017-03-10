@@ -21,7 +21,7 @@ To run
 TODO
 
 -> make averages update every step instead of every corrtime..
-    -> e.g. by making the MC or MD step a global system variable (duh!)
+    -> fix MC energy total bug
 -> make universal unit-cell  
     -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON
 -> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT
