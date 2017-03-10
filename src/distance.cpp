@@ -4,11 +4,9 @@
 
 double getDistance(System &system, int i, int j, int k, int l) {
    // calculate distance between atoms
-        double dx,dy,dz,r,rsq;
+        double d[3],r,rsq;
 
-        dx = (system.molecules[i].atoms[j].pos[0] - system.molecules[k].atoms[l].pos[0]);
-        dy = (system.molecules[i].atoms[j].pos[1] - system.molecules[k].atoms[l].pos[1]);
-        dz = (system.molecules[i].atoms[j].pos[2] - system.molecules[k].atoms[l].pos[2]);
+        for (int n=0; n<3; n++) d[n] = system.molecules[i].atoms[j].pos[n] - system.molecules[k].atoms[l].pos[n];
 
         // apply 1/2 box cutoff:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
         /*
@@ -20,18 +18,16 @@ double getDistance(System &system, int i, int j, int k, int l) {
         if (dz < system.constants.z_min) { dz = dz + system.constants.z_length; }
         */    
 
-        rsq = dx*dx + dy*dy + dz*dz;
+        rsq = d[0]*d[0] + d[1]*d[1] + d[2]*d[2];
         r = sqrt(rsq); 
         return r;
 }
 
 double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
     // calculate distance between atoms
-        double dx,dy,dz,r,rsq;
+        double d[3],r,rsq;
 
-        dx = (system.molecules[i].atoms[j].pos[0] - system.molecules[k].atoms[l].pos[0]);
-        dy = (system.molecules[i].atoms[j].pos[1] - system.molecules[k].atoms[l].pos[1]);
-        dz = (system.molecules[i].atoms[j].pos[2] - system.molecules[k].atoms[l].pos[2]);
+        for (int n=0; n<3; n++) d[n] = system.molecules[i].atoms[j].pos[n] - system.molecules[k].atoms[l].pos[n];
 
         // apply 1/2 box cutoff:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
        /*
@@ -42,14 +38,12 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         if (dz > system.constants.z_max) { dz = dz - system.constants.z_length; }
         if (dz < system.constants.z_min) { dz = dz + system.constants.z_length; }
 */
-        rsq = dx*dx + dy*dy + dz*dz;
+        rsq = d[0]*d[0] + d[1]*d[1] + d[2]*d[2];
         r = sqrt(rsq);
 
         static double output[4];
 
-        output[0] = dx;
-        output[1] = dy;
-        output[2] = dz;
+        for (int n=0; n<3; n++) output[n] = d[n];
         output[3] = r;        
 
         return output;
