@@ -181,7 +181,10 @@ class Pbc {
                 vector2[n] = box_vertices[p3index][n] - box_vertices[p1index][n];
             }
 
+            // 3) calculate normal vector to the plane
             double* normal = crossprod(vector1, vector2);
+
+            // 4) plane equation is thus defined
             A[planeIndex] = normal[0]; 
             B[planeIndex] = normal[1];
             C[planeIndex] = normal[2];

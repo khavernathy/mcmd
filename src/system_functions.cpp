@@ -268,6 +268,7 @@ else {
                 // set new z coordinate
                 system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
                 // set new y based on new z
+                
                 double ydist = system.molecules[i].atoms[k].pos[1] - box_limit[2];
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydist;

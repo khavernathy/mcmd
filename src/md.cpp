@@ -155,7 +155,7 @@ void calculateForces(System &system, string model, double dt) {
 				
                 if (system.constants.md_pbc == "on") {
                     // get image r in reciprocal space
-                    /*for (p = 0; p <3 ; p++) {
+                    for (p = 0; p <3 ; p++) {
                         img[p]=0;
                         for (q = 0; q < 3; q++) {
                             img[p] += system.pbc.reciprocal_basis[q][p]*d[q];
@@ -173,7 +173,7 @@ void calculateForces(System &system, string model, double dt) {
                     // correct displacement
                     for (n=0; n<3; n++)
                         di[n] = d[n] - di[n];
-                    */
+                    
 
                     // pythagorean
 	                rsq = dddotprod(d,d);
@@ -361,7 +361,6 @@ void integrate(System &system, double dt) {
     if (system.constants.md_pbc == "on") {
         for (int j=0; j<system.molecules.size(); j++) {
             if (system.molecules[j].MF == "M") {
-                // HEREIN LIES THE PROBLEM.
                 checkInTheBox(system,j);
             } // end if movable
 	    } // end loop j molecules
