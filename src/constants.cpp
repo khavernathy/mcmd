@@ -406,9 +406,12 @@ class Last {
     public:
         Last();
         double rdU, esU, polarU, totalU;
+            double current_rd_sum, current_es_sum, current_polar_sum, current_energy_sum;
         double lj_lrc, lj_self_lrc, lj;
+            double current_lj_lrc_sum, current_lj_self_lrc_sum, current_lj_sum;
         double coulombic_self, coulombic_real, coulombic_reciprocal;
-
+            double current_coulombic_self_sum, current_coulombic_real_sum, current_coulombic_reciprocal_sum;
+        
 };
 
 Last::Last() {}

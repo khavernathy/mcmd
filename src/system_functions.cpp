@@ -330,6 +330,23 @@ void setupBox(System &system) {
 
 void setCheckpoint(System &system) {
     // saves variables of interest to temporary storage JIC
+   
+    //sums
+    system.last.current_rd_sum = system.stats.current_rd_sum; 
+        system.last.current_lj_lrc_sum = system.stats.current_lj_lrc_sum;
+        system.last.current_lj_self_lrc_sum = system.stats.current_lj_self_lrc_sum;
+        system.last.current_lj_sum = system.stats.current_lj_sum;
+   
+    system.last.current_es_sum = system.stats.current_es_sum;
+        system.last.current_coulombic_self_sum = system.stats.current_coulombic_self_sum;
+        system.last.current_coulombic_real_sum = system.stats.current_coulombic_real_sum;
+        system.last.current_coulombic_reciprocal_sum = system.stats.current_coulombic_reciprocal_sum;
+
+    system.last.current_polar_sum = system.stats.current_polar_sum;
+
+    system.last.current_energy_sum = system.stats.current_energy_sum;
+
+    // values
     system.last.rdU = system.stats.rdU;
         system.last.lj_lrc = system.stats.lj_lrc;
         system.last.lj_self_lrc = system.stats.lj_self_lrc;
@@ -345,6 +362,23 @@ void setCheckpoint(System &system) {
 
 void revertToCheckpoint(System &system) {
     // reverts variables of interest if needed
+    
+    system.stats.current_rd_sum = system.last.current_rd_sum + system.last.rdU;
+        system.stats.current_lj_lrc_sum = system.last.current_lj_lrc_sum + system.last.lj_lrc;
+        system.stats.current_lj_self_lrc_sum = system.last.current_lj_self_lrc_sum + system.last.lj_self_lrc;
+        system.stats.current_lj_sum = system.last.current_lj_sum + system.last.lj;
+
+    system.stats.current_es_sum = system.last.current_es_sum + system.last.esU;
+        system.stats.current_coulombic_self_sum = system.last.current_coulombic_self_sum + system.last.coulombic_self;
+        system.stats.current_coulombic_real_sum = system.last.current_coulombic_real_sum + system.last.coulombic_real;
+        system.stats.current_coulombic_reciprocal_sum = system.last.current_coulombic_reciprocal_sum + system.last.coulombic_reciprocal;
+
+    system.stats.current_polar_sum = system.last.current_polar_sum + system.last.polarU;
+
+    system.stats.current_energy_sum = system.last.current_energy_sum + system.last.totalU;
+
+
+    // values
     system.stats.rdU = system.last.rdU;
         system.stats.lj_lrc = system.last.lj_lrc;
         system.stats.lj_self_lrc = system.last.lj_self_lrc;
