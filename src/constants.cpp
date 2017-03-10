@@ -52,7 +52,7 @@ class Constants {
         int finalstep; // user defined for MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int  md_corrtime; // user defined for MD
-		double x_length,y_length,z_length,x_max,y_max,z_max,x_min,y_min,z_min; // box parameters, in A
+		// OLD DEPRECATED double x_length,y_length,z_length,x_max,y_max,z_max,x_min,y_min,z_min; // box parameters, in A
 		double cutoff;
 
         // MD STUFF
@@ -133,10 +133,11 @@ class Pbc {
         Pbc();
 
         double x_length, y_length, z_length; // for moving molecules back into box on other side, computing in calcBoxVertices
+        double x_min,x_max,y_min,y_max,z_min,z_max;
         double basis[3][3];
         double reciprocal_basis[3][3];
 		double cutoff;
-        double volume, inverse_volume;
+        double volume, inverse_volume, old_volume;
         double a, b, c, alpha, beta, gamma;
         double box_vertices[8][3];
         double A[6], B[6], C[6], D[6]; // these are coefficients for plane equations for PBC

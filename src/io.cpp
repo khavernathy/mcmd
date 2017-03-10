@@ -382,21 +382,21 @@ void readInput(System &system, char* filename) {
             // BASIS STUFF. 
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {
-                system.constants.x_length = atof(lc[1].c_str());
+                system.pbc.x_length = atof(lc[1].c_str());
                 system.pbc.basis[0][0] = atof(lc[1].c_str());
                 system.pbc.basis[0][1] = 0;
                 system.pbc.basis[0][2] = 0;
                 std::cout << "Got x_length = " << lc[1].c_str() << " A"; printf("\n");
             
             } else if (!strcasecmp(lc[0].c_str(), "y_length")) {
-                system.constants.y_length = atof(lc[1].c_str());
+                system.pbc.y_length = atof(lc[1].c_str());
                 system.pbc.basis[1][1] = atof(lc[1].c_str());
                 system.pbc.basis[1][0] = 0;
                 system.pbc.basis[1][2] = 0;
                 std::cout << "Got y_length = " << lc[1].c_str() << " A"; printf("\n");
             
             } else if (!strcasecmp(lc[0].c_str(), "z_length")) {
-                system.constants.z_length = atof(lc[1].c_str());
+                system.pbc.z_length = atof(lc[1].c_str());
                 system.pbc.basis[2][2] = atof(lc[1].c_str());
                 system.pbc.basis[2][0] = 0;
                 system.pbc.basis[2][1] = 0;

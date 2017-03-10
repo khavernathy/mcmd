@@ -102,36 +102,36 @@ void checkInTheBox(System &system, int i) {
 if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
     if (system.constants.md_mode == "molecular") {
     for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-        if (system.molecules[i].atoms[j].pos[0]  > system.constants.x_max) {
+        if (system.molecules[i].atoms[j].pos[0]  > system.pbc.x_max) {
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                    system.molecules[i].atoms[k].pos[0] -= system.constants.x_length;
+                    system.molecules[i].atoms[k].pos[0] -= system.pbc.x_length;
                 }
         }
-        else if (system.molecules[i].atoms[j].pos[0] < system.constants.x_min) {
+        else if (system.molecules[i].atoms[j].pos[0] < system.pbc.x_min) {
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-	                system.molecules[i].atoms[k].pos[0] += system.constants.x_length;
+	                system.molecules[i].atoms[k].pos[0] += system.pbc.x_length;
                 }
         }
 
-        if (system.molecules[i].atoms[j].pos[1] > system.constants.y_max) {
+        if (system.molecules[i].atoms[j].pos[1] > system.pbc.y_max) {
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                    system.molecules[i].atoms[k].pos[1] -= system.constants.y_length;
+                    system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
                 }
         }
-        else if (system.molecules[i].atoms[j].pos[1] < system.constants.y_min) {
+        else if (system.molecules[i].atoms[j].pos[1] < system.pbc.y_min) {
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                    system.molecules[i].atoms[k].pos[1] += system.constants.y_length;
+                    system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
                 }
         }
 
-        if (system.molecules[i].atoms[j].pos[2]  > system.constants.z_max) {
+        if (system.molecules[i].atoms[j].pos[2]  > system.pbc.z_max) {
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                    system.molecules[i].atoms[k].pos[2] -= system.constants.z_length;
+                    system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
                 }
         }
-        else if (system.molecules[i].atoms[j].pos[2] < system.constants.z_min) {
+        else if (system.molecules[i].atoms[j].pos[2] < system.pbc.z_min) {
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                    system.molecules[i].atoms[k].pos[2] += system.constants.z_length;
+                    system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
                 }
         }	
     } // end atom loop
@@ -139,25 +139,25 @@ if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
     else if (system.constants.md_mode == "atomic") {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {        
 
-        if (system.molecules[i].atoms[j].pos[0]  > system.constants.x_max) {
-                    system.molecules[i].atoms[j].pos[0] -= system.constants.x_length;
+        if (system.molecules[i].atoms[j].pos[0]  > system.pbc.x_max) {
+                    system.molecules[i].atoms[j].pos[0] -= system.pbc.x_length;
         }
-        else if (system.molecules[i].atoms[j].pos[0] < system.constants.x_min) {
-                    system.molecules[i].atoms[j].pos[0] += system.constants.x_length;
-        }
-
-        if (system.molecules[i].atoms[j].pos[1] > system.constants.y_max) {
-                    system.molecules[i].atoms[j].pos[1] -= system.constants.y_length;
-        }
-        else if (system.molecules[i].atoms[j].pos[1] < system.constants.y_min) {
-                    system.molecules[i].atoms[j].pos[1] += system.constants.y_length;
+        else if (system.molecules[i].atoms[j].pos[0] < system.pbc.x_min) {
+                    system.molecules[i].atoms[j].pos[0] += system.pbc.x_length;
         }
 
-        if (system.molecules[i].atoms[j].pos[2]  > system.constants.z_max) {
-                    system.molecules[i].atoms[j].pos[2] -= system.constants.z_length;
+        if (system.molecules[i].atoms[j].pos[1] > system.pbc.y_max) {
+                    system.molecules[i].atoms[j].pos[1] -= system.pbc.y_length;
         }
-        else if (system.molecules[i].atoms[j].pos[2] < system.constants.z_min) {
-                    system.molecules[i].atoms[j].pos[2] += system.constants.z_length;
+        else if (system.molecules[i].atoms[j].pos[1] < system.pbc.y_min) {
+                    system.molecules[i].atoms[j].pos[1] += system.pbc.y_length;
+        }
+
+        if (system.molecules[i].atoms[j].pos[2]  > system.pbc.z_max) {
+                    system.molecules[i].atoms[j].pos[2] -= system.pbc.z_length;
+        }
+        else if (system.molecules[i].atoms[j].pos[2] < system.pbc.z_min) {
+                    system.molecules[i].atoms[j].pos[2] += system.pbc.z_length;
         } 
     } // end atom loop
     } // end if atomic
@@ -312,12 +312,12 @@ void moleculePrintout(System &system) {
 
 void setupBox(System &system) {
     if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
-	system.constants.x_max = system.constants.x_length/2.0;
-	system.constants.x_min = -system.constants.x_max;
-	system.constants.y_max = system.constants.y_length/2.0;
-	system.constants.y_min = -system.constants.y_max;
-	system.constants.z_max = system.constants.z_length/2.0;
-	system.constants.z_min = -system.constants.z_max;
+	system.pbc.x_max = system.pbc.x_length/2.0;
+	system.pbc.x_min = -system.pbc.x_max;
+	system.pbc.y_max = system.pbc.y_length/2.0;
+	system.pbc.y_min = -system.pbc.y_max;
+	system.pbc.z_max = system.pbc.z_length/2.0;
+	system.pbc.z_min = -system.pbc.z_max;
     }
     system.pbc.calcVolume();
     system.pbc.calcRecip();

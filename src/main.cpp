@@ -319,10 +319,8 @@ int main(int argc, char **argv) {
 
 	// FINAL EXIT OUTPUT
     if (system.constants.ensemble == "npt") {
-	    printf("Final box length parameters: \n");
-	    printf("x: %.5f\n",system.constants.x_length);
-	    printf("y: %.5f\n",system.constants.y_length);
-	    printf("z: %.5f\n",system.constants.z_length);
+	    printf("Final basis parameters: \n");
+        system.pbc.printBasis();
     }
 	printf("Insert accepts:        %i\n", system.stats.insert_accepts);
 	printf("Remove accepts:        %i\n", system.stats.remove_accepts);

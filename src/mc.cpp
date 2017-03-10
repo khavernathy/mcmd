@@ -9,46 +9,44 @@
 #include <potential.cpp>
 #include <add_molecule.cpp>
 #include <remove_molecule.cpp>
+#include <boltzmann.cpp>
 
 // PHAST2 NOT INCLUDED YET
 
 /* (RE)DEFINE THE BOX LENGTHS */
 void defineBox(System &system) { // takes input in A
+	// easy 90 90 90 systems
+	if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+		// assumes x_length, y_length, z_length are defined already in system.
+		// i.e. the volume-change function does that before calling this function
 
-// easy 90 90 90 systems
-if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+		system.pbc.basis[0][0] = system.pbc.x_length;
+		system.pbc.basis[1][1] = system.pbc.y_length;   
+		system.pbc.basis[2][2] = system.pbc.z_length;
 
-    // assumes x_length, y_length, z_length are defined already in system.
-    // i.e. the volume-change function does that before calling this function
+		system.pbc.x_max = system.pbc.x_length/2.0;
+		system.pbc.x_min = -system.pbc.x_max;
+		system.pbc.y_max = system.pbc.y_length/2.0;
+		system.pbc.y_min = -system.pbc.y_max;
+		system.pbc.z_max = system.pbc.z_length/2.0;
+		system.pbc.z_min = -system.pbc.z_max;
 
-	system.constants.x_max = system.constants.x_length/2.0;
-	system.constants.x_min = -system.constants.x_max;
-	system.constants.y_max = system.constants.y_length/2.0;
-	system.constants.y_min = -system.constants.y_max;
-	system.constants.z_max = system.constants.z_length/2.0;
-	system.constants.z_min = -system.constants.z_max;
+		system.pbc.cutoff = system.pbc.x_max; // crude method but good for cubes (and only cubes!!)
+		// need to make basis vector system later.
+		system.constants.ewald_alpha = 3.5/system.constants.cutoff; // update ewald_alpha if we have a vol change
 
-    system.constants.cutoff = system.constants.x_max; // a crude method for cutoff but does the job for cubic.
-    system.pbc.cutoff = system.constants.cutoff;
-    // need to make basis vector system later.
-    system.constants.ewald_alpha = 3.5/system.constants.cutoff; // update ewald_alpha if we have a vol change
-
-	system.constants.volume = system.constants.x_length * system.constants.y_length * system.constants.z_length; // in A^3
-
+		system.pbc.volume = system.pbc.x_length * system.pbc.y_length * system.pbc.z_length; // in A^3
+	}
+	// universal definitions
+	else {
+		// this could forseeably be a problem if, for some weird reason, someone wants to do NPT with a weird box.
+		system.pbc.calcVolume();
+		system.pbc.calcRecip();
+		system.pbc.calcCutoff();
+		system.pbc.calcBoxVertices();
+		system.pbc.calcPlanes();
+	}
 }
-// universal definitions
-else {
-    system.pbc.calcVolume();
-    system.pbc.calcRecip();
-    system.pbc.calcCutoff();
-    system.pbc.calcBoxVertices();
-    system.pbc.calcPlanes();
-}
-
-
-}
-
-
 
 /* CHANGE VOLUME OF SYSTEM BY BOLTZMANN PROB -- FOR NPT */
 void changeVolumeMove(System &system) {
@@ -62,40 +60,37 @@ void changeVolumeMove(System &system) {
         double* energies = getTotalPotential(system,system.constants.potential_form);
         old_energy=energies[0]+energies[1]+energies[2]+energies[3];
 
-    double old_volume = system.constants.volume; // in A3
-    double old_side = system.constants.x_length; // in A
-    //double old_volume_A3 = 1e30*old_volume; // in A3
+    double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
+    system.pbc.old_volume = system.pbc.volume;
 
     // change the volume to test new energy.
-    double new_volume = exp(log(old_volume) + (ranv-0.5)*system.constants.volume_change);// mpmc default = 2.5
+    double new_volume = exp(log(system.pbc.volume) + (ranv-0.5)*system.constants.volume_change);// mpmc default = 2.5
+
     //double new_volume = 1e-30*new_volume_A3;
     double new_side = pow(new_volume, 1.0/3.0);
-    system.constants.x_length = new_side;
-    system.constants.y_length = new_side;
-    system.constants.z_length = new_side;
+    system.pbc.x_length = new_side;
+    system.pbc.y_length = new_side;
+    system.pbc.z_length = new_side;
     defineBox(system);
+    //printf("OLDV before energy call: %f; NEWV before energy call: %f\n", system.pbc.old_volume, system.pbc.volume);        
+        double* potentials = getTotalPotential(system,system.constants.potential_form);
+        new_energy=potentials[0]+potentials[1]+potentials[2]+potentials[3];
 
-            double* potentials = getTotalPotential(system,system.constants.potential_form);
-            new_energy=potentials[0]+potentials[1]+potentials[2]+potentials[3];
-
-    double energy_delta = (new_energy - old_energy); //keep in K    
-    
-	//Frenkel Smit p. 118: volume change prob.
-    double boltzmann_factor = exp(-( energy_delta
-                            + system.constants.pres * system.constants.ATM2REDUCED * (new_volume - old_volume)
-                            - (system.stats.count_movables + 1) * system.constants.temp * log(new_volume/old_volume)
-                        )/system.constants.temp);
-
-	
+    //printf("OLDV before bf call: %f; NEWV before bf call: %f\n", system.pbc.old_volume, system.pbc.volume); 
+    double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, "volume");
 	system.stats.volume_change_bf_sum += boltzmann_factor;
+
+    //printf("ranf < bf? %f < %f ?\n", ranf, boltzmann_factor);
 	if (ranf < boltzmann_factor) {
 		// accept move
+        //printf("ACCEPTED\n");
 		system.stats.volume_change_accepts++;
 	} else {
+        //printf("REJECTED\n");
 		// reject move (move volume back)
-        system.constants.x_length = old_side;
-        system.constants.y_length = old_side;
-        system.constants.z_length = old_side;
+        system.pbc.x_length = old_side;
+        system.pbc.y_length = old_side;
+        system.pbc.z_length = old_side;
         defineBox(system);
 	}
 }

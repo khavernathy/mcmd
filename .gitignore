@@ -2,7 +2,7 @@
 #md_test/*
 thermo*
 restart*
-runlog*
+runlo*
 density*
 energy*
 traj*
@@ -11,4 +11,5 @@ radialdist*
 src/scratc*
 a
 b
+md_test/te
 te
