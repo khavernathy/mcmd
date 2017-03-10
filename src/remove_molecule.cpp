@@ -46,7 +46,7 @@ void removeMolecule(System &system, string model) {
 
     //printf("doing boltzmann -- ");
     // calculate BOLTZMANN FACTOR
-    double boltz_factor = system.constants.temp * ((double)(system.stats.count_movables) + 1.0)/(system.constants.volume*system.constants.pres*system.constants.ATM2REDUCED) *
+    double boltz_factor = system.constants.temp * ((double)(system.stats.count_movables) + 1.0)/(system.pbc.volume*system.constants.pres*system.constants.ATM2REDUCED) *
                             exp(-energy_delta/system.constants.temp); 
 
 

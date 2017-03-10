@@ -11,12 +11,14 @@ double getDistance(System &system, int i, int j, int k, int l) {
         dz = (system.molecules[i].atoms[j].pos[2] - system.molecules[k].atoms[l].pos[2]);
 
         // apply 1/2 box cutoff:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
+        /*
         if (dx > system.constants.x_max) { dx = dx - system.constants.x_length; }
         if (dx < system.constants.x_min) { dx = dx + system.constants.x_length; }
         if (dy > system.constants.y_max) { dy = dy - system.constants.y_length; }
         if (dy < system.constants.y_min) { dy = dy + system.constants.y_length; }
         if (dz > system.constants.z_max) { dz = dz - system.constants.z_length; }
         if (dz < system.constants.z_min) { dz = dz + system.constants.z_length; }
+        */    
 
         rsq = dx*dx + dy*dy + dz*dz;
         r = sqrt(rsq); 
@@ -32,13 +34,14 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         dz = (system.molecules[i].atoms[j].pos[2] - system.molecules[k].atoms[l].pos[2]);
 
         // apply 1/2 box cutoff:: p.29-30 Computer Simulation of Liquids 1991 Allen Tildesley
-        if (dx > system.constants.x_max) { dx = dx - system.constants.x_length; }
+       /*
+         if (dx > system.constants.x_max) { dx = dx - system.constants.x_length; }
         if (dx < system.constants.x_min) { dx = dx + system.constants.x_length; }
         if (dy > system.constants.y_max) { dy = dy - system.constants.y_length; }
         if (dy < system.constants.y_min) { dy = dy + system.constants.y_length; }
         if (dz > system.constants.z_max) { dz = dz - system.constants.z_length; }
         if (dz < system.constants.z_min) { dz = dz + system.constants.z_length; }
-
+*/
         rsq = dx*dx + dy*dy + dz*dz;
         r = sqrt(rsq);
 

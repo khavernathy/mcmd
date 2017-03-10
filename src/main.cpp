@@ -55,29 +55,10 @@ int main(int argc, char **argv) {
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
 	centerCoordinates(system);
-    defineBox(system);
+    setupBox(system);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
-    
-    // CONFIRM ATOMS AND MOLECULES PRINTOUT
-/*    
-	for (int b=0; b<system.molecules.size(); b++) {
-		printf("Molecule PDBID = %i: %s has %i atoms and is %s; The first atom has PDBID = %i\n", system.molecules[b].PDBID, system.molecules[b].name.c_str(), (int)system.molecules[b].atoms.size(), system.molecules[b].MF.c_str(), system.molecules[b].atoms[0].PDBID);
-		for (int c=0; c<system.molecules[b].atoms.size(); c++) {
-            system.molecules[b].atoms[c].printAll();
-            printf("\n");
-        }
-		
-	} 
-*/
-    if (system.constants.mode == "mc") { // prototype is only used for MC.
-	printf("Prototype molecule has PDBID %i ( name %s ) and has %i atoms\n", system.proto.PDBID, system.proto.name.c_str(), (int)system.proto.atoms.size());
-    /*for (int i=0; i<system.proto.atoms.size(); i++) {
-        system.proto.atoms[i].printAll();
-    } */	
-    }
-    
-    // END MOLECULE PRINTOUT
+    moleculePrintout(system);    
 
 	// clobber files 
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
@@ -232,7 +213,7 @@ int main(int argc, char **argv) {
             }
 
 			// VOLUME
-			double volume = system.constants.volume; 
+			double volume = system.pbc.volume; 
 			current_volume_sum += volume;
 				volume_average = current_volume_sum/corrtime_iter;
 	

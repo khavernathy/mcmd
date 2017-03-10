@@ -403,7 +403,6 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got z_length = " << lc[1].c_str() << " A"; printf("\n");
         
                 system.pbc.calcCarBasis();
-                system.pbc.calcBoxVertices();    
 
             // OR EXACT BASIS INPUT (by vectors)
             } else if (!strcasecmp(lc[0].c_str(), "basis1")) {
@@ -422,7 +421,6 @@ void readInput(System &system, char* filename) {
                 std:: cout << "Got basis3 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
 
                 system.pbc.calcCarBasis();
-                system.pbc.calcBoxVertices();
 
             } else if (!strcasecmp(lc[0].c_str(), "carbasis")) {
                 double a = atof(lc[1].c_str());
@@ -440,7 +438,6 @@ void readInput(System &system, char* filename) {
                 system.pbc.gamma = gamma;
 
                 system.pbc.calcNormalBasis();
-                system.pbc.calcBoxVertices();
 
                 std::cout << "Got .car basis: a,b,c = " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str(); printf("\n");
                 std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");

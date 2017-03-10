@@ -37,9 +37,9 @@ void addMolecule(System &system, string model) {
     }
 
 	// for random placement
-	double randx = system.constants.x_max*(((double)rand()/(double)RAND_MAX)*2-1); // (-1 -> 1) * 1/2length
-	double randy = system.constants.y_max*(((double)rand()/(double)RAND_MAX)*2-1);
-	double randz = system.constants.z_max*(((double)rand()/(double)RAND_MAX)*2-1);
+	double randx = 0.5*system.pbc.x_length*(((double)rand()/(double)RAND_MAX)*2-1); // (-1 -> 1) * 1/2length
+	double randy = 0.5*system.pbc.y_length*(((double)rand()/(double)RAND_MAX)*2-1);
+	double randz = 0.5*system.pbc.z_length*(((double)rand()/(double)RAND_MAX)*2-1);
 	double deltax = randx - system.proto.atoms[0].pos[0]; // fixed random distances from the prototype molecule.
 	double deltay = randy - system.proto.atoms[0].pos[1];
 	double deltaz = randz - system.proto.atoms[0].pos[2];
@@ -79,8 +79,7 @@ void addMolecule(System &system, string model) {
 	double energy_delta = (new_potential - old_potential);
 	
 	// BOLTZMANN ACCEPT OR REJECT
-	//printf("vol: %e, pres: %f, kb: %e, temp: %f, size: %f, e_delta: %e\n", system.constants.volume, system.constants.pres, system.constants.kb, system.constants.temp, (double)system.molecules.size(), energy_delta);
-        double boltz_factor = system.constants.volume * system.constants.pres * system.constants.ATM2REDUCED/(system.constants.temp * (double)(system.stats.count_movables)) *
+        double boltz_factor = system.pbc.volume * system.constants.pres * system.constants.ATM2REDUCED/(system.constants.temp * (double)(system.stats.count_movables)) *
                             exp(-energy_delta/system.constants.temp);
 
 	system.stats.insert_bf_sum += boltz_factor;				

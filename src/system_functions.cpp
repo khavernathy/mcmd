@@ -94,8 +94,7 @@ double * centerOfMass(System &system) {
 }
 
 
-/* CHECK IF ATOM IS IN BOX AND MOVE IT (AND MOLECULE) BACK IN */
-/* MAKING THIS UNIVERSAL FOR ANY UNIT-CELL, NOT JUST alpha=beta=gamma=90 */
+/* CHECK IF MOLECULE IS IN BOX AND MOVE BACK IN IF NOT */
 void checkInTheBox(System &system, int i) {
 
 // first the easy systems, alpha=beta=gamma=90
@@ -184,7 +183,7 @@ else {
     // if outside box checks are correct but moves are not..
     // NOTE: the r_c cutoff is not actually used in MD
     if (system.constants.md_mode == "molecular") {
-        
+
         if (system.molecules[i].com[0] < box_limit[0]) { // left of box
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 // set new x coordinate
@@ -287,3 +286,44 @@ else {
 
 } 
 } // end pbc function
+
+
+void moleculePrintout(System &system) {
+    // CONFIRM ATOMS AND MOLECULES PRINTOUT
+/*    
+    for (int b=0; b<system.molecules.size(); b++) {
+        printf("Molecule PDBID = %i: %s has %i atoms and is %s; The first atom has PDBID = %i\n", system.molecules[b].PDBID, system.molecules[b].name.c_str(), (int)system.molecules[b].atoms.size(), system.molecules[b].MF.c_str(), system.molecules[b].atoms[0].PDBID);
+        for (int c=0; c<system.molecules[b].atoms.size(); c++) {
+            system.molecules[b].atoms[c].printAll();
+            printf("\n");
+        }
+        
+    } 
+*/
+    if (system.constants.mode == "mc") { // prototype is only used for MC.
+    printf("Prototype molecule has PDBID %i ( name %s ) and has %i atoms\n", system.proto.PDBID, system.proto.name.c_str(), (int)system.proto.atoms.size());
+    /*for (int i=0; i<system.proto.atoms.size(); i++) {
+        system.proto.atoms[i].printAll();
+    } */    
+    }
+    
+    // END MOLECULE PRINTOUT
+}
+
+void setupBox(System &system) {
+    if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+	system.constants.x_max = system.constants.x_length/2.0;
+	system.constants.x_min = -system.constants.x_max;
+	system.constants.y_max = system.constants.y_length/2.0;
+	system.constants.y_min = -system.constants.y_max;
+	system.constants.z_max = system.constants.z_length/2.0;
+	system.constants.z_min = -system.constants.z_max;
+    }
+    system.pbc.calcVolume();
+    system.pbc.calcRecip();
+    system.pbc.calcCutoff();
+    system.constants.ewald_alpha = 3.5/system.pbc.cutoff;
+    system.pbc.calcBoxVertices();
+    system.pbc.calcPlanes();
+    system.pbc.printBasis();
+}

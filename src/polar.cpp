@@ -101,7 +101,7 @@ void thole_amatrix(System &system) {
     double damp1=0, damp2=0, wdamp1=0, wdamp2=0, v, s;
     double r, r2, ir3, ir5, ir=0;
     double rcut, rcut2, rcut3;
-    rcut = system.constants.cutoff;
+    rcut = system.pbc.cutoff;
     rcut2 = rcut*rcut; rcut3 = rcut2*rcut;
     double l, l2, l3;
     l = system.constants.polar_damp;
@@ -203,7 +203,7 @@ void thole_field(System &system) {
     double OneOverSqrtPi = 1.0/sqrt(M_PI);
     int p; //dimensionality
     double r, rr; //r and 1/r (reciprocal of r)
-    double R = system.constants.cutoff;
+    double R = system.pbc.cutoff;
     double rR = 1./R;
     //used for polar_wolf_alpha (aka polar_wolf_damp)
     double a = system.constants.polar_wolf_alpha;
@@ -222,11 +222,8 @@ void thole_field(System &system) {
                 double* distances = getDistanceXYZ(system, i,j,k,l);
                 r = distances[3];
 
-                if((r  < system.constants.cutoff) && (r != 0.)) {
+                if((r  < system.pbc.cutoff) && (r != 0.)) {
                     rr = 1./r;
-
-
-                    //printf("q1 = %f, q2 = %f, cutoff= %f\n", system.molecules[i].atoms[j].C*system.constants.E2REDUCED, system.molecules[k].atoms[l].C*system.constants.E2REDUCED, system.constants.cutoff);
 
                     if ( a != 0 )   
                         bigmess=(erfc(a*r)*rr*rr+2.0*a*OneOverSqrtPi*exp(-a*a*r*r)*rr);

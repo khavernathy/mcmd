@@ -67,9 +67,8 @@ double coulombic_real(System &system) {
         // calculate distance between atoms
         r = getDistance(system,i,j,k,l);
 
-//printf("r = %f, r_c = %f, i = %i, j = %i, k = %i, l = %i, q1 = %f, q2 = %f\n", r, system.constants.cutoff, i, j , k, l, charge1, charge2);
 
-        if (r < system.constants.cutoff && (i != k)) { // only pairs and not beyond cutoff
+        if (r < system.pbc.cutoff && (i != k)) { // only pairs and not beyond cutoff
             erfc_term = erfc(alpha*r);
             pair_potential += charge1 * charge2 * erfc_term / r;  // positive (inter)
   //          printf("nonfrozen and r < cutoff\n");
@@ -115,7 +114,7 @@ void coulombic_real_force(System &system) {
         rsq = r*r;
         for (int n=0; n<3; n++) u[n] = distances[n]/r;
 
-        if (r < system.constants.cutoff && (i < k)) { // only pairs and not beyond cutoff
+        if (r < system.pbc.cutoff && (i < k)) { // only pairs and not beyond cutoff
             erfc_term = erfc(alpha*r);
             for (int n=0; n<3; n++) {
                 system.molecules[i].atoms[j].force[n] += charge1* charge2 *erfc_term/rsq * u[n];

@@ -19,6 +19,7 @@ void defineBox(System &system) { // takes input in A
 if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
 
     // assumes x_length, y_length, z_length are defined already in system.
+    // i.e. the volume-change function does that before calling this function
 
 	system.constants.x_max = system.constants.x_length/2.0;
 	system.constants.x_min = -system.constants.x_max;
@@ -42,7 +43,6 @@ else {
     system.pbc.calcCutoff();
     system.pbc.calcBoxVertices();
     system.pbc.calcPlanes();
-    system.pbc.printBasis();
 }
 
 
@@ -158,13 +158,11 @@ void runMonteCarloStep(System &system, string model) {
 	
 	double old_V=0.0; double new_V=0.0;
 
-	
-	//printf("%i\n",atoms_in_mol);
-
 	// first calculate the system's current potential energy
 		double* oldpotentials = getTotalPotential(system,model); //new double[2];
 		old_V = (oldpotentials[0]+oldpotentials[1]+oldpotentials[2]+oldpotentials[3]);	// keep in K
-
+        //printf("0 1 2 3: %f %f %f %f\n", oldpotentials[0], oldpotentials[1], oldpotentials[2], oldpotentials[3]);
+        
     // save a temporary copy of molecule to go back if needed
     Molecule tmp_molecule = system.molecules[randm];
 
@@ -211,46 +209,12 @@ void runMonteCarloStep(System &system, string model) {
     } // end rotation/displacement if/else
 
 	// check P.B.C. (move the molecule back in the box if needed)
-    for (int i=0; i<system.molecules[randm].atoms.size(); i++) {    
-        if (system.molecules[randm].atoms[i].pos[0]  > system.constants.x_max) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[0] -= system.constants.x_length;
-                }
-        }
-        else if (system.molecules[randm].atoms[i].pos[0] < system.constants.x_min) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-	                system.molecules[randm].atoms[j].pos[0] += system.constants.x_length;
-                }
-        }
-
-        if (system.molecules[randm].atoms[i].pos[1] > system.constants.y_max) {
-	            for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[1] -= system.constants.y_length;
-                }
-        }
-        else if (system.molecules[randm].atoms[i].pos[1] < system.constants.y_min) {
-	            for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[1] += system.constants.y_length;
-                }
-        }
-
-        if (system.molecules[randm].atoms[i].pos[2]  > system.constants.z_max) {
-	            for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[2] -= system.constants.z_length;
-                }
-        }
-        else if (system.molecules[randm].atoms[i].pos[2] < system.constants.z_min) {
-	            for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[2] += system.constants.z_length;
-                }
-        }	
-    } // end PBC check
+    checkInTheBox(system, randm);
 
 		double* newpotentials = getTotalPotential(system,model); //new double[2];
                 new_V = (newpotentials[0]+newpotentials[1]+newpotentials[2]+newpotentials[3]); // keep in K
 
 	double potential_diff = new_V - old_V;
-	//printf("Energy diff: %10e J\n",potential_diff);	
 
 	// now accept or reject the move based on Boltzmann probability
 	double boltzmann_factor;
@@ -267,8 +231,6 @@ void runMonteCarloStep(System &system, string model) {
             else if (rot_disp_flag == 1)
                 system.stats.displace_bf_sum += boltzmann_factor;
             } // end BF not inf
-
-	//printf("bf: %f\n",boltzmann_factor);		
 
 	// make ranf for probability pick
 	double ranf = (double)rand() / (double)RAND_MAX; // a value between 0 and 1
@@ -293,41 +255,7 @@ void runMonteCarloStep(System &system, string model) {
 		}
 
             // check P.B.C. (move the molecule back in the box if needed)
-    for (int i=0; i<system.molecules[randm].atoms.size(); i++) {
-        if (system.molecules[randm].atoms[i].pos[0]  > system.constants.x_max) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[0] -= system.constants.x_length;
-                }
-        }
-        else if (system.molecules[randm].atoms[i].pos[0] < system.constants.x_min) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[0] += system.constants.x_length;
-                }
-        }
-
-        if (system.molecules[randm].atoms[i].pos[1] > system.constants.y_max) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[1] -= system.constants.y_length;
-                }
-        }
-        else if (system.molecules[randm].atoms[i].pos[1] < system.constants.y_min) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[1] += system.constants.y_length;
-                }
-        }
-
-        if (system.molecules[randm].atoms[i].pos[2]  > system.constants.z_max) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[2] -= system.constants.z_length;
-                }
-        }
-        else if (system.molecules[randm].atoms[i].pos[2] < system.constants.z_min) {
-                for (int j=0; j<system.molecules[randm].atoms.size(); j++) {
-                    system.molecules[randm].atoms[j].pos[2] += system.constants.z_length;
-                }
-        }
-    } // end PBC 
-
+            checkInTheBox(system, randm);
 	
 	} // end displace/rotate (all ensembles)
 	system.checkpoint("done with displace/rotate");

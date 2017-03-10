@@ -8,8 +8,8 @@
 
 double self_lj_lrc(System &system) {
     double potential=0;
-    double cutoff = system.constants.cutoff;
-    double volume = system.constants.volume;
+    double cutoff = system.pbc.cutoff;
+    double volume = system.pbc.volume;
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -37,8 +37,8 @@ double self_lj_lrc(System &system) {
 double lj(System &system) {
 
     double total_pot=0, total_lj=0, total_rd_lrc=0, total_rd_self_lrc = 0;
-    double cutoff = system.constants.cutoff;
-    double volume = system.constants.volume;
+    double cutoff = system.pbc.cutoff;
+    double volume = system.pbc.volume;
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -55,7 +55,7 @@ double lj(System &system) {
         double r,sr,sr2,sr6;
         r = getDistance(system, i, j, k, l);
     
-        sr = sig/r;
+        sr = sig/r; //printf("r=%f\n",r);
         sr2 = sr*sr;
         sr6 = sr2*sr2*sr2; //;
 
