@@ -327,3 +327,33 @@ void setupBox(System &system) {
     system.pbc.calcPlanes();
     system.pbc.printBasis();
 }
+
+void setCheckpoint(System &system) {
+    // saves variables of interest to temporary storage JIC
+    system.last.rdU = system.stats.rdU;
+        system.last.lj_lrc = system.stats.lj_lrc;
+        system.last.lj_self_lrc = system.stats.lj_self_lrc;
+        system.last.lj = system.stats.lj;
+    system.last.esU = system.stats.esU;
+        system.last.coulombic_self = system.stats.coulombic_self;
+        system.last.coulombic_real = system.stats.coulombic_real;
+        system.last.coulombic_reciprocal = system.stats.coulombic_reciprocal;
+    system.last.polarU = system.stats.polarU;
+    system.last.totalU = system.stats.totalU;
+    
+}
+
+void revertToCheckpoint(System &system) {
+    // reverts variables of interest if needed
+    system.stats.rdU = system.last.rdU;
+        system.stats.lj_lrc = system.last.lj_lrc;
+        system.stats.lj_self_lrc = system.last.lj_self_lrc;
+        system.stats.lj = system.last.lj;
+    system.stats.esU = system.last.esU;
+        system.stats.coulombic_self = system.last.coulombic_self;
+        system.stats.coulombic_real = system.last.coulombic_real;
+        system.stats.coulombic_reciprocal = system.last.coulombic_reciprocal;
+    system.stats.polarU = system.last.polarU;
+    system.stats.totalU = system.last.totalU;
+
+}

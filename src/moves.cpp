@@ -7,6 +7,92 @@
 #include <string>
 #include <stdlib.h>
 
+
+/* (RE)DEFINE THE BOX LENGTHS */
+void defineBox(System &system) { // takes input in A
+	// easy 90 90 90 systems
+	if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+		// assumes x_length, y_length, z_length are defined already in system.
+		// i.e. the volume-change function does that before calling this function
+
+		system.pbc.basis[0][0] = system.pbc.x_length;
+		system.pbc.basis[1][1] = system.pbc.y_length;   
+		system.pbc.basis[2][2] = system.pbc.z_length;
+
+		system.pbc.x_max = system.pbc.x_length/2.0;
+		system.pbc.x_min = -system.pbc.x_max;
+		system.pbc.y_max = system.pbc.y_length/2.0;
+		system.pbc.y_min = -system.pbc.y_max;
+		system.pbc.z_max = system.pbc.z_length/2.0;
+		system.pbc.z_min = -system.pbc.z_max;
+
+		system.pbc.cutoff = system.pbc.x_max; // crude method but good for cubes (and only cubes!!)
+		// need to make basis vector system later.
+		system.constants.ewald_alpha = 3.5/system.pbc.cutoff; // update ewald_alpha if we have a vol change
+
+		system.pbc.volume = system.pbc.x_length * system.pbc.y_length * system.pbc.z_length; // in A^3
+	}
+	// universal definitions
+	else {
+		// this could forseeably be a problem if, for some weird reason, someone wants to do NPT with a weird box.
+		system.pbc.calcVolume();
+		system.pbc.calcRecip();
+		system.pbc.calcCutoff();
+		system.constants.ewald_alpha = 3.5/system.pbc.cutoff;
+        system.pbc.calcBoxVertices();
+		system.pbc.calcPlanes();
+	}
+}
+
+/* CHANGE VOLUME OF SYSTEM BY BOLTZMANN PROB -- FOR NPT */
+void changeVolumeMove(System &system) {
+	system.stats.volume_attempts++;
+	// generate small randam distance change for volume adjustment
+	double ranf = (double)rand() / (double)RAND_MAX; // for boltz check	
+    double ranv = (double)rand() / (double)RAND_MAX; // for volume change
+    double old_energy, new_energy;
+
+        double* energies = getTotalPotential(system,system.constants.potential_form);
+        old_energy=energies[0]+energies[1]+energies[2]+energies[3];
+
+    double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
+    system.pbc.old_volume = system.pbc.volume;
+
+    // change the volume to test new energy.
+    double new_volume = exp(log(system.pbc.volume) + (ranv-0.5)*system.constants.volume_change);// mpmc default = 2.5
+
+    //double new_volume = 1e-30*new_volume_A3;
+    double new_side = pow(new_volume, 1.0/3.0);
+    system.pbc.x_length = new_side;
+    system.pbc.y_length = new_side;
+    system.pbc.z_length = new_side;
+    defineBox(system);
+    //printf("OLDV before energy call: %f; NEWV before energy call: %f\n", system.pbc.old_volume, system.pbc.volume);        
+        double* potentials = getTotalPotential(system,system.constants.potential_form);
+        new_energy=potentials[0]+potentials[1]+potentials[2]+potentials[3];
+
+    //printf("OLDV before bf call: %f; NEWV before bf call: %f\n", system.pbc.old_volume, system.pbc.volume); 
+    double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, "volume");
+
+    //printf("ranf < bf? %f < %f ?\n", ranf, boltzmann_factor);
+	if (ranf < boltzmann_factor) {
+		// accept move
+        //printf("ACCEPTED\n");
+		system.stats.volume_change_accepts++;
+        system.stats.MCmoveAccepted = true;
+	} else {
+        //printf("REJECTED\n");
+		// reject move (move volume back)
+        system.pbc.x_length = old_side;
+        system.pbc.y_length = old_side;
+        system.pbc.z_length = old_side;
+        defineBox(system);
+	}
+}
+
+
+
+
 /* ADD A MOLECULE */
 void addMolecule(System &system, string model) {
 
@@ -84,7 +170,8 @@ void addMolecule(System &system, string model) {
 	double ranf = (double)rand()/(double)RAND_MAX;
 	if (ranf < boltz_factor) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
-	} else {
+	    system.stats.MCmoveAccepted == true;
+    } else {
 		// remove the new molecule.
 		system.molecules.pop_back(); 
 		system.constants.total_atoms -= (int)system.proto.atoms.size();
@@ -141,6 +228,7 @@ void removeMolecule(System &system, string model) {
     if (ranf < boltz_factor) {
 	    //printf("accepted remove.\n");
 	    system.stats.remove_accepts++;
+        system.stats.MCmoveAccepted = true;
     } else {
 	    //printf("rejected remove.\n");
 	    // put the molecule back.
@@ -230,6 +318,7 @@ void displaceMolecule(System &system, string model) {
 	// accept move
 	if (ranf < boltzmann_factor) {
 			system.stats.displace_accepts++;
+            system.stats.MCmoveAccepted = true;
 	}
 	// reject move (by moving it back)
 	else {

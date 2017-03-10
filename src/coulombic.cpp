@@ -17,8 +17,6 @@ I borrowed these functions, more or less, from Belof & McLaughlin et. al.
 /* entire system self potential sum */
 /* this quantity is the same every step, later I can save it and not re-calculate */
 double coulombic_self(System &system) {
-    //initialize to zero
-    system.constants.coulombic_self =0.0;
     
     double potential=0.0, charge=0;
     double alpha=system.constants.ewald_alpha;
@@ -41,7 +39,6 @@ double coulombic_self(System &system) {
 
    //     printf("coulombic_self: %f K\n", system.constants.ke*potential);
 
-   // system.constants.coulombic_self = potential;
     return potential; // i dont think it should be multiplied by ke
 }
 
@@ -139,7 +136,6 @@ void coulombic_real_force(System &system) {
 
 // Coulombic reciprocal electrostatic energy from Ewald //
 double coulombic_reciprocal(System &system) {   
-    system.constants.coulombic_reciprocal=0;
     int p, q, kmax, l[3];
     double alpha, k[3], k_sq, position_product;
     double SF_re=0, SF_im=0;
@@ -193,7 +189,6 @@ double coulombic_reciprocal(System &system) {
     potential *= 4.0 * M_PI / system.pbc.volume;
 
     //printf("coulombic_reciprocal: %f K\n",potential);
- //   system.constants.coulombic_reciprocal = potential; 
    return potential;
 }
 
@@ -203,18 +198,15 @@ double coulombic_ewald(System &system) {
     // Ewald method for coulombic
     double potential;
     
-    system.constants.coulombic_self =0;
-    system.constants.coulombic_real = 0;
-    system.constants.coulombic_reciprocal = 0;
     
     double self, real, recip;
     self = coulombic_self(system);
     real = coulombic_real(system);
     recip = coulombic_reciprocal(system);
 
-    system.constants.coulombic_self = self;
-    system.constants.coulombic_real = real;
-    system.constants.coulombic_reciprocal = recip;
+    system.stats.coulombic_self = self; system.stats.current_coulombic_self_sum += self;
+    system.stats.coulombic_real = real; system.stats.current_coulombic_real_sum += real;
+    system.stats.coulombic_reciprocal = recip; system.stats.current_coulombic_reciprocal_sum += recip;
 
     potential = self + real + recip;
     

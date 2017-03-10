@@ -70,9 +70,7 @@ class Constants {
 	
     	int total_atoms=0; // actual sites, not "atoms" persay
         int old_total_atoms =0; // for use in resizing thole matrix in uvt
-
         double total_energy=0.0; // for MC NVE, in K, user defined
-
         int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
         double initial_energy=0.0; // "" ""
 
@@ -90,42 +88,6 @@ class Constants {
         int iter_success;
         double polar_rrms;
         double dipole_rrms = 0.0;
-
-        // SYSTEM ENERGIES
-        double coulombic_real = 0;
-        double coulombic_reciprocal = 0;
-        double coulombic_self = 0;
-        double total_coulombic = 0;
-        double lj_lrc =0;
-        double lj_self_lrc = 0;
-        double lj = 0;
-        double total_rd = 0;
-
-/*
-        void calcCutoff() {
-            int i, j, k, p;
-            double MAXVALUE = 1e40; int MAX_VECT_COEF=5;
-			double curr_mag;
-			double short_mag = MAXVALUE;
-			double curr_vec[3];
-
-			if ( pbc->volume <= 0 ) return MAXVALUE;
-
-			for ( i=-MAX_VECT_COEF; i<=MAX_VECT_COEF; i++ ) {
-				for ( j=-MAX_VECT_COEF; j<=MAX_VECT_COEF; j++ ) {
-				    for ( k=-MAX_VECT_COEF; k<=MAX_VECT_COEF; k++ ) {
-				        if ( i == 0 && j == 0 && k == 0 ) continue;
-				        for ( p = 0; p < 3; p++ )
-				            curr_vec[p] = i*pbc->basis[0][p] + j*pbc->basis[1][p] + k*pbc->basis[2][p];
-				        curr_mag = sqrt(dddotprod(curr_vec, curr_vec));
-				        if ( curr_mag < short_mag ) short_mag = curr_mag;
-				    }
-				}
-			}
-			return(0.5*short_mag);
-
-		}
-*/
 };
 
 class Pbc {
@@ -377,6 +339,9 @@ class Stats {
 	public:
 		Stats();
         
+        int MCstep, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
+        bool MCmoveAccepted;
+
         string radial_dist = "off"; // default is no radial distribution
         string radial_file = "radial_distribution.dat"; // default filename for output.
         double radial_bin_size = 0.1; // bin counts will be considered for this range in A
@@ -384,7 +349,7 @@ class Stats {
         vector<long unsigned int> radial_bins; // holds the counters       
         string radial_centroid, radial_counterpart; // the two atoms to get distance between, user def.
 		
-		double insert_bf_sum = 0; // insert boltzmanns added up
+		double insert_bf_sum = 0; // insert boltzmanns added up in boltzmann.cpp
 		double remove_bf_sum = 0; // ...
 		double displace_bf_sum = 0;
 		double volume_change_bf_sum = 0;
@@ -393,15 +358,60 @@ class Stats {
 		int remove_accepts = 0; int remove_attempts=0;// uVT only
 		int displace_accepts = 0; int displace_attempts=0;
 		int volume_change_accepts = 0; int volume_attempts=0;// NPT only
-		int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
+		int total_accepts=0; int total_attempts=0;
+
+        double ar_tot=0, ar_ins=0, ar_rem=0, ar_dis=0, ar_vol=0; // BF acceptance ratios
+        double ins_perc=0, rem_perc=0, dis_perc=0, vol_perc=0; // BF percentage of moves
+
+
+        int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
         int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
         int count_frozen_molecules=0; // frozen MOLECULES; normally 1
 
         double polar_iterations=0;
+
+        // AVERAGES: INITIALIZERS
+        double current_Nsq_sum=0; double Nsq_average=0; // for qst
+        double current_NU_sum=0; double NU_average = 0; // for qst
+        double current_qst_sum=0; double qst_average = 0;
+
+        double current_rd_sum=0.0; double current_es_sum=0.0; 
+        double rd_average=0.0; double es_average=0.0; 
+        double current_polar_sum=0.0; double polar_average=0.0;
+        double current_energy_sum=0.0; double current_density_sum=0.0; 
+        double current_volume_sum=0.0; double current_z_sum = 0.0;
+        double energy_average=0.0; double density_average=0.0; 
+        double volume_average=0.0; double z_average = 0.0;
+        double current_Nmov_sum=0.0; double Nmov_average=0.0;
+        double current_wt_percent_sum=0.0; double wt_percent_average=0.0;
+        double current_wt_percent_ME_sum=0.0; double wt_percent_ME_average=0.0;
+    
+        double bf_avg=0, ibf_avg=0, rbf_avg=0, dbf_avg=0, vbf_avg=0;
+        double totalmass=0, movablemass=0, frozenmass=0;
+        double lj_lrc=0, lj_self_lrc=0, lj=0; // parts of RD
+            double lj_lrc_avg=0, lj_self_lrc_avg=0, lj_avg=0; // parts avg RD
+            double current_lj_lrc_sum=0, current_lj_self_lrc_sum=0, current_lj_sum=0; // parts sums RD
+        double coulombic_self=0, coulombic_real=0, coulombic_reciprocal=0; // parts of ES 
+            double coulombic_self_avg=0, coulombic_real_avg=0, coulombic_reciprocal_avg=0; //parts avg ES       
+            double current_coulombic_self_sum=0, current_coulombic_real_sum=0, current_coulombic_reciprocal_sum=0; // parts sums ES 
+        double rdU=0, esU=0, polarU=0, totalU=0; // TOTAL energies
+        double chemical_potential=0, qst=0, volume=0, density=0;
+        double wt_percent=0, wt_percent_ME=0,Z=0;
+        // END AVERAGE STUFF
 };
 
 Stats::Stats() {}
 
+class Last {
+    public:
+        Last();
+        double rdU, esU, polarU, totalU;
+        double lj_lrc, lj_self_lrc, lj;
+        double coulombic_self, coulombic_real, coulombic_reciprocal;
+
+};
+
+Last::Last() {}
 
 class Atom {
 	public:

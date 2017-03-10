@@ -7,7 +7,7 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms	     pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms	  pdbs/h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 
@@ -18,7 +18,7 @@ z_length   111         25.669 150   15.669    60    27.4876  150.97371
 
 
 ! radial distribution option
-radial_dist         on   ! turns on/off radial distribution function. off for speed-up
+radial_dist         off  ! turns on/off radial distribution function. off for speed-up
 radial_bin_size     0.1  ! in A
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
 radial_centroid     Ne   ! element name

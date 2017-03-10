@@ -15,6 +15,7 @@ class System {
 		Constants constants;
 		Pbc pbc;
         Stats stats;
+        Last last; // to hold previous values for reversion if needed (checkpointing variables)
         vector<vector<int>> atommap;
 
         // defines the "previous checkpoint time object
