@@ -150,12 +150,11 @@ int main(int argc, char **argv) {
             double ETA_hrs = ETA/60.0;
 
 			// BOLTZMANN AVERAGES
-			double bf_avg = (system.stats.insert_bf_sum + system.stats.remove_bf_sum + system.stats.displace_bf_sum + system.stats.volume_change_bf_sum + system.stats.rotate_bf_sum)/5.0/t;
+			double bf_avg = (system.stats.insert_bf_sum + system.stats.remove_bf_sum + system.stats.displace_bf_sum + system.stats.volume_change_bf_sum)/4.0/t;
 			double ibf_avg = system.stats.insert_bf_sum/t;
 			double rbf_avg = system.stats.remove_bf_sum/t;
 			double dbf_avg = system.stats.displace_bf_sum/t;
 			double vbf_avg = system.stats.volume_change_bf_sum/t;
-			double robf_avg = system.stats.rotate_bf_sum/t; //printf("%f -----------\n",system.stats.rotate_bf_sum);
 
 			// MASS
 			double totalmass = 0.0; double movablemass = 0.0; double frozenmass = 0.0;
@@ -239,8 +238,8 @@ int main(int argc, char **argv) {
 				z_average = current_z_sum/corrtime_iter;
 
 			// MC MOVE ACCEPT STATS
-			double total_accepts = system.stats.insert_accepts + system.stats.remove_accepts + system.stats.displace_accepts + system.stats.volume_change_accepts + system.stats.rotate_accepts;
-			double total_attempts = system.stats.insert_attempts + system.stats.remove_attempts + system.stats.displace_attempts + system.stats.volume_attempts + system.stats.rotate_attempts;
+			double total_accepts = system.stats.insert_accepts + system.stats.remove_accepts + system.stats.displace_accepts + system.stats.volume_change_accepts;
+			double total_attempts = system.stats.insert_attempts + system.stats.remove_attempts + system.stats.displace_attempts + system.stats.volume_attempts;
 
 			// PRINT MAIN OUTPUT
 			printf("MONTE CARLO\n");
@@ -249,27 +248,24 @@ int main(int argc, char **argv) {
 			printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%\n",t,finalstep,progress);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("BF avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Rot / %.3f Vol ) \n",
+			printf("BF avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol ) \n",
 				bf_avg,
 				ibf_avg,
 				rbf_avg,
 				dbf_avg,
-				robf_avg,
 				vbf_avg);
 				
-			printf("AR avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Rot / %.3f Vol )  \n",
+			printf("AR avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol )  \n",
 				total_accepts/total_attempts, 
 				(double)system.stats.insert_accepts/system.stats.insert_attempts, 
 				(double)system.stats.remove_accepts/system.stats.remove_attempts, 
 				(double)system.stats.displace_accepts/system.stats.displace_attempts, 
-				(double)system.stats.rotate_accepts/system.stats.rotate_attempts, 
 				(double)system.stats.volume_change_accepts/system.stats.volume_attempts); 
-			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Rot / %.2f%% Vol )  \n", 
+			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n", 
 				(int)total_accepts, 
 				system.stats.insert_accepts/total_accepts*100, 
 				system.stats.remove_accepts/total_accepts*100, 
 				system.stats.displace_accepts/total_accepts*100, 
-				system.stats.rotate_accepts/total_accepts*100, 
 				system.stats.volume_change_accepts/total_accepts*100);
 			printf("RD avg =              %.5f K  (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",lj_average,system.constants.lj,system.constants.lj_lrc, system.constants.lj_self_lrc);
 			printf("ES avg =              %.5f K  (real = %.4f, recip = %.4f, self = %.4f)\n",es_average,system.constants.coulombic_real, system.constants.coulombic_reciprocal, system.constants.coulombic_self);

@@ -388,13 +388,11 @@ class Stats {
 		double remove_bf_sum = 0; // ...
 		double displace_bf_sum = 0;
 		double volume_change_bf_sum = 0;
-		double rotate_bf_sum = 0;
 
 		int insert_accepts = 0; int insert_attempts=0;// Counters for successful moves. uVT only
 		int remove_accepts = 0; int remove_attempts=0;// uVT only
 		int displace_accepts = 0; int displace_attempts=0;
 		int volume_change_accepts = 0; int volume_attempts=0;// NPT only
-		int rotate_accepts = 0; int rotate_attempts=0;// mpmc doesn't have this but i do
 		int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
         int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
         int count_frozen_molecules=0; // frozen MOLECULES; normally 1

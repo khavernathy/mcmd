@@ -27,7 +27,7 @@ radial_file         radialdist.dat
 
 
 ! MONTE CARLO ONLY ======================================
-ensemble		    uvt
+ensemble		    npt
 
 mc_corrtime	        200
 finalstep		    5000000

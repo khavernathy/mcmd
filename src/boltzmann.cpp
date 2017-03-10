@@ -10,7 +10,7 @@ using namespace std;
 /* THE BOLTZMANN FACTOR FUNCTION */
 // ==================================================================================
 double get_boltzmann_factor(System &system, double e_i, double e_f, string movetype) {
-    double bf, MAXVALUE=1e10; // we won't care about huge bf's
+    double bf, MAXVALUE=1e4; // we won't care about huge bf's
     double energy_delta = e_f - e_i;
 
     if (system.constants.ensemble == "uvt") {
@@ -19,24 +19,28 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
             system.constants.ATM2REDUCED/(system.constants.temp * 
             (double)(system.stats.count_movables)) *
                 exp(-energy_delta/system.constants.temp);
-            system.stats.insert_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.insert_bf_sum += bf;
+            else system.stats.insert_bf_sum += MAXVALUE;
         } 
         else if (movetype == "remove") {
             bf = system.constants.temp * 
             ((double)(system.stats.count_movables) + 1.0)/
             (system.pbc.volume*system.constants.pres*system.constants.ATM2REDUCED) *
                 exp(-energy_delta/system.constants.temp);
-            system.stats.remove_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.remove_bf_sum += bf;
+            else system.stats.remove_bf_sum += MAXVALUE;
         }
         else if (movetype == "displace") {
             bf = exp(-energy_delta/(system.constants.temp));
-            system.stats.displace_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
+            else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
     else if (system.constants.ensemble == "nvt") {
         if (movetype == "displace") {
             bf = exp(-energy_delta/(system.constants.temp));
-            system.stats.displace_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
+            else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
     else if (system.constants.ensemble == "npt") {
@@ -47,17 +51,20 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
             (system.pbc.volume - system.pbc.old_volume)
             - (system.stats.count_movables + 1) * system.constants.temp * 
                 log(system.pbc.volume/system.pbc.old_volume))/system.constants.temp);
-            system.stats.volume_change_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.volume_change_bf_sum += bf;
+            else system.stats.volume_change_bf_sum += MAXVALUE;
         }
         else if (movetype == "displace") {
             bf = exp(-energy_delta/system.constants.temp);
-            system.stats.displace_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
+            else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
     else if (system.constants.ensemble == "nve") {
         if (movetype == "displace") {
             bf = pow((system.constants.total_energy - e_f),3.0*system.stats.count_movables/2.0) / pow((system.constants.total_energy - e_i),(3.0*system.stats.count_movables/2.0));
-            system.stats.displace_bf_sum += bf;
+            if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
+            else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
   
