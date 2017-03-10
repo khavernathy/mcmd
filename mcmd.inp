@@ -32,7 +32,7 @@ ensemble		    uvt
 mc_corrtime	        25
 finalstep		    5000000
 temperature 	    77   !77.0  ! K
-pressure		    0.5     ! atm
+pressure		    1     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
 rotate_prob         0.5
