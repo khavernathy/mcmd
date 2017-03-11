@@ -179,6 +179,34 @@ int main(int argc, char **argv) {
                 printf("Qst avg = %.5f kJ/mol\n", system.stats.qst_average);
 
             printf("Chemical potential avg = %.4f K per sorbate molecule \n", system.stats.chemical_potential); 
+            printf("Compressibility factor Z avg = %.6f (for homogeneous gas %s) \n",system.stats.z_average,system.proto.name.c_str());
+            printf("N_movables avg = %.3f; N_molecules = %i; N_movables = %i; N_sites = %i\n",system.stats.Nmov_average,(int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
+            printf("--------------------\n\n");
+
+            // CONSOLIDATE ATOM AND MOLECULE PDBID's
+            // quick loop through all atoms to make PDBID's pretty (1->N)
+            int molec_counter=1, atom_counter=1;
+            for (int i=0; i<system.molecules.size(); i++) {
+                system.molecules[i].PDBID = molec_counter;
+                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    system.molecules[i].atoms[j].PDBID = atom_counter;
+                    system.molecules[i].atoms[j].mol_PDBID = system.molecules[i].PDBID;
+                    atom_counter++;
+                } // end loop j
+                molec_counter++;
+            } // end loop i
+
+            // WRITE RESTART FILE AND OTHER OUTPUTS
+            writeXYZ(system,system.constants.output_traj,frame,t,0);
+            frame++;
+            writePDB(system, system.constants.restart_pdb);
+            if (system.constants.pdb_traj_option == "on")
+                writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);    
+            writeThermo(system, system.stats.energy_average, 0.0, 0.0, system.stats.energy_average, system.stats.density_average*1000, system.constants.temp, system.constants.pres, t);
+            if (system.stats.radial_dist == "on") {
+                radialDist(system);
+                writeRadialDist(system);        
+            }
 
             // count the corrtime occurences.
             corrtime_iter++;
