@@ -45,11 +45,15 @@ double lj(System &system) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
         // do mixing rules
-        double eps,sig;
-        eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
-        sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        if (eps != system.molecules[k].atoms[l].eps)
+            eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
+       
+        if (sig != system.molecules[k].atoms[l].sig)
+         sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
 
-        if (!(sig == 0 || eps == 0)) {
+        if (sig == 0 || eps == 0) continue; // skip 0 energy interactions
+
         // calculate distance between atoms
         double r,sr,sr2,sr6;
         r = getDistance(system, i, j, k, l);
@@ -79,7 +83,6 @@ double lj(System &system) {
             total_rd_lrc += this_rd_lrc;
             total_pot += this_rd_lrc;
         } // end RD LRC
-        } // if nonzero sig/eps
 
     }  // loop l
     } // loop k 
