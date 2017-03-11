@@ -343,17 +343,16 @@ void setCheckpoint(System &system) {
         system.last.current_coulombic_reciprocal_sum = system.stats.current_coulombic_reciprocal_sum;
     system.last.current_polar_sum = system.stats.current_polar_sum;
     system.last.current_energy_sum = system.stats.current_energy_sum;
-        // QST
-    system.last.current_Nsq_sum = system.stats.current_Nsq_sum;
-    system.last.current_NU_sum = system.stats.current_NU_sum;
-    system.last.current_qst_sum = system.stats.current_qst_sum; 
         // VOLUME
     system.last.current_volume_sum = system.stats.current_volume_sum;    
         // DENSITY
     system.last.current_density_sum = system.stats.current_density_sum;
         // Z
     system.last.current_z_sum = system.stats.current_z_sum;    
-
+        // QST
+    system.last.current_qst_sum = system.stats.current_qst_sum;
+    system.last.current_NU_sum = system.stats.current_NU_sum;
+    system.last.current_Nsq_sum = system.stats.current_Nsq_sum;
 
     // VALUES
         // ENERGY
@@ -367,8 +366,6 @@ void setCheckpoint(System &system) {
         system.last.coulombic_reciprocal = system.stats.coulombic_reciprocal;
     system.last.polarU = system.stats.polarU;
     system.last.totalU = system.stats.totalU;
-        // QST
-    system.last.qst = system.stats.qst;    
         // VOLUME
     system.last.volume = system.stats.volume;
         // DENSITY
@@ -377,6 +374,8 @@ void setCheckpoint(System &system) {
     system.last.chemical_potential = system.stats.chemical_potential;
         // Z
     system.last.Z = system.stats.Z;
+        // QST
+    system.last.qst = system.stats.qst;
 
 
 }
@@ -396,18 +395,17 @@ void revertToCheckpoint(System &system) {
         system.stats.current_coulombic_reciprocal_sum = system.last.current_coulombic_reciprocal_sum + system.last.coulombic_reciprocal;
     system.stats.current_polar_sum = system.last.current_polar_sum + system.last.polarU;
     system.stats.current_energy_sum = system.last.current_energy_sum + system.last.totalU;
-    /**    // QST 
-    system.stats.current_Nsq_sum = system.last.current_Nsq_sum;
-    system.stats.current_NU_sum = system.last.current_NU_sum;
-    system.stats.current_qst_sum = system.last.current_qst_sum;
         // VOLUME
-    system.stats.current_volume_sum = system.last.current_volume_sum;
+    system.stats.current_volume_sum = system.last.current_volume_sum + system.last.volume;
         // DENSITY
-    system.stats.current_density_sum = system.last.current_density_sum;
+    system.stats.current_density_sum = system.last.current_density_sum + system.last.density;
         // Z
-    system.stats.current_z_sum = system.last.current_z_sum;
-    */
-
+    system.stats.current_z_sum = system.last.current_z_sum + system.last.Z;
+        // QST
+    system.stats.current_qst_sum = system.last.current_qst_sum + system.last.qst;    
+    system.stats.current_NU_sum = system.last.current_NU_sum + system.last.NU;
+    system.stats.current_Nsq_sum = system.last.current_Nsq_sum + system.last.Nsq;
+    
     // VALUES
         // ENERGY
     system.stats.rdU = system.last.rdU;
@@ -420,8 +418,6 @@ void revertToCheckpoint(System &system) {
         system.stats.coulombic_reciprocal = system.last.coulombic_reciprocal;
     system.stats.polarU = system.last.polarU;
     system.stats.totalU = system.last.totalU;    
-    /*    // QST
-    system.stats.qst = system.last.qst;
         // VOLUME
     system.stats.volume = system.last.volume;
         // DENSITY
@@ -429,6 +425,8 @@ void revertToCheckpoint(System &system) {
         // CHEMICAL POTENTIAL
     system.stats.chemical_potential = system.last.chemical_potential;
         // Z
-    system.stats.z = system.last.z;
-    */
+    system.stats.Z = system.last.Z;
+        // QST
+    system.stats.qst = system.last.qst;    
+
 }

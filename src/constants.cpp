@@ -397,6 +397,9 @@ class Stats {
         double rdU=0, esU=0, polarU=0, totalU=0; // TOTAL energies
         double chemical_potential=0, qst=0, volume=0, density=0;
         double wt_percent=0, wt_percent_ME=0,Z=0;
+        double Nsq=0, NU=0;
+
+        double qst_counter=1;
         // END AVERAGE STUFF
 };
 
@@ -432,6 +435,7 @@ class Last {
         double rdU=0, esU=0, polarU=0, totalU=0; // TOTAL energies
         double chemical_potential=0, qst=0, volume=0, density=0;
         double wt_percent=0, wt_percent_ME=0,Z=0;
+        double Nsq=0, NU=0;
 };
 
 Last::Last() {}

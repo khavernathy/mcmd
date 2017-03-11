@@ -155,23 +155,27 @@ void computeAverages(System &system) {
     // QST
     if (system.constants.ensemble != "nve") { // T must be fixed for Qst
         // NU (for qst)
-        system.stats.current_NU_sum += system.stats.totalU*system.stats.count_movables;
+        system.stats.NU = system.stats.totalU*system.stats.count_movables;
+        system.stats.current_NU_sum += system.stats.NU;
         system.stats.NU_average = system.stats.current_NU_sum / t;
 
         // Nsq (for qst)
-        system.stats.current_Nsq_sum += system.stats.count_movables * system.stats.count_movables;
+        system.stats.Nsq = system.stats.count_movables * system.stats.count_movables;
+        system.stats.current_Nsq_sum += system.stats.Nsq;
         system.stats.Nsq_average = system.stats.current_Nsq_sum / t;
 
         // Qst
-        system.stats.qst = -(system.stats.NU_average - system.stats.Nmov_average * system.stats.energy_average);
-        system.stats.qst /= (system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average);
-        system.stats.qst += system.constants.temp; 
-        system.stats.qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
-        
-        if (! std::isnan(system.stats.qst) && std::isfinite(system.stats.qst)) { // qst will def. be NaN for first calculation.
-            system.stats.current_qst_sum += system.stats.qst;
-            system.stats.qst_average = system.stats.current_qst_sum / t;
-        }
+            system.stats.qst = -(system.stats.NU_average - system.stats.Nmov_average * system.stats.energy_average);
+            system.stats.qst /= (system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average);
+            system.stats.qst += system.constants.temp; 
+            system.stats.qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
+            if (0 != system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average) {
+                system.stats.current_qst_sum += system.stats.qst;
+                system.stats.qst_average = system.stats.current_qst_sum / system.stats.qst_counter;
+                system.stats.qst_counter++;
+                //printf("qst = %f; sum = %f, avg = %f, denom = %f\n", system.stats.qst, system.stats.current_qst_sum,system.stats.qst_average, (system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average));
+
+            }
     }
 
 	// VOLUME
