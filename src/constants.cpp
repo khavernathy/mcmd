@@ -406,15 +406,32 @@ Stats::Stats() {}
 class Last {
     public:
         Last();
-        double rdU, esU, polarU, totalU;
-            double current_rd_sum, current_es_sum, current_polar_sum, current_energy_sum;
-        double lj_lrc, lj_self_lrc, lj;
-            double current_lj_lrc_sum, current_lj_self_lrc_sum, current_lj_sum;
-        double coulombic_self, coulombic_real, coulombic_reciprocal;
-            double current_coulombic_self_sum, current_coulombic_real_sum, current_coulombic_reciprocal_sum;
-        
-        double a;
+r        double current_Nsq_sum=0; double Nsq_average=0; // for qst
+        double current_NU_sum=0; double NU_average = 0; // for qst
+        double current_qst_sum=0; double qst_average = 0;
 
+        double current_rd_sum=0.0; double current_es_sum=0.0;
+        double rd_average=0.0; double es_average=0.0;
+        double current_polar_sum=0.0; double polar_average=0.0;
+        double current_energy_sum=0.0; double current_density_sum=0.0;
+        double current_volume_sum=0.0; double current_z_sum = 0.0;
+        double energy_average=0.0; double density_average=0.0;
+        double volume_average=0.0; double z_average = 0.0;
+        double current_Nmov_sum=0.0; double Nmov_average=0.0;
+        double current_wt_percent_sum=0.0; double wt_percent_average=0.0;
+        double current_wt_percent_ME_sum=0.0; double wt_percent_ME_average=0.0;
+
+        double bf_avg=0, ibf_avg=0, rbf_avg=0, dbf_avg=0, vbf_avg=0;
+        double totalmass=0, movablemass=0, frozenmass=0;
+        double lj_lrc=0, lj_self_lrc=0, lj=0; // parts of RD
+            double lj_lrc_avg=0, lj_self_lrc_avg=0, lj_avg=0; // parts avg RD
+            double current_lj_lrc_sum=0, current_lj_self_lrc_sum=0, current_lj_sum=0; // parts sums RD
+        double coulombic_self=0, coulombic_real=0, coulombic_reciprocal=0; // parts of ES 
+            double coulombic_self_avg=0, coulombic_real_avg=0, coulombic_reciprocal_avg=0; //parts avg ES       
+            double current_coulombic_self_sum=0, current_coulombic_real_sum=0, current_coulombic_reciprocal_sum=0; // parts sums ES 
+        double rdU=0, esU=0, polarU=0, totalU=0; // TOTAL energies
+        double chemical_potential=0, qst=0, volume=0, density=0;
+        double wt_percent=0, wt_percent_ME=0,Z=0;
 };
 
 Last::Last() {}
