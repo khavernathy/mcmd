@@ -30,21 +30,20 @@ void computeInitialValues(System &system) {
     system.stats.Nmov_average = system.stats.current_Nmov_sum/t;
 
 	// ENERGY
-        double* placeholder = getTotalPotential(system, system.constants.potential_form); // getTotPot sends values to stat vars
-            system.stats.current_energy_sum += system.stats.totalU;
-                system.stats.rd_average = system.stats.current_rd_sum/t;
-                    system.stats.lj_lrc_avg = system.stats.current_lj_lrc_sum/t;
-                    system.stats.lj_self_lrc_avg = system.stats.current_lj_lrc_sum/t;
-                    system.stats.lj_avg = system.stats.current_lj_sum/t;
+    double* placeholder = getTotalPotential(system, system.constants.potential_form); // getTotPot sends values to stat vars
+            system.stats.rd_average = system.stats.current_rd_sum/t;
+                system.stats.lj_lrc_avg = system.stats.current_lj_lrc_sum/t;
+                system.stats.lj_self_lrc_avg = system.stats.current_lj_lrc_sum/t;
+                system.stats.lj_avg = system.stats.current_lj_sum/t;
 
-                system.stats.es_average = system.stats.current_es_sum/t;
-                    system.stats.coulombic_self_avg = system.stats.current_coulombic_self_sum/t;
-                    system.stats.coulombic_real_avg = system.stats.current_coulombic_real_sum/t;
-                    system.stats.coulombic_reciprocal_avg = system.stats.current_coulombic_reciprocal_sum/t;
+            system.stats.es_average = system.stats.current_es_sum/t;
+                system.stats.coulombic_self_avg = system.stats.current_coulombic_self_sum/t;
+                system.stats.coulombic_real_avg = system.stats.current_coulombic_real_sum/t;
+                system.stats.coulombic_reciprocal_avg = system.stats.current_coulombic_reciprocal_sum/t;
 
-            	system.stats.polar_average = system.stats.current_polar_sum/t;
+        	system.stats.polar_average = system.stats.current_polar_sum/t;
 
-                system.stats.energy_average = system.stats.current_energy_sum/t;		
+            system.stats.energy_average = system.stats.current_energy_sum/t;		
     
     // CHEMICAL POTENTIAL dE/dN
     system.stats.chemical_potential = (system.stats.energy_average - system.constants.initial_energy)
@@ -134,20 +133,20 @@ void computeAverages(System &system) {
     system.stats.Nmov_average = system.stats.current_Nmov_sum/t1;
 
 	// ENERGY
-        system.stats.current_energy_sum += system.stats.totalU;
-                system.stats.rd_average = system.stats.current_rd_sum/t1;
-                    system.stats.lj_lrc_avg = system.stats.current_lj_lrc_sum/t1;
-                    system.stats.lj_self_lrc_avg = system.stats.current_lj_lrc_sum/t1;
-                    system.stats.lj_avg = system.stats.current_lj_sum/t1;
-
-                system.stats.es_average = system.stats.current_es_sum/t1;
-                    system.stats.coulombic_self_avg = system.stats.current_coulombic_self_sum/t1;
-                    system.stats.coulombic_real_avg = system.stats.current_coulombic_real_sum/t1;
-                    system.stats.coulombic_reciprocal_avg = system.stats.current_coulombic_reciprocal_sum/t1;
-
-            	system.stats.polar_average = system.stats.current_polar_sum/t1;
-
-                system.stats.energy_average = system.stats.current_energy_sum/t1;		
+    // 1) RD
+    system.stats.rd_average = system.stats.current_rd_sum/t1;
+        system.stats.lj_lrc_avg = system.stats.current_lj_lrc_sum/t1;
+        system.stats.lj_self_lrc_avg = system.stats.current_lj_lrc_sum/t1;
+        system.stats.lj_avg = system.stats.current_lj_sum/t1;
+    // 2) ES
+    system.stats.es_average = system.stats.current_es_sum/t1;
+        system.stats.coulombic_self_avg = system.stats.current_coulombic_self_sum/t1;
+        system.stats.coulombic_real_avg = system.stats.current_coulombic_real_sum/t1;
+        system.stats.coulombic_reciprocal_avg = system.stats.current_coulombic_reciprocal_sum/t1;
+    // 3) POLAR
+	system.stats.polar_average = system.stats.current_polar_sum/t1;
+    // 4) TOTAL
+    system.stats.energy_average = system.stats.current_energy_sum/t1;		
     
     // CHEMICAL POTENTIAL dE/dN
     system.stats.chemical_potential = (system.stats.energy_average - system.constants.initial_energy)
