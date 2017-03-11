@@ -121,6 +121,7 @@ int main(int argc, char **argv) {
 				    runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
                     system.constants.old_total_atoms = system.constants.total_atoms;
+                    printf("Actual energies: RD: %f, ES: %f, POLAR: %f\n", system.stats.rdU, system.stats.esU, system.stats.polarU,system.stats.totalU);
                     if (system.stats.MCmoveAccepted == false) revertToCheckpoint(system); // correct the energies before taking avg.
                     computeAverages(system);
                 } else {

@@ -412,6 +412,8 @@ class Last {
         double coulombic_self, coulombic_real, coulombic_reciprocal;
             double current_coulombic_self_sum, current_coulombic_real_sum, current_coulombic_reciprocal_sum;
         
+        
+
 };
 
 Last::Last() {}
