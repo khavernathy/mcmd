@@ -406,7 +406,7 @@ Stats::Stats() {}
 class Last {
     public:
         Last();
-r        double current_Nsq_sum=0; double Nsq_average=0; // for qst
+        double current_Nsq_sum=0; double Nsq_average=0; // for qst
         double current_NU_sum=0; double NU_average = 0; // for qst
         double current_qst_sum=0; double qst_average = 0;
 

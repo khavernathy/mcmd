@@ -376,7 +376,7 @@ void setCheckpoint(System &system) {
         // CHEMICAL POTENTIAL
     system.last.chemical_potential = system.stats.chemical_potential;
         // Z
-    system.last.z = system.stats.z;
+    system.last.Z = system.stats.Z;
 
 
 }
