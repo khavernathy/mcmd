@@ -153,6 +153,7 @@ void computeAverages(System &system) {
     system.stats.chemical_potential = (system.stats.energy_average - system.constants.initial_energy)
             / (system.stats.Nmov_average - system.constants.initial_sorbates);		
     
+    // QST
     if (system.constants.ensemble != "nve") { // T must be fixed for Qst
         // NU (for qst)
         system.stats.current_NU_sum += system.stats.totalU*system.stats.count_movables;
@@ -168,7 +169,7 @@ void computeAverages(System &system) {
         system.stats.qst += system.constants.temp; 
         system.stats.qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
         
-        if (! std::isnan(system.stats.qst)) { // qst will def. be NaN for first calculation.
+        if (! std::isnan(system.stats.qst) && std::isfinite(system.stats.qst)) { // qst will def. be NaN for first calculation.
             system.stats.current_qst_sum += system.stats.qst;
             system.stats.qst_average = system.stats.current_qst_sum / t;
         }

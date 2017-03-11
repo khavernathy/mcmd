@@ -22,6 +22,7 @@ TODO
 
 -> make averages update every step instead of every corrtime..
     -> fix MC energy total bug
+    -> fix Qst bug inf
 -> make universal unit-cell  
     -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON
 -> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT
