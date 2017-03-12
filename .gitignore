@@ -15,3 +15,5 @@ md_test/te
 te
 #cloc-git.sh
 *.tmp
+garbage
+garbage/*
