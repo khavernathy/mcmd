@@ -41,20 +41,16 @@ double * getTotalPotential(System &system, string model) {
     total_potential = total_rd + total_es + total_polar;
     
     // save values to vars
-    system.stats.rdU = total_rd;
-        system.stats.current_rd_sum += total_rd;
+    system.stats.rd.value = total_rd;
     
-    system.stats.esU = total_es; 
-        system.stats.current_es_sum += total_es;
+    system.stats.es.value = total_es; 
     
-    system.stats.polarU = total_polar; 
-        system.stats.current_polar_sum += total_polar;
+    system.stats.polar.value = total_polar; 
     
-    system.stats.totalU = total_potential; 
-        system.stats.current_energy_sum += total_potential;
+    system.stats.potential.value = total_potential; 
 
 
-	static double output[4];
+	static double output[3];
         output[0] = total_rd;
         output[1] = total_es;
         output[2] = total_polar;

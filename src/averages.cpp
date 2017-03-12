@@ -9,71 +9,67 @@ using namespace std;
 
 void computeInitialValues(System &system) {
 	
-    double t=1.0;
-
     // MASS OF SYSTEM
-    system.stats.totalmass = 0.0; system.stats.movablemass = 0.0; system.stats.frozenmass = 0.0;
+    system.stats.totalmass.value = 0.0; system.stats.movablemass.value = 0.0; system.stats.frozenmass.value = 0.0;
 	for (int c=0; c<system.molecules.size();c++) {
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
-			system.stats.totalmass += thismass; // total mass in g
+			system.stats.totalmass.value += thismass; // total mass in g
 		    if (system.molecules[c].MF == "M")
-                system.stats.movablemass += thismass;
+                system.stats.movablemass.value += thismass;
             else if (system.molecules[c].MF == "F")
-                system.stats.frozenmass += thismass;
+                system.stats.frozenmass.value += thismass;
         }
 	}
 
     // N_movables (sorbates, usually)
-    system.stats.current_Nmov_sum += system.stats.count_movables;
     system.constants.initial_sorbates = system.stats.count_movables;
-    system.stats.Nmov_average = system.stats.current_Nmov_sum/t;
+    system.stats.Nmov.value = system.stats.count_movables;
+    system.stats.Nmov.average = system.stats.count_movables;
 
 	// ENERGY
     double* placeholder = getTotalPotential(system, system.constants.potential_form); // getTotPot sends values to stat vars
-            system.stats.rd_average = system.stats.current_rd_sum/t;
-                system.stats.lj_lrc_avg = system.stats.current_lj_lrc_sum/t;
-                system.stats.lj_self_lrc_avg = system.stats.current_lj_lrc_sum/t;
-                system.stats.lj_avg = system.stats.current_lj_sum/t;
+            system.stats.rd.average = system.stats.rd.value;
+                system.stats.lj_lrc.average = system.stats.lj_lrc.value;
+                system.stats.lj_self_lrc.average = system.stats.lj_lrc.value;
+                system.stats.lj.average = system.stats.lj.value;
 
-            system.stats.es_average = system.stats.current_es_sum/t;
-                system.stats.coulombic_self_avg = system.stats.current_coulombic_self_sum/t;
-                system.stats.coulombic_real_avg = system.stats.current_coulombic_real_sum/t;
-                system.stats.coulombic_reciprocal_avg = system.stats.current_coulombic_reciprocal_sum/t;
+            system.stats.es.average = system.stats.es.value;
+                system.stats.es_self.average = system.stats.es_self.value;
+                system.stats.es_real.average = system.stats.es_real.value;
+                system.stats.es_recip.average = system.stats.es_recip.value;
 
-        	system.stats.polar_average = system.stats.current_polar_sum/t;
+        	system.stats.polar.average = system.stats.polar.value;
 
-            system.stats.energy_average = system.stats.current_energy_sum/t;		
-    
+            system.stats.potential.average = system.stats.potential.value;		
+            system.constants.initial_energy = system.stats.potential.value;    
+
     // CHEMICAL POTENTIAL dE/dN
-    system.stats.chemical_potential = (system.stats.energy_average - system.constants.initial_energy)
-            / (system.stats.Nmov_average - system.constants.initial_sorbates);		
-
+    if (system.constants.ensemble != "npt") {
+    system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
+            / (system.stats.Nmov.average - system.constants.initial_sorbates);		
+    }
+    
 	// VOLUME
-	system.stats.volume = system.pbc.volume; 
-	system.stats.current_volume_sum += system.stats.volume;
-		system.stats.volume_average = system.stats.current_volume_sum/t;
+	system.stats.volume.average = system.pbc.volume; 
+    system.stats.volume.value = system.pbc.volume;
 
 	// DENSITY
-	system.stats.density = system.stats.movablemass/(system.stats.volume*1e-24); // that's mass in g /mL	
-	system.stats.current_density_sum += system.stats.density;
-		system.stats.density_average = system.stats.current_density_sum/t;
+	system.stats.density.value = system.stats.movablemass.value/(system.stats.volume.value*1e-24); // that's mass in g /mL	
+		system.stats.density.average = system.stats.density.value;
 
     // WT %
-    system.stats.wt_percent = (system.stats.movablemass / system.stats.totalmass)*100;
-    system.stats.wt_percent_ME = (system.stats.movablemass / system.stats.frozenmass)*100;
-    system.stats.current_wt_percent_sum += system.stats.wt_percent;
-    system.stats.current_wt_percent_ME_sum += system.stats.wt_percent_ME;
-        system.stats.wt_percent_average = system.stats.current_wt_percent_sum/t;
-        system.stats.wt_percent_ME_average = system.stats.current_wt_percent_ME_sum/t;			
+    system.stats.wtp.value = (system.stats.movablemass.value / system.stats.totalmass.value)*100;
+    system.stats.wtpME.value = (system.stats.movablemass.value / system.stats.frozenmass.value)*100;
+        system.stats.wtp.average = system.stats.wtp.value;
+        system.stats.wtpME.average = system.stats.wtpME.value;
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass/(system.proto.get_mass()*1000*system.constants.NA);
-	system.stats.Z = (system.constants.pres*(system.stats.volume*1e-27) * 101.325 ) // PV
+    double n_moles_sorb = system.stats.movablemass.value/(system.proto.get_mass()*1000*system.constants.NA);
+	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
             / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
-	system.stats.current_z_sum += system.stats.Z;
-		system.stats.z_average = system.stats.current_z_sum/t;
+		system.stats.z.average = system.stats.z.value;
 
 
 }
@@ -82,8 +78,7 @@ void computeInitialValues(System &system) {
 
 void computeAverages(System &system) {
     system.checkpoint("started computeAverages()");
-    double t = (double)system.stats.MCstep;
-    double t1 = t+1.0; // for values which already got initial-value treatment
+    double t = system.stats.MCstep;
 
     // MC MOVE ACCEPT STATS
 	system.stats.total_accepts = system.stats.insert_accepts + system.stats.remove_accepts + system.stats.displace_accepts + system.stats.volume_change_accepts;
@@ -114,95 +109,84 @@ void computeAverages(System &system) {
 
     system.checkpoint("done with boltzmann stuff.");
 	// MASS OF SYSTEM
-    if (system.constants.ensemble == "uvt") { // only uvt changes mass.
-	system.stats.totalmass = 0.0; system.stats.movablemass = 0.0; system.stats.frozenmass = 0.0;
+    if (system.constants.ensemble == "uvt" && system.stats.Nmov.value != system.last.Nmov) { // only uvt changes mass
+	system.stats.totalmass.value = 0.0; system.stats.movablemass.value = 0.0; system.stats.frozenmass.value = 0.0;
 	for (int c=0; c<system.molecules.size();c++) {
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
-			system.stats.totalmass += thismass; // total mass in g
+			system.stats.totalmass.value += thismass; // total mass in g
 		    if (system.molecules[c].MF == "M")
-                system.stats.movablemass += thismass;
+                system.stats.movablemass.value += thismass;
             else if (system.molecules[c].MF == "F")
-                system.stats.frozenmass += thismass;
+                system.stats.frozenmass.value += thismass;
         }
 	}
     }
 
     // N_movables (sorbates, usually)
-    system.stats.current_Nmov_sum += system.stats.count_movables;
-    system.stats.Nmov_average = system.stats.current_Nmov_sum/t1;
+    system.stats.Nmov.value = system.stats.count_movables;
+    system.stats.Nmov.calcNewStats();
 
 	// ENERGY
-    // 1) RD
-    system.stats.rd_average = system.stats.current_rd_sum/t1;
-        system.stats.lj_lrc_avg = system.stats.current_lj_lrc_sum/t1;
-        system.stats.lj_self_lrc_avg = system.stats.current_lj_lrc_sum/t1;
-        system.stats.lj_avg = system.stats.current_lj_sum/t1;
-    // 2) ES
-    system.stats.es_average = system.stats.current_es_sum/t1;
-        system.stats.coulombic_self_avg = system.stats.current_coulombic_self_sum/t1;
-        system.stats.coulombic_real_avg = system.stats.current_coulombic_real_sum/t1;
-        system.stats.coulombic_reciprocal_avg = system.stats.current_coulombic_reciprocal_sum/t1;
-    // 3) POLAR
-	system.stats.polar_average = system.stats.current_polar_sum/t1;
-    // 4) TOTAL
-    system.stats.energy_average = system.stats.current_energy_sum/t1;		
-    
+    system.stats.rd.calcNewStats();
+        system.stats.lj.calcNewStats();
+        system.stats.lj_lrc.calcNewStats();
+        system.stats.lj_self_lrc.calcNewStats();
+    system.stats.es.calcNewStats();
+        system.stats.es_real.calcNewStats();
+        system.stats.es_self.calcNewStats();
+        system.stats.es_recip.calcNewStats();
+    system.stats.polar.calcNewStats();
+    system.stats.potential.calcNewStats();
+
     // CHEMICAL POTENTIAL dE/dN
-    system.stats.chemical_potential = (system.stats.energy_average - system.constants.initial_energy)
-            / (system.stats.Nmov_average - system.constants.initial_sorbates);		
-    
+    if (system.constants.ensemble != "npt") {
+        system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
+                / (system.stats.Nmov.average - system.constants.initial_sorbates);		
+        system.stats.chempot.calcNewStats();
+    }
     // QST
-    if (system.constants.ensemble != "nve") { // T must be fixed for Qst
+    if (system.constants.ensemble == "uvt") { // T must be fixed for Qst
         // NU (for qst)
-        system.stats.NU = system.stats.totalU*system.stats.count_movables;
-        system.stats.current_NU_sum += system.stats.NU;
-        system.stats.NU_average = system.stats.current_NU_sum / t;
+        system.stats.NU.value = system.stats.potential.value*system.stats.count_movables;
+        system.stats.NU.calcNewStats();
 
         // Nsq (for qst)
-        system.stats.Nsq = system.stats.count_movables * system.stats.count_movables;
-        system.stats.current_Nsq_sum += system.stats.Nsq;
-        system.stats.Nsq_average = system.stats.current_Nsq_sum / t;
+        system.stats.Nsq.value = system.stats.count_movables * system.stats.count_movables;
+        system.stats.Nsq.calcNewStats();
 
         // Qst
-            system.stats.qst = -(system.stats.NU_average - system.stats.Nmov_average * system.stats.energy_average);
-            system.stats.qst /= (system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average);
-            system.stats.qst += system.constants.temp; 
-            system.stats.qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
-            if (0 != system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average) {
-                system.stats.current_qst_sum += system.stats.qst;
-                system.stats.qst_average = system.stats.current_qst_sum / system.stats.qst_counter;
-                system.stats.qst_counter++;
-                //printf("qst = %f; sum = %f, avg = %f, denom = %f\n", system.stats.qst, system.stats.current_qst_sum,system.stats.qst_average, (system.stats.Nsq_average - system.stats.Nmov_average * system.stats.Nmov_average));
+            if (0 != system.stats.Nsq.average - system.stats.Nmov.average * system.stats.Nmov.average) {
+            double qst = -(system.stats.NU.average - system.stats.Nmov.average * system.stats.potential.average);
+            qst /= (system.stats.Nsq.average - system.stats.Nmov.average * system.stats.Nmov.average);
+            qst += system.constants.temp; 
+            qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
+                system.stats.qst.value = qst;
+                system.stats.qst.calcNewStats();
 
             }
     }
 
 	// VOLUME
-	system.stats.volume = system.pbc.volume; 
-	system.stats.current_volume_sum += system.stats.volume;
-		system.stats.volume_average = system.stats.current_volume_sum/t1;
+	system.stats.volume.value = system.pbc.volume; 
+        system.stats.volume.calcNewStats();
 
 	// DENSITY
-	system.stats.density = system.stats.movablemass/(system.stats.volume*1e-24); // that's mass in g /mL	
-	system.stats.current_density_sum += system.stats.density;
-		system.stats.density_average = system.stats.current_density_sum/t1;
+	system.stats.density.value = system.stats.movablemass.value/(system.stats.volume.value*1e-24); // that's mass in g /mL	
+        system.stats.density.calcNewStats();
 
     // WT %
-    system.stats.wt_percent = (system.stats.movablemass / system.stats.totalmass)*100;
-    system.stats.wt_percent_ME = (system.stats.movablemass / system.stats.frozenmass)*100;
-    system.stats.current_wt_percent_sum += system.stats.wt_percent;
-    system.stats.current_wt_percent_ME_sum += system.stats.wt_percent_ME;
-        system.stats.wt_percent_average = system.stats.current_wt_percent_sum/t1;
-        system.stats.wt_percent_ME_average = system.stats.current_wt_percent_ME_sum/t1;			
+    system.stats.wtp.value = (system.stats.movablemass.value / system.stats.totalmass.value)*100;
+    system.stats.wtpME.value = (system.stats.movablemass.value / system.stats.frozenmass.value)*100;
+        system.stats.wtp.calcNewStats();
+        system.stats.wtpME.calcNewStats();
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass/(system.proto.get_mass()*1000*system.constants.NA);
-	system.stats.Z = (system.constants.pres*(system.stats.volume*1e-27) * 101.325 ) // PV
+    double n_moles_sorb = system.stats.movablemass.value/(system.proto.get_mass()*1000*system.constants.NA);
+	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
             / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
-	system.stats.current_z_sum += system.stats.Z;
-		system.stats.z_average = system.stats.current_z_sum/t1;
+        system.stats.z.calcNewStats();
 
-	
+    system.checkpoint("finished computeAverages()");	
 }

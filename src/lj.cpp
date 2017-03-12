@@ -97,14 +97,9 @@ double lj(System &system) {
         total_pot += total_rd_self_lrc;
     } // end LRC self contribution.
 
-    system.stats.lj_lrc = total_rd_lrc; 
-        system.stats.current_lj_lrc_sum += total_rd_lrc;
-    
-    system.stats.lj_self_lrc = total_rd_self_lrc; 
-        system.stats.current_lj_self_lrc_sum += total_rd_self_lrc;
-    
-    system.stats.lj = total_lj; 
-        system.stats.current_lj_sum += total_lj;
+    system.stats.lj_lrc.value = total_rd_lrc; 
+    system.stats.lj_self_lrc.value = total_rd_self_lrc; 
+    system.stats.lj.value = total_lj; 
 
 //printf("potential: %f, self = %f, lrc = %f, lj = %f\n", total_pot, total_rd_self_lrc, total_rd_lrc, total_lj);
     return total_pot;

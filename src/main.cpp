@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
     moleculePrintout(system);    
+    initialize(system); // these are just system name sets, 
 
 	// clobber files 
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
@@ -121,9 +122,10 @@ int main(int argc, char **argv) {
 				    runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
                     system.constants.old_total_atoms = system.constants.total_atoms;
-                    if (system.stats.MCmoveAccepted == false) {
-                        revertToCheckpoint(system); // correct the energies before taking avg.
-                    }
+                    
+                    if (system.stats.MCmoveAccepted == false)
+                        revertToCheckpoint(system);
+
                     computeAverages(system);
                 } else {
                     computeInitialValues(system);
@@ -170,19 +172,24 @@ int main(int argc, char **argv) {
                 system.stats.rem_perc,
                 system.stats.dis_perc,
                 system.stats.vol_perc);
-            printf("RD avg =              %.5f K  (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",system.stats.rd_average,system.stats.lj_avg,system.stats.lj_lrc_avg, system.stats.lj_self_lrc_avg);
-			printf("ES avg =              %.5f K  (real = %.4f, recip = %.4f, self = %.4f)\n",system.stats.es_average,system.stats.coulombic_real_avg, system.stats.coulombic_reciprocal_avg, system.stats.coulombic_self_avg);
-			printf("Polar avg =           %.5f K\n",system.stats.polar_average);
-			printf("Total potential avg = %.5f K\n",system.stats.energy_average);
-			printf("Volume avg  = %.2f A^3 = %.2f nm^3\n",system.stats.volume_average,system.stats.volume_average/1000.0);
-			printf("Density avg = %.6f g/mL = %6f g/L \n",system.stats.density_average,system.stats.density_average*1000.0); 
-			printf("wt %% = %.4f %%; wt %% ME = %.4f %% \n",system.stats.wt_percent_average, system.stats.wt_percent_ME_average);
-            if (system.constants.ensemble != "nve")
-                printf("Qst avg = %.5f kJ/mol\n", system.stats.qst_average);
-
-            printf("Chemical potential avg = %.4f K per sorbate molecule \n", system.stats.chemical_potential); 
-            printf("Compressibility factor Z avg = %.6f (for homogeneous gas %s) \n",system.stats.z_average,system.proto.name.c_str());
-            printf("N_movables avg = %.3f; N_molecules = %i; N_movables = %i; N_sites = %i\n",system.stats.Nmov_average,(int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
+            printf("RD avg =              %.5f +- %.5f K (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",
+                system.stats.rd.average, system.stats.rd.sd, system.stats.lj.average, system.stats.lj_lrc.average, system.stats.lj_self_lrc.average);
+			printf("ES avg =              %.5f +- %.5f K (real = %.4f, recip = %.4f, self = %.4f)\n",
+                system.stats.es.average, system.stats.es.sd, system.stats.es_real.average, system.stats.es_recip.average, system.stats.es_self.average);
+			printf("Polar avg =           %.5f +- %.5f K\n",system.stats.polar.average, system.stats.polar.sd);
+			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
+			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
+			printf("Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density.average, system.stats.density.sd, system.stats.density.average*1000.0); 
+			if (system.constants.ensemble == "uvt") {
+                printf("wt %% = %.4f +- %.4f %%; wt %% ME = %.4f +- %.4f %% \n",system.stats.wtp.average, system.stats.wtp.sd, system.stats.wtpME.average, system.stats.wtpME.sd);
+                printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
+            }
+            if (system.constants.ensemble != "npt") {
+                printf("Chemical potential avg = %.4f +- %.4f K / sorbate molecule \n", system.stats.chempot.average, system.stats.chempot.sd); 
+            }
+            printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto.name.c_str());
+            printf("N_movables avg = %.3f +- %.3f; N_molecules = %i; N_movables = %i; N_sites = %i\n",
+                system.stats.Nmov.average, system.stats.Nmov.sd, (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             printf("--------------------\n\n");
 
             // CONSOLIDATE ATOM AND MOLECULE PDBID's
@@ -204,7 +211,7 @@ int main(int argc, char **argv) {
             writePDB(system, system.constants.restart_pdb);
             if (system.constants.pdb_traj_option == "on")
                 writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);    
-            writeThermo(system, system.stats.energy_average, 0.0, 0.0, system.stats.energy_average, system.stats.density_average*1000, system.constants.temp, system.constants.pres, t);
+            writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density.average*1000, system.constants.temp, system.constants.pres, t);
             if (system.stats.radial_dist == "on") {
                 radialDist(system);
                 writeRadialDist(system);        

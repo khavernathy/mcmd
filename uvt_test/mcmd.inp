@@ -1,0 +1,41 @@
+! Douglas Franz, Space group, USF
+! all input params are defined only by the second column
+! 2017
+
+name			    mcmd_development
+mode	 		    mc ! mc or md
+checkpoints_option  off
+ewald_es            on
+rd_lrc              on
+input_atoms	        mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
+com_option		    off   	! center of mass
+
+! P.B.C. will be 1/2 of these lengths for each dimension
+x_length   25.669 150    27.4876  150.97371 !  in A   
+y_length   25.669 150  60    27.4876  150.97371
+z_length   25.669 150   15.669    60    27.4876  150.97371
+
+
+! radial distribution option
+radial_dist         off  ! turns on/off radial distribution function. off for speed-up
+radial_bin_size     0.1  ! in A
+radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
+radial_centroid     Ne   ! element name
+radial_counterpart  Ne   ! element name to get distance of w/centroid
+radial_file         radialdist.dat 
+
+
+! MONTE CARLO ONLY ======================================
+ensemble		    uvt
+
+mc_corrtime	        50
+finalstep		    5000000
+temperature 	    77   !77.0  ! K
+pressure		    1.0     ! atm
+
+insert_factor		0.667     ! uVT: prob to insert/delete in uVT
+rotate_prob         0.5
+displace_factor     2.5
+rotate_angle_factor 360.0
+! =======================================================

@@ -204,9 +204,9 @@ double coulombic_ewald(System &system) {
     real = coulombic_real(system);
     recip = coulombic_reciprocal(system);
 
-    system.stats.coulombic_self = self; system.stats.current_coulombic_self_sum += self;
-    system.stats.coulombic_real = real; system.stats.current_coulombic_real_sum += real;
-    system.stats.coulombic_reciprocal = recip; system.stats.current_coulombic_reciprocal_sum += recip;
+    system.stats.es_self.value = self; 
+    system.stats.es_real.value = real; 
+    system.stats.es_recip.value = recip; 
 
     potential = self + real + recip;
     
