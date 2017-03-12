@@ -95,12 +95,11 @@ double * centerOfMass(System &system) {
 
 
 /* CHECK IF MOLECULE IS IN BOX AND MOVE BACK IN IF NOT */
-void checkInTheBox(System &system, int i) {
+void checkInTheBox(System &system, int i) { // i is molecule id passed in function call.
 
 // first the easy systems, alpha=beta=gamma=90
 // saves some time because box limits need not be recomputed
 if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
-    if (system.constants.md_mode == "molecular") {
     for (int j=0; j<system.molecules[i].atoms.size(); j++) {
         if (system.molecules[i].atoms[j].pos[0]  > system.pbc.x_max) {
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
@@ -135,32 +134,6 @@ if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
                 }
         }	
     } // end atom loop
-    } // end if molecular
-    else if (system.constants.md_mode == "atomic") {
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {        
-
-        if (system.molecules[i].atoms[j].pos[0]  > system.pbc.x_max) {
-                    system.molecules[i].atoms[j].pos[0] -= system.pbc.x_length;
-        }
-        else if (system.molecules[i].atoms[j].pos[0] < system.pbc.x_min) {
-                    system.molecules[i].atoms[j].pos[0] += system.pbc.x_length;
-        }
-
-        if (system.molecules[i].atoms[j].pos[1] > system.pbc.y_max) {
-                    system.molecules[i].atoms[j].pos[1] -= system.pbc.y_length;
-        }
-        else if (system.molecules[i].atoms[j].pos[1] < system.pbc.y_min) {
-                    system.molecules[i].atoms[j].pos[1] += system.pbc.y_length;
-        }
-
-        if (system.molecules[i].atoms[j].pos[2]  > system.pbc.z_max) {
-                    system.molecules[i].atoms[j].pos[2] -= system.pbc.z_length;
-        }
-        else if (system.molecules[i].atoms[j].pos[2] < system.pbc.z_min) {
-                    system.molecules[i].atoms[j].pos[2] += system.pbc.z_length;
-        } 
-    } // end atom loop
-    } // end if atomic
 } // end if alpha=beta=gamma=90
 
 // the universal treatment, alpha != beta ?= gamma
@@ -182,7 +155,6 @@ else {
 
     // if outside box checks are correct but moves are not..
     // NOTE: the r_c cutoff is not actually used in MD
-    if (system.constants.md_mode == "molecular") {
 
         if (system.molecules[i].com[0] < box_limit[0]) { // left of box
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
@@ -278,13 +250,8 @@ else {
             }
         }
 
-    } else if (system.constants.md_mode == "atomic") {
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-        int a=0;  // i'm too lazy to bother with an atomic algorithm because the prog really should just be molecules.
-        }
-    } // end if atomic     
 
-} 
+} // end if non-90/90/90 
 } // end pbc function
 
 

@@ -44,12 +44,6 @@ void computeInitialValues(System &system) {
             system.stats.potential.average = system.stats.potential.value;		
             system.constants.initial_energy = system.stats.potential.value;    
 
-    // CHEMICAL POTENTIAL dE/dN
-    if (system.constants.ensemble != "npt") {
-    system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
-            / (system.stats.Nmov.average - system.constants.initial_sorbates);		
-    }
-    
 	// VOLUME
 	system.stats.volume.average = system.pbc.volume; 
     system.stats.volume.value = system.pbc.volume;
@@ -109,7 +103,6 @@ void computeAverages(System &system) {
 
     system.checkpoint("done with boltzmann stuff.");
 	// MASS OF SYSTEM
-    if (system.constants.ensemble == "uvt" && system.stats.Nmov.value != system.last.Nmov) { // only uvt changes mass
 	system.stats.totalmass.value = 0.0; system.stats.movablemass.value = 0.0; system.stats.frozenmass.value = 0.0;
 	for (int c=0; c<system.molecules.size();c++) {
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
@@ -120,7 +113,6 @@ void computeAverages(System &system) {
             else if (system.molecules[c].MF == "F")
                 system.stats.frozenmass.value += thismass;
         }
-	}
     }
 
     // N_movables (sorbates, usually)
@@ -141,9 +133,11 @@ void computeAverages(System &system) {
 
     // CHEMICAL POTENTIAL dE/dN
     if (system.constants.ensemble != "npt") {
-        system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
+        if (0 != system.stats.Nmov.average - system.constants.initial_sorbates) {
+            system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
                 / (system.stats.Nmov.average - system.constants.initial_sorbates);		
-        system.stats.chempot.calcNewStats();
+            system.stats.chempot.calcNewStats();
+        }
     }
     // QST
     if (system.constants.ensemble == "uvt") { // T must be fixed for Qst

@@ -157,7 +157,7 @@ void addMolecule(System &system, string model) {
 	}
 
     // **IMPORTANT: MAKE SURE THE MOLECULE IS IN THE BOX** 
-    // maybe not needed actually. displaces move the molecules into box methinks 
+    checkInTheBox(system, last_molecule_id);
 	
 	// FULLY DONE ADDING MOLECULE TO SYSTEM IN PLACE. NOW GET NEW ENERGY		
 	double* new_potentials = getTotalPotential(system, model);

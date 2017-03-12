@@ -379,18 +379,20 @@ class Stats {
             double sd=0;
 
             void calcNewStats() { // gets new stats based on new val
+                // the assumption here is that the new val was already calculated and provided (in "value")
                 double x = value;
                 double prevavg = average;
                 double prevsd = sd; //printf("counter %f\n",obs.counter);
                 counter = counter+1.0; //printf("counter %f\n",obs.counter);
                 average = ((counter-1.0)*average + x)/counter;
                 //sd = sqrt( ((counter-2.0)*prevsd + (x - average)*(x - prevavg) ) / (counter-1.0));
-                sd = sqrt( prevsd*prevsd + prevavg*prevavg - average*average + 
-                    ((x*x - prevsd*prevsd - prevavg*prevavg)/counter)  );        
-
-                //if (name == "potential") {
-                //printf("observable %14s :: counter = %5f; value = %-10.5f; average = %-10.5f; sd = %-10.5f\n", 
-                  //  name.c_str(), counter, value, average, sd);
+                double operand =  prevsd*prevsd + prevavg*prevavg - average*average +((x*x - prevsd*prevsd - prevavg*prevavg)/counter);
+                (operand > 0) ? sd = sqrt( operand ) : sd = 0;       
+    
+                //if (name == "es") {
+                //if (name == "es" || name == "es_self" || name == "es_real" || name == "es_recip") {
+                //printf("observable %14s :: counter = %5f; value = %-10.5f; prevavg = %-10.5f; average = %-10.5f; prevsd = %-10.5f; sd = %-10.5f\n", 
+                //    name.c_str(), counter, value, prevavg, average, prevsd, sd);
                 //}
             }
 
