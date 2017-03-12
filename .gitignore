@@ -13,5 +13,5 @@ a
 b
 md_test/te
 te
-cloc-git.sh
-*/t
+#cloc-git.sh
+*.tmp
