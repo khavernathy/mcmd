@@ -16,6 +16,9 @@
 #include <chrono>
 using namespace std;
 
+double getrand() {
+    return (double)rand()/(double)RAND_MAX; // a value between 0 and 1.
+}
 
 /* GET BOX LIMIT COORDINATE FOR PBC */
 double getBoxLimit(System &system, int planeid, double x, double y, double z) {

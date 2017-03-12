@@ -7,6 +7,65 @@
 #include <string>
 #include <stdlib.h>
 
+void translate(System &system, int molid) {
+    double randx,randy,randz;
+        	randx = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
+        	randy = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
+        	randz = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
+
+            system.molecules[molid].com[0] += randx;
+            system.molecules[molid].com[1] += randy;
+            system.molecules[molid].com[2] += randz;
+
+			for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
+					system.molecules[molid].atoms[i].pos[0] += randx;
+        			system.molecules[molid].atoms[i].pos[1] += randy;
+        			system.molecules[molid].atoms[i].pos[2] += randz;
+			}
+
+} // end translate()
+
+void rotate(System &system, int molid) {
+    system.checkpoint("doing a rotation move.");
+        double com[3];		
+
+        // 1) GET RANDOM ANGLE AND PLANE OF ROTATION.
+        double randangle; string plane; 
+		randangle = system.constants.rotate_angle_factor*(double)rand()/(double)RAND_MAX; // angle of rotation from 0 -> rotate_angle_factor
+		double randxyz = (double)rand()/(double)RAND_MAX;
+		// 1/3 change for a given plane
+		if (randxyz < 0.33333) {
+			plane="x";
+		} else if (randxyz > 0.33333 && randxyz < 0.66667) {
+			plane="y";
+		} else { plane="z";}
+
+        // 2) SAVE CURRENT COM
+        for (int n=0; n<3; n++) com[n] = system.molecules[molid].com[n];
+
+        // 3) MOVE MOLECULE TO ORIGIN TEMPORARILY
+        for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
+            for (int n=0; n<3; n++) {
+                system.molecules[molid].atoms[i].pos[n] -= com[n]; 
+                //printf("com[%i]: %f\n", n,system.molecules[molid].com[n]);
+            }
+        }
+        
+        // 4) ROTATE THE MOLECULE ABOUT ORIGIN
+		for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
+				double* rotated = rotatePoint(system, system.molecules[molid].atoms[i].pos[0], system.molecules[molid].atoms[i].pos[1], system.molecules[molid].atoms[i].pos[2], plane, randangle);
+				system.molecules[molid].atoms[i].pos[0] = rotated[0];
+				system.molecules[molid].atoms[i].pos[1] = rotated[1];
+				system.molecules[molid].atoms[i].pos[2] = rotated[2];
+		} // end for i
+
+        // 5) MOVE MOLECULE BACK TO COM POSITION, BUT ROTATED
+        for (int i=0; i<system.molecules[molid].atoms.size(); i++) 
+            for (int n=0; n<3; n++) 
+                system.molecules[molid].atoms[i].pos[n] += com[n];
+
+} // end rotate();
+
 
 /* (RE)DEFINE THE BOX LENGTHS */
 void defineBox(System &system) { // takes input in A
@@ -138,23 +197,7 @@ void addMolecule(System &system, string model) {
 	}
 	
 	// rotate the molecule here by random amount.
-	// get random plane of rotation
-		string plane;
-		double randp = (double)rand()/(double)RAND_MAX;
-		if (randp < 0.33333) plane="x";	
-		else if (randp < 0.66667) plane="y";
-		else plane="z";
-		// get random angle from 0 -> 360
-		double randangle = system.constants.rotate_angle_factor * (double)rand()/(double)RAND_MAX;
-	// rotate atoms in molecule.
-	for (int i=0; i<system.molecules[last_molecule_id].atoms.size(); i++) {
-					
-		double* rotated_points = rotatePoint(system, system.molecules[last_molecule_id].atoms[i].pos[0], system.molecules[last_molecule_id].atoms[i].pos[1], system.molecules[last_molecule_id].atoms[i].pos[2], plane, randangle);
-	
-		system.molecules[last_molecule_id].atoms[i].pos[0] = rotated_points[0];
-		system.molecules[last_molecule_id].atoms[i].pos[1] = rotated_points[1];
-		system.molecules[last_molecule_id].atoms[i].pos[2] = rotated_points[2];	
-	}
+    rotate(system, last_molecule_id);
 
     // **IMPORTANT: MAKE SURE THE MOLECULE IS IN THE BOX** 
     checkInTheBox(system, last_molecule_id);
@@ -170,7 +213,8 @@ void addMolecule(System &system, string model) {
 	double ranf = (double)rand()/(double)RAND_MAX;
 	if (ranf < boltz_factor) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
-	    system.stats.MCmoveAccepted == true;
+	    system.stats.MCmoveAccepted = true;
+        system.molecules[last_molecule_id].calc_center_of_mass();
     } else {
 		// remove the new molecule.
 		system.molecules.pop_back(); 
@@ -240,7 +284,7 @@ return;
 }
 
 
-/* DISPLACE (TRANSLATE OR ROTATE) */
+/* DISPLACE (TRANSLATE AND ROTATE) */
 void displaceMolecule(System &system, string model) {
     system.stats.displace_attempts++;
     string movable="notyet";
@@ -261,46 +305,24 @@ void displaceMolecule(System &system, string model) {
     // save a temporary copy of molecule to go back if needed
     Molecule tmp_molecule = system.molecules[randm];
 
-	// pick rotation or displacement
-
-    if (system.molecules[randm].atoms.size() > 1) { // try rotation
-	double randRotTrans = (double)rand()/(double)RAND_MAX;
-	if (randRotTrans < system.constants.rotate_prob && system.constants.rotate_option == "on") { // do a rotation
-		
-        // ROTATION
-        system.checkpoint("doing a rotation move.");
-		double randangle; string plane; 
-		randangle = system.constants.rotate_angle_factor*(double)rand()/(double)RAND_MAX; // angle of rotation from 0 -> rotate_angle_factor
-		double randxyz = (double)rand()/(double)RAND_MAX;
-		// 1/3 change for a given plane
-		if (randxyz < 0.33333) {
-			plane="x";
-		} else if (randxyz > 0.33333 && randxyz < 0.66667) {
-			plane="y";
-		} else { plane="z";}
-
-		for (int i=0; i<system.molecules[randm].atoms.size(); i++) {
-				double* rotated = rotatePoint(system, system.molecules[randm].atoms[i].pos[0], system.molecules[randm].atoms[i].pos[1], system.molecules[randm].atoms[i].pos[2], plane, randangle);
-				system.molecules[randm].atoms[i].pos[0] = rotated[0];
-				system.molecules[randm].atoms[i].pos[1] = rotated[1];
-				system.molecules[randm].atoms[i].pos[2] = rotated[2];
-		} // end for i
-	} // end rotation option
-    } // end if atoms-in-mol > 1 
-	else {
-		// DISPLACEMENT
-        system.checkpoint("doing displacement move.");
-		double randx,randy,randz;
-        	randx = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
-        	randy = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
-        	randz = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
-
-			for (int i=0; i<system.molecules[randm].atoms.size(); i++) {
-					system.molecules[randm].atoms[i].pos[0] += randx;
-        			system.molecules[randm].atoms[i].pos[1] += randy;
-        			system.molecules[randm].atoms[i].pos[2] += randz;
-			}
-    } // end rotation/displacement if/else
+	// do rotation AND translation
+    // TRANSLATE
+    system.checkpoint("doing translate move.");
+	    translate(system, randm);	
+/*
+     printf("before rotating: \n");
+        for (int n=0; n<5; n++)
+            printf("H %f %f %f \n", system.molecules[randm].atoms[n].pos[0], system.molecules[randm].atoms[n].pos[1], system.molecules[randm].atoms[n].pos[2]);
+*/
+    // ROTATION
+    if (system.molecules[randm].atoms.size() > 1 && system.constants.rotate_option == "on") { // try rotation
+        rotate(system, randm);    	
+    } // end rotation option
+/*	
+    printf("after rotating: \n");
+    for (int n=0; n<5; n++)
+        printf("H %f %f %f \n", system.molecules[randm].atoms[n].pos[0], system.molecules[randm].atoms[n].pos[1], system.molecules[randm].atoms[n].pos[2]);
+*/
 
 	// check P.B.C. (move the molecule back in the box if needed)
     checkInTheBox(system, randm);
@@ -319,19 +341,18 @@ void displaceMolecule(System &system, string model) {
 	if (ranf < boltzmann_factor) {
 			system.stats.displace_accepts++;
             system.stats.MCmoveAccepted = true;
-	}
-	// reject move (by moving it back)
+	} // end accept
 	else {
 		// for whole molecule
 		for (int i=0; i<system.molecules[randm].atoms.size(); i++) {
-			system.molecules[randm].atoms[i].pos[0] = tmp_molecule.atoms[i].pos[0];
-            system.molecules[randm].atoms[i].pos[1] = tmp_molecule.atoms[i].pos[1];
-            system.molecules[randm].atoms[i].pos[2] = tmp_molecule.atoms[i].pos[2];
+            for (int n=0; n<3; n++) {
+                system.molecules[randm].atoms[i].pos[n] = tmp_molecule.atoms[i].pos[n];
+                system.molecules[randm].com[n] = tmp_molecule.com[n];
+            }
 		}
-
-            // check P.B.C. (move the molecule back in the box if needed)
-            checkInTheBox(system, randm);
-	
-	} // end displace/rotate (all ensembles)
+        // check P.B.C. (move the molecule back in the box if needed)
+        checkInTheBox(system, randm);
+	} // end reject 
     return;
 }
+

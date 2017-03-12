@@ -408,15 +408,19 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "basis1")) {
                 for (int n=0; n<3; n++)
                     system.pbc.basis[0][n] = atof(lc[n+1].c_str());
+                system.pbc.x_length = system.pbc.basis[0][0];
+
                 std::cout << "Got basis1 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "basis2")) {
                 for (int n=0; n<3; n++)
                     system.pbc.basis[1][n] = atof(lc[n+1].c_str());
+                system.pbc.y_length = system.pbc.basis[1][1];
 
                 std:: cout << "Got basis2 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "basis3")) {
                 for (int n=0; n<3; n++)
                     system.pbc.basis[2][n] = atof(lc[n+1].c_str());
+                system.pbc.z_length = system.pbc.basis[2][2];
 
                 std:: cout << "Got basis3 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
 
@@ -436,6 +440,9 @@ void readInput(System &system, char* filename) {
                 system.pbc.alpha = alpha;
                 system.pbc.beta = beta;
                 system.pbc.gamma = gamma;
+                system.pbc.x_length = a;
+                system.pbc.y_length = b;
+                system.pbc.z_length = c;
 
                 system.pbc.calcNormalBasis();
 
@@ -537,10 +544,11 @@ void readInput(System &system, char* filename) {
 				system.constants.com_option = lc[1].c_str();
 				std::cout << "Got center-of-mass option = " << lc[1].c_str(); printf("\n");
 			
+            /* DEPRECATED
 			} else if (!strcasecmp(lc[0].c_str(),  "rotate_prob")) {
 				system.constants.rotate_prob = atof(lc[1].c_str());
 				std::cout << "Got rotate probability = " << lc[1].c_str(); printf("\n");
-			
+			*/
 			} else if (!strcasecmp(lc[0].c_str(), "md_dt")) {
 				system.constants.md_dt = atof(lc[1].c_str());
 				std::cout << "Got MD timestep = " << lc[1].c_str() << " fs"; printf("\n");

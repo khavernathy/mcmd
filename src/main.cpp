@@ -62,6 +62,13 @@ int main(int argc, char **argv) {
     moleculePrintout(system);    
     initialize(system); // these are just system name sets, 
 
+    // compute inital COM for all molecules, and moment of inertia
+    // (io.cpp handles molecular masses // 
+    for (int i=0; i<system.molecules.size(); i++) {
+        system.molecules[i].calc_center_of_mass();
+        if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
+    }
+
 	// clobber files 
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
@@ -126,13 +133,16 @@ int main(int argc, char **argv) {
                     if (system.stats.MCmoveAccepted == false)
                         revertToCheckpoint(system);
 
-                    computeAverages(system);
+                    //computeAverages(system);
                 } else {
                     computeInitialValues(system);
                 }
 
         // CHECK FOR CORRTIME
-        if (t==0 || t % corrtime == 0) { /// write every x steps
+        if (t==0 || t % corrtime == 0 || t == finalstep) { /// write every x steps
+
+            computeAverages(system);
+
             /* -------------------------------- */	
 			// [[[[ PRINT OUTPUT VALUES ]]]]		
 			/* -------------------------------- */
@@ -292,12 +302,6 @@ int main(int argc, char **argv) {
     } 
      // end initial velocities
 
-    // compute inital COM for all molecules, and moment of inertia
-    // (io.cpp handles molecular masses // 
-    for (int i=0; i<system.molecules.size(); i++) {
-        system.molecules[i].calc_center_of_mass();
-        if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
-    }
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond. 

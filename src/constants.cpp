@@ -44,10 +44,10 @@ class Constants {
         double pres=1.0; // in atm
         double volume_change=2.5; // a factor used in volume change BF, mpmc default 2.5
         double vcp_factor=1.0; // a factor used in probability for volume change. this / num_sorbates is good per Frenkel
-        double displace_factor=2.5; // in A, amount to displace * +-0 to 1 
+        double displace_factor=2.5; // up to +- this number in A 
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
-        double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
-        double rotate_angle_factor=360.0; // angle +- to rotate if rotate selected 
+        // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
+        double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected 
 		int stepsize=1; // obvi
         int finalstep; // user defined for MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
@@ -132,6 +132,8 @@ class Pbc {
                     n, A[n], B[n], C[n], D[n]);
             }
             printf("x_length = %.5f; y_length = %.5f; z_length = %.5f\n", x_length, y_length, z_length);
+            printf("x_max = %.5f; y_max = %.5f; z_max = %.5f\n", x_max, y_max, z_max);
+            printf("x_min = %.5f; y_min = %.5f; z_min = %.5f\n", x_min, y_min, z_min);
         }
 
         void calcPlane(int p1index, int p2index, int p3index, int planeIndex) { // 3 points define a plane.
