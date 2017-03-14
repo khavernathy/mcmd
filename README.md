@@ -20,9 +20,11 @@ To run
   
 TODO
 
+
 -> make pair lists for MC to run faster. 
+-> add input for easy model selection e.g. co2*, co2, h2_bssp, etc
 -> make averages update every step instead of every corrtime..
-    -> fix SD's maybe
+    -> fix SD's maybe?
 -> make universal unit-cell  
     -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON
 -> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT
