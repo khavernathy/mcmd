@@ -14,7 +14,7 @@ To compile:  (in src dir)
 g++ main.cpp -lm -o ../t -I. -std=c++11  
 
 To run  
-./my_executable myinput.inp  
+./t myinput.inp  
   
 ------------------------------------------
   
