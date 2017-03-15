@@ -62,8 +62,8 @@ double coulombic_real(System &system) {
         charge2 = system.molecules[k].atoms[l].C*system.constants.E2REDUCED;
                 
         // calculate distance between atoms
-        r = getDistance(system,i,j,k,l);
-
+        double* distances = getDistanceXYZ(system, i, j, k, l);
+        r = distances[3];
 
         if (r < system.pbc.cutoff && (i != k)) { // only pairs and not beyond cutoff
             erfc_term = erfc(alpha*r);
@@ -223,7 +223,9 @@ double coulombic(System &system) { // old super basic coulombic
     for (int k = i+1; k < system.molecules.size(); k++) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) { 
         if (!(system.molecules[i].atoms[j].C == 0 || system.molecules[k].atoms[l].C ==0)) {
-        r = getDistance(system, i, j, k, l);
+        double* distances = getDistanceXYZ(system, i, j, k, l);
+        r = distances[3];
+
         q1 = system.molecules[i].atoms[j].C * system.constants.E2REDUCED;
         q2 = system.molecules[k].atoms[l].C * system.constants.E2REDUCED;
         

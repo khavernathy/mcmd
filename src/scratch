@@ -69,7 +69,7 @@
                     r = sqrt(rsq);
                     //rimg = sqrt(rimg2);
                 } else {
-                    double* distances = getDistanceXYZ(system, i,j,k,l);
+                    double distances[4] distances = getDistanceXYZ(system, i,j,k,l);
                     r = distances[3];
                     for (int n=0; n<3; n++) d[n] = distances[n];
                     rsq = r*r;
@@ -144,7 +144,7 @@
                     for (int l=0; l<system.molecules[k].atoms.size(); l++) {
                         if (k>i || (k==i && l>j)) {
                            if (system.molecules[i].MF == "M" && system.molecules[k].MF == "M") {
-                                double* dist = getDistanceXYZ(system, i,j,k,l);
+                                double distances[4] dist = getDistanceXYZ(system, i,j,k,l);
                                 for (int n=0; n<3; n++) {
                                     system.constants.force_sum_for_pressure += system.molecules[i].atoms[j].force[n] * dist[n];
                                     system.constants.force_sum_for_pressure += system.molecules[k].atoms[l].force[n] * dist[n];

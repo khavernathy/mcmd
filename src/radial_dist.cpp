@@ -55,12 +55,13 @@ void radialDist(System &system) {
                      && (system.molecules[i].atoms[j].name == centroid && system.molecules[k].atoms[l].name == counterpart
                      || system.molecules[i].atoms[j].name == counterpart && system.molecules[k].atoms[l].name == centroid)) 
                     {
-                        double dist = getDistance(system, i, j, k, l);     
+                        double* distances = getDistanceXYZ(system, i, j, k, l);
+                        double r = distances[3];     
                         //printf("distance = %f\n",dist);      
                         //system.checkpoint("getting index"); 
-                        if (dist < system.stats.radial_max_dist) {
+                        if (r < system.stats.radial_max_dist) {
                             // determine index of radial_bins
-                            int indexr = floor(dist / system.stats.radial_bin_size);  // so 0.02/0.2 -> index 0; 0.25/0.2 -> index 1..
+                            int indexr = floor(r / system.stats.radial_bin_size);  // so 0.02/0.2 -> index 0; 0.25/0.2 -> index 1..
                             //system.checkpoint("adding to bin");
                             system.stats.radial_bins[indexr]++;
                         } // end dist<max_dist

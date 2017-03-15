@@ -132,7 +132,10 @@ void update_ranking (System &system, int * ranked_array ) {
         for (k=0; k<system.molecules.size(); k++) {
         for (l=0; l<system.molecules[k].atoms.size(); l++) {
             if (system.molecules[k].atoms[l].polar == 0) continue;
-            r = getDistance(system,i,j,k,l);
+            
+            double* distances = getDistanceXYZ(system, i, j, k, l);
+            r = distances[3];
+ 
             if (r < rmin) {
                 rmin = r;
             }
@@ -148,7 +151,9 @@ void update_ranking (System &system, int * ranked_array ) {
         for (k=0; k<system.molecules.size(); k++) {
         for (l=0; l<system.molecules[k].atoms.size(); l++) {
             if (system.molecules[k].atoms[l].polar == 0) continue;
-            r = getDistance(system,i,j,k,l);
+            double* distances = getDistanceXYZ(system, i, j, k, l);
+            r = distances[3];
+
             if (r <= rmin*1.5) {
                 system.molecules[i].atoms[j].rank_metric += 1.0;
                 system.molecules[k].atoms[l].rank_metric += 1.0;

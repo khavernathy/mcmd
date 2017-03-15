@@ -56,7 +56,9 @@ double lj(System &system) {
 
         // calculate distance between atoms
         double r,sr,sr2,sr6;
-        r = getDistance(system, i, j, k, l);
+        double* distances = getDistanceXYZ(system, i, j, k, l);
+        r = distances[3];
+
     
         sr = sig/r; //printf("r=%f\n",r);
         sr2 = sr*sr;
