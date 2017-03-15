@@ -7,7 +7,7 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms	        mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms	       restart.pdb  mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 
@@ -30,7 +30,7 @@ radial_file         radialdist.dat
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt
 
-mc_corrtime	        50
+mc_corrtime	        200
 finalstep		    5000000
 temperature 	    77   !77.0  ! K
 pressure		    1.0     ! atm

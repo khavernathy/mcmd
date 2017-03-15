@@ -20,7 +20,8 @@ To run
   
 TODO
 
--> get R from img like mpmc/src/energy/pairs.c
+-> for some reason my RD energy is 0.001% off from MPMC every time. Maybe self energy is diff?
+-> allow 0 sorbate molecules in uvt
 -> make pair lists for MC to run faster. 
 -> add input for easy model selection e.g. co2*, co2, h2_bssp, etc
 -> make averages update every step instead of every corrtime..
