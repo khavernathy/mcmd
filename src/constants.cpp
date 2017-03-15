@@ -26,6 +26,7 @@ class Constants {
         string volume_change_option; // kind of useless now but used for NPT,
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
+        string sorbate_name=""; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         string pdb_traj_option="on"; // option to write PDB trajectory (in addition to xyz). default on
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
@@ -506,6 +507,28 @@ class Molecule {
         double mass=0.0;
         double inertia=0.0; //moment of inertia
 
+        void reInitialize() {
+            while (!atoms.empty()) atoms.pop_back();
+            mass=0;
+            inertia=0;
+            for (int n=0; n<3; n++) {
+                com[n] = 0;
+                force[n]=0;
+                torque[n]=0;
+                acc[n]=0;
+                old_acc[n]=0;
+                vel[n]=0;
+                ang_vel[n]=0;
+                ang_acc[n]=0;
+                old_ang_acc[n]=0;
+                ang_pos[n]=0;
+                d_theta[n]=0;
+            }
+            name = "";
+            PDBID=0;
+            MF = "M";
+        }
+
         double get_mass() {
             // ( mass is generated at input in io.cpp )
             return mass;
@@ -729,7 +752,7 @@ Constants::Constants() {
 
 
 	// LJ EPSILON VALUES (kcal/mol) -> K
-	eps["HB"] = 0.06796; // buch model h2
+	eps["HB"] = 34.20; // buch model h2
     eps["H2G"] = 8.8516; // bss model h2
     eps["H2E"] = 0.0; // bss
     eps["H2N"] = 4.0659; // bss

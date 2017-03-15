@@ -258,8 +258,38 @@ else {
 } // end pbc function
 
 
+void addAtomToProto(System &system, string name, string molname, string MF, double x, double y, double z, double mass, double charge, double polarizability, double epsilon, double sigma) {
+    // initialize
+    Atom atom;
+    // PDBIDS
+    int last_mol_index = system.molecules.size() - 1;
+    int last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+    int last_atom_pdbid = system.molecules[last_mol_index].atoms[system.molecules[last_mol_index].atoms.size() - 1].PDBID;
+    atom.PDBID = (int)(last_atom_pdbid + 1);
+    atom.mol_PDBID = (int)(last_mol_pdbid + 1);
+
+    atom.name = name;
+    atom.mol_name = molname;
+    atom.MF = MF;
+    atom.pos[0] = x;
+    atom.pos[1] = y;
+    atom.pos[2] = z;
+    atom.m = mass * system.constants.cM;
+    atom.C = charge;
+    atom.polar = polarizability;
+    atom.eps = epsilon;
+    atom.sig = sigma;
+
+    system.proto.mass += atom.m;
+    // send it over
+    system.proto.atoms.push_back(atom);
+    
+}
+
 void moleculePrintout(System &system) {
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
+
+    // an excessive full list of atoms/molecules.
 /*    
     for (int b=0; b<system.molecules.size(); b++) {
         printf("Molecule PDBID = %i: %s has %i atoms and is %s; The first atom has PDBID = %i\n", system.molecules[b].PDBID, system.molecules[b].name.c_str(), (int)system.molecules[b].atoms.size(), system.molecules[b].MF.c_str(), system.molecules[b].atoms[0].PDBID);
@@ -270,11 +300,135 @@ void moleculePrintout(System &system) {
         
     } 
 */
+
     if (system.constants.mode == "mc") { // prototype is only used for MC.
-    printf("Prototype molecule has PDBID %i ( name %s ) and has %i atoms\n", system.proto.PDBID, system.proto.name.c_str(), (int)system.proto.atoms.size());
-    /*for (int i=0; i<system.proto.atoms.size(); i++) {
-        system.proto.atoms[i].printAll();
-    } */    
+    // CHANGE THE PROTOTYPE IF USER SUPPLIED A KEYWORD IN INPUT
+    // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
+        if (system.constants.sorbate_name != "") {
+            string sorbmodel = system.constants.sorbate_name;
+            
+            // clear the prototype (even if there isn't one).
+            system.proto.reInitialize(); 
+            int last_mol_index = system.molecules.size() -1;
+            int last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+            system.proto.PDBID = last_mol_pdbid+1;
+
+
+            //std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
+            // each call takes 12 arguments
+            // HYDROGEN H2
+            if (sorbmodel == "h2_buch") {
+                addAtomToProto(system, "H2G", "H2", "M", 0.0, 0.0, 0.0, 2.016, 0.0, 0.0, 34.2, 2.96);
+            }
+            else if (sorbmodel == "h2_bss") {
+                addAtomToProto(system, "H2G", "H2", "M", 0.0, 0.0, 0.0, 0.0, -0.74640, 0.0, 8.85160, 3.2293);
+                addAtomToProto(system, "H2E", "H2", "M", 0.371, 0.0, 0.0, 1.008, 0.37320, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "H2E", "H2", "M", -0.371, 0.0, 0.0, 1.008, 0.37320, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "H2N", "H2", "M", 0.329, 0.0, 0.0, 0.0, 0.0, 0.0, 4.06590, 2.3406);
+                addAtomToProto(system, "H2N", "H2", "M", -0.329, 0.0, 0.0, 0.0, 0.0, 0.0, 4.06590, 2.3406);
+            }
+            else if (sorbmodel == "h2_dl") {
+                addAtomToProto(system, "H2G", "H2", "M", 0.00, 0.0, 0.0, -0.93600, 0.0, 36.7, 2.958, 0.0);
+                addAtomToProto(system, "H2E", "H2", "M", -0.370, 0.0, 0.0, 1.008, 0.468, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "H2E", "H2", "M", 0.370, 0.0, 0.0, 1.008, 0.468, 0.0, 0.0, 0.0);
+
+            }
+            else if (sorbmodel == "h2_bssp") {
+                addAtomToProto(system, "H2G", "H2", "M", 0.0, 0.0, 0.0, 0.0, -0.7464, 0.6938, 12.76532, 3.15528);
+                addAtomToProto(system, "H2E", "H2", "M", 0.371, 0.0, 0.0, 1.008, 0.3732, 0.00044, 0.0, 0.0);
+                addAtomToProto(system, "H2E", "H2", "M", -0.371, 0.0, 0.0, 1.008, 0.37320, 0.00044, 0.0, 0.0);
+                addAtomToProto(system, "H2N", "H2", "M", 0.363, 0.0, 0.0, 0.0, 0.0, 0.0, 2.16726, 2.37031);
+                addAtomToProto(system, "H2N", "H2", "M", -0.363, 0.0, 0.0, 0.0, 0.0, 0.0, 2.16726, 2.37031);
+
+            }
+            // CARBON DIOXIDE CO2
+            else if (sorbmodel == "co2_phast") {
+                addAtomToProto(system, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.77106, 0.0, 8.52238, 3.05549);
+                addAtomToProto(system, "COE", "CO2", "M", 1.162, 0.0, 0.0, 15.9994, -0.38553, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "COE", "CO2", "M", -1.162, 0.0, 0.0, 15.9994, -0.38553, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "CON", "CO2", "M", 1.091, 0.0, 0.0, 0.0, 0.0, 0.0, 76.76607, 2.94473);
+                addAtomToProto(system, "CON", "CO2", "M", -1.091, 0.0, 0.0, 0.0, 0.0, 0.0, 76.76607, 2.94473);
+            }
+            else if (sorbmodel == "co2_phast*") {
+                addAtomToProto(system, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.77134, 1.22810, 19.61757, 3.03366);
+                addAtomToProto(system, "COE", "CO2", "M", 1.162, 0.0, 0.0, 15.9994, -0.38567, 0.73950, 0.0, 0.0);
+                addAtomToProto(system, "COE", "CO2", "M", -1.162, 0.0, 0.0, 15.9994, -0.38567, 0.73950, 0.0, 0.0);
+                addAtomToProto(system, "CON", "CO2", "M", 1.208, 0.0, 0.0, 0.0, 0.0, 0.0, 46.47457, 2.99429);
+                addAtomToProto(system, "CON", "CO2", "M", -1.208, 0.0, 0.0, 0.0, 0.0, 0.0, 46.47457, 2.99429);
+ 
+            }
+            else if (sorbmodel == "co2_trappe") {
+                addAtomToProto(system, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.01, 0.7, 0.0, 27.0, 2.80);
+                addAtomToProto(system, "COE", "CO2", "M", 1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05);
+                addAtomToProto(system, "COE", "CO2", "M", -1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05); 
+            }
+            // NITROGEN N2
+            else if (sorbmodel == "n2_mcquarrie") {
+                addAtomToProto(system, "N2G", "N2", "M", 0.0, 0.0, 0.0, 28.01344, 0.0, 0.0, 95.1, 3.7);
+            }
+            // METHANE CH4
+            else if (sorbmodel == "ch4_trappe") {
+                addAtomToProto(system, "CHG", "CH4", "M", 0.0, 0.0, 0.0, 16.0426, 0.0, 0.0, 148.0, 3.73);
+            }
+            else if (sorbmodel == "ch4_9site") {
+                addAtomToProto(system, "CHG", "CH4", "M", 0.0, 0.0, 0.0, 12.011, -0.5868, 0.0, 58.53869, 2.22416);
+                addAtomToProto(system, "CHE", "CH4", "M", 0.0, 0.0, 1.099, 1.0079, 0.14670, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "CHE", "CH4", "M", 1.036, 0.0, -0.366, 1.0079, 0.14670, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "CHE", "CH4", "M", -0.518, -0.897, -0.366, 1.0079, 0.14670, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "CHE", "CH4", "M", -0.518, 0.897, -0.366, 1.0079, 0.14670, 0.0, 0.0, 0.0);
+                addAtomToProto(system, "MOV", "CH4", "M", 0.0, 0.0, 0.816, 0.0, 0.0, 0.0, 16.85422, 2.96286);
+                addAtomToProto(system, "MOV", "CH4", "M", 0.769, 0.0, -0.271, 0.0, 0.0, 0.0, 16.85422, 2.96286);
+                addAtomToProto(system, "MOV", "CH4", "M", -0.385, -0.668, -0.271, 0.0, 0.0, 0.0, 16.85422, 2.96286);
+                addAtomToProto(system, "MOV", "CH4", "M", -0.385,   0.668,  -0.271,  0.00000,  0.00000,  0.00000, 16.85422,  2.96286);
+            }
+            else if (sorbmodel == "ch4_9site*") {  
+                addAtomToProto(system, "CHG",  "CH4", "M", 0.000,  -0.000,  -0.000, 12.01100, -0.58680,  1.09870, 45.09730,  2.16247); //  0.00000  0.00000
+                addAtomToProto(system, "CHE", "CH4", "M", 0.000,  0.000,1.099,  1.00790,  0.14670,  0.42460,  0.00000,  0.0000);
+                addAtomToProto(system, "CHE",  "CH4", "M",  1.036,  -0.000,  -0.366,  1.00790,  0.14670,  0.42460, 0.00000,  0.00000); //  0.00000  0.00000
+                addAtomToProto(system, "CHE",  "CH4", "M", -0.518, -0.897, -0.366,  1.00790,  0.14670,  0.42460,  0.00000,  0.00000); //  0.00000  0.00000
+                addAtomToProto(system, "CHE",  "CH4", "M", -0.518,   0.897,  -0.366,  1.00790,  0.14670,  0.42460,  0.00000,  0.00000); //  0.00000  0.00000
+                addAtomToProto(system, "MOV", "CH4", "M", 0.000,  -0.000,   0.814,  0.00000,  0.00000,  0.00000, 18.57167,  2.94787); //  0.00000  0.00000
+                addAtomToProto(system, "MOV", "CH4", "M", 0.768,  -0.000,  -0.270,  0.00000,  0.00000,  0.00000, 18.57167,  2.94787);//  0.00000  0.00000
+                addAtomToProto(system, "MOV",  "CH4", "M", -0.383,  -0.666, -0.270,  0.00000,  0.00000,  0.00000, 18.57167,  2.94787); //  0.00000  0.00000
+                addAtomToProto(system, "MOV",  "CH4", "M", -0.383,   0.666,  -0.270,  0.00000,  0.00000,  0.00000, 18.57167,  2.94787); //  0.00000  0.00000
+            }
+            // ACETYLENE C2H2
+            else if (sorbmodel == "c2h2") {
+
+            }
+            else if (sorbmodel == "c2h2*") {
+
+            }
+            // ETHLYENE C2H4
+            else if (sorbmodel == "c2h4") {
+
+            }
+            else if (sorbmodel == "c2h4*") {
+
+            }
+            // ETHANE C2H6
+            else if (sorbmodel == "c2h6") {
+
+            }
+            else if (sorbmodel == "c2h6*") {
+
+            }
+            // WATER H20
+            else if (sorbmodel == "h2o") {
+                
+            }
+
+            // USER SORBATE MODEL NOT FOUND; ERROR OUT
+            else {
+                std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
+                std::exit(0);
+            }
+        }    
+
+        printf("Prototype molecule has PDBID %i ( name %s ) and has %i atoms\n", system.proto.PDBID, system.proto.name.c_str(), (int)system.proto.atoms.size());
+        for (int i=0; i<system.proto.atoms.size(); i++) {
+            system.proto.atoms[i].printAll();
+        }    
     }
     
     // END MOLECULE PRINTOUT
@@ -288,7 +442,7 @@ void setupBox(System &system) {
 	system.pbc.y_min = -system.pbc.y_max;
 	system.pbc.z_max = system.pbc.z_length/2.0;
 	system.pbc.z_min = -system.pbc.z_max;
-    }
+    } 
     system.pbc.calcVolume();
     system.pbc.calcRecip();
     system.pbc.calcCutoff();

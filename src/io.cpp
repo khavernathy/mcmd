@@ -46,7 +46,6 @@ void readInAtoms(System &system, string filename) {
                 if (myvector[0] != "ATOM") continue; // skip anything in file that isn't an atom
                 if (myvector[2] == "X" && myvector[3] == "BOX") continue; // skip box vertices
 
-
 			//temporary class instance current_atom
 			Atom current_atom;
 			current_atom.name = myvector[2];
@@ -379,6 +378,10 @@ void readInput(System &system, char* filename) {
 				system.constants.ensemble = lc[1].c_str();
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
 			
+            } else if (!strcasecmp(lc[0].c_str(), "sorbate_name")) {
+                system.constants.sorbate_name = lc[1].c_str();
+                std::cout << "Got sorbate model name = " << lc[1].c_str(); printf("\n");
+            
             // BASIS STUFF. 
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {

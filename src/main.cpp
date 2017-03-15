@@ -52,14 +52,14 @@ int main(int argc, char **argv) {
 
     // SET UP THE SYSTEM 
 	System system;
-	readInput(system, argv[1]); // executable takes the input file
+	readInput(system, argv[1]); // executable takes the input file as only argument.
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
 	centerCoordinates(system);
     setupBox(system);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
-    moleculePrintout(system);    
+    moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
 
     // compute inital COM for all molecules, and moment of inertia
