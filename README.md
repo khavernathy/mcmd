@@ -20,7 +20,7 @@ To run
   
 TODO
 
-
+-> get R from img like mpmc/src/energy/pairs.c
 -> make pair lists for MC to run faster. 
 -> add input for easy model selection e.g. co2*, co2, h2_bssp, etc
 -> make averages update every step instead of every corrtime..
