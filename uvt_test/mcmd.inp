@@ -31,7 +31,7 @@ radial_file         radialdist.dat
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt
 
-mc_corrtime	        200
+mc_corrtime	        100
 finalstep		    5000000
 temperature 	    77   !77.0  ! K
 pressure		    1.0     ! atm

@@ -376,7 +376,7 @@ class Stats {
 
         struct obs_t {
             string name;
-            double counter=1.0;
+            double counter=0.0;
             double value=0;
             double average=0;
             double sd=0;
@@ -392,11 +392,11 @@ class Stats {
                 double operand =  prevsd*prevsd + prevavg*prevavg - average*average +((x*x - prevsd*prevsd - prevavg*prevavg)/counter);
                 (operand > 0) ? sd = sqrt( operand ) : sd = 0;       
     
-                //if (name == "es") {
+                if (name == "es") {
                 //if (name == "es" || name == "es_self" || name == "es_real" || name == "es_recip") {
-                //printf("observable %14s :: counter = %5f; value = %-10.5f; prevavg = %-10.5f; average = %-10.5f; prevsd = %-10.5f; sd = %-10.5f\n", 
-                //    name.c_str(), counter, value, prevavg, average, prevsd, sd);
-                //}
+                printf("observable %14s :: counter = %5f; value = %-10.5f; prevavg = %-10.5f; average = %-10.5f; prevsd = %-10.5f; sd = %-10.5f\n", 
+                    name.c_str(), counter, value, prevavg, average, prevsd, sd);
+                }
             }
 
 
