@@ -31,7 +31,7 @@ void rotate(System &system, int molid) {
 
         // 1) GET RANDOM ANGLE AND PLANE OF ROTATION.
         double randangle; string plane; 
-		randangle = system.constants.rotate_angle_factor*(double)rand()/(double)RAND_MAX; // angle of rotation from 0 -> rotate_angle_factor
+		randangle = system.constants.rotate_angle_factor*((double)rand()/(double)RAND_MAX); // angle of rotation from 0 -> rotate_angle_factor
 		double randxyz = (double)rand()/(double)RAND_MAX;
 		// 1/3 change for a given plane
 		if (randxyz < 0.33333) {
