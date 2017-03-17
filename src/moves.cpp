@@ -85,7 +85,8 @@ void defineBox(System &system) { // takes input in A
 		system.pbc.z_max = system.pbc.z_length/2.0;
 		system.pbc.z_min = -system.pbc.z_max;
 
-		system.pbc.cutoff = system.pbc.x_max; // crude method but good for cubes (and only cubes!!)
+        system.pbc.calcCutoff();
+		//system.pbc.cutoff = system.pbc.x_max; // crude method but good for cubes (and only cubes!!)
 		// need to make basis vector system later.
 		system.constants.ewald_alpha = 3.5/system.pbc.cutoff; // update ewald_alpha if we have a vol change
 
@@ -229,6 +230,8 @@ return;
 /* REMOVE A MOLECULE */
 void removeMolecule(System &system, string model) {
     system.checkpoint("starting removeMolecule");
+    
+    if (system.stats.count_movables == 0) return; // skip if no molecules are there to be removed.
     system.stats.remove_attempts++;
     
     if ((int)system.stats.count_movables == 1) // IMPORTANT: CANCEL THE DELETE IF ONLY 1 MOVABLE MOLECULE LEFT
@@ -286,6 +289,8 @@ return;
 
 /* DISPLACE (TRANSLATE AND ROTATE) */
 void displaceMolecule(System &system, string model) {
+    
+    if (system.stats.count_movables == 0) return; // skip if no sorbate molecules are in the cell.
     system.stats.displace_attempts++;
     string movable="notyet";
     int randm = -1;

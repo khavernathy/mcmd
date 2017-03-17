@@ -7,12 +7,14 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms	        mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms	      mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
-sorbate_name        h2_bss
+sorbate_name        c2h2
 
-carbasis 25.669 25.669 25.669 90 90 90
+carbasis 23.441   20.414   29.911  90.00 91.44  90.00
+!carbasis 27.934   27.934   41.081  90.00  90.00  90.00
+!carbasis 25.669 25.669 25.669 90 90 90
 !x_length 25.669
 !y_length 25.669
 !z_length 25.669
@@ -20,20 +22,20 @@ carbasis 25.669 25.669 25.669 90 90 90
 
 
 ! radial distribution option
-radial_dist         off  ! turns on/off radial distribution function. off for speed-up
+radial_dist         on  ! turns on/off radial distribution function. off for speed-up
 radial_bin_size     0.1  ! in A
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
-radial_centroid     Ne   ! element name
-radial_counterpart  Ne   ! element name to get distance of w/centroid
+radial_centroid     Mn1   ! element name
+radial_counterpart  C2G   ! element name to get distance of w/centroid
 radial_file         radialdist.dat 
 
 
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt
 
-mc_corrtime	        100
+mc_corrtime	        25
 finalstep		    5000000
-temperature 	    77   !77.0  ! K
+temperature 	    298   !77.0  ! K
 pressure		    1.0     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
