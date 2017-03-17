@@ -2,7 +2,7 @@
 This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
 
 --> MC Currently fully supporting NPT,NVT,NVE,uVT ensembles.  <br />
---> MD supporting NVT, basically.  <br />
+--> MD supporting NVT, kinda.  <br />
 --> POLARIZATION IS NOT WORKING so avoid using  <br />
     `potential_form   ljespolar`<br /><br />
 
@@ -10,11 +10,11 @@ PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
     -> gcc compiler 6.2.0 (circe)  <br />
     -> gcc compiler 4.9.3 (stampede)  <br />
 
-To compile:  (in src dir)<br />
-g++ main.cpp -lm -o ../t -I. -std=c++11  <br />
+To compile:  (in src dir "src")<br />
+`g++ main.cpp -lm -o ../t -I. -std=c++11`  <br />
 
-To run  <br />
-./t myinput.inp<br /><br />  
+To run (in base dir "mcmd") <br />
+`./t mcmd.inp`<br /><br />  
   
 <hr />
   
