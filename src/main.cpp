@@ -300,6 +300,7 @@ int main(int argc, char **argv) {
         printf("Computed initial velocities from temperature: v_init = %f A/fs\n",v_init);
         system.constants.md_init_vel = v_init;
     } 
+    system.constants.md_vel_goal = sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
      // end initial velocities
 
 

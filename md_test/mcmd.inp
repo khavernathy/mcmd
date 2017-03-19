@@ -4,7 +4,7 @@
  checkpoints_option  off       
        
                
- input_atoms    MPM1.pdb  mof5h2.pdb  8h2bssp.pdb  ! PDB ONLY       
+ input_atoms  MPM1.pdb   mof5h2.pdb  8h2bssp.pdb  ! PDB ONLY       
  potential_form        ljes   !ljespolar   !phast2    !!lj     
  com_option            off     ! center of mass        
        
@@ -37,7 +37,7 @@ carbasis 27.1979   27.1979   30.9998 90.0000   90.0000  120.0000
  ! MOLECULAR DYNAMICS ONLY ===============================     
  md_dt             0.2  ! fs       
  md_ft             200000  ! fs        
- md_corrtime       1      ! steps        
+ md_corrtime       20      ! steps        
  !md_init_vel         0    ! A / fs^2      
  md_mode             molecular      !atomic        
  md_rotations        on

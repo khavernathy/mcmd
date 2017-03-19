@@ -255,7 +255,7 @@ void integrate(System &system, double dt) {
             else if (system.constants.md_mode == "molecular") {
                 // linear
                 system.molecules[j].calc_acc();
-                system.molecules[j].calc_vel(dt, system.constants.md_init_vel);
+                system.molecules[j].calc_vel(dt, system.constants.md_vel_goal);
     
                 // rotational
                 if (system.constants.md_rotations == "on") {

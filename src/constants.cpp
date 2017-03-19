@@ -60,6 +60,7 @@ class Constants {
         string md_pbc="on"; // PBC in molecular dynamics. default on.
         string md_rotations="on"; // MD only.
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
+        double md_vel_goal=0; // 1D vector component of the velocity (which has magnitude md_init_vel)
         double md_dt=0.1, md_ft; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
 		double md_thermostat_constant = 0.0001; // in fs
@@ -566,10 +567,20 @@ class Molecule {
         }
 
         // linear velocity
-        void calc_vel(double dt, double max) {
+        void calc_vel(double dt, double goal) {
+            double booster=0.001;
             for (int n=0; n<3; n++) {
                 vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
-                if (vel[n] > max) vel[n] = max; // apply the cap
+            }
+           double vmag = sqrt(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
+            for (int n=0; n<3; n++) {
+                if (vel[n] < 0) {  // THE NVT THERMOSTAT :: it changes velocities to try to approach the initial v
+                    if (vel[n] < -goal) vel[n] += booster;
+                    else if (vel[n] > -goal) vel[n] -= booster;
+                } else if (vel[n] > 0) {
+                    if (vel[n] < goal) vel[n] += booster;
+                    else if (vel[n] > goal) vel[n] -= booster;
+                }
             }
         }
    
