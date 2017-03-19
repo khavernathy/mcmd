@@ -23,6 +23,7 @@ double getrand() {
 /* GET BOX LIMIT COORDINATE FOR PBC */
 double getBoxLimit(System &system, int planeid, double x, double y, double z) {
 
+    // 0: -x; 1: +x; 2: -y; 3: +y; 4: -z; 5: +z;
     if (planeid == 0) return (-system.pbc.D[0] - system.pbc.B[0]*y - system.pbc.C[0]*z)/system.pbc.A[0]; // -x
     if (planeid == 1) return (-system.pbc.D[1] - system.pbc.B[1]*y - system.pbc.C[1]*z)/system.pbc.A[1]; // +x
     if (planeid == 2) return (-system.pbc.D[2] - system.pbc.A[2]*x - system.pbc.C[2]*z)/system.pbc.B[2]; // -y
@@ -161,95 +162,113 @@ else {
 
         if (system.molecules[i].com[0] < box_limit[0]) { // left of box
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                // set new x coordinate
-                system.molecules[i].atoms[k].pos[0] += system.pbc.x_length;
-                // set new y based on x
-                double ydist = system.molecules[i].atoms[k].pos[1] - box_limit[2];
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydist;
-                // set new z based on new xy
-                double zdist = system.molecules[i].atoms[k].pos[2] - box_limit[4];
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdist;
-            }
+
+                double ydiff = system.molecules[i].atoms[k].pos[1] - newlimit[2];
+                double zdiff = system.molecules[i].atoms[k].pos[2] - newlimit[4];
+
+                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0] + system.pbc.x_length, system.molecules[i].atoms[k].pos[1] , system.molecules[i].atoms[k].pos[2]);
+                newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0] + system.pbc.x_length, system.molecules[i].atoms[k].pos[1] , system.molecules[i].atoms[k].pos[2]);
+
+                system.molecules[i].atoms[k].pos[0] += system.pbc.x_length;
+                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
+                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
+             }
         }
-    
+
+
         if (system.molecules[i].com[0] > box_limit[1]) { // right of box
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                // set new x coordinate
-                system.molecules[i].atoms[k].pos[0] -= system.pbc.x_length;
-                // set new y based on x
-                double ydist = system.molecules[i].atoms[k].pos[1] - box_limit[2];
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydist;
-                // set new z based on new xy
-                double zdist = system.molecules[i].atoms[k].pos[2] - box_limit[4];
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdist;
+
+                double ydiff = system.molecules[i].atoms[k].pos[1] - newlimit[2];
+                double zdiff = system.molecules[i].atoms[k].pos[2] - newlimit[4];
+
+                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0] - system.pbc.x_length, system.molecules[i].atoms[k].pos[1] , system.molecules[i].atoms[k].pos[2]);
+                newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0] - system.pbc.x_length, system.molecules[i].atoms[k].pos[1] , system.molecules[i].atoms[k].pos[2]);
+
+                system.molecules[i].atoms[k].pos[0] -= system.pbc.x_length;
+                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
+                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
             }
 
         }
 
         if (system.molecules[i].com[1] < box_limit[2]) { // below box
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                // set new y coordinate
-                system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
-                // set new x based on new y
-                double xdist = system.molecules[i].atoms[k].pos[0] - box_limit[0];
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdist;
-                // set new z based on new xy
-                double zdist = system.molecules[i].atoms[k].pos[2] - box_limit[4];
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdist;
+
+                double xdiff = system.molecules[i].atoms[k].pos[0] - newlimit[0];
+                double zdiff = system.molecules[i].atoms[k].pos[2] - newlimit[4];
+
+                newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] + system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
+                newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] + system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
+    
+                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
+                system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
+                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
+
             }
 
         }
 
         if (system.molecules[i].com[1] > box_limit[3]) { // above box
+
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                // set new y coordinate
-                system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
-                // set new x based on new y
-                double xdist = system.molecules[i].atoms[k].pos[0] - box_limit[0];
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdist;
-                // set new z based on new xy
-                double zdist = system.molecules[i].atoms[k].pos[2] - box_limit[4];
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdist;
+
+                double xdiff = system.molecules[i].atoms[k].pos[0] - newlimit[0];
+                double zdiff = system.molecules[i].atoms[k].pos[2] - newlimit[4];
+
+                newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] - system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
+                newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] - system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
+
+    
+                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
+                system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
+                system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
+        
             }
         }
 
         if (system.molecules[i].com[2] < box_limit[4]) { // behind box
+        
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                // set new z coordinate
-                system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
-                // set new y based on new z
-                double ydist = system.molecules[i].atoms[k].pos[1] - box_limit[2];
-                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydist;
-                // set new x based on new yz
-                double xdist = system.molecules[i].atoms[k].pos[0] - box_limit[0];
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdist;
-            }
+                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
+        
+                double xdiff = system.molecules[i].atoms[k].pos[0] - newlimit[0];
+                double ydiff = system.molecules[i].atoms[k].pos[1] - newlimit[2];
 
+                newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2] + system.pbc.z_length);
+                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2] + system.pbc.z_length);
+
+                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
+                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff; 
+                system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
+
+            }
         }
 
         if (system.molecules[i].com[2] > box_limit[5]) { // in front of box
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
-                // set new z coordinate
-                system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
-                // set new y based on new z
-                
-                double ydist = system.molecules[i].atoms[k].pos[1] - box_limit[2];
-                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydist;
-                // set new x based on new yz
-                double xdist = system.molecules[i].atoms[k].pos[0] - box_limit[0];
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdist;
+                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
+
+                double xdiff = system.molecules[i].atoms[k].pos[0] - newlimit[0];
+                double ydiff = system.molecules[i].atoms[k].pos[1] - newlimit[2];
+
+                newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2] - system.pbc.z_length);
+                newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2] - system.pbc.z_length);
+
+                system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
+                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff; 
+                system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
+
             }
         }
 
