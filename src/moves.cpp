@@ -349,13 +349,13 @@ void displaceMolecule(System &system, string model) {
             system.molecules[randm].calc_center_of_mass();
 	} // end accept
 	else {
-		// for whole molecule
+		// reject for whole molecule
 		for (int i=0; i<system.molecules[randm].atoms.size(); i++) {
             for (int n=0; n<3; n++) {
                 system.molecules[randm].atoms[i].pos[n] = tmp_molecule.atoms[i].pos[n];
-                system.molecules[randm].com[n] = tmp_molecule.com[n];
             }
 		}
+        system.molecules[randm].calc_center_of_mass();
         // check P.B.C. (move the molecule back in the box if needed)
         checkInTheBox(system, randm);
 	} // end reject 
