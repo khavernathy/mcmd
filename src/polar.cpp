@@ -232,20 +232,20 @@ void thole_field(System &system) {
                         //see JCP 124 (234104)
                         if ( a == 0 ) {
                             system.molecules[i].atoms[j].efield[p] += 
-                            (system.molecules[k].atoms[l].C * system.constants.E2REDUCED)*
+                            (system.molecules[k].atoms[l].C)*
                             (rr*rr-rR*rR)*distances[p]*rr;
                         
                             system.molecules[k].atoms[l].efield[p] -= 
-                            (system.molecules[i].atoms[j].C * system.constants.E2REDUCED)*
+                            (system.molecules[i].atoms[j].C )*
                             (rr*rr-rR*rR)*distances[p]*rr;
 
                         } else {
                             system.molecules[i].atoms[j].efield[p] +=
-                            (system.molecules[k].atoms[j].C * system.constants.E2REDUCED)*
+                            (system.molecules[k].atoms[j].C )*
                             (bigmess-cutoffterm)*distances[p]*rr;
 
                             system.molecules[k].atoms[l].efield[p] -= 
-                            (system.molecules[i].atoms[j].C * system.constants.E2REDUCED)*
+                            (system.molecules[i].atoms[j].C )*
                             (bigmess-cutoffterm)*distances[p]*rr;
                          }
                       //      printf("efield[%i]: %f\n", p,system.molecules[i].atoms[j].efield[p]);

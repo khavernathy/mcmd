@@ -10,7 +10,7 @@ rd_lrc              on
 input_atoms	   MPM1.pdb   mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
-sorbate_name        h2_bss
+sorbate_name        co2_phast
 
 carbasis 27.1979   27.1979   30.9998 90.0000   90.0000  120.0000
 !carbasis 23.441   20.414   29.911  90.00 91.44  90.00

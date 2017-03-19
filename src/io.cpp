@@ -86,7 +86,7 @@ void readInAtoms(System &system, string filename) {
 			current_atom.prevpos[0] = current_atom.pos[0];
 			current_atom.prevpos[1] = current_atom.pos[1];
 			current_atom.prevpos[2] = current_atom.pos[2];
-            current_atom.C = stod(myvector[10]);
+            current_atom.C = stod(myvector[10]) * system.constants.E2REDUCED;
 			//system.atoms.push_back(current_atom); // to master atom list
 			
 			// create new molecule if needed.
@@ -217,7 +217,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
             system.molecules[j].atoms[i].m/system.constants.cM, // 10 
-            system.molecules[j].atoms[i].C,  // 11
+            system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
             system.molecules[j].atoms[i].sig); //14
@@ -233,7 +233,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
             system.molecules[j].atoms[i].m/system.constants.cM, // 10 
-            system.molecules[j].atoms[i].C,  // 11
+            system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
             system.molecules[j].atoms[i].sig); //14

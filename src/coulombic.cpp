@@ -29,7 +29,7 @@ double coulombic_self(System &system) {
 
             if (system.molecules[i].atoms[j].MF == "M" &&
                 system.molecules[i].atoms[j].C != 0) {
-                charge = system.molecules[i].atoms[j].C * system.constants.E2REDUCED; 
+                charge = system.molecules[i].atoms[j].C; 
                    // system.molecules[i].atoms[j].printAll(); 
                  potential -= alpha* charge * charge / sqrt(M_PI); 
                 //printf("self pot on mol %i atom %i = %f\n", i, j, alpha*charge*charge/sqrt(M_PI));   
@@ -58,8 +58,8 @@ double coulombic_real(System &system) {
         !(system.molecules[i].atoms[j].C == 0 || system.molecules[i].atoms[j].C == 0) ) { // don't do frozen-frozen or zero charge
        
         pair_potential = 0; 
-        charge1 = system.molecules[i].atoms[j].C*system.constants.E2REDUCED;
-        charge2 = system.molecules[k].atoms[l].C*system.constants.E2REDUCED;
+        charge1 = system.molecules[i].atoms[j].C;
+        charge2 = system.molecules[k].atoms[l].C;
                 
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
@@ -102,8 +102,8 @@ void coulombic_real_force(System &system) {
     if (!(system.molecules[i].MF =="F" && system.molecules[k].MF =="F") &&
         !(system.molecules[i].atoms[j].C == 0 || system.molecules[i].atoms[j].C == 0) ) { // don't do frozen-frozen or zero charge
 
-        charge1 = system.molecules[i].atoms[j].C*system.constants.E2REDUCED;
-        charge2 = system.molecules[k].atoms[l].C*system.constants.E2REDUCED;
+        charge1 = system.molecules[i].atoms[j].C;
+        charge2 = system.molecules[k].atoms[l].C;
 
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system,i,j,k,l);
@@ -174,8 +174,8 @@ double coulombic_reciprocal(System &system) {
                         // inner product of position vector and k vector
                         position_product = (k[0]*system.molecules[i].atoms[j].pos[0] + k[1]*system.molecules[i].atoms[j].pos[1] + k[2]*system.molecules[i].atoms[j].pos[2]);
 
-                        SF_re += system.molecules[i].atoms[j].C*system.constants.E2REDUCED * cos(position_product);
-                        SF_im += system.molecules[i].atoms[j].C*system.constants.E2REDUCED * sin(position_product);
+                        SF_re += system.molecules[i].atoms[j].C * cos(position_product);
+                        SF_im += system.molecules[i].atoms[j].C * sin(position_product);
 
                     } // end for atom j in molecule i
                 } // end for molecule i           
@@ -226,8 +226,8 @@ double coulombic(System &system) { // old super basic coulombic
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];
 
-        q1 = system.molecules[i].atoms[j].C * system.constants.E2REDUCED;
-        q2 = system.molecules[k].atoms[l].C * system.constants.E2REDUCED;
+        q1 = system.molecules[i].atoms[j].C;
+        q2 = system.molecules[k].atoms[l].C;
         
         potential += q1*q2/r;
         } // end if nonzero charges
