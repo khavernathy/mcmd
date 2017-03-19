@@ -7,7 +7,7 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms	   MPM1.pdb   mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms	   MPM1+1CO2.pdb   mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 sorbate_name        co2_phast
@@ -34,7 +34,7 @@ radial_file         radialdist.dat
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt
 
-mc_corrtime	  1      25
+mc_corrtime	        25
 finalstep		    5000000
 temperature 	    298.0  !77.0  ! K
 pressure		    1.0     ! atm
