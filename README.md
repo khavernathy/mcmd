@@ -2,7 +2,7 @@
 This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
 
 --> MC Currently fully supporting NPT,NVT,NVE,uVT ensembles.  <br />
---> MD supporting NVT, kinda.  <br />
+--> MD supporting NVT.  <br />
 --> POLARIZATION IS NOT WORKING so avoid using  <br />
     `potential_form   ljespolar`<br /><br />
 
