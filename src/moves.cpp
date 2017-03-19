@@ -186,9 +186,9 @@ void addMolecule(System &system, string model) {
 	double randx = 0.5*system.pbc.x_length*(((double)rand()/(double)RAND_MAX)*2-1); // (-1 -> 1) * 1/2length
 	double randy = 0.5*system.pbc.y_length*(((double)rand()/(double)RAND_MAX)*2-1);
 	double randz = 0.5*system.pbc.z_length*(((double)rand()/(double)RAND_MAX)*2-1);
-	double deltax = randx - system.proto.atoms[0].pos[0]; // fixed random distances from the prototype molecule.
-	double deltay = randy - system.proto.atoms[0].pos[1];
-	double deltaz = randz - system.proto.atoms[0].pos[2];
+	double deltax = randx - system.proto.com[0]; // fixed random distances from the prototype molecule.
+	double deltay = randy - system.proto.com[1];
+	double deltaz = randz - system.proto.com[2];
 
 	// translate the new molecule's atoms to random place.
 	for (int i=0; i<system.molecules[last_molecule_id].atoms.size(); i++) {
@@ -346,6 +346,7 @@ void displaceMolecule(System &system, string model) {
 	if (ranf < boltzmann_factor) {
 			system.stats.displace_accepts++;
             system.stats.MCmoveAccepted = true;
+            system.molecules[randm].calc_center_of_mass();
 	} // end accept
 	else {
 		// for whole molecule

@@ -489,13 +489,23 @@ void moleculePrintout(System &system) {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
                 std::exit(0);
             }
-        }    
+        } // end if sorbate name != ""    
+       
+        // finally, zero the prototype's coordinates
+        system.proto.calc_center_of_mass();
+        for (int i=0; i<system.proto.atoms.size(); i++) {
+            for (int k=0; k<3; k++) system.proto.atoms[i].pos[k] -= system.proto.com[k];
+        }
+        system.proto.calc_center_of_mass(); 
 
         printf("Prototype molecule has PDBID %i ( name %s ) and has %i atoms\n", system.proto.PDBID, system.proto.name.c_str(), (int)system.proto.atoms.size());
-        for (int i=0; i<system.proto.atoms.size(); i++) {
-            system.proto.atoms[i].printAll();
-        }    
-    }
+        system.proto.printAll();
+        //for (int i=0; i<system.proto.atoms.size(); i++) {
+         //   system.proto.atoms[i].printAll();
+        //}    
+
+
+    } // end if MC
     
     // END MOLECULE PRINTOUT
 }
