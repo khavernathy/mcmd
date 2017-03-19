@@ -587,10 +587,12 @@ class Molecule {
         // angular position // in rad
         void calc_ang_pos(double dt) {
             double theta[3];
+            double cap = 0.005;
             for (int n=0; n<3; n++) {
                 theta[n] = ang_pos[n];
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
-                if (ang_pos[n] > 0.005) ang_pos[n] = 0.005; // SET THE ROTATION CAP -- rad/fs
+                if (ang_pos[n] > cap) ang_pos[n] = cap; // SET THE ROTATION CAP -- rad/fs
+                else if (ang_pos[n] < -cap) ang_pos[n] = -cap;
                 d_theta[n] = ang_pos[n] - theta[n];
             }
         }
