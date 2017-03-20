@@ -22,13 +22,14 @@ TODO<br /><br />
 
 -> for some reason my RD energy is 0.001% off from MPMC every time. Maybe self energy is diff?<br />
 -> allow 0 sorbate molecules in uvt<br />
--> make pair lists for MC to run faster. <br />
+-> make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
 -> fix MC SD's maybe? Seem to be wrong<br />
-    -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
+-> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
+    -> although I think it's always the case with crystalline systems.
 -> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT<br />
--> make correct pressure calculator (Frenkel method, check MPMC to compare)<br />  
+-> make correct pressure calculator (Frenkel method, check MPMC to compare?)<br />  
 -> include more-than-static polarization energy  <br />
-	-> right now I just use V = -0.5 sum{u.E}  <br />
+    -> right now I just use V = -0.5 sum{u.E}  <br />
 -> Use GPU for MD force calculations? (add option)  <br />
 -> Use GPU for polarization routine (later)  <br />
 -> Implement Phast2 model?  <br />
