@@ -93,7 +93,7 @@ void coulombic_real_force(System &system) {
     double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
     double charge1, charge2, r,rsq;
-    double u[3];
+    double u[3]; double holder;
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -114,15 +114,18 @@ void coulombic_real_force(System &system) {
         if (r < system.pbc.cutoff && (i < k)) { // only pairs and not beyond cutoff
             erfc_term = erfc(alpha*r);
             for (int n=0; n<3; n++) {
-                system.molecules[i].atoms[j].force[n] += charge1* charge2 *erfc_term/rsq * u[n];
-                system.molecules[k].atoms[l].force[n] -= charge1* charge2 *erfc_term/rsq * u[n];
-                
+                holder = charge1*charge2*erfc_term/rsq * u[n];
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[k].atoms[l].force[n] -= holder;
+
             }
             system.molecules[i].atoms[j].V += charge1 * charge2 * erfc_term / r;
         } else if (i == k && j != l) { // self molecule interaction
             for (int n=0; n<3; n++) {
-                system.molecules[i].atoms[j].force[n] += charge1 * charge2 * erf(alpha*r) / rsq * u[n];
-                system.molecules[k].atoms[l].force[n] -= charge1 * charge2 * erf(alpha*r) / rsq * u[n];
+                holder = charge1*charge2*erf(alpha*r) / rsq * u[n];
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[k].atoms[l].force[n] -= holder;
+                
             }
             system.molecules[i].atoms[j].V -= (charge1 * charge2 * erf(alpha*r) / r); // negative (intra)
         }
