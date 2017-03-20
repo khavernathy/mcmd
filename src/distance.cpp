@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+// by giving molecule/atom IDs
 double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
    // calculate distance between atoms
         double rimg;
@@ -56,4 +57,62 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         for (p=0;p<3;p++) output[p] = dimg[p];
         output[3] = rimg;
         return output;
+}
+
+// by giving two r vectors.
+double * getR(System &system, double * com1, double * com2) {
+        double rimg;
+        double d[3],di[3],img[3],dimg[3];
+        int p,q;
+        double r,r2,ri,ri2;
+
+        // get dx dy dz
+        for (int n=0; n<3; n++) d[n] = com1[n] - com2[n];
+
+        // images from reciprocal basis.
+        for (p=0; p<3; p++) {
+            img[p] = 0;
+            for (q=0; q<3; q++) {
+                img[p] += system.pbc.reciprocal_basis[q][p]*d[q];
+            }
+            img[p] = rint(img[p]);
+        }
+
+        // get d_image
+        for (p=0; p<3; p++) {
+            di[p]=0;
+            for (q=0; q<3; q++) {
+                di[p] += system.pbc.basis[q][p]*img[q];
+            }
+        }
+
+        // correct displacement
+        for (p=0; p<3; p++)
+            di[p] = d[p] - di[p];
+
+        // pythagorean terms
+        r2=0; ri2=0;
+        for (p=0; p<3; p++) {
+            r2 += d[p]*d[p];
+            ri2 += di[p]*di[p];
+        }
+        r = sqrt(r2);
+        ri = sqrt(ri2);
+
+        if (isnan(ri) != 0 ) {
+            rimg = r;
+            for (p=0; p<3; p++)
+                dimg[p] = d[p];
+        } else {
+            rimg = ri;
+            for (p=0; p<3; p++)
+                dimg[p] = di[p];
+        }
+
+        
+        static double output[4];
+        for (p=0; p<3; p++) output[p] = dimg[p];
+        output[3] = rimg;
+        return output;
+    
 }

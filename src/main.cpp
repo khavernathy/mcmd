@@ -154,13 +154,14 @@ int main(int argc, char **argv) {
             double progress = (((float)t)/finalstep*100);
             double ETA = ((time_elapsed*finalstep/t) - time_elapsed)/60.0;
             double ETA_hrs = ETA/60.0;
+            double efficiency = system.stats.MCeffRsq / time_elapsed;
 
 			// PRINT MAIN OUTPUT
 			printf("MONTE CARLO\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
 			printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
 			printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-			printf("Step: %i / %i; Progress = %.3f%%\n",system.stats.MCstep,finalstep,progress);
+			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep,finalstep,progress,efficiency);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			
             printf("BF avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol ) \n",

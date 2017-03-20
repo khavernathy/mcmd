@@ -293,6 +293,8 @@ return;
 
 /* DISPLACE (TRANSLATE AND ROTATE) */
 void displaceMolecule(System &system, string model) {
+
+    double tmpcom[3], d[3], rsq;
     
     if (system.stats.count_movables == 0) return; // skip if no sorbate molecules are in the cell.
     system.stats.displace_attempts++;
@@ -304,6 +306,8 @@ void displaceMolecule(System &system, string model) {
             movable = system.molecules[randm].MF;
     }           
 	system.checkpoint("Got the random molecule.");
+
+    for (int n=0; n<3; n++) tmpcom[n] = system.molecules[randm].com[n];
 	
 	double old_V=0.0; double new_V=0.0;
 
@@ -351,6 +355,12 @@ void displaceMolecule(System &system, string model) {
 			system.stats.displace_accepts++;
             system.stats.MCmoveAccepted = true;
             system.molecules[randm].calc_center_of_mass();
+
+            // for MC efficiency measurement (Frenkel p44)
+            for (int n=0; n<3; n++) d[n] = (system.molecules[randm].com[n] - tmpcom[n]);
+            system.stats.MCeffRsq += dddotprod(d, d);
+            
+            
 	} // end accept
 	else {
 		// reject for whole molecule

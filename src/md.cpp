@@ -140,6 +140,26 @@ void calculateForces(System &system, string model, double dt) {
             system.molecules[i].calc_torque();
     }
 
+    /*
+    // calculate f.r sum (for emergent pressure in MD)
+    double com1[3], com2[3];
+    for (int i=0; i<system.molecules.size(); i++) {
+        for (int j=0; j<system.molecules.size(); j++) {
+            if (system.molecules[i].MF == "F" && system.molecules[j].MF == "F") continue;
+            for (int n=0; n<3; n++) {
+                com1[n] = system.molecules[i].com[n];
+                com2[n] = system.molecules[j].com[n];
+            }
+            
+            double* distances = getR(system, com1, com2);
+
+            system.stats.fdotr.value += ddotprod(system.molecules[i].force
+
+            // GOING TO NEED PAIRS FOR THIS TO WORK OUT.
+            
+        }
+    }
+    */
 }
 
 // ==================== MOVE ATOMS MD STYLE =========================

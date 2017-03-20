@@ -345,6 +345,7 @@ class Stats {
         
         int MCstep, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
         bool MCmoveAccepted;
+        double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
 
         string radial_dist = "off"; // default is no radial distribution
         string radial_file = "radial_distribution.dat"; // default filename for output.
@@ -403,20 +404,20 @@ class Stats {
 
         } Nsq,NU,qst,rd,es,polar,potential,density,volume,z,Nmov,wtp,wtpME,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass, movablemass,pressure,temperature;
+            frozenmass, movablemass,pressure,temperature, fdotr;
 
 
 };
 
 Stats::Stats() {}
 
-// stores variables to return to, if move rejected.
+// stores variables to return to, if move rejected, or for checkpointing.
 class Last {
     public:
         Last();
         double Nsq,NU,qst,rd,es,polar,potential,density,volume,z,Nmov,wtp,wtpME,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass,movablemass,pressure,temperature;
+            frozenmass,movablemass,pressure,temperature, fdotr;
 
 
 };
@@ -587,7 +588,7 @@ class Molecule {
         // angular position // in rad
         void calc_ang_pos(double dt) {
             double theta[3];
-            double cap = 0.005;
+            double cap = 0.0005;
             for (int n=0; n<3; n++) {
                 theta[n] = ang_pos[n];
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
