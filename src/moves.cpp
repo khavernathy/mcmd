@@ -163,7 +163,7 @@ void addMolecule(System &system, string model) {
 	double* old_potentials = getTotalPotential(system, model);
 	double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2] + old_potentials[3];
 	
-	system.molecules.push_back(system.proto);
+	system.molecules.push_back(system.proto); // proto is already centered at zero.
 	system.stats.count_movables += 1;	
 
 	//id in vector INDEX. .ID is PDB ID
@@ -182,19 +182,23 @@ void addMolecule(System &system, string model) {
         //printf("the added molecule atom %i has charge = %f\n", i, system.molecules[last_molecule_id].atoms[i].C);
     }
 
-	// for random placement
-	double randx = 0.5*system.pbc.x_length*(((double)rand()/(double)RAND_MAX)*2-1); // (-1 -> 1) * 1/2length
-	double randy = 0.5*system.pbc.y_length*(((double)rand()/(double)RAND_MAX)*2-1);
-	double randz = 0.5*system.pbc.z_length*(((double)rand()/(double)RAND_MAX)*2-1);
-	double deltax = randx - system.proto.com[0]; // fixed random distances from the prototype molecule.
-	double deltay = randy - system.proto.com[1];
-	double deltaz = randz - system.proto.com[2];
+	// for random placement in the unit cell
+    double randn[3]; int p,q,n;
+    double move[3];
+    for (p=0; p<3; p++)
+        randn[p] = 0.5 - ((double)rand()/(double)RAND_MAX);
+    for (p=0; p<3; p++) {
+        move[p]=0;
+        for (q=0; q<3; q++)
+            move[p] += system.pbc.basis[q][p]*randn[q];
+    }
+
+    //printf("com of new molecule: %f %f %f\n", system.molecules[last_molecule_id].com[0], system.molecules[last_molecule_id].com[1], system.molecules[last_molecule_id].com[2]);
 
 	// translate the new molecule's atoms to random place.
 	for (int i=0; i<system.molecules[last_molecule_id].atoms.size(); i++) {
-		system.molecules[last_molecule_id].atoms[i].pos[0] += deltax;
-		system.molecules[last_molecule_id].atoms[i].pos[1] += deltay;
-		system.molecules[last_molecule_id].atoms[i].pos[2] += deltaz;	
+        for (int n=0; n<3; n++)
+		    system.molecules[last_molecule_id].atoms[i].pos[n] += move[n];
 	}
 	
 	// rotate the molecule here by random amount.
