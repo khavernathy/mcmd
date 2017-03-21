@@ -4,6 +4,7 @@
 
 // by giving molecule/atom IDs
 double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
+    if (system.constants.mc_pbc == "on") {
    // calculate distance between atoms
         double rimg;
         double d[3],di[3],img[3],dimg[3];
@@ -57,6 +58,18 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         for (p=0;p<3;p++) output[p] = dimg[p];
         output[3] = rimg;
         return output;
+    }
+    else
+    {
+        //printf("no pbc r\n");
+        // no PBC r
+        double r, d[3];
+        for (int n=0; n<3; n++) d[n] = system.molecules[i].atoms[j].pos[n] - system.molecules[k].atoms[l].pos[n];
+        static double output[4];
+        for (int p=0; p<3; p++) output[p] = d[p];
+        output[3] = sqrt(dddotprod(d, d));
+        return output;
+    }
 }
 
 // by giving two r vectors.

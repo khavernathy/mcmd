@@ -491,6 +491,10 @@ void readInput(System &system, char* filename) {
                 system.constants.md_pbc = lc[1].c_str();
                 std::cout << "Got MD PBC option = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "mc_pbc")) {
+                system.constants.mc_pbc = lc[1].c_str();
+                std::cout << "Got MC PBC option = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "mc_corrtime")) {
 				system.constants.mc_corrtime = atoi(lc[1].c_str());
 				std::cout << "Got MC corrtime = " << lc[1].c_str(); printf("\n");

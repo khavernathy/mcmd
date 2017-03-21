@@ -35,7 +35,8 @@ double getBoxLimit(System &system, int planeid, double x, double y, double z) {
 
 /* MOVE ALL ATOMS SUCH THAT THEY ARE CENTERED ABOUT 0,0,0 */
 void centerCoordinates(System &system) {
-	int size = system.constants.total_atoms;	
+	printf("Centering all coordinates...\n");
+    int size = system.constants.total_atoms;	
 	double xtemp[size];
 	double ytemp[size];
 	double ztemp[size];
@@ -57,6 +58,11 @@ void centerCoordinates(System &system) {
 	double xmin= *std::min_element(xtemp, xtemp+size);
 	double ymin= *std::min_element(ytemp, ytemp+size);
 	double zmin= *std::min_element(ztemp, ztemp+size);
+
+    printf("Pre-centered values:\n");
+    printf("----> xmax: %.5f ymax: %.5f zmax: %.5f\n", xmax, ymax, zmax);
+    printf("----> xmin: %.5f ymin: %.5f zmin: %.5f\n", xmin, ymin, zmin);
+    printf("----> xlen: %.5f ylen: %.5f zlen: %.5f\n", xmax-xmin, ymax-ymin, zmax-zmin);
 
 	//cout << xmax << ymax << zmax << xmin << ymin << zmin;
 	for (int i=0; i<system.molecules.size(); i++) {
@@ -420,14 +426,14 @@ void moleculePrintout(System &system) {
                 system.proto.name = "CH4";
             }
             // ACETYLENE C2H2
-            else if (sorbmodel == "c2h2") {
+            else if (sorbmodel == "c2h2" || sorbmodel == "acetylene") {
                 addAtomToProto(system, "C2G", "ACE", "M", 0.605, 0.0, 0.0, 12.011, -0.29121, 0.0, 81.35021, 3.40149);
                 addAtomToProto(system, "C2G", "ACE", "M", -0.605, 0.0, 0.0, 12.011, -0.29121, 0.0, 81.35021, 3.40149);
                 addAtomToProto(system, "H2G", "ACE", "M", 1.665, 0.0, 0.0, 1.008, 0.29121, 0.0, 0.00026, 4.77683);
                 addAtomToProto(system, "H2G", "ACE", "M", -1.665, 0.0, 0.0, 1.008, 0.29121, 0.0, 0.00026, 4.77683);
                 system.proto.name = "ACE";
             }
-            else if (sorbmodel == "c2h2*") {
+            else if (sorbmodel == "c2h2*" || sorbmodel == "acetylene*") {
                 addAtomToProto(system, "C2G", "ACE", "M", 0.605, 0.0, 0.0, 12.011, -0.29121, 1.55140, 70.81797, 3.42964);
                 addAtomToProto(system, "C2G", "ACE", "M", -0.605, 0.0, 0.0, 12.011, -0.29121, 1.55140, 70.81797, 3.42964);
                 addAtomToProto(system, "H2G", "ACE", "M", 1.665, 0.0, 0.0, 1.008, 0.29121, 0.14480, 0.00026, 4.91793);
@@ -435,7 +441,7 @@ void moleculePrintout(System &system) {
                 system.proto.name = "ACE";
             }
             // ETHLYENE C2H4
-            else if (sorbmodel == "c2h4") {
+            else if (sorbmodel == "c2h4" || sorbmodel == "ethlyene" || sorbmodel == "ethene") {
                 addAtomToProto(system, "C2G", "ETH", "M", 0.666, 0.0, 0.0, 10.011, -0.34772, 0.0, 69.08116, 3.51622);
                 addAtomToProto(system, "C2G", "ETH", "M", -0.666, 0.0, 0.0, 10.011, -0.34772, 0.0, 69.08116, 3.51622);
                 addAtomToProto(system, "H2G", "ETH", "M", 1.230, 0.921, 0.0, 1.0079, 0.17386, 0.0, 3.169, 2.41504);
@@ -444,7 +450,7 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, "H2G", "ETH", "M", -1.230, -0.921, 0.0, 1.0079, 0.17386, 0.0, 3.169, 2.41504);
                 system.proto.name = "ETH";
             }
-            else if (sorbmodel == "c2h4*") {
+            else if (sorbmodel == "c2h4*" || sorbmodel == "ethlyene*" || sorbmodel == "ethene*") {
                 addAtomToProto(system, "C2G", "ETH", "M", 0.666, 0.0, 0.0, 10.011, -0.34772, 1.6304, 52.22317, 3.58174);
                 addAtomToProto(system, "C2G", "ETH", "M", -0.666, 0.0, 0.0, 10.011, -0.34772, 1.6304, 52.22317, 3.58174);
                 addAtomToProto(system, "H2G", "ETH", "M", 1.230, 0.921, 0.0, 1.0079, 0.17386, 0.19, 7.47472, 2.26449);
@@ -454,7 +460,7 @@ void moleculePrintout(System &system) {
                 system.proto.name = "ETH";
             }
             // ETHANE C2H6
-            else if (sorbmodel == "c2h6") {
+            else if (sorbmodel == "c2h6" || sorbmodel == "ethane") {
                 addAtomToProto(system, "C2G", "ETH", "M", -0.762,   0.000,   0.000, 12.01100, -0.04722,  0.00000, 141.80885,  3.28897); //  0.00000  0.00000
                 addAtomToProto(system, "C2G", "ETH", "M", 0.762,   0.000,   0.000, 12.01100, -0.04722,  0.00000, 141.80885,  3.28897);
                 addAtomToProto(system, "H2G", "ETH", "M", -1.156, 1.015, 0.0, 1.0079, 0.01574, 0.0, 0.62069, 2.88406);
@@ -465,7 +471,7 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, "H2G", "ETH", "M", 1.156, -1.015, 0.0, 1.0079, 0.01574, 0.0, 0.62069, 2.88406);
                 system.proto.name = "ETH";
             }
-            else if (sorbmodel == "c2h6*") {
+            else if (sorbmodel == "c2h6*" || sorbmodel == "ethane*") {
                 addAtomToProto(system, "C2G", "ETH", "M", -0.762,0.000, 0.000,12.01100, -0.04722,0.6967,98.63326,3.37151);
                 addAtomToProto(system, "C2G", "ETH", "M", 0.762,0.000,0.000,12.01100,-0.04722,0.6967,98.63326,  3.37151);
                 addAtomToProto(system, "H2G", "ETH", "M", -1.156, 1.015, 0.0, 1.0079, 0.01574, 0.4758, 2.60236, 2.57302);
@@ -483,7 +489,30 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, "HYD", "H2O", "M", 0.757, -0.586, 0.0, 1.008, 0.417, 0.0, 0.0, 0.0);
                 system.proto.name = "H2O";
             }
-
+            // METHANOL CH3OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz on CCSDT=FULL aug-cc-pvtz geometry (CCCBDB); van Deuynen polariz's
+            else if (sorbmodel == "methanol" || sorbmodel == "ch3oh" || sorbmodel == "ch4o") {
+                addAtomToProto(system, "CME", "MET", "M", -0.046520, 0.662923, 0.0, 12.0107, 0.074830, 1.2886, 52.84, 3.431);
+                addAtomToProto(system, "OME", "MET", "M", -0.046520, -0.754865, 0.0, 15.9994, -0.577001, 0.852, 30.19, 3.118);
+                addAtomToProto(system, "HME", "MET", "M", -1.086272, 0.976083, 0.0, 1.00794, 0.085798, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HME", "MET", "M", 0.437877, 1.070546, 0.888953, 1.00794, 0.015921, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HME", "MET", "M", 0.437877, 1.070546, -0.888953, 1.00794, 0.016558, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HME", "MET", "M", 0.861794, -1.055796, 0.0, 1.00794, 0.383895, 0.41380, 22.14, 2.571); 
+                system.proto.name = "MET";
+            }
+            // ETHANOL C2H5OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz pbe0 on CCSDT aug-cc-pvtz geomtry (CCCBDB); van Deuynen polariz's
+                
+            else if (sorbmodel == "ethanol" || sorbmodel == "c2h5oh" || sorbmodel == "c2h6o") {
+                addAtomToProto(system, "CET", "ETH", "M", 1.161583, -0.406755, 0.0, 12.0107, -0.352167, 1.2886, 52.84, 3.431);
+                addAtomToProto(system, "CET", "ETH", "M", 0.0, 0.552718, 0.0, 12.0107, 0.362477, 1.2886, 52.84, 3.431);
+                addAtomToProto(system, "OET", "ETH", "M", -1.187114, -0.212860, 0.0, 15.9994, -0.619551, 0.852, 30.19, 3.118);
+                addAtomToProto(system, "HET", "ETH", "M", -1.932434, 0.383817, 0.0, 1.00794, 0.367986, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HET", "ETH", "M", 2.102860, 0.135840, 0.0, 1.00794, 0.072973, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HET", "ETH", "M", 1.122347, -1.039829, 0.881134, 1.00794, 0.115255, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HET", "ETH", "M", 1.122347, -1.039829, -0.881134, 1.00794, 0.114702, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HET", "ETH", "M", 0.056147, 1.193553, 0.880896, 1.00794, -0.031564, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "HET", "ETH", "M", 0.056147, 1.193553, -0.880896, 1.00794, -0.030110, 0.41380, 22.14, 2.571);
+                system.proto.name = "ETH";
+            }
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
@@ -499,10 +528,10 @@ void moleculePrintout(System &system) {
         system.proto.calc_center_of_mass(); 
 
         printf("Prototype molecule has PDBID %i ( name %s ) and has %i atoms\n", system.proto.PDBID, system.proto.name.c_str(), (int)system.proto.atoms.size());
-        system.proto.printAll();
-        //for (int i=0; i<system.proto.atoms.size(); i++) {
-         //   system.proto.atoms[i].printAll();
-        //}    
+        //system.proto.printAll();
+        for (int i=0; i<system.proto.atoms.size(); i++) {
+            system.proto.atoms[i].printAll();
+        }    
 
 
     } // end if MC

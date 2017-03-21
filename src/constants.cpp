@@ -54,7 +54,8 @@ class Constants {
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int  md_corrtime; // user defined for MD
 		// OLD DEPRECATED double x_length,y_length,z_length,x_max,y_max,z_max,x_min,y_min,z_min; // box parameters, in A
-		double cutoff;
+		//double cutoff;
+        string mc_pbc="on"; // PBC in monte carlo, default on
 
         // MD STUFF
         string md_pbc="on"; // PBC in molecular dynamics. default on.
@@ -77,7 +78,7 @@ class Constants {
         double initial_energy=0.0; // "" ""
 
         // Ewald (for ES)
-        double ewald_alpha=3.5/cutoff;
+        double ewald_alpha; // =3.5/cutoff;
         double ewald_kmax = 7;
         
         // Wolf (for polarization)
