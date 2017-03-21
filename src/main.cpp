@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			printf("Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density.average, system.stats.density.sd, system.stats.density.average*1000.0); 
 			if (system.constants.ensemble == "uvt") {
-                printf("wt %% = %.4f +- %.4f %%; wt %% ME = %.4f +- %.4f %% \n",system.stats.wtp.average, system.stats.wtp.sd, system.stats.wtpME.average, system.stats.wtpME.sd);
+                printf("wt %% = %.4f +- %.4f %%; wt %% ME = %.4f +- %.4f %% = %.4f mmol/g\n",system.stats.wtp.average, system.stats.wtp.sd, system.stats.wtpME.average, system.stats.wtpME.sd, system.stats.wtpME.average * 10 / (system.proto.mass * 1000 * system.constants.NA));
                 printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
             }
             if (system.constants.ensemble != "npt") {
@@ -347,6 +347,7 @@ int main(int argc, char **argv) {
 			double ETA_hrs = ETA/60.0;
        
             printf("MOLECULAR DYNAMICS\n");
+            printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("ENSEMBLE: %s\n",system.constants.ensemble.c_str());
