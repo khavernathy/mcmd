@@ -562,14 +562,17 @@ class Molecule {
 
         // angular velocity
         void calc_ang_vel(double dt) {
+            double cap = 0.00001;
             for (int n=0; n<3; n++) {
                 ang_vel[n] = ang_vel[n] + 0.5*(ang_acc[n] * old_ang_acc[n])*dt;
+                if (ang_vel[n] > cap) ang_vel[n] = cap;
+                else if (ang_vel[n] < -cap) ang_vel[n] = -cap;
             }
         }
 
         // linear velocity
         void calc_vel(double dt, double goal) {
-            double booster=0.001;
+            double booster=0.0005; // for NVT thermostat.
             for (int n=0; n<3; n++) {
                 vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
             }
@@ -588,12 +591,12 @@ class Molecule {
         // angular position // in rad
         void calc_ang_pos(double dt) {
             double theta[3];
-            double cap = 0.0005;
+            //double cap = 0.0005;
             for (int n=0; n<3; n++) {
                 theta[n] = ang_pos[n];
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
-                if (ang_pos[n] > cap) ang_pos[n] = cap; // SET THE ROTATION CAP -- rad/fs
-                else if (ang_pos[n] < -cap) ang_pos[n] = -cap;
+                //if (ang_pos[n] > cap) ang_pos[n] = cap; // SET THE ROTATION CAP -- rad/fs
+                //else if (ang_pos[n] < -cap) ang_pos[n] = -cap;
                 d_theta[n] = ang_pos[n] - theta[n];
             }
         }

@@ -62,9 +62,18 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
     }
     else if (system.constants.ensemble == "nve") {
         if (movetype == "displace") {
-            bf = pow((system.constants.total_energy - e_f),3.0*system.stats.count_movables/2.0) / pow((system.constants.total_energy - e_i),(3.0*system.stats.count_movables/2.0));
+            double exponent = 3.0*system.stats.count_movables/2.0;
+            //printf("exponent = %f\n", exponent);
+
+            //printf("num %f\n", pow( (system.constants.total_energy - e_f ), 3.0*system.stats.count_movables/2.0));
+            //printf("denom %f\n", pow( (system.constants.total_energy - e_i), 3.0*system.stats.count_movables/2.0));
+            bf = pow(
+            (system.constants.total_energy - e_f) , exponent) / 
+                pow(
+                    (system.constants.total_energy - e_i) , exponent);
             if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
             else system.stats.displace_bf_sum += MAXVALUE;
+            //printf("bf %f \n", bf);
         }
     }
   
