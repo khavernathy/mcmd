@@ -10,6 +10,9 @@ PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
     -> gcc compiler 6.2.0 (circe)  <br />
     -> gcc compiler 4.9.3 (stampede)  <br />
 
+To download: <br />
+git clone https://github.com/khavernathy/mcmd<br />
+
 To compile:  (in src dir "src")<br />
 `g++ main.cpp -lm -o ../t -I. -std=c++11`  <br />
 

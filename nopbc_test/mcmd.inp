@@ -4,10 +4,10 @@
 
 name			    mcmd_development
 mode	 		    mc ! mc or md
-checkpoints_option  on
+checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-!input_atoms	 usf2m+rubpy_SA.MC.optimized.pdb   mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms	 usf2m+rubpy_SA.MC.optimized.pdb   mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljes  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 sorbate_name        methanol
