@@ -21,9 +21,6 @@ class Constants {
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
-        //string energy_output="energy.dat"; // logs energy average as f'n of step
-        //string density_output="density.dat"; // logs avg. density as f'n of step
-        string volume_change_option; // kind of useless now but used for NPT,
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         string sorbate_name=""; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
@@ -32,7 +29,7 @@ class Constants {
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
         string draw_box_option="on"; // option to draw the box for visualization in restart.pdb
         string rd_lrc="on"; // long range corrections for LJ RD
-        string ewald_es="off"; // ewald method for electrostatic potential calculation.
+        string ewald_es="on"; // ewald method for electrostatic potential calculation.
         string pdb_long="off"; // on would force long coordinate/charge output
         string dist_within_option="off"; // a function to calculate atom distances within a certain radius of origin
         string dist_within_target; // the atom to find in above option
@@ -43,7 +40,8 @@ class Constants {
 		map <string,double> eps; // LJ epsions database for defaults. Defined lated
 		map <string,double> phast2_c6; map <string,double> phast2_c8; map <string,double> phast2_c10; map <string,double> phast2_sigs; map <string,double> phast2_eps; map <string,double> phast2_polar; // phast2 defaults
 		map <string,double> polars; // polarizability database for defaults. Defined below
-		double volume; // in A^3
+		double total_energy=0.0; // for MC NVE, in K, user defined
+        double volume; // in A^3
         double temp=0.0; //273.15; // in K
         double prevtemp = 0.0; // previous temp for NVT MD thermostat
         double pres=1.0; // in atm
@@ -56,19 +54,17 @@ class Constants {
 		int stepsize=1; // obvi
         int finalstep; // user defined for MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
-        int  md_corrtime; // user defined for MD
-		// OLD DEPRECATED double x_length,y_length,z_length,x_max,y_max,z_max,x_min,y_min,z_min; // box parameters, in A
-		//double cutoff;
         string mc_pbc="on"; // PBC in monte carlo, default on
 
         // MD STUFF
+        int  md_corrtime=50; // user defined for MD
         string md_pbc="on"; // PBC in molecular dynamics. default on.
         string md_rotations="on"; // MD only.
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_vel_goal=0; // 1D vector component of the velocity (which has magnitude md_init_vel)
-        double md_dt=0.1, md_ft; // MD timestep and final time, in fs
+        double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
-		double md_thermostat_constant = 0.0001; // in fs
+		//double md_thermostat_constant = 0.0001; // in fs
         double force_sum_for_pressure = 0; // K/A, for computing pressure in NVT MD
         int MM_interactions = 0; // counts the M-M interactions for averaging force sum
 
@@ -77,8 +73,7 @@ class Constants {
 	
     	int total_atoms=0; // actual sites, not "atoms" persay
         int old_total_atoms =0; // for use in resizing thole matrix in uvt
-        double total_energy=0.0; // for MC NVE, in K, user defined
-        int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
+                int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
         double initial_energy=0.0; // "" ""
 
         // Ewald (for ES)
