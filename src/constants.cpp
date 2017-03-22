@@ -37,6 +37,7 @@ class Constants {
         string dist_within_option="off"; // a function to calculate atom distances within a certain radius of origin
         string dist_within_target; // the atom to find in above option
         double dist_within_radius; // the radius within which to search from origin
+        string autocenter = "on"; // center all atoms about origin automatically. can opt out of it.
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. NOT r_m (as in UFF). Defined below
 		map <string,double> eps; // LJ epsions database for defaults. Defined lated
@@ -514,6 +515,8 @@ class Molecule {
         double inertia=0.0; //moment of inertia
 
         void reInitialize() {
+            // if there are no atoms, don't bother
+            if (atoms.size() > 0) {
             while (!atoms.empty()) atoms.pop_back();
             mass=0;
             inertia=0;
@@ -533,6 +536,7 @@ class Molecule {
             name = "";
             PDBID=0;
             MF = "M";
+            }
         }
 
         double get_mass() {

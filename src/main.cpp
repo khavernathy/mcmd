@@ -55,7 +55,8 @@ int main(int argc, char **argv) {
 	readInput(system, argv[1]); // executable takes the input file as only argument.
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
-	centerCoordinates(system);
+	if (system.constants.autocenter == "on")
+        centerCoordinates(system);
     setupBox(system);
     if (system.stats.radial_dist == "on")   
         setupRadialDist(system);
@@ -255,11 +256,13 @@ int main(int argc, char **argv) {
         time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
 	printf("Total wall time = %f s\n",time_elapsed);
 
-    printf("Freeing data structures... ");
-    for (int i=0; i< 3* system.constants.total_atoms; i++) {
-        free(system.constants.A_matrix[i]);
+    if (system.constants.potential_form == "ljespolar") {
+        printf("Freeing data structures... ");
+        for (int i=0; i< 3* system.constants.total_atoms; i++) {
+            free(system.constants.A_matrix[i]);
+        }
+        free(system.constants.A_matrix); system.constants.A_matrix = NULL;
     }
-    free(system.constants.A_matrix); system.constants.A_matrix = NULL;
     printf("done.\n");
 	printf("MC steps completed. Exiting program.\n"); std::exit(0);
 	}

@@ -133,7 +133,11 @@ void readInAtoms(System &system, string filename) {
 		myfile.close();
 		
 	}
-	else { printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0); } 
+	else {
+        if (system.constants.sorbate_name != "") return;
+  
+        printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0); 
+    } 
 }
 
 
@@ -487,6 +491,10 @@ void readInput(System &system, char* filename) {
 	        } else if (!strcasecmp(lc[0].c_str(), "dist_within_radius")) {
                 system.constants.dist_within_radius = atof(lc[1].c_str());
                 std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
+                system.constants.autocenter = lc[1].c_str();
+                std::cout << "Got auto-center-atoms-to-origin option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_corrtime")) {
 				system.constants.md_corrtime = atoi(lc[1].c_str());

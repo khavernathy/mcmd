@@ -287,11 +287,18 @@ void addAtomToProto(System &system, string name, string molname, string MF, doub
     // initialize
     Atom atom;
     // PDBIDS
-    int last_mol_index = system.molecules.size() - 1;
-    int last_mol_pdbid = system.molecules[last_mol_index].PDBID;
-    int last_atom_pdbid = system.molecules[last_mol_index].atoms[system.molecules[last_mol_index].atoms.size() - 1].PDBID;
-    atom.PDBID = (int)(last_atom_pdbid + 1);
-    atom.mol_PDBID = (int)(last_mol_pdbid + 1);
+    int last_mol_index, last_mol_pdbid, last_atom_pdbid;
+    if (system.molecules.size() > 0) {
+        last_mol_index = system.molecules.size() - 1;
+        last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+        last_atom_pdbid = system.molecules[last_mol_index].atoms[system.molecules[last_mol_index].atoms.size() - 1].PDBID;
+        atom.PDBID = (int)(last_atom_pdbid + 1);
+        atom.mol_PDBID = (int)(last_mol_pdbid + 1);
+    } else {
+        atom.PDBID = 1;
+        atom.mol_PDBID = 1;
+    }
+
 
     atom.name = name;
     atom.mol_name = molname;
@@ -330,14 +337,19 @@ void moleculePrintout(System &system) {
     // CHANGE THE PROTOTYPE IF USER SUPPLIED A KEYWORD IN INPUT
     // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
         if (system.constants.sorbate_name != "") {
+            int last_mol_index;
+            int last_mol_pdbid=0;
+
             string sorbmodel = system.constants.sorbate_name;
-            
+     
             // clear the prototype (even if there isn't one).
             system.proto.reInitialize(); 
-            int last_mol_index = system.molecules.size() -1;
-            int last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+            if (system.molecules.size() > 0) {
+                last_mol_index = system.molecules.size() -1;
+                last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+            }
             system.proto.PDBID = last_mol_pdbid+1;
-
+            printf("now here");
 
             //std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
             // each call takes 12 arguments
@@ -497,6 +509,7 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, "HME", "MET", "M", 0.437877, 1.070546, 0.888953, 1.00794, 0.015921, 0.41380, 22.14, 2.571);
                 addAtomToProto(system, "HME", "MET", "M", 0.437877, 1.070546, -0.888953, 1.00794, 0.016558, 0.41380, 22.14, 2.571);
                 addAtomToProto(system, "HME", "MET", "M", 0.861794, -1.055796, 0.0, 1.00794, 0.383895, 0.41380, 22.14, 2.571); 
+                addAtomToProto(system, "CoM", "MET", "M", -0.020179, -0.063588, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);    
                 system.proto.name = "MET";
             }
             // ETHANOL C2H5OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz pbe0 on CCSDT aug-cc-pvtz geomtry (CCCBDB); van Deuynen polariz's
@@ -511,8 +524,13 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, "HET", "ETH", "M", 1.122347, -1.039829, -0.881134, 1.00794, 0.114702, 0.41380, 22.14, 2.571);
                 addAtomToProto(system, "HET", "ETH", "M", 0.056147, 1.193553, 0.880896, 1.00794, -0.031564, 0.41380, 22.14, 2.571);
                 addAtomToProto(system, "HET", "ETH", "M", 0.056147, 1.193553, -0.880896, 1.00794, -0.030110, 0.41380, 22.14, 2.571);
+                addAtomToProto(system, "CoM", "ETH", "M", -0.054141, -0.017774, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 system.proto.name = "ETH";
             }
+
+            // add proto to system molecule list if there's nothing there yet (i.e. no input file is OK)
+            if (system.molecules.size() == 0) system.molecules.push_back(system.proto);
+
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
