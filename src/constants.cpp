@@ -659,8 +659,8 @@ class Molecule {
 
         // for debugging
         void printAll() {
-            printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
-            PDBID,mass,inertia,
+            printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e; movable = %s; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
+            PDBID,mass,inertia,MF.c_str(),
             force[0], force[1], force[2], acc[0], acc[1], acc[2], 
             old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2], com[0], com[1], com[2],
             torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2], 

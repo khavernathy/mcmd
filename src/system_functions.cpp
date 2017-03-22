@@ -349,9 +349,9 @@ void moleculePrintout(System &system) {
                 last_mol_pdbid = system.molecules[last_mol_index].PDBID;
             }
             system.proto.PDBID = last_mol_pdbid+1;
-            printf("now here");
-
-            //std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
+            system.proto.MF = "M";           
+ 
+            std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
             // each call takes 12 arguments
             // HYDROGEN H2
             if (sorbmodel == "h2_buch") {
@@ -527,15 +527,19 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, "CoM", "ETH", "M", -0.054141, -0.017774, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 system.proto.name = "ETH";
             }
-
-            // add proto to system molecule list if there's nothing there yet (i.e. no input file is OK)
-            if (system.molecules.size() == 0) system.molecules.push_back(system.proto);
-
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
                 std::exit(0);
             }
+
+            // add proto to system molecule list if there's nothing there yet (i.e. no input file is OK)
+            if (system.molecules.size() == 0) {
+                system.molecules.push_back(system.proto);
+                system.stats.count_movables++;
+                system.constants.total_atoms += system.proto.atoms.size();
+            }
+
         } // end if sorbate name != ""    
        
         // finally, zero the prototype's coordinates
