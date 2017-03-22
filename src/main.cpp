@@ -61,6 +61,8 @@ int main(int argc, char **argv) {
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
+    printf("VERSION NUMBER: %s\n", "133");
+
 
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses // 
@@ -201,6 +203,11 @@ int main(int argc, char **argv) {
             printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto.name.c_str());
             printf("N_movables avg = %.3f +- %.3f; N_molecules = %i; N_movables = %i; N_sites = %i\n",
                 system.stats.Nmov.average, system.stats.Nmov.sd, (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
+
+            if (system.constants.dist_within_option == "on") {
+                printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
+            }
+
             printf("--------------------\n\n");
 
             // CONSOLIDATE ATOM AND MOLECULE PDBID's

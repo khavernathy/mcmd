@@ -26,6 +26,10 @@ void computeInitialValues(System &system) {
     system.constants.initial_sorbates = system.stats.count_movables;
     system.stats.Nmov.value = system.stats.count_movables;
     system.stats.Nmov.average = system.stats.count_movables;
+    if (system.constants.dist_within_option == "on") {
+        countAtomInRadius(system, system.constants.dist_within_target, system.constants.dist_within_radius);
+        system.stats.dist_within.average = system.stats.dist_within.value;
+    }
 
 	// ENERGY
     double* placeholder = getTotalPotential(system, system.constants.potential_form); // getTotPot sends values to stat vars
@@ -118,6 +122,11 @@ void computeAverages(System &system) {
     // N_movables (sorbates, usually)
     system.stats.Nmov.value = system.stats.count_movables;
     system.stats.Nmov.calcNewStats();
+    if (system.constants.dist_within_option == "on") {
+        countAtomInRadius(system, system.constants.dist_within_target, system.constants.dist_within_radius);
+        system.stats.dist_within.calcNewStats();
+    }
+
 
 	// ENERGY
     system.stats.rd.calcNewStats();

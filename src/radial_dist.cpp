@@ -113,3 +113,22 @@ void writeRadialDist(System &system) {
     return;
 }
 
+void countAtomInRadius(System &system, string atomname, double radius) {
+    int count=0;
+    double r=0;
+    // loop through all atoms and count the number that are within radius
+    for (int i=0; i<system.molecules.size(); i++) {
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+            if (system.molecules[i].atoms[j].name == atomname) {
+                for (int n=0; n<3; n++) 
+                    r += system.molecules[i].atoms[j].pos[n] * system.molecules[i].atoms[j].pos[n];
+
+                r = sqrt(r);
+                if (r <= radius) count++;
+            }
+        }
+    }
+
+    system.stats.dist_within.value = count;
+}
+

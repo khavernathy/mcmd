@@ -475,7 +475,19 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "finalstep")) {
 				system.constants.finalstep = atoi(lc[1].c_str());
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
-			
+
+            } else if (!strcasecmp(lc[0].c_str(), "dist_within")) {
+                system.constants.dist_within_option = lc[1].c_str(); 
+                std::cout << "Got dist_within option = " << lc[1].c_str(); printf("\n");
+        		
+            } else if (!strcasecmp(lc[0].c_str(), "dist_within_target")) {
+                system.constants.dist_within_target = lc[1].c_str();
+                std::cout << "Got dist_within_target atom = " << lc[1].c_str(); printf("\n");
+
+	        } else if (!strcasecmp(lc[0].c_str(), "dist_within_radius")) {
+                system.constants.dist_within_radius = atof(lc[1].c_str());
+                std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
+
 			} else if (!strcasecmp(lc[0].c_str(), "md_corrtime")) {
 				system.constants.md_corrtime = atoi(lc[1].c_str());
 				std::cout << "Got MD corrtime = " << lc[1].c_str(); printf("\n");

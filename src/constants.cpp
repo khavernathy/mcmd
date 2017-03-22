@@ -34,6 +34,9 @@ class Constants {
         string rd_lrc="on"; // long range corrections for LJ RD
         string ewald_es="off"; // ewald method for electrostatic potential calculation.
         string pdb_long="off"; // on would force long coordinate/charge output
+        string dist_within_option="off"; // a function to calculate atom distances within a certain radius of origin
+        string dist_within_target; // the atom to find in above option
+        double dist_within_radius; // the radius within which to search from origin
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. NOT r_m (as in UFF). Defined below
 		map <string,double> eps; // LJ epsions database for defaults. Defined lated
@@ -405,7 +408,7 @@ class Stats {
 
         } Nsq,NU,qst,rd,es,polar,potential,density,volume,z,Nmov,wtp,wtpME,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass, movablemass,pressure,temperature, fdotr;
+            frozenmass, movablemass,pressure,temperature, fdotr, dist_within;
 
 
 };
@@ -418,7 +421,7 @@ class Last {
         Last();
         double Nsq,NU,qst,rd,es,polar,potential,density,volume,z,Nmov,wtp,wtpME,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass,movablemass,pressure,temperature, fdotr;
+            frozenmass,movablemass,pressure,temperature, fdotr, dist_within;
 
 
 };

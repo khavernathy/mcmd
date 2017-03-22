@@ -14,6 +14,9 @@ sorbate_name        methanol
 
 carbasis 25.66200 17.49800 25.66200 90 90 90
 
+dist_within on
+dist_within_target CME
+dist_within_radius 20.0
 
 ! radial distribution option
 radial_dist         off  ! turns on/off radial distribution function. off for speed-up
@@ -30,7 +33,7 @@ ensemble		    uvt
 mc_pbc              off
 mc_corrtime	        25
 finalstep		    5000000
-temperature 	    77.0  !77.0  ! K
+temperature 	    298.0  !77.0  ! K
 pressure		    1.0     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
