@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
-    printf("VERSION NUMBER: %s\n", "135");
+    printf("VERSION NUMBER: %s\n", "137");
 
 
     // compute inital COM for all molecules, and moment of inertia
