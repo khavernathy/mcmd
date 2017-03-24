@@ -3,6 +3,8 @@
 #include <math.h>
 #include <cmath>
 #include <stdlib.h>
+#include <string>
+#include <string.h>
 
 using namespace std;
 
@@ -10,13 +12,21 @@ using namespace std;
 void computeInitialValues(System &system) {
 	
     // MASS OF SYSTEM
-    system.stats.totalmass.value = 0.0; system.stats.movablemass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    system.stats.totalmass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    for (int i=0; i<system.proto.size(); i++) 
+        system.stats.movablemass[i].value = 0.0;
 	for (int c=0; c<system.molecules.size();c++) {
+        string thismolname = system.molecules[c].name;
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
-		    if (system.molecules[c].MF == "M")
-                system.stats.movablemass.value += thismass;
+		    if (system.molecules[c].MF == "M") {
+                for (int i=0; i<system.proto.size(); i++) {
+                    if (system.proto[i].name == thismolname)
+                        system.stats.movablemass[i].value += thismass;
+                }
+                               
+            }
             else if (system.molecules[c].MF == "F")
                 system.stats.frozenmass.value += thismass;
         }
@@ -24,8 +34,17 @@ void computeInitialValues(System &system) {
 
     // N_movables (sorbates, usually)
     system.constants.initial_sorbates = system.stats.count_movables;
-    system.stats.Nmov.value = system.stats.count_movables;
-    system.stats.Nmov.average = system.stats.count_movables;
+    for (int i=0; i<system.molecules.size(); i++) {
+        if (system.molecules[i].MF == "F") continue;
+        string thismolname = system.molecules[i].name;
+        for (int j=0; j<system.proto.size(); j++) 
+            if (thismolname == system.proto[j].name)
+                system.stats.Nmov[j].value++;
+    }
+    
+    for (int i=0; i<system.proto.size(); i++)
+        system.stats.Nmov[i].average = system.stats.Nmov[i].value;
+
     if (system.constants.dist_within_option == "on") {
         countAtomInRadius(system, system.constants.dist_within_target, system.constants.dist_within_radius);
         system.stats.dist_within.average = system.stats.dist_within.value;
@@ -53,18 +72,22 @@ void computeInitialValues(System &system) {
     system.stats.volume.value = system.pbc.volume;
 
 	// DENSITY
-	system.stats.density.value = system.stats.movablemass.value/(system.stats.volume.value*1e-24); // that's mass in g /mL	
-		system.stats.density.average = system.stats.density.value;
+    for (int i=0; i<system.proto.size(); i++) {
+	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24); // that's mass in g /mL	
+		system.stats.density[i].average = system.stats.density[i].value;
+    }
 
     // WT %
-    system.stats.wtp.value = (system.stats.movablemass.value / system.stats.totalmass.value)*100;
-    system.stats.wtpME.value = (system.stats.movablemass.value / system.stats.frozenmass.value)*100;
-        system.stats.wtp.average = system.stats.wtp.value;
-        system.stats.wtpME.average = system.stats.wtpME.value;
+    for (int i=0; i<system.proto.size(); i++) {
+    system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
+    system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
+        system.stats.wtp[i].average = system.stats.wtp[i].value;
+        system.stats.wtpME[i].average = system.stats.wtpME[i].value;
+    }
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass.value/(system.proto.get_mass()*1000*system.constants.NA);
+    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*1000*system.constants.NA);
 	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
             / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
 		system.stats.z.average = system.stats.z.value;
@@ -106,27 +129,44 @@ void computeAverages(System &system) {
     system.stats.vol_perc = (system.stats.total_accepts == 0) ? 0 : system.stats.volume_change_accepts/(double)system.stats.total_accepts*100;
 
     system.checkpoint("done with boltzmann stuff.");
-	// MASS OF SYSTEM
-	system.stats.totalmass.value = 0.0; system.stats.movablemass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    // MASS OF SYSTEM
+    system.stats.totalmass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    for (int i=0; i<system.proto.size(); i++) 
+        system.stats.movablemass[i].value = 0.0; 
 	for (int c=0; c<system.molecules.size();c++) {
+        string thismolname = system.molecules[c].name;
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
-		    if (system.molecules[c].MF == "M")
-                system.stats.movablemass.value += thismass;
+		    if (system.molecules[c].MF == "M") {
+                for (int i=0; i<system.proto.size(); i++) {
+                    if (system.proto[i].name == thismolname)
+                        system.stats.movablemass[i].value += thismass;
+                }
+                               
+            }
             else if (system.molecules[c].MF == "F")
                 system.stats.frozenmass.value += thismass;
         }
-    }
+	}
 
     // N_movables (sorbates, usually)
-    system.stats.Nmov.value = system.stats.count_movables;
-    system.stats.Nmov.calcNewStats();
+    for (int i=0; i<system.proto.size(); i++) system.stats.Nmov[i].value = 0; // initialize b4 counting. 
+    for (int i=0; i<system.molecules.size(); i++) {
+        if (system.molecules[i].MF == "F") continue;
+        string thismolname = system.molecules[i].name;
+        for (int j=0; j<system.proto.size(); j++) 
+            if (thismolname == system.proto[j].name)
+                system.stats.Nmov[j].value++;
+    }
+    
+    for (int i=0; i<system.proto.size(); i++)
+        system.stats.Nmov[i].calcNewStats();
+
     if (system.constants.dist_within_option == "on") {
         countAtomInRadius(system, system.constants.dist_within_target, system.constants.dist_within_radius);
         system.stats.dist_within.calcNewStats();
     }
-
 
 	// ENERGY
     system.stats.rd.calcNewStats();
@@ -140,6 +180,7 @@ void computeAverages(System &system) {
     system.stats.polar.calcNewStats();
     system.stats.potential.calcNewStats();
 
+/*
     // CHEMICAL POTENTIAL dE/dN
     if (system.constants.ensemble != "npt") {
         if (0 != system.stats.Nmov.average - system.constants.initial_sorbates) {
@@ -148,8 +189,10 @@ void computeAverages(System &system) {
             system.stats.chempot.calcNewStats();
         }
     }
+*/
     // QST
-    if (system.constants.ensemble == "uvt") { // T must be fixed for Qst
+    if (system.constants.ensemble == "uvt" && system.proto.size() == 1) { // T must be fixed for Qst
+        
         // NU (for qst)
         system.stats.NU.value = system.stats.potential.value*system.stats.count_movables;
         system.stats.NU.calcNewStats();
@@ -159,9 +202,9 @@ void computeAverages(System &system) {
         system.stats.Nsq.calcNewStats();
 
         // Qst
-            if (0 != system.stats.Nsq.average - system.stats.Nmov.average * system.stats.Nmov.average) {
-            double qst = -(system.stats.NU.average - system.stats.Nmov.average * system.stats.potential.average);
-            qst /= (system.stats.Nsq.average - system.stats.Nmov.average * system.stats.Nmov.average);
+            if (0 != system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average) {
+            double qst = -(system.stats.NU.average - system.stats.Nmov[0].average * system.stats.potential.average);
+            qst /= (system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average);
             qst += system.constants.temp; 
             qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
                 system.stats.qst.value = qst;
@@ -175,18 +218,23 @@ void computeAverages(System &system) {
         system.stats.volume.calcNewStats();
 
 	// DENSITY
-	system.stats.density.value = system.stats.movablemass.value/(system.stats.volume.value*1e-24); // that's mass in g /mL	
-        system.stats.density.calcNewStats();
+    for (int i=0; i<system.proto.size(); i++) {
+	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24); // that's mass in g /mL	
+        system.stats.density[i].calcNewStats();
+    }
 
     // WT %
-    system.stats.wtp.value = (system.stats.movablemass.value / system.stats.totalmass.value)*100;
-    system.stats.wtpME.value = (system.stats.movablemass.value / system.stats.frozenmass.value)*100;
-        system.stats.wtp.calcNewStats();
-        system.stats.wtpME.calcNewStats();
+    for (int i=0; i<system.proto.size(); i++) {
+        system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
+        system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
+            system.stats.wtp[i].calcNewStats();
+            system.stats.wtpME[i].calcNewStats();
+    }
+
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass.value/(system.proto.get_mass()*1000*system.constants.NA);
+    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*1000*system.constants.NA);
 	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
             / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
         system.stats.z.calcNewStats();

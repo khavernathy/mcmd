@@ -12,10 +12,14 @@ using namespace std;
 double get_boltzmann_factor(System &system, double e_i, double e_f, string movetype) {
     double bf, MAXVALUE=1e4; // we won't care about huge bf's
     double energy_delta = e_f - e_i;
+    double fugacity;
+
+    if (system.proto.size() == 1) fugacity = system.constants.pres;
+    else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
     if (system.constants.ensemble == "uvt") {
         if (movetype == "add") {
-            bf = system.pbc.volume * system.constants.pres * 
+            bf = system.pbc.volume * fugacity * 
             system.constants.ATM2REDUCED/(system.constants.temp * 
             (double)(system.stats.count_movables)) *
                 exp(-energy_delta/system.constants.temp);
@@ -25,7 +29,7 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
         else if (movetype == "remove") {
             bf = system.constants.temp * 
             ((double)(system.stats.count_movables) + 1.0)/
-            (system.pbc.volume*system.constants.pres*system.constants.ATM2REDUCED) *
+            (system.pbc.volume* fugacity *system.constants.ATM2REDUCED) *
                 exp(-energy_delta/system.constants.temp);
             if (bf < MAXVALUE) system.stats.remove_bf_sum += bf;
             else system.stats.remove_bf_sum += MAXVALUE;

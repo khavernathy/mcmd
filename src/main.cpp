@@ -17,7 +17,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <map>
-#include <string>
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
@@ -51,8 +50,9 @@ int main(int argc, char **argv) {
 	setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.
 
     // SET UP THE SYSTEM 
-	System system;
-	readInput(system, argv[1]); // executable takes the input file as only argument.
+    System system;
+	system.checkpoint("setting up system with main functions...");
+    readInput(system, argv[1]); // executable takes the input file as only argument.
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
 	if (system.constants.autocenter == "on")
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
     printf("VERSION NUMBER: %s\n", "137");
-
+    system.checkpoint("Done with system setup functions.");
 
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses // 
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 				// DO MC STEP
                 if (t!=0) {
                     setCheckpoint(system); // save all the relevant values in case we need to revert something.
-				    runMonteCarloStep(system,system.constants.potential_form);
+                    runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
                     system.constants.old_total_atoms = system.constants.total_atoms;
                     
@@ -193,18 +193,24 @@ int main(int argc, char **argv) {
 			printf("Polar avg =           %.5f +- %.5f K\n",system.stats.polar.average, system.stats.polar.sd);
 			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
-			printf("Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density.average, system.stats.density.sd, system.stats.density.average*1000.0); 
-			if (system.constants.ensemble == "uvt") {
-                printf("wt %% = %.4f +- %.4f %%; wt %% ME = %.4f +- %.4f %% = %.4f mmol/g\n",system.stats.wtp.average, system.stats.wtp.sd, system.stats.wtpME.average, system.stats.wtpME.sd, system.stats.wtpME.average * 10 / (system.proto.mass * 1000 * system.constants.NA));
-                printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
+			for (int i=0; i<system.proto.size(); i++) {
+                printf("-> %s wt %% = %.4f +- %.4f %%; wt %% ME = %.4f +- %.4f %% = %.4f mmol/g\n",system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
+                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0); 
+
+                printf("      N_movables avg = %.3f +- %.3f\n",
+                system.stats.Nmov[i].average, system.stats.Nmov[i].sd);
             }
+            if (system.constants.ensemble == "uvt") {
+                printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
+                printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
+            }
+            /*
             if (system.constants.ensemble != "npt") {
                 printf("Chemical potential avg = %.4f +- %.4f K / sorbate molecule \n", system.stats.chempot.average, system.stats.chempot.sd); 
             }
-            printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto.name.c_str());
-            printf("N_movables avg = %.3f +- %.3f; N_molecules = %i; N_movables = %i; N_sites = %i\n",
-                system.stats.Nmov.average, system.stats.Nmov.sd, (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
-
+            */
+            if (system.proto.size() == 1) 
+                printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
             if (system.constants.dist_within_option == "on") {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
             }
@@ -230,7 +236,8 @@ int main(int argc, char **argv) {
             writePDB(system, system.constants.restart_pdb);
             if (system.constants.pdb_traj_option == "on")
                 writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);    
-            writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density.average*1000, system.constants.temp, system.constants.pres, t);
+            // ONLY WRITES DENSITY FOR FIRST SORBATE
+            writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density[0].average*1000, system.constants.temp, system.constants.pres, t);
             if (system.stats.radial_dist == "on") {
                 radialDist(system);
                 writeRadialDist(system);        
@@ -295,7 +302,8 @@ int main(int argc, char **argv) {
     } else {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
-        double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / (M_PI*system.proto.mass*system.constants.NA)) / 1e5; // A/fs
+        double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / 
+            (M_PI*system.proto[0].mass*system.constants.NA)) / 1e5; // THIS IS NOT GOOD FOR MULTISORBATE SYSTEM YET. A/fs
         double v_component = sqrt(v_init*v_init / 3.0);
 
         double pm = 0;

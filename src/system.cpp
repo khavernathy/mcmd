@@ -11,7 +11,7 @@ class System {
 	public:
 		System();
 		vector<Molecule> molecules; // added 2-5-17
-		Molecule proto;
+		vector<Molecule> proto; // prototypes (i.e. sorbate molecules which can be moved/inserted/removed
 		Constants constants;
 		Pbc pbc;
         Stats stats;

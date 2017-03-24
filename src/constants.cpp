@@ -23,7 +23,8 @@ class Constants {
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
         string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
-        string sorbate_name=""; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
+        vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
+        vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
         string pdb_traj_option="on"; // option to write PDB trajectory (in addition to xyz). default on
         string com_option="off"; // enables computation of center-of-mass and logs in output_traj
         string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
@@ -55,6 +56,7 @@ class Constants {
         int finalstep; // user defined for MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         string mc_pbc="on"; // PBC in monte carlo, default on
+        int currentprotoid=0; // for getting fugacity for the boltzmann factor.
 
         // MD STUFF
         int  md_corrtime=50; // user defined for MD
@@ -402,9 +404,15 @@ class Stats {
             }
 
 
-        } Nsq,NU,qst,rd,es,polar,potential,density,volume,z,Nmov,wtp,wtpME,
+        } Nsq,NU,qst,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass, movablemass,pressure,temperature, fdotr, dist_within;
+            frozenmass, pressure,temperature, fdotr, dist_within;
+
+        vector<obs_t> wtp = vector<obs_t>(10);
+        vector<obs_t> wtpME = vector<obs_t>(10);
+        vector<obs_t> Nmov = vector<obs_t>(10);
+        vector<obs_t> movablemass = vector<obs_t>(10); 
+        vector<obs_t> density = vector<obs_t>(10); // gotta have multiples for multi-sorbate.
 
 
 };
@@ -415,11 +423,15 @@ Stats::Stats() {}
 class Last {
     public:
         Last();
-        double Nsq,NU,qst,rd,es,polar,potential,density,volume,z,Nmov,wtp,wtpME,
+        double Nsq,NU,qst,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass,movablemass,pressure,temperature, fdotr, dist_within;
+            frozenmass,pressure,temperature, fdotr, dist_within;
 
-
+        vector<double> wtp = vector<double>(10);
+        vector<double> wtpME = vector<double>(10);
+        vector<double> Nmov = vector<double>(10);
+        vector<double> movablemass = vector<double>(10);
+        vector<double> density = vector<double>(10); // for multi-sorbate
 };
 
 Last::Last() {}
@@ -508,6 +520,7 @@ class Molecule {
         vector<double> d_theta = vector<double>(3); // for calculating rotational potential E
         double mass=0.0;
         double inertia=0.0; //moment of inertia
+        double fugacity;
 
         void reInitialize() {
             // if there are no atoms, don't bother

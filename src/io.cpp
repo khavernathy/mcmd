@@ -29,6 +29,8 @@ void readInAtoms(System &system, string filename) {
 		bool prototype_made = false;
 		bool first_mover_passed = false;
 		int first_mover_id = -1;
+        Molecule whatev;
+        system.proto.push_back(whatev); // the first prototype.
 		Molecule current_molecule; // initializer. Will be overwritten
 		while ( getline (myfile,line) )
 		{
@@ -74,9 +76,9 @@ void readInAtoms(System &system, string filename) {
 			if (myvector[4] == "M" && first_mover_passed == false) {
 				first_mover_passed = true;
 				first_mover_id = stoi(myvector[5]);
-				system.proto.name = myvector[3];
-				system.proto.MF = myvector[4];
-				system.proto.PDBID = stoi(myvector[5]);
+				system.proto[0].name = myvector[3];
+				system.proto[0].MF = myvector[4];
+				system.proto[0].PDBID = stoi(myvector[5]);
 			}
 			current_atom.mol_PDBID = stoi(myvector[5]);
 			//current_mol_id = stoi(myvector[5]);
@@ -119,8 +121,8 @@ void readInAtoms(System &system, string filename) {
 
 			// and add current atom to prototype only if its in the first mover
 			if (current_mol_id == first_mover_id) {
-				system.proto.atoms.push_back(current_atom);
-                system.proto.mass += current_atom.m;	
+				system.proto[0].atoms.push_back(current_atom);
+                system.proto[0].mass += current_atom.m;	
 			}
 			system.constants.total_atoms++;	// add +1 to master atoms count
 
@@ -134,7 +136,7 @@ void readInAtoms(System &system, string filename) {
 		
 	}
 	else {
-        if (system.constants.sorbate_name != "") return;
+        if (system.constants.sorbate_name.size() > 0) return;
   
         printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0); 
     } 
@@ -383,9 +385,27 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
 			
             } else if (!strcasecmp(lc[0].c_str(), "sorbate_name")) {
-                system.constants.sorbate_name = lc[1].c_str();
-                std::cout << "Got sorbate model name = " << lc[1].c_str(); printf("\n");
+                system.constants.sorbate_name.push_back(lc[1].c_str());
+                std::cout << "Got sorbate model name 1 = " << lc[1].c_str(); printf("\n");
+
+                for (int i=2; i<=10; i++) { // so max sorbates is 10.
+                    if (lc.size() >= (i+1)) {
+                        system.constants.sorbate_name.push_back(lc[i].c_str());
+                        std::cout << "Got sorbate model name " << i << " = " << lc[i].c_str(); printf("\n");
+                    }
+                }
             
+            } else if (!strcasecmp(lc[0].c_str(), "sorbate_fugacities")) {
+                system.constants.sorbate_fugacity.push_back(atof(lc[1].c_str()));
+                std::cout << "Got fugacity for sorbate 1 = " << lc[1].c_str(); printf("\n");
+
+                for (int i=2; i<=10; i++) {
+                    if (lc.size() >= (i+1)) {
+                        system.constants.sorbate_fugacity.push_back(atof(lc[i].c_str()));
+                        std::cout << "Got fugacity for sorbate " << i << " = " << lc[i].c_str(); printf("\n");
+                    }
+                }
+
             // BASIS STUFF. 
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {

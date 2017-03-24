@@ -69,7 +69,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	//float dof = 6.0; // degrees of freedom. Not sure what correct value is.
 	//T = K_total / ((3.0 * (float)system.constants.total_atoms - dof )); // in kelvin
 	// https://en.wikipedia.org/wiki/Thermal_velocity
-    T = (avg_v*1e5)*(avg_v*1e5) * system.proto.mass * M_PI / 8.0 / system.constants.kb;
+    T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
 
     /*if (system.constants.ensemble == "nvt") {
 		// NVT THERMOSTAT: Berendsen :: https://en.wikipedia.org/wiki/Berendsen_thermostat 

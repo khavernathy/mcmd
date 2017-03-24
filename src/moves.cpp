@@ -158,12 +158,20 @@ void addMolecule(System &system, string model) {
 
     system.checkpoint("starting addMolecule");
 	system.stats.insert_attempts++;
+    int protoid;
 
 	// get current energy.
 	double* old_potentials = getTotalPotential(system, model);
 	double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2] + old_potentials[3];
-	
-	system.molecules.push_back(system.proto); // proto is already centered at zero.
+
+    // select a random prototype molecule
+    if (system.proto.size() == 1) protoid=0;
+    else {
+        protoid = (rand() % (int)(system.proto.size()));
+        //printf("rand proto id selected: %i\n", protoid);
+    }	
+    system.molecules.push_back(system.proto[protoid]);
+    system.constants.currentprotoid = protoid; // for getting boltz factor later.
 	system.stats.count_movables += 1;	
 
 	//id in vector INDEX. .ID is PDB ID
@@ -223,7 +231,7 @@ void addMolecule(System &system, string model) {
     } else {
 		// remove the new molecule.
 		system.molecules.pop_back(); 
-		system.constants.total_atoms -= (int)system.proto.atoms.size();
+		system.constants.total_atoms -= (int)system.proto[protoid].atoms.size();
 		system.stats.count_movables--;
 	}
     system.checkpoint("done with addMolecule");
@@ -263,7 +271,7 @@ void removeMolecule(System &system, string model) {
     // delete the molecule
     system.molecules.erase(system.molecules.begin() + randm);
     system.stats.count_movables--;
-    system.constants.total_atoms -= (int)system.proto.atoms.size();
+    system.constants.total_atoms -= tmp_molecule.atoms.size(); //(int)system.proto[protoid].atoms.size();
 
     // get new energy
     double* new_potentials = getTotalPotential(system, model);
@@ -284,7 +292,7 @@ void removeMolecule(System &system, string model) {
 	    //printf("rejected remove.\n");
 	    // put the molecule back.
 	    system.molecules.push_back(tmp_molecule);
-        system.constants.total_atoms += (int)system.proto.atoms.size();
+        system.constants.total_atoms += tmp_molecule.atoms.size(); //(int)system.proto.atoms.size();
 	    system.stats.count_movables++;
 	}	 // end boltz accept/reject
 return;
