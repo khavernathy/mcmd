@@ -168,6 +168,19 @@ void computeAverages(System &system) {
         system.stats.dist_within.calcNewStats();
     }
 
+    // SELECTIVITY :: N / (other Ns)
+    double num, denom;
+    for (int i=0; i<system.proto.size(); i++) {
+        num = system.stats.Nmov[i].average;
+        denom=0;
+        for (int j=0; j<system.proto.size(); j++) {
+            if (i == j) continue;
+            denom += system.stats.Nmov[j].average;
+        }
+        system.stats.selectivity[i].value = num/denom;
+        system.stats.selectivity[i].calcNewStats();
+    }
+
 	// ENERGY
     system.stats.rd.calcNewStats();
         system.stats.lj.calcNewStats();

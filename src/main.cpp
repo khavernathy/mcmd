@@ -199,9 +199,12 @@ int main(int argc, char **argv) {
 
                 printf("      N_movables avg = %.3f +- %.3f\n",
                 system.stats.Nmov[i].average, system.stats.Nmov[i].sd);
+                printf("      Selectivity = %.3f +- %.3f\n",
+                system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             }
             if (system.constants.ensemble == "uvt") {
-                printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
+                if (system.proto.size() == 1)
+                    printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
                 printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             }
             /*

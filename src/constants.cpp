@@ -413,7 +413,7 @@ class Stats {
         vector<obs_t> Nmov = vector<obs_t>(10);
         vector<obs_t> movablemass = vector<obs_t>(10); 
         vector<obs_t> density = vector<obs_t>(10); // gotta have multiples for multi-sorbate.
-
+        vector<obs_t> selectivity = vector<obs_t>(10); 
 
 };
 
@@ -432,6 +432,7 @@ class Last {
         vector<double> Nmov = vector<double>(10);
         vector<double> movablemass = vector<double>(10);
         vector<double> density = vector<double>(10); // for multi-sorbate
+        vector<double> selectivity = vector<double>(10);
 };
 
 Last::Last() {}
