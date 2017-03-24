@@ -503,7 +503,7 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "ETH";
             }
             // WATER H2O (TIP3P)
-            else if (sorbmodel == "h2o") {
+            else if (sorbmodel == "h2o" || sorbmodel == "water" || sorbmodel == "tip3p") {
                 addAtomToProto(system,i, "OXY", "H2O", "M", 0.0, 0.0, 0.0, 16.0, -0.834, 0.0, 76.42, 3.151);
                 addAtomToProto(system,i, "HYD", "H2O", "M", -0.757, -0.586, 0.0, 1.008, 0.417, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "HYD", "H2O", "M", 0.757, -0.586, 0.0, 1.008, 0.417, 0.0, 0.0, 0.0);
