@@ -23,9 +23,7 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
--> MC: add selectivity calculator for multi-sorbate
 -> MC: fix atom-stuck-at-origin issue in uVT
--> MD: rotation cap is on theta, so rotational velocity can still get big. This throws off rotational KE<br />
 -> for some reason my RD energy is 0.001% off from MPMC every time. Maybe self energy is diff?<br />
 -> allow 0 sorbate molecules in uvt<br />
 -> make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
