@@ -32,7 +32,6 @@ TODO<br /><br />
 -> fix MC SD's maybe? Seem to be wrong<br />
 -> NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
     -> although I think it's always the case with crystalline systems.
--> REDUCE CHARGE CALCULATIONS BY CONVERTING TO AU BEFOREHAND AND CONVERTING BACK IN OUTPUT<br />
 -> make correct pressure calculator (Frenkel method, check MPMC to compare?)<br />  
 -> include more-than-static polarization energy  <br />
     -> right now I just use V = -0.5 sum{u.E}  <br />
