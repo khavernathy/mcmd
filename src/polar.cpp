@@ -211,6 +211,7 @@ void thole_field(System &system) {
         }
     }
 
+    double SMALL_dR = 1e-12;
     double OneOverSqrtPi = 1.0/sqrt(M_PI);
     int p; //dimensionality
     double r, rr; //r and 1/r (reciprocal of r)
@@ -235,7 +236,7 @@ void thole_field(System &system) {
                 double* distances = getDistanceXYZ(system, i,j,k,l);
                 r = distances[3];
 
-                if((r  < system.pbc.cutoff) && (r != 0.)) {
+                if((r - SMALL_dR  < system.pbc.cutoff) && (r != 0.)) {
                     rr = 1./r;
 
                     if ( a != 0 )   
@@ -293,13 +294,6 @@ double polarization(System &system) {
     // MPMC CAN DO THOSE TOO, BUT WE ALMOST ALWAYS USE ITERATIVE.
     double potential; int num_iterations;
 
-    // initialize potentials to zero
-	for (int j=0; j<system.molecules.size(); j++) {
-		for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
-			system.molecules[j].atoms[i].V = 0.0;
-		} // end atom loop i
-	} // end molecule loop j
-    system.checkpoint("done with zero-initiallization of e-fields");
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
     if (system.constants.ensemble == "uvt") {

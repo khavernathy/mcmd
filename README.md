@@ -27,6 +27,7 @@ TODO<br /><br />
     -> it seems to always max-out on the iteration count, unlike mpmc.<br />
     -> 4x slower than mpmc. (def. need to make pair lists)<br />
     -> my polar energy is +~25% from mpmc...<br />
+    -> need to add Thole_field NO-PBC option.
 -> MC: add S.A.
 -> MC: fix atom-stuck-at-origin issue in uVT
 -> MC: for some reason my RD energy is 0.001% off from MPMC every time. Maybe self energy is diff?<br />
