@@ -106,14 +106,17 @@ int main(int argc, char **argv) {
     int finalstep = system.constants.finalstep;
     int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
+
     // RESIZE A MATRIX IF POLAR IS ACTIVE
     if (system.constants.potential_form == "ljespolar") {
-        system.constants.old_total_atoms = system.constants.total_atoms;
+        system.last.total_atoms = system.constants.total_atoms;
         int N = 3 * system.constants.total_atoms;
         system.constants.A_matrix= (double **) calloc(N,sizeof(double*));
         for (int i=0; i< N; i++ ) {
             system.constants.A_matrix[i]= (double *) malloc(N*sizeof(double));
         }
+
+        system.last.thole_total_atoms = system.constants.total_atoms;
     }
 
     // begin timing for steps "begin_steps"
@@ -131,7 +134,6 @@ int main(int argc, char **argv) {
                     setCheckpoint(system); // save all the relevant values in case we need to revert something.
                     runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
-                    system.constants.old_total_atoms = system.constants.total_atoms;
                     
                     if (system.stats.MCmoveAccepted == false)
                         revertToCheckpoint(system);
@@ -194,7 +196,7 @@ int main(int argc, char **argv) {
 			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
-                printf("-> %s wt %% = %.4f +- %.4f %%; wt %% ME = %.4f +- %.4f %% = %.4f mmol/g\n",system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
+                printf("-> %s wt %% = %.5f +- %.5f %%; wt %% ME = %.5f +- %.5f %% = %.5f mmol/g\n",system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0); 
 
                 printf("      N_movables avg = %.3f +- %.3f\n",

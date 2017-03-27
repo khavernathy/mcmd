@@ -626,6 +626,9 @@ void setCheckpoint(System &system) {
         system.last.density[i] = system.stats.density[i].value;
         system.last.Nmov[i] = system.stats.Nmov[i].value;
     }
+
+        // N
+    system.last.total_atoms = system.constants.total_atoms;
 }
 
 void revertToCheckpoint(System &system) {
@@ -657,6 +660,9 @@ void revertToCheckpoint(System &system) {
         system.stats.density[i].value = system.last.density[i];
         system.stats.Nmov[i].value = system.last.Nmov[i];
     }
+
+        // N
+    system.constants.total_atoms = system.last.total_atoms;
     
 }
 

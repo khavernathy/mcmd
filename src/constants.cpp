@@ -74,7 +74,6 @@ class Constants {
         map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
 	
     	int total_atoms=0; // actual sites, not "atoms" persay
-        int old_total_atoms =0; // for use in resizing thole matrix in uvt
                 int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
         double initial_energy=0.0; // "" ""
 
@@ -88,10 +87,14 @@ class Constants {
         double polar_gamma = 1.03;
         int polar_max_iter = 4;
         double **A_matrix, **B_matrix, C_matrix[3][3];
-        double polar_precision=0.0;
+        int polar_precision=0;
         int iter_success;
-        double polar_rrms;
+        int polar_rrms =0;
         double dipole_rrms = 0.0;
+        int polar_gs_ranked = 1;
+        int polar_gs = 0;
+        int polar_palmo = 1;
+        //int thole_total_atoms = 0;
 };
 
 class Pbc {
@@ -426,6 +429,8 @@ class Last {
         double Nsq,NU,qst,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass,pressure,temperature, fdotr, dist_within;
+    
+        int total_atoms, thole_total_atoms;
 
         vector<double> wtp = vector<double>(10);
         vector<double> wtpME = vector<double>(10);
@@ -453,7 +458,7 @@ class Atom {
         double K=0.0; // kinetic energy in K
         double E=0.0; // total energy in K
 		int PDBID; // the atom's PDBID (from input)
-        double rank_metric;       
+        double rank_metric;  // for polarization sorting     
  
 		vector<double> pos = vector<double>(3); // 0=x; 1=y; 2=z
 		vector<double> prevpos = vector<double>(3);

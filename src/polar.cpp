@@ -65,13 +65,14 @@ void thole_resize_matrices(System &system) {
     int i, N, dN, oldN;
 
     /* determine how the number of atoms has changed and realloc matrices */
-    oldN = 3*system.constants.old_total_atoms; //will be set to zero if first time called
+    oldN = 3*system.last.thole_total_atoms; //will be set to zero if first time called
     N = 3*system.constants.total_atoms;
     dN = N-oldN;
+    system.last.thole_total_atoms = system.constants.total_atoms;
 
-    printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
+    //printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
 
-    if(!dN) return;
+    if(!dN) { return; }
 
     // grow A matricies by free/malloc (to prevent fragmentation)
     //free the A matrix
@@ -109,11 +110,11 @@ void thole_amatrix(System &system) {
     double explr; //exp(-l*r)
     double explrcut = exp(-l*rcut);
     double MAXVALUE = 1.0e40;
-    N = system.constants.total_atoms;
+    N = (int)system.constants.total_atoms;
 
-    //system.checkpoint("in thole_amatrix() --> zeroing out");
-    zero_out_amatrix(system,system.constants.total_atoms);
-    //system.checkpoint("done with zero_out_amatrix()");
+    system.checkpoint("in thole_amatrix() --> zeroing out");
+    zero_out_amatrix(system,N);
+    system.checkpoint("done with zero_out_amatrix()");
 
     //system.checkpoint("setting diagonals in A");
     /* set the diagonal blocks */
@@ -131,7 +132,7 @@ void thole_amatrix(System &system) {
     }   
     //system.checkpoint("done setting diagonals in A");
    
-   // system.checkpoint("starting Tij loop"); 
+    //system.checkpoint("starting Tij loop"); 
     /* calculate each Tij tensor component for each dipole pair */
     for(i = 0; i < (N - 1); i++) {
         ii = i*3;
@@ -198,7 +199,17 @@ void thole_amatrix(System &system) {
 }
 
 void thole_field(System &system) {
-    // wolf thole field.
+    // wolf thole field
+
+    // first zero-out field vectors
+    for (int i=0; i<system.molecules.size(); i++) {
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+            for (int p=0; p<3; p++) {
+                system.molecules[i].atoms[j].efield[p] = 0;
+                system.molecules[i].atoms[j].efield_self[p] = 0;
+            }
+        }
+    }
 
     double OneOverSqrtPi = 1.0/sqrt(M_PI);
     int p; //dimensionality
@@ -211,6 +222,8 @@ void thole_field(System &system) {
         erR=erfc(a*R);
     double cutoffterm = (erR*rR*rR + 2.0*a*OneOverSqrtPi*exp(-a*a*R*R)*rR);
     double bigmess=0;
+
+    //printf("R = %f; a = %f; erR = %f; cutoffterm = %f\n", R, a, erR, cutoffterm);
 
     for(int i=0; i<system.molecules.size(); i++) {
         for(int j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -227,7 +240,7 @@ void thole_field(System &system) {
 
                     if ( a != 0 )   
                         bigmess=(erfc(a*r)*rr*rr+2.0*a*OneOverSqrtPi*exp(-a*a*r*r)*rr);
-
+                
                     for ( p=0; p<3; p++ ) {
                         //see JCP 124 (234104)
                         if ( a == 0 ) {
@@ -241,7 +254,7 @@ void thole_field(System &system) {
 
                         } else {
                             system.molecules[i].atoms[j].efield[p] +=
-                            (system.molecules[k].atoms[j].C )*
+                            (system.molecules[k].atoms[l].C )*
                             (bigmess-cutoffterm)*distances[p]*rr;
 
                             system.molecules[k].atoms[l].efield[p] -= 
@@ -260,22 +273,30 @@ void thole_field(System &system) {
 
     return;
 
+/*
+printf("THOLE FIELD RESULT: \n");
+for (int i=0; i<system.molecules.size(); i++) {
+    for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+        printf("
+    }
+}
+*/
+
 } // end thole_field()
 
 
 // =========================== POLAR POTENTIAL ========================
 double polarization(System &system) {
 
-    double potential=0; int num_iterations;
+    // POLAR ITERATIVE METHOD IS WHAT I USE.
+    // THERE ARE OTHERS, E.G. MATRIX INVERSION OR FULL EWALD
+    // MPMC CAN DO THOSE TOO, BUT WE ALMOST ALWAYS USE ITERATIVE.
+    double potential; int num_iterations;
 
-    // initialize potentials and electric fields to zero
+    // initialize potentials to zero
 	for (int j=0; j<system.molecules.size(); j++) {
 		for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
 			system.molecules[j].atoms[i].V = 0.0;
-            for (int n=0; n<3; n++) {
-                system.molecules[j].atoms[i].efield[n] = 0.0;
-                system.molecules[j].atoms[i].efield_self[n] = 0.0;
-            }
 		} // end atom loop i
 	} // end molecule loop j
     system.checkpoint("done with zero-initiallization of e-fields");
@@ -288,7 +309,7 @@ double polarization(System &system) {
 
     system.checkpoint("running thole_amatrix().");
     // 0) MAKE THOLE A MATRIX
-    thole_amatrix(system);
+    thole_amatrix(system); // this function also makes the i,j -> single-index atommap.
     system.checkpoint("done running thole_amatrix(). Running thole_field()");
 
     // 1) CALCULATE ELECTRIC FIELD AT EACH SITE
@@ -298,12 +319,14 @@ double polarization(System &system) {
 
     // 2) DO DIPOLE ITERATIONS
     num_iterations = thole_iterative(system);    
+    //printf("num_iterations = %f\n", (double)num_iterations);
     system.stats.polar_iterations = (double)num_iterations;
     system.constants.dipole_rrms = get_dipole_rrms(system);
     system.checkpoint("done with dipole iters. Calculating polarization energy");
 
 
     // 3) CALCULATE POLARIZATION ENERGY 1/2 mu*E
+    potential=0;
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
             potential += (
@@ -311,12 +334,20 @@ double polarization(System &system) {
             (system.molecules[i].atoms[j].dip[1] * system.molecules[i].atoms[j].efield[1]) +
             (system.molecules[i].atoms[j].dip[2] * system.molecules[i].atoms[j].efield[2])
             );
+            
+            if (system.constants.polar_palmo) { 
+                potential += (
+                    system.molecules[i].atoms[j].dip[0] * system.molecules[i].atoms[j].efield_induced_change[0] +
+                    system.molecules[i].atoms[j].dip[1] * system.molecules[i].atoms[j].efield_induced_change[1] +
+                    system.molecules[i].atoms[j].dip[2] * system.molecules[i].atoms[j].efield_induced_change[2]
+                );
+            }
         }
     }
     system.checkpoint("POLARIZATION POTENTIAL CALCULATED.");
     
     potential *= -0.5;
-    printf("POLARIZATION POTENTIAL: %f\n",potential);
+    //printf("POLARIZATION POTENTIAL: %f\n",potential);
     return potential;
 
 } // end polarization() function
