@@ -81,7 +81,7 @@ double lj(System &system) {
             double sigcut3 = sigcut * sigcut * sigcut;
             double sigcut9 = sigcut3 * sigcut3 * sigcut3;
 
-            double this_rd_lrc = (16.0/3.0)*M_PI*eps*sig3*(sigcut9 - sigcut3)/volume;
+            double this_rd_lrc = (16.0/3.0)*M_PI*eps*sig3*((1.0/3.0)*sigcut9 - sigcut3)/volume;
             total_rd_lrc += this_rd_lrc;
             total_pot += this_rd_lrc;
         } // end RD LRC
