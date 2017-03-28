@@ -734,6 +734,7 @@ Constants::Constants() {
     DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
     JL2ATM = 0.00986923297; // J/L to atm
 
+    // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle
 	masses["HB"] = 2.016*cM; // buch model	h2
 	masses["H2G"] = 0.0*cM;
@@ -741,13 +742,25 @@ Constants::Constants() {
     masses["H2N"] = 0.0*cM;
     masses["HW"] = 1.008*cM; // H in water ( my model)
     masses["HT"] = 1.008*cM; // H in TIP3P
-    masses["H"] = 1.008*cM;
+    masses["H"] = 1.0079*cM;
+    masses["HS"] = 1.0079*cM;
 	masses["He"] = 4.002602*cM;
 	masses["Li"] = 6.941*cM;
 	masses["Be"] = 9.012182*cM;
 	masses["B"] = 10.811*cM;
 	masses["C"] = 12.011*cM;
-	masses["N"] = 14.007*cM;
+	masses["C_p"] = 12.0107*cM; // C SAPT
+    masses["C_s"] = 12.0107*cM;
+    masses["C_t"] = 12.0107*cM;
+    masses["C_a"] = 12.0107*cM;
+    masses["C_en"] = 12.0107*cM;
+    masses["C_yn"] = 12.0107*cM;
+    masses["C_ony"] = 12.0107*cM;
+    masses["N_sp3"] = 14.0067*cM; // N SAPT
+    masses["N_sp2"] = 14.0067*cM;
+    masses["N"] = 14.007*cM;
+    masses["O_sp3"] = 15.9994*cM; // O SAPT
+    masses["O_sp2"] = 15.9994*cM;
 	masses["O"] = 15.9998*cM;
 	masses["O2"] = 32.0*cM; // my O2 model
 	masses["OW"] = 15.9998*cM; // O in water (my model)
@@ -760,8 +773,10 @@ Constants::Constants() {
 	masses["Si"] = 28.085*cM;
 	masses["P"] = 30.973*cM;
 	masses["S"] = 32.06*cM;
+    masses["SS"] = 32.065*cM; /// S SAPT
 	masses["Cl"] = 35.45*cM;
 	masses["Ar"] = 39.948*cM;
+    masses["ArS"] = 39.948*cM; // Ar SAPT
 // per4
 	masses["Fe"] = 55.845*cM;
 	masses["Cu"] = 63.546*cM;
@@ -783,23 +798,37 @@ Constants::Constants() {
     sigs["H"] = 2.886*uff2mpmc; // Rappe=2.886; I changed to 0.5 for MD water model; 0.3 for MOF5.
 	sigs["HW"] = 0.5; // H in water, my model; old (sticky MD) 0.4
     sigs["HT"] = 0.0; // H in TIP3P
+    sigs["HS"] = 3.09061; // H SAPT (Adam)
     sigs["He"] = 2.362*uff2mpmc;
 	sigs["Li"] = 2.451*uff2mpmc;
 	sigs["Be"] = 2.745*uff2mpmc;
 	sigs["B"] = 4.083*uff2mpmc;
 	sigs["C"] = 3.851*uff2mpmc; // Rappe = 3.851; I changed to 1.3 for MD MOF5
+    sigs["C_s"] = 3.5786; // C SAPT
+    sigs["C_p"] = 3.63956;
+    sigs["C_t"] = 3.37707;
+    sigs["C_a"] = 3.65947;
+    sigs["C_en"] = 3.74892;
+    sigs["C_yn"] = 3.79838;
+    sigs["C_ony"] = 3.56023;
 	sigs["N"] = 3.66*uff2mpmc;
+    sigs["N_sp3"] = 3.32588; // N SAPT
+    sigs["N_sp2"] = 3.45133;
 	sigs["O"] = 3.5*uff2mpmc; // Rappe=3.5; I changed to 1.5 for MD water model (SPC = 3.166); 1.3 for MOF5
 	sigs["O2"] = 4.0*uff2mpmc; // my O2 model // roughly accurate for densities -> 10atm
 	sigs["OW"] = 1.5; // O in water (my model) -- old (sticky MD) 1.4
     sigs["OT"] = 3.15061; // O in TIP3P
+    sigs["O_sp3"] = 3.15611; // O SAPT
+    sigs["O_sp2"] = 3.34161;
     sigs["F"] = 3.364*uff2mpmc;
 	sigs["Ne"] = 3.243*uff2mpmc;
     sigs["Cu"] = 3.495*uff2mpmc;
 	sigs["Na"] = 2.983*uff2mpmc;
 // mg al ...
+    sigs["SS"] = 3.8899; // S SAPT
 	sigs["Cl"] = 3.947*uff2mpmc;
 	sigs["Ar"] = 3.868*uff2mpmc;
+    sigs["ArS"] = 3.37191; // Ar SAPT
 // k ca ..
 	sigs["Fe"] = 2.912*uff2mpmc;
 // co ni..
@@ -821,22 +850,36 @@ Constants::Constants() {
 	eps["H"] = 0.044/kbk; // rappe verbatim
 	eps["HW"] = 0.044/kbk; // H in water (my model)
     eps["HT"] = 0.0; // H in TIP3P
+    eps["HS"] = 0.66563; // H SAPT
     eps["He"] = 0.056/kbk;
 	eps["Li"] = 0.025/kbk;
 	eps["Be"] = 0.085/kbk;
 	eps["B"] = 0.18/kbk;
 	eps["C"] = 0.105/kbk;
+    eps["C_p"] = 36.692; // C SAPT
+    eps["C_s"] = 31.35824;
+    eps["C_t"] = 41.45435;
+    eps["C_a"] = 22.30908;
+    eps["C_en"] = 26.88878;
+    eps["C_yn"] = 22.40343;
+    eps["C_ony"] = 18.09254;
 	eps["N"] = 0.069/kbk;
+    eps["N_sp3"] = 36.97995; // N SAPT
+    eps["N_sp2"] = 24.25732;
 	eps["O"] = 0.06/kbk;
 	eps["O2"] = 0.06/kbk; // my O2 model
     eps["OW"] = 0.06/kbk; // O in water (my model)
     eps["OT"] = 0.6364/0.0083144621; // O in TIP3P 
-	eps["F"] = 0.05/kbk;
+	eps["O_sp3"] = 30.01345; // O SAPT
+    eps["O_sp2"] = 21.81177;
+    eps["F"] = 0.05/kbk;
 	eps["Ne"] = 0.042/kbk;
     eps["Na"] = 0.03/kbk;
 //mg al si ...
+    eps["SS"] = 53.02994; // S SAPT
 	eps["Cl"] = 0.227/kbk;
 	eps["Ar"] = 0.185/kbk;
+    eps["ArS"] = 128.32680; // Ar SAPT
 // k ca sc ..
 	eps["Fe"] = 0.013/kbk;
 // co ni..
@@ -853,18 +896,24 @@ Constants::Constants() {
 	// POLARIZABILITIES  // in A^3 
 	polars["H"] = 0.41380;//*cV/ke;
 	polars["HW"] = 0.41380;//*cV/ke; // H in water (my model)
+    polars["HS"] = 0.41380; // H SAPT
     polars["B"] = 0.6634;//*cV/ke;
 	polars["C"] = 1.2866;//*cV/ke;
+    polars["C_p"] = polars["C_s"] = polars["C_t"] = polars["C_a"] = polars["C_en"] = polars["C_yn"] = polars["C_ony"] = 1.2866; // C SAPT
 	polars["N"] = 0.97157;//*cV/ke;
+    polars["N_sp3"] = polars["N_sp2"] = 0.97157; // N SAPT
 	polars["O"] = 0.852;//*cV/ke;
     polars["OW"] = 0.852;//*cV/ke; // O in water (my model)
+    polars["O_sp3"] = polars["O_sp2"] = 0.852; // O SAPT
 	polars["Na"] = 24.11;//*cV/ke; // from paper https://www.researchgate.net/publication/45896756_Absolute_and_ratio_measurements_of_the_polarizability_of_Na_K_and_Rb_with_an_atom_interferometer
 	polars["P"] = 3.35;//*cV/ke;
+    polars["SS"] = 2.474; // S SAPT
 	polars["Cl"] = 2.40028;//*cV/ke;
+    polars["ArS"] = 1.63922; // Ar SAPT
 	polars["Cu"] = 2.19630;//*cV/ke;
 	polars["Zn"] = 1.98870;//*cV/ke;
 	//polars["Br"]
-	polars["Ru"] = 1.98870;//*cV/ke; // THIS IS THE PARAM FOR Zn. Borrowed for now.
+	polars["Ru"] = 5.191; // I calculated this by Adam's fitting method.
 	polars["Pd"] = 5.25926;//*cV/ke;
 	polars["Pt"] = 8.56281;//*cV/ke;
 
