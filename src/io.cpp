@@ -537,6 +537,18 @@ void readInput(System &system, char* filename) {
                     system.constants.polar_pbc = "off";
                 }
 
+            } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing")) {
+                system.constants.simulated_annealing = lc[1].c_str();
+                std::cout << "Got simulated annealing option = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing_target")) {
+                system.constants.sa_target = atof(lc[1].c_str());
+                std::cout << "Got simulated annealing target temperature = " << lc[1].c_str() << " K"; printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing_schedule")) {
+                system.constants.sa_schedule = atof(lc[1].c_str());
+                std::cout << "Got simulated annealing schedule = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "draw_box_option")) {
                 system.constants.draw_box_option = lc[1].c_str();
                 std::cout << "Got draw-box-option for PDB output = " << lc[1].c_str(); printf("\n");

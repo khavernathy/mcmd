@@ -140,6 +140,13 @@ int main(int argc, char **argv) {
                     
                     if (system.stats.MCmoveAccepted == false)
                         revertToCheckpoint(system);
+                    else if (system.constants.simulated_annealing == "on") { // S.A. only goes when move is accepted.
+                        system.constants.temp = 
+                            system.constants.sa_target + 
+                            (system.constants.temp - system.constants.sa_target) *
+                            system.constants.sa_schedule;
+                        
+                    }
 
                     //computeAverages(system);
                 } else {
@@ -167,8 +174,12 @@ int main(int argc, char **argv) {
 			// PRINT MAIN OUTPUT
 			printf("MONTE CARLO\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
-			printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
-			printf("Input atoms: %s\n",system.constants.atom_file.c_str());
+            if (system.constants.simulated_annealing == "off")
+			    printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
+			else
+                printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on); P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
+
+            printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep,finalstep,progress,efficiency);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			
