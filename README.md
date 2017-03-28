@@ -6,8 +6,8 @@ It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6
 --> MD supporting NVT.  <br />
 
 PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
-    -> gcc compiler 6.2.0 (circe)  <br />
-    -> gcc compiler 4.9.3 (stampede)  <br />
+&emsp;-> gcc compiler 6.2.0 (circe)  <br />
+&emsp;-> gcc compiler 4.9.3 (stampede)  <br />
 
 To download: <br />
 `git clone https://github.com/khavernathy/mcmd` <br />
@@ -30,7 +30,7 @@ TODO<br /><br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
 -> MC: fix MC SD's maybe? Seem to be wrong<br />
 -> both: NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
-    -> although I think it's always the case with crystalline systems.
+&emsp;-> although I think it's always the case with crystalline systems.
 -> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />  
 -> MD: Use GPU for MD force calculations? (add option)  <br />
 -> MC: Use GPU for polarization routine (later)  <br />
