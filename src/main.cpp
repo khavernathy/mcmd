@@ -384,7 +384,7 @@ int main(int argc, char **argv) {
 			double ETA_hrs = ETA/60.0;
        
             printf("MOLECULAR DYNAMICS\n");
-            printf("testing angular velocity\n");
+            //printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("ENSEMBLE: %s\n",system.constants.ensemble.c_str());

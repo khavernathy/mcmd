@@ -4,8 +4,8 @@
  checkpoints_option  off       
        
                
- input_atoms  MPM1.pdb   mof5h2.pdb  8h2bssp.pdb  ! PDB ONLY       
- potential_form        ljes   !ljespolar   !phast2    !!lj     
+ input_atoms  ../pdbs/MPM1.pdb   mof5h2.pdb  8h2bssp.pdb  ! PDB ONLY       
+ potential_form        lj   !ljespolar   !phast2    !!lj     
  com_option            off     ! center of mass        
        
        
