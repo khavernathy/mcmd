@@ -18,7 +18,8 @@ double self_lj_lrc(System &system) {
             double eps = system.molecules[i].atoms[j].eps;
     
             if (!(sig == 0 || eps == 0)) {
-            double sig3 = sig*sig*sig;
+            double sig3 = fabs(sig);
+            sig3 *= sig3*sig3;
             double sigcut = fabs(sig)/cutoff;
             double sigcut3 = sigcut*sigcut*sigcut;
             double sigcut9 = sigcut3 * sigcut3 * sigcut3;
@@ -76,7 +77,8 @@ double lj(System &system) {
         // http://www.seas.upenn.edu/~amyers/MolPhys.pdf
         if (system.constants.rd_lrc == "on") {
          
-            double sig3 = sig*sig*sig;
+            double sig3 = fabs(sig);
+            sig3 *= sig3*sig3;
             double sigcut = fabs(sig)/cutoff;
             double sigcut3 = sigcut * sigcut * sigcut;
             double sigcut9 = sigcut3 * sigcut3 * sigcut3;
