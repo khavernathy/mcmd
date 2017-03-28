@@ -7,7 +7,7 @@ mode	 		    mc ! mc or md
 checkpoints_option off 
 ewald_es            on
 rd_lrc              on
-input_atoms	../pdbs/restart.pdb  mof5+h2bssp.pdb   MPM1+1CO2.pdb   mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms	../pdbs/mof5+h2bssp.pdb   MPM1+1CO2.pdb   mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljespolar  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
 

@@ -55,6 +55,6 @@ void make_pairs(System &system) {
             currentsize--; 
         } 
     }  
-    printf("current size: %i; pairs now: %i\n", (int)system.pairs.size(), count);
+    //printf("current size: %i; pairs now: %i\n", (int)system.pairs.size(), count);
 }
 
