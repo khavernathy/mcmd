@@ -31,7 +31,7 @@ TODO<br /><br />
 -> MC: fix MC SD's maybe? Seem to be wrong<br />
 -> both: NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
 &emsp;-> although I think it's always the case with crystalline systems.<br />
--> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />  
--> MD: Use GPU for MD force calculations? (add option)  <br />
--> MC: Use GPU for polarization routine (later)  <br />
--> MC: Implement Phast2 model?  <br />
+-> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />
+-> MD: Use GPU for MD force calculations? (add option)<br />
+-> MC: Use GPU for polarization routine (later)<br />
+-> MC: Implement Phast2 model?<br />
