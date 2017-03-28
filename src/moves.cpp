@@ -248,8 +248,8 @@ void removeMolecule(System &system, string model) {
     if (system.stats.count_movables == 0) return; // skip if no molecules are there to be removed.
     system.stats.remove_attempts++;
     
-    if ((int)system.stats.count_movables == 1) // IMPORTANT: CANCEL THE DELETE IF ONLY 1 MOVABLE MOLECULE LEFT
-        return;
+    //if ((int)system.stats.count_movables == 1) // IMPORTANT: CANCEL THE DELETE IF ONLY 1 MOVABLE MOLECULE LEFT
+    //    return;
    
     // get original energy.
     double* old_potentials = getTotalPotential(system, model);
