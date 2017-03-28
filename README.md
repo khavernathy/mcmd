@@ -23,6 +23,7 @@ To run (in base dir "mcmd") <br />
 TODO<br /><br />
 
 -> MD: Andersen Thermostat should assign velocity by Boltz-dist., not preset goal value.<br />
+&emsp;-> The temp/velocities tend to explode because rando-collisions seem to be forcing molecules to collide.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections<br />
 -> MC: got polarization working but:<br />
