@@ -24,9 +24,7 @@ To run (in base dir "mcmd") <br />
 TODO<br /><br />
 
 -> MC: got polarization working but:<br />
-    -> it seems to always max-out on the iteration count, unlike mpmc.<br />
     -> 4x slower than mpmc. (def. need to make pair lists)<br />
-    -> my polar energy is +~25% from mpmc...<br />
     -> need to add Thole_field NO-PBC option.<br />
 -> MC: add S.A.<br />
 -> MC: fix atom-stuck-at-origin issue in uVT<br />

@@ -15,10 +15,12 @@ void init_dipoles (System &system) {
                 (system.molecules[i].atoms[j].efield[p] + system.molecules[i].atoms[j].efield_self[p]);
                 // improve convergence
                 system.molecules[i].atoms[j].dip[p] *= system.constants.polar_gamma;
-            //printf("mol %i atom %i dip[%i] = %f\n", i, j, p, system.molecules[i].atoms[j].dip[p]);
             }
+            //printf("mol %i atom %i dip = %f %f %f\n", i, j, system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2]);
+
         }
     }
+    //printf("=============================\n");
     return;
 }
 // DONE
@@ -213,9 +215,9 @@ int thole_iterative(System &system) {
 
         /* divergence detection */
         /* if we fail to converge, then return dipoles as alpha*E */
-        if(iteration_counter >= system.constants.polar_max_iter) // && system.constants.polar_precision != 0) {
+        if(iteration_counter >= system.constants.polar_max_iter && system.constants.polar_precision) // && system.constants.polar_precision != 0) {
         {
-            //printf("GOT TO MAX ITER COUNT");
+           // printf("GOT TO MAX ITER COUNT");
             for(i = 0; i < N; i++) {
                 int ti = system.atommap[i][0]; int tj = system.atommap[i][1];
                 for(p = 0; p < 3; p++) {

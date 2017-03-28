@@ -272,16 +272,15 @@ void thole_field(System &system) {
         } // end j
     } // end i
 
+    /*
+    printf("THOLE ELECTRIC FIELD: \n");
+    for (int i=0; i<system.molecules.size(); i++)
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) 
+            printf("ij efield: %f %f %f\n", system.molecules[i].atoms[j].efield[0], system.molecules[i].atoms[j].efield[1], system.molecules[i].atoms[j].efield[2]);
+    printf("=======================\n");
+    */
     return;
 
-/*
-printf("THOLE FIELD RESULT: \n");
-for (int i=0; i<system.molecules.size(); i++) {
-    for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-        printf("
-    }
-}
-*/
 
 } // end thole_field()
 
