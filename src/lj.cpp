@@ -24,7 +24,7 @@ double self_lj_lrc(System &system) {
             double sigcut9 = sigcut3 * sigcut3 * sigcut3;
 
 
-            double this_self_lrc = (16.0/3.0)*M_PI*eps*sig3*(sigcut9 - sigcut3)/volume;
+            double this_self_lrc = (16.0/3.0)*M_PI*eps*sig3*((1.0/3.0)*sigcut9 - sigcut3)/volume;
             potential += this_self_lrc;
             } // if nonzero sig/eps
         }
