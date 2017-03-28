@@ -25,6 +25,7 @@ TODO<br /><br />
 -> MC: add LJ Feynmann-Hibbs corrections<br />
 -> MC: got polarization working but:<br />
     -> 4x slower than mpmc. (def. need to make pair lists)<br />
+    -> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.
 -> MC: fix atom-stuck-at-origin issue in uVT<br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
 -> MC: fix MC SD's maybe? Seem to be wrong<br />
