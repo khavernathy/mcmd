@@ -34,8 +34,9 @@ double self_lj_lrc(System &system) {
     return potential;
 }
 
+
+
 double lj(System &system) {
-int lrcount=0;
     double total_pot=0, total_lj=0, total_rd_lrc=0, total_rd_self_lrc = 0;
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;
@@ -73,10 +74,33 @@ int lrcount=0;
             total_lj += this_lj;    //;
             total_pot += this_lj;
         }
-        // 2) Long range corr.: apply RD long range correction if needed
+        
+
+    }  // loop l
+    } // loop k 
+    } //loop j
+    } // loop i
+
+
+    // 2) Long range corr.: apply RD long range correction if needed
         // http://www.seas.upenn.edu/~amyers/MolPhys.pdf
-        if (system.constants.rd_lrc == "on") {
-         
+    if (system.constants.rd_lrc == "on") {
+        for (int i=0; i < system.molecules.size(); i++) {
+        for (int j=0; j< system.molecules[i].atoms.size(); j++) {
+        for (int k=0; k <system.molecules.size(); k++) {
+        for (int l=0; l <system.molecules[k].atoms.size(); l++) {
+
+        if (system.molecules[i].MF == "F" && system.molecules[k].MF == "F") continue; // skip frozens
+        if (i<k || (i==k && j<l)) {
+
+        // do mixing rules
+        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        if (eps != system.molecules[k].atoms[l].eps)
+            eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
+        if (sig != system.molecules[k].atoms[l].sig)
+         sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+        if (sig == 0 || eps == 0) continue; // skip 0 energy interactions         
+
             double sig3 = fabs(sig);
             sig3 *= sig3*sig3;
             double sigcut = fabs(sig)/cutoff;
@@ -86,13 +110,12 @@ int lrcount=0;
             double this_rd_lrc = (16.0/3.0)*M_PI*eps*sig3*((1.0/3.0)*sigcut9 - sigcut3)/volume;
             total_rd_lrc += this_rd_lrc;
             total_pot += this_rd_lrc;
-            lrcount++;
-        } // end RD LRC
-
-    }  // loop l
-    } // loop k 
-    } //loop j
-    } // loop i
+        } // pair condition
+        }
+        }
+        }
+        } // end 4 atom loops.
+    } // end if RD LRC is on
     // DONE WITH PAIR INTERACTIONS
 
     // 3) LJ LRC self energy
@@ -107,7 +130,6 @@ int lrcount=0;
     system.stats.lj.value = total_lj; 
 
 //printf("potential: %f, self = %f, lrc = %f, lj = %f\n", total_pot, total_rd_self_lrc, total_rd_lrc, total_lj);
-    printf("LRC COUNT: %i\n", lrcount);
     return total_pot;
 
 }
