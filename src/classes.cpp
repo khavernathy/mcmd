@@ -452,7 +452,7 @@ Last::Last() {}
 class Pair {
     public:
         Pair();
-        vector<int> id_set = vector<int>(4); // contains i,j,k,l for pair.
+        vector<int> id_set = vector<int>(4); // contains mol i, atom j, mol k, atom l for pair.
         int recalculate = 1; // a flag to queue recalculation of energies
         double rd_energy=0;
         double es_energy=0;

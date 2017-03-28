@@ -9,6 +9,7 @@
 #include <potential.cpp>
 #include <rotatepoint.cpp>
 #include <boltzmann.cpp>
+#include <pairs.cpp>
 #include <moves.cpp>
 
 // PHAST2 NOT INCLUDED YET

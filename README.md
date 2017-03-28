@@ -21,7 +21,7 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
--> LC: add LJ Feynmann-Hibbs corrections<br />
+-> MC: add LJ Feynmann-Hibbs corrections<br />
 -> MC: got polarization working but:<br />
     -> 4x slower than mpmc. (def. need to make pair lists)<br />
 -> MC: add S.A. linear? (exponential already there)<br />

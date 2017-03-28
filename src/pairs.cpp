@@ -5,6 +5,8 @@
 using namespace std;
 
 void make_pairs(System &system) {
+    // we need to call this any time N changes..
+
     int i,j,k,l,p;
     int count=0;
     int currentsize = (int)system.pairs.size();

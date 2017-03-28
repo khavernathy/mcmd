@@ -174,6 +174,8 @@ void addMolecule(System &system, string model) {
     system.constants.currentprotoid = protoid; // for getting boltz factor later.
 	system.stats.count_movables += 1;	
 
+    //make_pairs(system); // re-make pairs for energy calc.
+
 	//id in vector INDEX. .ID is PDB ID
 	int last_molecule_id = (int)system.molecules.size()-1;
 	system.molecules[last_molecule_id].PDBID = system.molecules[last_molecule_id -1].PDBID + 1; // .PDBID is the last one +1
@@ -272,6 +274,8 @@ void removeMolecule(System &system, string model) {
     system.molecules.erase(system.molecules.begin() + randm);
     system.stats.count_movables--;
     system.constants.total_atoms -= tmp_molecule.atoms.size(); //(int)system.proto[protoid].atoms.size();
+
+    //make_pairs(system); // recompute pairs for new energy calc.
 
     // get new energy
     double* new_potentials = getTotalPotential(system, model);
