@@ -367,7 +367,7 @@ int main(int argc, char **argv) {
             double TE = KE+PE;
             double Temp = ETarray[2];
             double v_avg = ETarray[3];
-            double Ek = ETarray[4];
+            double Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
             double Klin = ETarray[5];
             double Krot = ETarray[6];
             double pressure = ETarray[7]; // only good for NVT. Frenkel p84
@@ -391,8 +391,8 @@ int main(int argc, char **argv) {
             printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nKE(equipartition) = %.3f K\nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm\n", 
-            KE, Klin, Krot, PE, TE, Ek, 
+			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
+            KE, Klin, Krot, PE, TE,  
             Temp, v_avg, system.constants.md_init_vel,
             pressure);			
 

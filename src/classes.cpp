@@ -12,7 +12,7 @@ class Constants {
 		Constants();
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
             ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED, 
-            DEBYE2SKA, JL2ATM; // all defined below.
+            DEBYE2SKA, JL2ATM,A32L; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md" 
         string checkpoints_option="off"; // enables checkpoints for debuggin
@@ -71,9 +71,8 @@ class Constants {
         double md_vel_goal=0; // 1D vector component of the velocity (which has magnitude md_init_vel)
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         string md_mode = "molecular"; // default is to keep molecules rigid (bonded)
-		//double md_thermostat_constant = 0.0001; // in fs
-        double force_sum_for_pressure = 0; // K/A, for computing pressure in NVT MD
-        int MM_interactions = 0; // counts the M-M interactions for averaging force sum
+		double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i
+        double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
 
         map <string,double> sig_override;
         map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
@@ -415,7 +414,7 @@ class Stats {
 
         } Nsq,NU,qst,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass, pressure,temperature, fdotr, dist_within;
+            frozenmass, pressure,temperature, fdotrsum, dist_within;
 
         vector<obs_t> wtp = vector<obs_t>(10);
         vector<obs_t> wtpME = vector<obs_t>(10);
@@ -434,7 +433,7 @@ class Last {
         Last();
         double Nsq,NU,qst,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass,pressure,temperature, fdotr, dist_within;
+            frozenmass,pressure,temperature, fdotrsum, dist_within;
     
         int total_atoms, thole_total_atoms;
 
@@ -457,6 +456,7 @@ class Pair {
         double rd_energy=0;
         double es_energy=0;
         double pol_energy=0;
+        double fdotr=0; // F.r dot prod. Needed to get emergent pressure in MD NVT
         double r; // r, distance between atoms
         double d[3]; // dx, dy, dz
         double prev_r=0;
@@ -617,10 +617,11 @@ class Molecule {
 
         // linear velocity
         void calc_vel(double dt, double goal) {
-            double booster=0.0005; // for NVT thermostat.
+            //double booster=0.0005; // for NVT thermostat.
             for (int n=0; n<3; n++) {
                 vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
             }
+            /*
            double vmag = sqrt(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
             for (int n=0; n<3; n++) {
                 if (vel[n] < 0) {  // THE NVT THERMOSTAT :: it changes velocities to try to approach the initial v
@@ -631,6 +632,7 @@ class Molecule {
                     else if (vel[n] > goal) vel[n] -= booster;
                 }
             }
+            */
         }
    
         // angular position // in rad
@@ -733,6 +735,7 @@ Constants::Constants() {
     FORCE2REDUCED = kb * 1e-30 * 1e20; // K/A -> kg A/fs^2
     DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
     JL2ATM = 0.00986923297; // J/L to atm
+    A32L = 1e-27; // A^3 to liters.
 
     // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle

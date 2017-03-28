@@ -66,37 +66,25 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
 
 	// calculate temperature from kinetic energy and number of particles
-	//float dof = 6.0; // degrees of freedom. Not sure what correct value is.
-	//T = K_total / ((3.0 * (float)system.constants.total_atoms - dof )); // in kelvin
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
 
-    /*if (system.constants.ensemble == "nvt") {
-		// NVT THERMOSTAT: Berendsen :: https://en.wikipedia.org/wiki/Berendsen_thermostat 
-		double dTdt = (T - system.constants.prevtemp)/(system.constants.md_dt);
-		double tau = system.constants.md_thermostat_constant;
-		double T_change = T - system.constants.prevtemp;
-		double prod = tau*dTdt;
-		// set new velocity according to thermostat
-		double scale_v = 8.0*system.constants.kb/system.proto.mass/M_PI;
-		scale_v *= (T_change/tau * currtime) - 
-		            (T_change/tau * (currtime-system.constants.md_dt)) + 
-		            (system.constants.prevtemp);
-		scale_v = sqrt(scale_v)*1e-5; // converted to A/fs
-		
+   
+    if (system.constants.ensemble == "nvt") {
+        // grab the sum of F.r's
+        double frsum=0;
+        for (int i=0; i<system.pairs.size(); i++) {
+            frsum += system.pairs[i].fdotr;
+        }
+        system.stats.fdotrsum.value = frsum;
+        system.stats.fdotrsum.calcNewStats(); // makes new average based on new value.
 
-		//printf("dT/dt: %f;  T_change: %f;  prod: %f; scale_v: %f\n\n", dTdt, T_change,prod,scale_v);
-		// END NVT THERMOSTAT
-    
-		// get emergent PRESSURE for NVT Frenkel p84
-        pressure= system.stats.count_movables/system.constants.volume * system.constants.kb * system.constants.temp; // rho * k_b  * T
-        double fsfp = system.constants.kb * (system.constants.force_sum_for_pressure / system.constants.MM_interactions); // force sum for pressure, calc'ed during force function in MD  
-        pressure += (1.0/(3.0*system.constants.volume)) * fsfp;
-        pressure *= 1e27 * system.constants.JL2ATM; // to atm  
-    }*/
-    
-    // reset temperature for NVT thermostat
-    //system.constants.prevtemp = T;
+        double volInLiters = system.pbc.volume * system.constants.A32L;
+        pressure = (system.stats.count_movables/volInLiters)*
+            system.constants.kb * T + (1.0/(3.0*volInLiters))*system.stats.fdotrsum.average*system.constants.kb;
+        pressure *= system.constants.JL2ATM; // J/L -> atm
+    }
+ 
 
 	static double output[8];
 	output[0] = K_total;
@@ -114,8 +102,6 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 void calculateForces(System &system, string model, double dt) {
 	
     // initialize variable for pressure calc in NVT
-    system.constants.force_sum_for_pressure = 0;
-    system.constants.MM_interactions = 0;
     // loop through all atoms
 	for (int j=0; j <system.molecules.size(); j++) {
 	for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
@@ -140,26 +126,6 @@ void calculateForces(System &system, string model, double dt) {
             system.molecules[i].calc_torque();
     }
 
-    /*
-    // calculate f.r sum (for emergent pressure in MD)
-    double com1[3], com2[3];
-    for (int i=0; i<system.molecules.size(); i++) {
-        for (int j=0; j<system.molecules.size(); j++) {
-            if (system.molecules[i].MF == "F" && system.molecules[j].MF == "F") continue;
-            for (int n=0; n<3; n++) {
-                com1[n] = system.molecules[i].com[n];
-                com2[n] = system.molecules[j].com[n];
-            }
-            
-            double* distances = getR(system, com1, com2);
-
-            system.stats.fdotr.value += ddotprod(system.molecules[i].force
-
-            // GOING TO NEED PAIRS FOR THIS TO WORK OUT.
-            
-        }
-    }
-    */
 }
 
 // ==================== MOVE ATOMS MD STYLE =========================
@@ -284,5 +250,39 @@ void integrate(System &system, double dt) {
                 }
             }
         } // end if movable
-    	} // end for j molecules
+    } // end for j molecules
+
+    // 5) apply heat bath in NVT
+    if (system.constants.ensemble == "nvt") {
+        // loop through all molecules and adjust velocities by Anderson Thermostat method
+        // this process makes the NVT MD simulation stochastic/ Markov / MC-like, which is good for equilibration results.
+        double probab = system.constants.md_thermostat_probab;
+        double ranf;
+        if (system.constants.md_mode == "molecular") {
+        for (int i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].MF == "F") continue; // skip frozens
+            ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
+            if (ranf < probab) {
+                // adjust the velocity components of the molecule.
+                for (int n=0; n<3; n++) {
+                    if (system.molecules[i].vel[n] >= 0) system.molecules[i].vel[n] = system.constants.md_vel_goal;
+                    else system.molecules[i].vel[n] = -system.constants.md_vel_goal;
+                }
+            }
+        }
+        } else if (system.constants.md_mode == "atomic") {
+            for (int i =0; i<system.molecules.size(); i++) {
+                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    if (system.molecules[i].atoms[j].MF == "F") continue; // skip frozen atoms
+                    ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
+                    if (ranf <probab) {
+                        for (int n=0; n<3; n++) {
+                            if (system.molecules[i].atoms[j].vel[n] >= 0) system.molecules[i].atoms[j].vel[n] = system.constants.md_vel_goal;
+                            else system.molecules[i].atoms[j].vel[n] = -system.constants.md_vel_goal;
+                        }
+                    }            
+                }
+            }
+        }
+    } // end if NVT (thermostat)
 }// end integrate() function

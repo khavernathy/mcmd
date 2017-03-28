@@ -140,6 +140,7 @@ double lj_force(System &system) {
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;
     double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
+    int count=0; // for the pair values
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -174,11 +175,18 @@ double lj_force(System &system) {
                 system.molecules[i].atoms[j].force[n] += f[n];
                 system.molecules[k].atoms[l].force[n] -= f[n];
             }
+
+            // this dot product is calc'd to get pressure.
+            if (system.molecules[i].MF == "M" && system.molecules[k].MF == "M") { // make sure it's gas-to-gas
+            system.pairs[count].fdotr = (f[0] * distances[0] +
+            f[1] * distances[1] +
+            f[2] * distances[2]); // F.r for the sum for pressure calculator.
+            count++;       
+            }
         }
 
         system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
         } // if nonzero sig/eps
-
     }  // loop l
     } // loop k 
     } //loop j

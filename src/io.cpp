@@ -618,6 +618,9 @@ void readInput(System &system, char* filename) {
 				system.constants.md_dt = atof(lc[1].c_str());
 				std::cout << "Got MD timestep = " << lc[1].c_str() << " fs"; printf("\n");
 			
+                system.constants.md_thermostat_probab = system.constants.md_thermostat_freq * 
+                    exp(-system.constants.md_thermostat_freq * system.constants.md_dt);
+
 			} else if (!strcasecmp(lc[0].c_str(), "md_ft")) {
 				system.constants.md_ft = atof(lc[1].c_str());
 				std::cout << "Got MD final step = " << lc[1].c_str() << " fs"; printf("\n");

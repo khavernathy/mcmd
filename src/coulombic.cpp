@@ -127,9 +127,9 @@ void coulombic_real_force(System &system) {
                 system.molecules[k].atoms[l].force[n] -= holder;
                 
             }
+
             system.molecules[i].atoms[j].V -= (charge1 * charge2 * erf(alpha*r) / r); // negative (intra)
         }
-
     } // end if not frozen
     } // end l
     } // end k
