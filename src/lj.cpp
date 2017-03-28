@@ -35,7 +35,7 @@ double self_lj_lrc(System &system) {
 }
 
 double lj(System &system) {
-
+int lrcount=0;
     double total_pot=0, total_lj=0, total_rd_lrc=0, total_rd_self_lrc = 0;
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;
@@ -86,6 +86,7 @@ double lj(System &system) {
             double this_rd_lrc = (16.0/3.0)*M_PI*eps*sig3*((1.0/3.0)*sigcut9 - sigcut3)/volume;
             total_rd_lrc += this_rd_lrc;
             total_pot += this_rd_lrc;
+            lrcount++;
         } // end RD LRC
 
     }  // loop l
@@ -106,6 +107,7 @@ double lj(System &system) {
     system.stats.lj.value = total_lj; 
 
 //printf("potential: %f, self = %f, lrc = %f, lj = %f\n", total_pot, total_rd_self_lrc, total_rd_lrc, total_lj);
+    printf("LRC COUNT: %i\n", lrcount);
     return total_pot;
 
 }
