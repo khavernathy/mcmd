@@ -22,6 +22,7 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
+-> MD: Andersen Thermostat should assign velocity by Boltz-dist., not preset goal value.
 -> MC: add LJ Feynmann-Hibbs corrections<br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
