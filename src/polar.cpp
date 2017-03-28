@@ -284,6 +284,29 @@ void thole_field(System &system) {
 
 } // end thole_field()
 
+void thole_field_nopbc(System &system) {
+    int p, i, j, k,l;
+    double r, SMALL_dR = 1e-12;
+
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            for (k=i+1; k<system.molecules.size(); k++) {
+                for (l=0; l<system.molecules[k].atoms.size(); l++) {
+                    if (system.molecules[i].MF == "F" && system.molecules[k].MF == "F") continue;
+                    double* distances = getDistanceXYZ(system,i,j,k,l);
+                    r = distances[3];
+
+                    if ( (r-SMALL_dR < system.pbc.cutoff) && (r != 0.)) {
+                        for (p=0; p<3; p++) {
+                            system.molecules[i].atoms[j].efield[p] += system.molecules[k].atoms[l].C * distances[p]/(r*r*r);
+                            system.molecules[k].atoms[l].efield[p] -= system.molecules[i].atoms[j].C * distances[p]/(r*r*r);
+                        }
+                    }
+                }
+            }
+        }
+    }
+} // end thole_field_nopbc
 
 // =========================== POLAR POTENTIAL ========================
 double polarization(System &system) {
@@ -306,7 +329,11 @@ double polarization(System &system) {
     system.checkpoint("done running thole_amatrix(). Running thole_field()");
 
     // 1) CALCULATE ELECTRIC FIELD AT EACH SITE
-    thole_field(system);
+    if (system.constants.mc_pbc == "on")
+        thole_field(system);
+    else
+        thole_field_nopbc(system);
+
     system.checkpoint("done with thole_field(). Doing dipole iterations");
 
 

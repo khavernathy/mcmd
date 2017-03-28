@@ -17,6 +17,7 @@ class System {
         Stats stats;
         Last last; // to hold previous values for reversion if needed (checkpointing variables)
         vector<vector<int>> atommap;
+        vector<Pair> pairs; 
 
         // defines the "previous checkpoint time object
         std::chrono::time_point<std::chrono::system_clock> previous_checkpoint = std::chrono::system_clock::now();       

@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// Constants is sort-of a misnomer for some things in this class but you get the idea.
 class Constants {
 	public:
 		Constants();
@@ -94,6 +95,7 @@ class Constants {
         int polar_gs_ranked = 1;
         int polar_gs = 0;
         int polar_palmo = 1;
+        string polar_pbc = "on"; // default periodic polar
         //int thole_total_atoms = 0;
 };
 
@@ -441,6 +443,23 @@ class Last {
 };
 
 Last::Last() {}
+
+// a pair contains relevant information to avoid redundant calculated for unmoved particles (in MC)
+class Pair {
+    public:
+        Pair();
+        vector<int> id_set = vector<int>(4); // contains i,j,k,l for pair.
+        int recalculate = 1; // a flag to queue recalculation of energies
+        double rd_energy=0;
+        double es_energy=0;
+        double pol_energy=0;
+        double r; // r, distance between atoms
+        double d[3]; // dx, dy, dz
+        double prev_r=0;
+        double prev_d[3];
+};
+
+Pair::Pair() {}
 
 class Atom {
 	public:

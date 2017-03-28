@@ -51,7 +51,7 @@ void readInAtoms(System &system, string filename) {
 			//temporary class instance current_atom
 			Atom current_atom;
 			current_atom.name = myvector[2];
-            // I have a database of defaults in constants.cpp
+            // I have a database of defaults in classes.cpp
             // Those defaults will load unless the input column is there
             if (9 < myvector.size() && myvector[9] != "default") current_atom.m = stod(myvector[9])*system.constants.cM;
             else current_atom.m = system.constants.masses[current_atom.name]; 
@@ -531,6 +531,11 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "mc_pbc")) {
                 system.constants.mc_pbc = lc[1].c_str();
                 std::cout << "Got MC PBC option = " << lc[1].c_str(); printf("\n");
+                if (system.constants.mc_pbc == "off") {
+                    system.constants.ewald_es = "off";
+                    system.constants.rd_lrc = "off";
+                    system.constants.polar_pbc = "off";
+                }
 
             } else if (!strcasecmp(lc[0].c_str(), "draw_box_option")) {
                 system.constants.draw_box_option = lc[1].c_str();

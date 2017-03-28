@@ -26,7 +26,7 @@
 // c++ code files of this program
 // ORDER MATTERS HERE
 #include <usefulmath.cpp>
-#include <constants.cpp>
+#include <classes.cpp>
 #include <system.cpp>
 #include <system_functions.cpp>
 #include <mc.cpp> // this will include potential.cpp, which includes lj, coulombic, polar
@@ -34,6 +34,7 @@
 #include <io.cpp>
 #include <radial_dist.cpp>
 #include <averages.cpp>
+#include <pairs.cpp>
 
 using namespace std;
 
@@ -62,6 +63,7 @@ int main(int argc, char **argv) {
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
+    make_pairs(system);
     printf("VERSION NUMBER: %s\n", "137");
     system.checkpoint("Done with system setup functions.");
 
@@ -132,6 +134,7 @@ int main(int argc, char **argv) {
 				// DO MC STEP
                 if (t!=0) {
                     setCheckpoint(system); // save all the relevant values in case we need to revert something.
+                    make_pairs(system); // establish pair quantities
                     runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
                     
