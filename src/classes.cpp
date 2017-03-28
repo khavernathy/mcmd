@@ -38,7 +38,7 @@ class Constants {
         double dist_within_radius; // the radius within which to search from origin
         string autocenter = "on"; // center all atoms about origin automatically. can opt out of it.
         string simulated_annealing = "off"; // sim. ann.
-        double sa_target = 0; // target temperature for annealing.
+        double sa_target = 0.0; // target temperature for annealing.
         double sa_schedule = 0.9999; // T-change factor for annealing.
 
         map <string,double> masses; // mass database for defaults.
