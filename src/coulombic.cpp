@@ -147,9 +147,11 @@ double coulombic_reciprocal(System &system) {
     alpha = system.constants.ewald_alpha;
     kmax = system.constants.ewald_kmax;   
 
-   // get recip (current)
-    system.pbc.calcVolume();
-    system.pbc.calcRecip(); 
+   // get recip (re-calc only needed for NPT)
+   if (system.constants.ensemble == "npt") {
+        system.pbc.calcVolume();
+        system.pbc.calcRecip(); 
+   }
 
     // fourier sum over a hemisphere (skipping certain points to avoid overcounting the face //
     for (l[0] = 0; l[0] <= kmax; l[0]++) {

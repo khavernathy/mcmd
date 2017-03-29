@@ -170,9 +170,13 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 
 	if (system.constants.com_option == "on") {	
 		// get center of mass
-		double* comfinal = centerOfMass(system);
-		myfile << "COM   " << to_string(comfinal[0]) << "   " << to_string(comfinal[1]) << "   " << to_string(comfinal[2]) << "\n";
+        if (system.stats.count_movables > 0) {
+		    double* comfinal = centerOfMass(system);
+		    myfile << "COM   " << to_string(comfinal[0]) << "   " << to_string(comfinal[1]) << "   " << to_string(comfinal[2]) << "\n";
         	delete[] comfinal;
+        } else {
+            myfile << "COM   " << "0.0" << "   " << "0.0" << "   " << "0.0" << "\n";
+        }
 	}
 
   	myfile.close();

@@ -311,7 +311,7 @@ void addAtomToProto(System &system, int protoid, string name, string molname, st
     atom.pos[1] = y;
     atom.pos[2] = z;
     atom.m = mass * system.constants.cM;
-    atom.C = charge;
+    atom.C = charge * system.constants.E2REDUCED;
     atom.polar = polarizability;
     atom.eps = epsilon;
     atom.sig = sigma;
