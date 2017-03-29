@@ -212,7 +212,6 @@ int main(int argc, char **argv) {
 			for (int i=0; i<system.proto.size(); i++) {
                 printf("-> %s wt %% = %.5f +- %.5f %%; wt %% ME = %.5f +- %.5f %% = %.5f mmol/g\n",system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0); 
-
                 printf("      N_movables avg = %.3f +- %.3f\n",
                 system.stats.Nmov[i].average, system.stats.Nmov[i].sd);
                 printf("      Selectivity = %.3f +- %.3f\n",
