@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 				// DO MC STEP
                 if (t!=0) {
                     setCheckpoint(system); // save all the relevant values in case we need to revert something.
-                    make_pairs(system); // establish pair quantities
+                    //make_pairs(system); // establish pair quantities
                     runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
                     
