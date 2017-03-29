@@ -135,6 +135,7 @@ int main(int argc, char **argv) {
                 if (t!=0) {
                     setCheckpoint(system); // save all the relevant values in case we need to revert something.
                     //make_pairs(system); // establish pair quantities
+                    //computeDistances(system);
                     runMonteCarloStep(system,system.constants.potential_form);
                     system.checkpoint("...finished runMonteCarloStep");
                     

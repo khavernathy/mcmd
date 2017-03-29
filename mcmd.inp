@@ -6,7 +6,7 @@ name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option  off
 input_atoms pdbs/mof5+h2bssp.pdb   naclh2o.pdb	  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
-potential_form 		ljes    espolar   !ljespolar 	!phast2    !!lj
+potential_form 		lj espolar   !ljespolar 	!phast2    !!lj
 com_option		    on   	! center of mass
 
 ! P.B.C. will be 1/2 of these lengths for each dimension

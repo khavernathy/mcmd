@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <vector>
 
 // by giving molecule/atom IDs
 double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
@@ -129,3 +130,28 @@ double * getR(System &system, double * com1, double * com2) {
         return output;
     
 }
+
+
+void computeDistances(System &system) {
+    int i,j,k,l,p,q,r;
+    int molsize = (int)system.molecules.size();
+    int frozenatoms = system.stats.count_frozens;
+    
+    double whatever[molsize][frozenatoms][molsize][frozenatoms];
+
+    // gets all the pairwise distances for the entire system in one shot.
+    for (i=0; i<molsize; i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            for (k=0; k<molsize; k++) {
+                for (l=0; l<system.molecules[k].atoms.size(); l++) {
+                    if (i==k && j==l) continue; // always skip self-atom distance
+                    double *distances = getDistanceXYZ(system, i,j,k,l);
+                    whatever[i][j][k][l] = distances[3];
+                    printf("whatever[%i][%i][%i][%i] = %f\n", i,j,k,l, whatever[i][j][k][l]);
+                }
+            }
+        }
+    }
+
+}
+

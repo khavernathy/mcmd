@@ -535,8 +535,6 @@ class Pair {
 Pair::Pair() {}
 
 
-
-
 class Molecule {
 	public:
 		Molecule();

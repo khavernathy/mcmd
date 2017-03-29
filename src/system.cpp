@@ -18,6 +18,7 @@ class System {
         Last last; // to hold previous values for reversion if needed (checkpointing variables)
         vector<vector<int>> atommap;
         vector<Pair> pairs; 
+        double *distarray; // 4-D i,j,k,l distance array
 
         // defines the "previous checkpoint time object
         std::chrono::time_point<std::chrono::system_clock> previous_checkpoint = std::chrono::system_clock::now();       
