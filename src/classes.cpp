@@ -447,28 +447,10 @@ class Last {
 
 Last::Last() {}
 
-// a pair contains relevant information to avoid redundant calculated for unmoved particles (in MC)
-class Pair {
-    public:
-        Pair();
-        vector<int> id_set = vector<int>(4); // contains mol i, atom j, mol k, atom l for pair.
-        int recalculate = 1; // a flag to queue recalculation of energies
-        double rd_energy=0;
-        double es_energy=0;
-        double pol_energy=0;
-        double fdotr=0; // F.r dot prod. Needed to get emergent pressure in MD NVT
-        double r; // r, distance between atoms
-        double d[3]; // dx, dy, dz
-        double prev_r=0;
-        double prev_d[3];
-};
-
-Pair::Pair() {}
-
 class Atom {
 	public:
 		Atom();
-		string name; // element or label, e.g. H or H2G
+        string name; // element or label, e.g. H or H2G
         string mol_name; // molecule name that the atom belongs to
         string MF; // movable/frozen (M or F)
 		int mol_PDBID; // the molecule's PDBID that this atom belongs to
@@ -527,6 +509,33 @@ class Atom {
 };
 
 Atom::Atom() {}
+
+// a pair contains relevant information to avoid redundant calculated for unmoved particles (in MC)
+class Pair {
+    public:
+        Pair();
+        vector<int> id_set = vector<int>(4); // contains mol i, atom j, mol k, atom l for pair.
+        Atom* atom1_ptr;
+        Atom* atom2_ptr;
+        int recalculate = 1; // a flag to queue recalculation of energies
+        double eps = 0; // LJ param, mixing rule'd
+        double sig = 0; // LJ param, mixing rule'd
+        double rd_energy=0;
+            double lj=0;
+            double lj_lrc=0;
+        double es_energy=0;
+        double pol_energy=0;
+        double fdotr=0; // F.r dot prod. Needed to get emergent pressure in MD NVT
+        double r; // r, distance between atoms
+        double d[3]; // dx, dy, dz
+        double prev_r=0;
+        double prev_d[3];
+};
+
+Pair::Pair() {}
+
+
+
 
 class Molecule {
 	public:

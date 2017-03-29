@@ -10,27 +10,34 @@ double self_lj_lrc(System &system) {
     double potential=0;
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;
+    double sig, eps, sig3,sigcut,sigcut3,sigcut9;
+    double this_self_lrc;
 
+    if (system.stats.MCstep == 0 || system.constants.ensemble == "uvt" || system.constants.ensemble == "npt") { // only changes if N or V changes
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
            if (system.molecules[i].MF != "F") {
-            double sig = system.molecules[i].atoms[j].sig;
-            double eps = system.molecules[i].atoms[j].eps;
+            sig = system.molecules[i].atoms[j].sig;
+            eps = system.molecules[i].atoms[j].eps;
     
             if (!(sig == 0 || eps == 0)) {
-            double sig3 = fabs(sig);
+            sig3 = fabs(sig);
             sig3 *= sig3*sig3;
-            double sigcut = fabs(sig)/cutoff;
-            double sigcut3 = sigcut*sigcut*sigcut;
-            double sigcut9 = sigcut3 * sigcut3 * sigcut3;
+            sigcut = fabs(sig)/cutoff;
+            sigcut3 = sigcut*sigcut*sigcut;
+            sigcut9 = sigcut3 * sigcut3 * sigcut3;
 
 
-            double this_self_lrc = (16.0/3.0)*M_PI*eps*sig3*((1.0/3.0)*sigcut9 - sigcut3)/volume;
+            this_self_lrc = (16.0/3.0)*M_PI*eps*sig3*((1.0/3.0)*sigcut9 - sigcut3)/volume;
             potential += this_self_lrc;
             } // if nonzero sig/eps
         }
     } // end for j atom
     } // end for i molecule
+    } // end if self LRC changes
+    else {
+        potential = system.stats.lj_self_lrc.value;
+    }
     return potential;
 }
 
@@ -40,7 +47,10 @@ double lj(System &system) {
     double total_pot=0, total_lj=0, total_rd_lrc=0, total_rd_self_lrc = 0;
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;
-
+    int i,j,k,l,index;
+    double this_lj;
+    double r,sr6;
+    
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i+1; k < system.molecules.size(); k++) {
@@ -49,22 +59,20 @@ double lj(System &system) {
         // do mixing rules
         double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
         if (eps != system.molecules[k].atoms[l].eps)
-            eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
+            eps = sqrt(eps * system.molecules[k].atoms[l].eps);
        
         if (sig != system.molecules[k].atoms[l].sig)
-         sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+         sig = 0.5 * (sig + system.molecules[k].atoms[l].sig);
 
         if (sig == 0 || eps == 0) continue; // skip 0 energy interactions
 
         // calculate distance between atoms
-        double r,sr,sr2,sr6;
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];
-
     
-        sr = sig/r; //printf("r=%f\n",r);
-        sr2 = sr*sr;
-        sr6 = sr2*sr2*sr2; //;
+        sr6 = sig/r; //printf("r=%f\n",r);
+        sr6 *= sr6;
+        sr6 *= sr6*sr6; //;
 
         // ============================ LJ potential =============================
 
@@ -85,6 +93,7 @@ double lj(System &system) {
     // 2) Long range corr.: apply RD long range correction if needed
         // http://www.seas.upenn.edu/~amyers/MolPhys.pdf
     if (system.constants.rd_lrc == "on") {
+        if (system.stats.MCstep == 0 || system.constants.ensemble == "npt" || system.constants.ensemble == "uvt") { // lrc only changes if volume or N changes.
         for (int i=0; i < system.molecules.size(); i++) {
         for (int j=0; j< system.molecules[i].atoms.size(); j++) {
         for (int k=0; k <system.molecules.size(); k++) {
@@ -96,9 +105,9 @@ double lj(System &system) {
         // do mixing rules
         double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
         if (eps != system.molecules[k].atoms[l].eps)
-            eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
+            eps = sqrt(eps * system.molecules[k].atoms[l].eps);
         if (sig != system.molecules[k].atoms[l].sig)
-         sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+         sig = 0.5 * (sig + system.molecules[k].atoms[l].sig);
         if (sig == 0 || eps == 0) continue; // skip 0 energy interactions         
 
             double sig3 = fabs(sig);
@@ -115,6 +124,11 @@ double lj(System &system) {
         }
         }
         } // end 4 atom loops.
+        } // end if recalculate lrc
+        else {
+           total_rd_lrc = system.stats.lj_lrc.value;
+           total_pot += total_rd_lrc;
+        }
     } // end if RD LRC is on
     // DONE WITH PAIR INTERACTIONS
 

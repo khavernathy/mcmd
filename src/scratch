@@ -1,3 +1,56 @@
+// PAIR LENNARD-JONES
+
+   // int countlj=0;
+/*
+    for (int index=0; index<system.pairs.size(); index++) {
+        Atom *atom1_ptr = system.pairs[index].atom1_ptr;
+        Atom *atom2_ptr = system.pairs[index].atom2_ptr;
+        
+        i = system.pairs[index].id_set[0];
+        j = system.pairs[index].id_set[1];
+        k = system.pairs[index].id_set[2];
+        l = system.pairs[index].id_set[3];
+
+        if ( i >= k) continue; // skip duplicates
+        if (system.pairs[index].eps == 0 || system.pairs[index].sig == 0) continue; // skip zero energy 
+        if (system.pairs[index].recalculate) { 
+            // only if flagged for recalculation
+
+            r = system.pairs[index].r;
+            sr6 = system.pairs[index].sig / r;
+            sr6 *= sr6;
+            sr6 *= sr6*sr6;
+
+            if (system.constants.rd_lrc == "off" || r <= cutoff) {
+                this_lj = 4.0*system.pairs[index].eps*(sr6*sr6 - sr6);
+                total_lj += this_lj;
+                total_pot += this_lj;
+                system.pairs[index].lj = this_lj;
+         //       countlj++;
+            }
+            
+        } else {
+            // r hasn't changed so don't recalculate.
+            if (system.constants.rd_lrc == "off" || system.pairs[index].r <= cutoff) {
+                this_lj = system.pairs[index].lj;
+                total_lj += this_lj;
+                total_pot += this_lj;
+           //     countlj++;
+            }
+        }
+    }
+   // printf("COUNT LJ %i \n",countlj);
+*/
+
+
+
+
+
+
+
+
+
+
 // ================ GET FORCES ON ATOMS ==============================
 /*void calculateForces_OLD(System &system, string model, double dt) {
 	

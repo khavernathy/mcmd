@@ -21,6 +21,7 @@ void make_pairs(System &system) {
                         system.pairs[count].r = distances[3];
                         for (p=0; p<3; p++) system.pairs[count].d[p] = distances[p];
 
+                        // set recalculation flag
                         if (system.pairs[count].r == system.pairs[count].prev_r) 
                             system.pairs[count].recalculate=0;
                         else { 
@@ -33,10 +34,22 @@ void make_pairs(System &system) {
                         // the pair doesn't exist yet.
                         Pair newpair;
                         newpair.id_set = {i,j,k,l};
-                    
+                        newpair.atom1_ptr = &system.molecules[i].atoms[j];
+                        newpair.atom2_ptr = &system.molecules[k].atoms[l]; 
+
                         double* distances = getDistanceXYZ(system, i,j,k,l);
                         newpair.r = distances[3];
-                        for (p=0; p<3; p++) newpair.d[p] = distances[p]; 
+                        for (p=0; p<3; p++) newpair.d[p] = distances[p];
+
+                        // LJ params
+                        newpair.eps = system.molecules[i].atoms[j].eps;
+                        newpair.sig = system.molecules[i].atoms[j].sig;
+                        if (newpair.eps != system.molecules[k].atoms[l].eps)
+                            newpair.eps = sqrt(newpair.eps * system.molecules[k].atoms[l].eps);
+                        if (newpair.sig != system.molecules[k].atoms[l].sig)
+                            newpair.sig = 0.5*(newpair.sig + system.molecules[k].atoms[l].sig);
+                        
+        
 
                         // since default for recalculate = 1, no need to set for new pair.
 
@@ -57,6 +70,16 @@ void make_pairs(System &system) {
             currentsize--; 
         } 
     }  
-    //printf("current size: %i; pairs now: %i\n", (int)system.pairs.size(), count);
+    /*
+    printf("current size: %i; pairs now: %i\n", (int)system.pairs.size(), count);
+
+    for (int i=0; i<system.pairs.size(); i++) {
+        Atom *atom_ptr;
+        atom_ptr = system.pairs[i].atom1_ptr;
+        cout << atom_ptr << endl;
+        printf("pos: %f\n", atom_ptr->pos[0]);
+    
+    }
+    */
 }
 
