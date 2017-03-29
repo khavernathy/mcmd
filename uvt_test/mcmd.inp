@@ -8,8 +8,8 @@ checkpoints_option off
 input_atoms	../pdbs/mof5+h2bssp.pdb   MPM1+1CO2.pdb   mnformate+c2h2.pdb  rhtmof9+c2h2.pdb    mof5+h2bss.pdb  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljespolar   polar  polar   !ljespolar 	!phast2    !!lj
 com_option		    off   	! center of mass
-sorbate_name h2_bssp co2_phast* ch4_9site*
-sorbate_fugacities 1 1 1
+!sorbate_name h2_bssp co2_phast* ch4_9site*
+!sorbate_fugacities 1 1 1
 
 !simulated_annealing on
 !simulated_annealing_schedule 0.97
@@ -37,8 +37,8 @@ ensemble		    uvt
 
 mc_corrtime	        25
 finalstep		    5000000
-temperature 	 298.0  !77.0  ! K
-!!pressure		    0.000005     ! atm
+temperature 	    77.0  ! K
+pressure		    0.5     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
 displace_factor     2.5

@@ -135,7 +135,7 @@ double lj(System &system) {
 }
 
 
-double lj_force(System &system) {
+void lj_force(System &system) {
 
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;

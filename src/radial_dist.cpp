@@ -52,8 +52,8 @@ void radialDist(System &system) {
                     // and only if its a centroid/counterpart pair
                     if (
                         !(i==k && j==l) // don't do self interaction (r=0)
-                     && (system.molecules[i].atoms[j].name == centroid && system.molecules[k].atoms[l].name == counterpart
-                     || system.molecules[i].atoms[j].name == counterpart && system.molecules[k].atoms[l].name == centroid)) 
+                     && ((system.molecules[i].atoms[j].name == centroid && system.molecules[k].atoms[l].name == counterpart)
+                     || (system.molecules[i].atoms[j].name == counterpart && system.molecules[k].atoms[l].name == centroid))) 
                     {
                         double* distances = getDistanceXYZ(system, i, j, k, l);
                         double r = distances[3];     
