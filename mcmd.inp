@@ -12,16 +12,16 @@ sorbate_name water
 sorbate_fugacities 200.0
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
-x_length   50    27.4876  150.97371 !  in A   
-y_length   50  60    27.4876  150.97371
-z_length   50   15.669    60    27.4876  150.97371
+x_length   15    27.4876  150.97371 !  in A   
+y_length   15  60    27.4876  150.97371
+z_length   15   15.669    60    27.4876  150.97371
 
 
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt
 
 mc_pbc              on
-mc_corrtime	        1000
+mc_corrtime	        100
 finalstep		    5000000
 temperature 	    200.0   !77.0  ! K
 !!!!!!!pressure		    1.0     ! atm
