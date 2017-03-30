@@ -20,7 +20,7 @@ void runMonteCarloStep(System &system, string model) {
     system.stats.MCmoveAccepted = false; // reset acceptance checker
 
 	// VOLUME MOVE (only NPT)
-	if (system.constants.ensemble == "npt") {
+	if (system.constants.ensemble == ENSEMBLE_NPT) {
 		double VCP = system.constants.vcp_factor/(double)system.stats.count_movables; // Volume Change Probability
 		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
         	if (ranf < VCP) {
@@ -33,7 +33,7 @@ void runMonteCarloStep(System &system, string model) {
 
 	// ADD / REMOVE (only uVT)
 	// We'll choose 0-0.5 for add; 0.5-1 for remove (equal prob.)
-	if (system.constants.ensemble == "uvt") {
+	if (system.constants.ensemble == ENSEMBLE_UVT) {
 		double IRP = system.constants.insert_factor;  
 		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
 		if (ranf < IRP) {

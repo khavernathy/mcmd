@@ -336,7 +336,7 @@ double polarization(System &system) {
 
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
-    if (system.constants.ensemble == "uvt") {
+    if (system.constants.ensemble == ENSEMBLE_UVT) {
         thole_resize_matrices(system);
     }
     system.checkpoint("done resizing thole matrix.");

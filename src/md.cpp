@@ -255,7 +255,7 @@ void integrate(System &system, double dt) {
     } // end for j molecules
 
     // 5) apply heat bath in NVT
-    if (system.constants.ensemble == "nvt") {
+    if (system.constants.ensemble == ENSEMBLE_NVT) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like, which is good for equilibration results.
         double probab = system.constants.md_thermostat_probab;

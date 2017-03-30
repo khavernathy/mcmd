@@ -175,9 +175,9 @@ int main(int argc, char **argv) {
 			printf("MONTE CARLO\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             if (!system.constants.simulated_annealing)
-			    printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
+			    printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble_str.c_str(), system.constants.temp, system.constants.pres);
 			else
-                printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on); P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
+                printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on); P = %.3f atm\n",system.constants.ensemble_str.c_str(), system.constants.temp, system.constants.pres);
 
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep,finalstep,progress,efficiency);
@@ -217,7 +217,7 @@ int main(int argc, char **argv) {
                 printf("      Selectivity = %.3f +- %.3f\n",
                 system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             }
-            if (system.constants.ensemble == "uvt") {
+            if (system.constants.ensemble == ENSEMBLE_UVT) {
                 if (system.proto.size() == 1)
                     printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
                 printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
 	} // END MC STEPS LOOP.
 
 	// FINAL EXIT OUTPUT
-    if (system.constants.ensemble == "npt") {
+    if (system.constants.ensemble == ENSEMBLE_NPT) {
 	    printf("Final basis parameters: \n");
         system.pbc.printBasis();
     }
@@ -388,7 +388,7 @@ int main(int argc, char **argv) {
             //printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-            printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble.c_str(), system.stats.count_movables, system.constants.total_atoms);
+            printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
 			printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);

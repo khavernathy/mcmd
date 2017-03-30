@@ -132,7 +132,7 @@ void changeVolumeMove(System &system) {
         new_energy=potentials[0]+potentials[1]+potentials[2]+potentials[3];
 
     //printf("OLDV before bf call: %f; NEWV before bf call: %f\n", system.pbc.old_volume, system.pbc.volume); 
-    double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, "volume");
+    double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, MOVETYPE_VOLUME);
 
     //printf("ranf < bf? %f < %f ?\n", ranf, boltzmann_factor);
 	if (ranf < boltzmann_factor) {
@@ -223,7 +223,7 @@ void addMolecule(System &system, string model) {
 	double energy_delta = (new_potential - old_potential);
 	
 	// BOLTZMANN ACCEPT OR REJECT
-    double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, "add");     
+    double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);     
 
 	double ranf = (double)rand()/(double)RAND_MAX;
 	if (ranf < boltz_factor) {
@@ -284,7 +284,7 @@ void removeMolecule(System &system, string model) {
 
     //printf("doing boltzmann -- ");
     // calculate BOLTZMANN FACTOR
-    double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, "remove");
+    double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_REMOVE);
 
     // accept or reject
     double ranf = (double)rand()/(double)RAND_MAX;
@@ -356,7 +356,7 @@ void displaceMolecule(System &system, string model) {
                 new_V = (newpotentials[0]+newpotentials[1]+newpotentials[2]+newpotentials[3]); // keep in K
 
 	// now accept or reject the move based on Boltzmann probability
-	double boltzmann_factor = get_boltzmann_factor(system, old_V, new_V, "displace");
+	double boltzmann_factor = get_boltzmann_factor(system, old_V, new_V, MOVETYPE_DISPLACE);
 
 	// make ranf for probability pick
 	double ranf = (double)rand() / (double)RAND_MAX; // a value between 0 and 1

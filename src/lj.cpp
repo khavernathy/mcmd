@@ -13,7 +13,7 @@ double self_lj_lrc(System &system) {
     double sig, eps, sig3,sigcut,sigcut3,sigcut9;
     double this_self_lrc;
 
-    if (system.stats.MCstep == 0 || system.constants.ensemble == "uvt" || system.constants.ensemble == "npt") { // only changes if N or V changes
+    if (system.stats.MCstep == 0 || system.constants.ensemble == ENSEMBLE_UVT || system.constants.ensemble == ENSEMBLE_NPT) { // only changes if N or V changes
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
            if (!system.molecules[i].frozen) {
@@ -105,7 +105,7 @@ double lj(System &system) {
     // 2) Long range corr.: apply RD long range correction if needed
         // http://www.seas.upenn.edu/~amyers/MolPhys.pdf
     if (system.constants.rd_lrc) {
-        if (system.stats.MCstep == 0 || system.constants.ensemble == "npt" || system.constants.ensemble == "uvt") { // lrc only changes if volume or N changes.
+        if (system.stats.MCstep == 0 || system.constants.ensemble == ENSEMBLE_NPT || system.constants.ensemble == ENSEMBLE_UVT) { // lrc only changes if volume or N changes.
         for (int i=0; i < system.molecules.size(); i++) {
         for (int j=0; j< system.molecules[i].atoms.size(); j++) {
         for (int k=0; k <system.molecules.size(); k++) {

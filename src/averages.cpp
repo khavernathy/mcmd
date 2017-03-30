@@ -204,7 +204,7 @@ void computeAverages(System &system) {
     }
 */
     // QST
-    if (system.constants.ensemble == "uvt" && system.proto.size() == 1) { // T must be fixed for Qst
+    if (system.constants.ensemble == ENSEMBLE_UVT && system.proto.size() == 1) { // T must be fixed for Qst
         
         // NU (for qst)
         system.stats.NU.value = system.stats.potential.value*system.stats.count_movables;

@@ -10,7 +10,7 @@ void make_pairs(System &system) {
     int molsize = (int)system.molecules.size();
     int frozenatoms = system.stats.count_frozens;
 
-    if (system.stats.MCstep == 0 || system.constants.ensemble != "nvt") {
+    if (system.stats.MCstep == 0 || system.constants.ensemble != ENSEMBLE_NVT) {
         // (re-)set up sizes for 4D array
         system.pairs.resize(molsize);
         for (i=0; i<molsize; ++i) {

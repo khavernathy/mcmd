@@ -7,6 +7,19 @@
 
 using namespace std;
 
+enum {
+    ENSEMBLE_UVT,
+    ENSEMBLE_NVT,
+    ENSEMBLE_NPT,
+    ENSEMBLE_NVE
+};
+enum {
+    MOVETYPE_DISPLACE,
+    MOVETYPE_INSERT,
+    MOVETYPE_REMOVE,
+    MOVETYPE_VOLUME
+};
+
 // Constants is sort-of a misnomer for some things in this class but you get the idea.
 class Constants {
 	public:
@@ -17,7 +30,9 @@ class Constants {
 		string jobname="default_jobname";
         string mode; // "mc" or "md" 
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
-        string ensemble; // "nve", "nvt", "nvp", "uvt"
+        int_fast8_t ensemble; 
+        string ensemble_str;
+        //int_fast8_t movetype;
         string atom_file; // input atoms .pdb file
         string output_traj="traj.xyz"; // system trajectory in xyz 
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb

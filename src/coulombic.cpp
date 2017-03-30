@@ -23,7 +23,7 @@ double coulombic_self(System &system) {
     double sqrtPI = sqrt(M_PI);
  
     // loop all atoms but skip frozen atoms   
-    if (system.stats.MCstep == 0 || system.constants.ensemble == "uvt") { // only changes if N changes
+    if (system.stats.MCstep == 0 || system.constants.ensemble == ENSEMBLE_UVT) { // only changes if N changes
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
 
@@ -142,7 +142,7 @@ double coulombic_reciprocal(System &system) {
     kmax = system.constants.ewald_kmax;   
 
    // get recip (re-calc only needed for NPT)
-   if (system.constants.ensemble == "npt") {
+   if (system.constants.ensemble == ENSEMBLE_NPT) {
         system.pbc.calcVolume();
         system.pbc.calcRecip(); 
    }

@@ -9,7 +9,7 @@ using namespace std;
 // ==================================================================================
 /* THE BOLTZMANN FACTOR FUNCTION */
 // ==================================================================================
-double get_boltzmann_factor(System &system, double e_i, double e_f, string movetype) {
+double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t movetype) {
     double bf, MAXVALUE=1e4; // we won't care about huge bf's
     double energy_delta = e_f - e_i;
     double fugacity;
@@ -17,8 +17,8 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
     if (system.proto.size() == 1) fugacity = system.constants.pres;
     else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
-    if (system.constants.ensemble == "uvt") {
-        if (movetype == "add") {
+    if (system.constants.ensemble == ENSEMBLE_UVT) {
+        if (movetype == MOVETYPE_INSERT) {
             bf = system.pbc.volume * fugacity * 
             system.constants.ATM2REDUCED/(system.constants.temp * 
             (double)(system.stats.count_movables)) *
@@ -26,7 +26,7 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
             if (bf < MAXVALUE) system.stats.insert_bf_sum += bf;
             else system.stats.insert_bf_sum += MAXVALUE;
         } 
-        else if (movetype == "remove") {
+        else if (movetype == MOVETYPE_REMOVE) {
             bf = system.constants.temp * 
             ((double)(system.stats.count_movables) + 1.0)/
             (system.pbc.volume* fugacity *system.constants.ATM2REDUCED) *
@@ -34,21 +34,21 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
             if (bf < MAXVALUE) system.stats.remove_bf_sum += bf;
             else system.stats.remove_bf_sum += MAXVALUE;
         }
-        else if (movetype == "displace") {
+        else if (movetype == MOVETYPE_DISPLACE) {
             bf = exp(-energy_delta/(system.constants.temp));
             if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
             else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
-    else if (system.constants.ensemble == "nvt") {
-        if (movetype == "displace") {
+    else if (system.constants.ensemble == ENSEMBLE_NVT) {
+        if (movetype == MOVETYPE_DISPLACE) {
             bf = exp(-energy_delta/(system.constants.temp));
             if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
             else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
-    else if (system.constants.ensemble == "npt") {
-        if (movetype == "volume") {
+    else if (system.constants.ensemble == ENSEMBLE_NPT) {
+        if (movetype == MOVETYPE_VOLUME) {
             // Frenkel Smit p118
             bf= exp(-( (energy_delta)
             + system.constants.pres * system.constants.ATM2REDUCED * 
@@ -58,14 +58,14 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, string movet
             if (bf < MAXVALUE) system.stats.volume_change_bf_sum += bf;
             else system.stats.volume_change_bf_sum += MAXVALUE;
         }
-        else if (movetype == "displace") {
+        else if (movetype == MOVETYPE_DISPLACE) {
             bf = exp(-energy_delta/system.constants.temp);
             if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
             else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
-    else if (system.constants.ensemble == "nve") {
-        if (movetype == "displace") {
+    else if (system.constants.ensemble == ENSEMBLE_NVE) {
+        if (movetype == MOVETYPE_DISPLACE) {
             double exponent = 3.0*system.stats.count_movables/2.0;
             //printf("exponent = %f\n", exponent);
 
