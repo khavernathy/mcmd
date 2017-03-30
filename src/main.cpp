@@ -63,7 +63,6 @@ int main(int argc, char **argv) {
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
-    make_pairs(system);
     printf("VERSION NUMBER: %i\n", 163);
     system.checkpoint("Done with system setup functions.");
 

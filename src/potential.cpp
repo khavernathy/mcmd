@@ -10,10 +10,14 @@
 #include <lj.cpp>
 #include <coulombic.cpp>
 #include <polar.cpp>
+#include <pairs.cpp>
 
 // =================== MAIN FUNCTION ======================
 // ---------------POTENTIAL OF ENTIRE SYSTEM --------------
 double * getTotalPotential(System &system, string model) {
+
+    // compute all interaction distances
+    //make_pairs(system);
 
     // initializers 
     double total_potential=0;    	

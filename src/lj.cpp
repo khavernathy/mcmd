@@ -56,6 +56,8 @@ double lj(System &system) {
     for (int k = i+1; k < system.molecules.size(); k++) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
+        //if (system.pairs[i][j][k][l].recalculate) {
+
         // do mixing rules
         double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
         if (eps != system.molecules[k].atoms[l].eps)
@@ -69,7 +71,8 @@ double lj(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];
-    
+        //r = system.pairs[i][j][k][l].r;    
+
         sr6 = sig/r; //printf("r=%f\n",r);
         sr6 *= sr6;
         sr6 *= sr6*sr6; //;
@@ -78,12 +81,21 @@ double lj(System &system) {
 
         // 1) Normal LJ: only apply if long range corrections are off, or if on and r<cutoff
         if ((system.constants.rd_lrc == "off" || r <= cutoff)) {
-            double this_lj = 4.0*eps*(sr6*sr6 - sr6);
+            this_lj = 4.0*eps*(sr6*sr6 - sr6);
             total_lj += this_lj;    //;
             total_pot += this_lj;
         }
         
-
+        /*
+        // end if recalculate
+        } else {
+            if ((system.constants.rd_lrc=="off" || r <= cutoff)) {
+                this_lj = system.pairs[i][j][k][l].lj;
+                total_lj += this_lj;
+                total_pot += this_lj;
+            }
+        }
+        */
     }  // loop l
     } // loop k 
     } //loop j
@@ -190,6 +202,7 @@ void lj_force(System &system) {
                 system.molecules[k].atoms[l].force[n] -= f[n];
             }
 
+/*
             // this dot product is calc'd to get pressure.
             if (system.molecules[i].MF == "M" && system.molecules[k].MF == "M") { // make sure it's gas-to-gas
             system.pairs[count].fdotr = (f[0] * distances[0] +
@@ -197,6 +210,7 @@ void lj_force(System &system) {
             f[2] * distances[2]); // F.r for the sum for pressure calculator.
             count++;       
             }
+*/
         }
 
         system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);

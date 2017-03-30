@@ -70,6 +70,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
 
    
+/*
     if (system.constants.ensemble == "nvt") {
         // grab the sum of F.r's
         double frsum=0;
@@ -84,7 +85,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             system.constants.kb * T + (1.0/(3.0*volInLiters))*system.stats.fdotrsum.average*system.constants.kb;
         pressure *= system.constants.JL2ATM; // J/L -> atm
     }
- 
+ */
 
 	static double output[8];
 	output[0] = K_total;

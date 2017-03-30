@@ -99,7 +99,7 @@ void thole_amatrix(System &system) {
 
     int i, j, ii, jj, N, p, q;
     int w, x, y, z;
-    double damp1=0, damp2=0, wdamp1=0, wdamp2=0, v, s;
+    double damp1=0, damp2=0, wdamp1=0, wdamp2=0, v, s; //, distancesp[3], rp;
     double r, r2, ir3, ir5, ir=0;
     double rcut, rcut2, rcut3;
     rcut = system.pbc.cutoff;
@@ -146,7 +146,13 @@ void thole_amatrix(System &system) {
 
             double* distances = getDistanceXYZ(system, w,x,y,z);
             r = distances[3];
+            // this on-the-spot distance calculator works, but the new method
+            // below does not work, even though everywhere else, it does...
+            //rp = system.pairs[w][x][y][z].r;
+            //for (int n=0;n<3;n++) distancesp[n] = system.pairs[w][x][y][z].d[n];
             r2 = r*r;
+
+            //printf("r: %f; rp: %f\n", r, rp);
 
             //system.checkpoint("got r.");
             //printf("distances: x %f y %f z %f r %f\n", distances[0], distances[1], distances[2], r);
@@ -218,7 +224,7 @@ void thole_field(System &system) {
     double R = system.pbc.cutoff;
     double rR = 1./R;
     //used for polar_wolf_alpha (aka polar_wolf_damp)
-    double a = system.constants.polar_wolf_alpha;
+    double a = system.constants.polar_wolf_alpha, distances[3];
     double erR; //complementary error functions
         erR=erfc(a*R);
     double cutoffterm = (erR*rR*rR + 2.0*a*OneOverSqrtPi*exp(-a*a*R*R)*rR);
@@ -235,6 +241,8 @@ void thole_field(System &system) {
 
                 double* distances = getDistanceXYZ(system, i,j,k,l);
                 r = distances[3];
+                //r = system.pairs[i][j][k][l].r;
+                //for (int n=0;n<3;n++) distances[n] = system.pairs[i][j][k][l].d[n];
 
                 if((r - SMALL_dR  < system.pbc.cutoff) && (r != 0.)) {
                     rr = 1./r;
@@ -286,7 +294,7 @@ void thole_field(System &system) {
 
 void thole_field_nopbc(System &system) {
     int p, i, j, k,l;
-    double r, SMALL_dR = 1e-12;
+    double r, SMALL_dR = 1e-12, distances[3];
 
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -295,6 +303,8 @@ void thole_field_nopbc(System &system) {
                     if (system.molecules[i].MF == "F" && system.molecules[k].MF == "F") continue;
                     double* distances = getDistanceXYZ(system,i,j,k,l);
                     r = distances[3];
+                    //r = system.pairs[i][j][k][l].r;
+                    //for (int n=0;n<3;n++) distances[n] = system.pairs[i][j][k][l].d[n];
 
                     if ( (r-SMALL_dR < system.pbc.cutoff) && (r != 0.)) {
                         for (p=0; p<3; p++) {
@@ -333,7 +343,6 @@ double polarization(System &system) {
         thole_field(system);
     else
         thole_field_nopbc(system);
-
     system.checkpoint("done with thole_field(). Doing dipole iterations");
 
 

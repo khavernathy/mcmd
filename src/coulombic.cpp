@@ -60,8 +60,9 @@ double coulombic_real(System &system) {
         pair_potential = 0; 
                 
         // calculate distance between atoms
-        double* distances = getDistanceXYZ(system, i, j, k, l);
+        double* distances = getDistanceXYZ(system,i,j,k,l);
         r = distances[3];
+        //r = system.pairs[i][j][k][l].r;
 
         if (r < system.pbc.cutoff && (i < k)) { // only pairs and not beyond cutoff
             erfc_term = erfc(alpha*r);
@@ -100,6 +101,7 @@ void coulombic_real_force(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system,i,j,k,l);
         r = distances[3];
+
         rsq = r*r;
         for (int n=0; n<3; n++) u[n] = distances[n]/r;
 
@@ -220,8 +222,10 @@ double coulombic(System &system) { // old super basic coulombic
     for (int k = i+1; k < system.molecules.size(); k++) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) { 
         if (!(system.molecules[i].atoms[j].C == 0 || system.molecules[k].atoms[l].C ==0)) {
-        double* distances = getDistanceXYZ(system, i, j, k, l);
+        
+        double* distances = getDistanceXYZ(system,i,j,k,l);
         r = distances[3];
+        //r = system.pairs[i][j][k][l].r;
 
         q1 = system.molecules[i].atoms[j].C;
         q2 = system.molecules[k].atoms[l].C;
