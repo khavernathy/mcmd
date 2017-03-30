@@ -5,7 +5,7 @@ checkpoints_option  off
        
                
 input_atoms  ../pdbs/waterbox15A.pdb   ../pdbs/MPM1.pdb   mof5h2.pdb  8h2bssp.pdb  ! PDB ONLY       
-potential_form        lj  es   !ljespolar   !phast2    !!lj     
+potential_form        ljes   !ljespolar   !phast2    !!lj     
 com_option            off     ! center of mass        
        
        

@@ -485,22 +485,23 @@ class Atom {
 		int PDBID; // the atom's PDBID (from input)
         double rank_metric;  // for polarization sorting     
  
-		vector<double> pos = vector<double>(3); // 0=x; 1=y; 2=z
-		vector<double> prevpos = vector<double>(3);
-		vector<double> force = vector<double>(3); // force, K / A
-		vector<double> vel = vector<double>(3); // velocity, A/fs. Not using b/c I switched to rigid molecular motion
-		vector<double> acc = vector<double>(3); // acceleration, A/fs^2
-        vector<double> old_acc = vector<double>(3);
-		vector<double> torque = vector<double>(3);
-        vector<double> dip = vector<double>(3); // dipole in e*A ... I think
-		vector<double> newdip = vector<double>(3);
-        vector<double> olddip = vector<double>(3);
-        double dipole_rrms=0;    
-        vector<double> efield = vector<double>(3); // external electric field
-        vector<double> efield_self = vector<double>(3); // self electric field
-        vector<double> efield_induced = vector<double>(3); // induced e field
-        vector<double> efield_induced_change = vector<double>(3); 
-
+        double pos[3];
+		double prevpos[3];
+        double force[3];
+        double vel[3];
+        double acc[3];
+        double old_acc[3];
+        double torque[3];
+        double dip[3];
+        double newdip[3];
+        double olddip[3];
+        double efield[3];
+        double efield_self[3];
+        double efield_induced[3];
+        double efield_induced_change[3];
+        double dipole_rrms=0;
+		/*vector<double> force = vector<double>(3); // force, K / A
+*/
         double * get_acc() {
             static double output[3];
             for (int n=0; n<3; n++) output[n] = acc[n];
@@ -538,18 +539,18 @@ class Molecule {
 		int PDBID; // the molecule's PDBID (from input)
 		string name; // the molecule name/label (from input), e.g. H2 or MOF
         string MF; // movable/frozen: M or F
-        vector<double> force = vector<double>(3); // K / A
-        vector<double> torque = vector<double>(3); // t = r x F
-        vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
-        //vector<double> prev_com = vector<double>(3);
-        vector<double> acc = vector<double>(3); // A / fs^2
-        vector<double> old_acc = vector<double>(3);
-        vector<double> vel = vector<double>(3); // A / fs
-        vector<double> ang_vel = vector<double>(3); // w, angular velocity
-        vector<double> ang_acc = vector<double>(3); // alpha, angular acceleration
-        vector<double> old_ang_acc = vector<double>(3); // old ang. acceleration
-        vector<double> ang_pos = vector<double>(3); // angular rotation distance in rad
-        vector<double> d_theta = vector<double>(3); // for calculating rotational potential E
+        double force[3];
+        double torque[3];
+        double com[3];
+        double acc[3];
+        double old_acc[3];
+        double vel[3];
+        double ang_vel[3];
+        double ang_acc[3];
+        double old_ang_acc[3];
+        double ang_pos[3];
+        double d_theta[3];
+        //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
         double inertia=0.0; //moment of inertia
         double fugacity;
