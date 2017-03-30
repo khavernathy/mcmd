@@ -22,7 +22,6 @@ void translate(System &system, int molid) {
         			system.molecules[molid].atoms[i].pos[1] += randy;
         			system.molecules[molid].atoms[i].pos[2] += randz;
 			}
-
 } // end translate()
 
 void rotate(System &system, int molid) {
@@ -30,15 +29,15 @@ void rotate(System &system, int molid) {
         double com[3];		
 
         // 1) GET RANDOM ANGLE AND PLANE OF ROTATION.
-        double randangle; string plane; 
+        double randangle; int plane; 
 		randangle = system.constants.rotate_angle_factor*((double)rand()/(double)RAND_MAX); // angle of rotation from 0 -> rotate_angle_factor
 		double randxyz = (double)rand()/(double)RAND_MAX;
 		// 1/3 change for a given plane
 		if (randxyz < 0.33333) {
-			plane="x";
-		} else if (randxyz > 0.33333 && randxyz < 0.66667) {
-			plane="y";
-		} else { plane="z";}
+			plane=0;
+		} else if (randxyz < 0.66667) {
+			plane=1;
+		} else { plane=2;}
 
         // 2) SAVE CURRENT COM
         for (int n=0; n<3; n++) com[n] = system.molecules[molid].com[n];

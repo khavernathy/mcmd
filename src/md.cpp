@@ -175,7 +175,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                "x", system.molecules[j].ang_pos[0] * 180.0/M_PI); 
+                0, system.molecules[j].ang_pos[0] * 180.0/M_PI); 
                 for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedx[n] + system.molecules[j].com[n];
 
@@ -184,7 +184,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                "y", system.molecules[j].ang_pos[1] * 180.0/M_PI); 
+                1, system.molecules[j].ang_pos[1] * 180.0/M_PI); 
                 for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedy[n] + system.molecules[j].com[n];
 
@@ -193,7 +193,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                "z", system.molecules[j].ang_pos[2] * 180.0/M_PI); 
+                2, system.molecules[j].ang_pos[2] * 180.0/M_PI); 
                 for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
             } // end loop over atoms i 
