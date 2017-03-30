@@ -249,7 +249,8 @@ int main(int argc, char **argv) {
             } // end loop i
 
             // WRITE RESTART FILE AND OTHER OUTPUTS
-            writeXYZ(system,system.constants.output_traj,frame,t,0);
+            if (system.constants.xyz_traj_option)
+                writeXYZ(system,system.constants.output_traj,frame,t,0);
             frame++;
             writePDB(system, system.constants.restart_pdb);
             if (system.constants.pdb_traj_option)
@@ -299,7 +300,8 @@ int main(int argc, char **argv) {
 	else if (system.constants.mode == "md") {
     
         // write initial XYZ
-        writeXYZ(system,system.constants.output_traj, 1, 0, 0);	
+        if (system.constants.xyz_traj_option)
+            writeXYZ(system,system.constants.output_traj, 1, 0, 0);	
         int frame = 2; // weird way to initialize but it works for the output file.
         // and initial PDB
         writePDB(system,system.constants.restart_pdb);
@@ -386,7 +388,7 @@ int main(int argc, char **argv) {
             //printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-            printf("ENSEMBLE: %s\n",system.constants.ensemble.c_str());
+            printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
 			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
@@ -398,7 +400,8 @@ int main(int argc, char **argv) {
 			printf("--------------------\n\n");
 
             // WRITE OUTPUT FILES 
-			writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
+            if (system.constants.xyz_traj_option)
+			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
             frame++;
             writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, count_md_steps); 
             writePDB(system,system.constants.restart_pdb);	

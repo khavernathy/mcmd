@@ -606,6 +606,11 @@ void readInput(System &system, char* filename) {
                 system.constants.output_traj_pdb = lc[1].c_str();
                 std::cout << "Got output trajectory PDB filename = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "xyz_traj_option")) {
+                if (lc[1] == "on") system.constants.xyz_traj_option = 1;
+                else system.constants.xyz_traj_option = 0;
+                std::cout << "Got XYZ trajectory output option = " << lc[1].c_str(); printf("\n");
+
 			} else if (!strcasecmp(lc[0].c_str(), "vcp_factor")) {
 				system.constants.vcp_factor = atof(lc[1].c_str());
 				std::cout << "Got volume change probability factor = " << lc[1].c_str(); printf("\n");
