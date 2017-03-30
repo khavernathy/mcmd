@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <stdint.h>
 
 using namespace std;
 
@@ -60,7 +61,7 @@ class Constants {
 		int stepsize=1; // obvi
         int finalstep; // user defined for MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
-        string mc_pbc="on"; // PBC in monte carlo, default on
+        int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
         int currentprotoid=0; // for getting fugacity for the boltzmann factor.
 
         // MD STUFF

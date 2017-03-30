@@ -5,7 +5,7 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option  off
-input_atoms pdbs/mof5+h2bssp.pdb   naclh2o.pdb	  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms ../pdbs/mof5+h2bssp.pdb   naclh2o.pdb	  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
 potential_form 		ljespolar   !ljespolar 	!phast2    !!lj
 com_option		    off  	! center of mass
 

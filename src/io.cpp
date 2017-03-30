@@ -533,9 +533,13 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD PBC option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "mc_pbc")) {
-                system.constants.mc_pbc = lc[1].c_str();
+                if (lc[1] == "on") {
+                    system.constants.mc_pbc = 1;
+                }
+                else
+                    system.constants.mc_pbc = 0;
                 std::cout << "Got MC PBC option = " << lc[1].c_str(); printf("\n");
-                if (system.constants.mc_pbc == "off") {
+                if (system.constants.mc_pbc == 0) {
                     system.constants.ewald_es = "off";
                     system.constants.rd_lrc = "off";
                     system.constants.polar_pbc = "off";

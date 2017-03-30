@@ -339,7 +339,7 @@ double polarization(System &system) {
     system.checkpoint("done running thole_amatrix(). Running thole_field()");
 
     // 1) CALCULATE ELECTRIC FIELD AT EACH SITE
-    if (system.constants.mc_pbc == "on")
+    if (system.constants.mc_pbc)
         thole_field(system);
     else
         thole_field_nopbc(system);
