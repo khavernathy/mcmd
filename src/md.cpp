@@ -115,10 +115,10 @@ void calculateForces(System &system, string model, double dt) {
 	}
 	
     if (model == "lj" || model == "ljes" || model == "ljespolar")
-        coulombic_real_force(system);
-    
+        lj_force(system);    
     if (model == "ljes" || model == "ljespolar")
-        lj_force(system);
+        coulombic_real_force(system);
+
     
     // atomic forces are done, so now calc molecular values
     for (int i=0; i<system.molecules.size(); i++) {
