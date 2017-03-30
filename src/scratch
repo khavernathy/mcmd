@@ -1,3 +1,14 @@
+Fast-forward
+ src/averages.cpp         |   4 ++++
+ src/classes.cpp          |   4 ++--
+ src/main.cpp             |   4 +++-
+ src/system_functions.cpp |   5 ++++-
+ t                        | Bin 648260 -> 494472 bytes
+ uvt_test/mcmd.inp        |   4 ++--
+ 6 files changed, 15 insertions(+), 6 deletions(-)
+
+
+
 // PAIR LENNARD-JONES
 
    // int countlj=0;
