@@ -502,20 +502,20 @@ class Atom {
 		int PDBID; // the atom's PDBID (from input)
         double rank_metric;  // for polarization sorting     
  
-        double pos[3];
-		double prevpos[3];
-        double force[3];
-        double vel[3];
-        double acc[3];
-        double old_acc[3];
-        double torque[3];
-        double dip[3];
-        double newdip[3];
-        double olddip[3];
-        double efield[3];
-        double efield_self[3];
-        double efield_induced[3];
-        double efield_induced_change[3];
+        double pos[3] = {0,0,0};
+		double prevpos[3] = {0,0,0};
+        double force[3] = {0,0,0};
+        double vel[3] = {0,0,0};
+        double acc[3] = {0,0,0};
+        double old_acc[3] = {0,0,0};
+        double torque[3] = {0,0,0};
+        double dip[3] = {0,0,0};
+        double newdip[3] = {0,0,0};
+        double olddip[3] = {0,0,0};
+        double efield[3] = {0,0,0};
+        double efield_self[3] = {0,0,0};
+        double efield_induced[3] = {0,0,0};
+        double efield_induced_change[3] = {0,0,0};
         double dipole_rrms=0;
 		/*vector<double> force = vector<double>(3); // force, K / A
 */
@@ -556,17 +556,17 @@ class Molecule {
 		int PDBID; // the molecule's PDBID (from input)
 		string name; // the molecule name/label (from input), e.g. H2 or MOF
         int_fast8_t frozen; //0 or 1
-        double force[3];
-        double torque[3];
-        double com[3];
-        double acc[3];
-        double old_acc[3];
-        double vel[3];
-        double ang_vel[3];
-        double ang_acc[3];
-        double old_ang_acc[3];
-        double ang_pos[3];
-        double d_theta[3];
+        double force[3] = {0,0,0};
+        double torque[3] = {0,0,0};
+        double com[3] = {0,0,0};
+        double acc[3] = {0,0,0};
+        double old_acc[3] = {0,0,0};
+        double vel[3] = {0,0,0};
+        double ang_vel[3] = {0,0,0};
+        double ang_acc[3] = {0,0,0};
+        double old_ang_acc[3] = {0,0,0};
+        double ang_pos[3] = {0,0,0};
+        double d_theta[3] = {0,0,0};
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
         double inertia=0.0; //moment of inertia
