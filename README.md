@@ -23,6 +23,7 @@ To run (in base dir "mcmd") <br />
 TODO<br /><br />
 
 -> MC: fix weird NPT bug where ES energy gets really low, quickly
+&emsp;-> definitely in the volume-change function..
 -> MD: Andersen Thermostat should assign velocity by Boltz-dist., not preset goal value.<br />
 &emsp;-> The temp/velocities tend to explode because rando-collisions seem to be forcing molecules to collide.<br />
 -> MC: add multi-sorb Qst calculator<br />
