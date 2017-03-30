@@ -132,13 +132,14 @@ void calculateForces(System &system, string model, double dt) {
 // ==================== MOVE ATOMS MD STYLE =========================
 /* THIS IS THE MAIN LOOPING FUNCTION. calculateForces() is called within */
 void integrate(System &system, double dt) {
+    int i,j,n;
 
     // DEBUG
-    int debug=0;
+    int_fast8_t debug=0;
     if (debug == 1) {
-        for (int j=0; j<system.molecules.size(); j++) {
+        for (j=0; j<system.molecules.size(); j++) {
             if (system.constants.md_mode == "molecular") system.molecules[j].printAll();
-            for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+            for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 if (system.constants.md_mode == "atomic") system.molecules[j].atoms[i].printAll();
             }
         }
@@ -147,10 +148,10 @@ void integrate(System &system, double dt) {
 
     // 1a) CHANGE POSITIONS OF PARTICLES
     // save old positions
-    for (int j=0; j<system.molecules.size(); j++) {
-        if (system.molecules[j].MF == "M") {
-        for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-            for (int n=0; n<3; n++) system.molecules[j].atoms[i].prevpos[n] = system.molecules[j].atoms[i].pos[n];
+    for (j=0; j<system.molecules.size(); j++) {
+        if (!system.molecules[j].frozen) {
+        for (i=0; i<system.molecules[j].atoms.size(); i++) {
+            for (n=0; n<3; n++) system.molecules[j].atoms[i].prevpos[n] = system.molecules[j].atoms[i].pos[n];
         } // end for atom i
         } // end if movable
     } // end for molecule j
@@ -158,8 +159,8 @@ void integrate(System &system, double dt) {
 
     // if molecular motion
     if (system.constants.md_mode == "molecular") {
-        for (int j=0; j<system.molecules.size(); j++) {
-            if (system.molecules[j].MF == "M") {
+        for (j=0; j<system.molecules.size(); j++) {
+            if (!system.molecules[j].frozen) {
 
             system.molecules[j].calc_pos(dt);
             
@@ -168,14 +169,14 @@ void integrate(System &system, double dt) {
             system.molecules[j].calc_ang_pos(dt);
 
             // rotate molecules
-            for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+            for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 // ROTATE IN X
                 double* rotatedx = rotatePoint(system, 
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
                 "x", system.molecules[j].ang_pos[0] * 180.0/M_PI); 
-                for (int n=0; n<3; n++) 
+                for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedx[n] + system.molecules[j].com[n];
 
                 // ROTATE IN Y
@@ -184,7 +185,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
                 "y", system.molecules[j].ang_pos[1] * 180.0/M_PI); 
-                for (int n=0; n<3; n++) 
+                for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedy[n] + system.molecules[j].com[n];
 
                 // ROTATE IN Z
@@ -193,7 +194,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
                 "z", system.molecules[j].ang_pos[2] * 180.0/M_PI); 
-                for (int n=0; n<3; n++) 
+                for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
             } // end loop over atoms i 
             } // end if rotations allowed and >1 atom
@@ -202,9 +203,9 @@ void integrate(System &system, double dt) {
     } // end if molecular motion
     // if atomic motion
     else if (system.constants.md_mode == "atomic") {
-        for (int j=0; j<system.molecules.size(); j++) {
-            if (system.molecules[j].MF == "M") {
-            for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+        for (j=0; j<system.molecules.size(); j++) {
+            if (!system.molecules[j].frozen) {
+            for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 system.molecules[j].atoms[i].calc_pos(dt);
             }
             }
@@ -214,26 +215,26 @@ void integrate(System &system, double dt) {
 
     // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
     if (system.constants.md_pbc) {
-        for (int j=0; j<system.molecules.size(); j++) {
-            if (system.molecules[j].MF == "M") {
+        for (j=0; j<system.molecules.size(); j++) {
+            if (!system.molecules[j].frozen) {
                 checkInTheBox(system,j);
             } // end if movable
 	    } // end loop j molecules
     } // end if PBC
    
     // 2) GET NEW C.O.M. for new positions.
-    for (int j=0; j<system.molecules.size(); j++) system.molecules[j].calc_center_of_mass();
+    for (j=0; j<system.molecules.size(); j++) system.molecules[j].calc_center_of_mass();
  
     // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
 	calculateForces(system, system.constants.potential_form, dt);
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
-	for (int j=0; j<system.molecules.size(); j++) {
-		if (system.molecules[j].MF == "M") { // only movable atoms should move.
+	for (j=0; j<system.molecules.size(); j++) {
+		if (!system.molecules[j].frozen) { // only movable atoms should move.
 
             // if atoms allowed to move from molecules
             if (system.constants.md_mode == "atomic") {
-                for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+                for (i=0; i<system.molecules[j].atoms.size(); i++) {
                     system.molecules[j].atoms[i].calc_acc();
                     system.molecules[j].atoms[i].calc_vel(dt); 
             } // end atomic loop i
@@ -260,24 +261,24 @@ void integrate(System &system, double dt) {
         double probab = system.constants.md_thermostat_probab;
         double ranf;
         if (system.constants.md_mode == "molecular") {
-        for (int i=0; i<system.molecules.size(); i++) {
-            if (system.molecules[i].MF == "F") continue; // skip frozens
+        for (i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].frozen) continue; // skip frozens
             ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
             if (ranf < probab) {
                 // adjust the velocity components of the molecule.
-                for (int n=0; n<3; n++) {
+                for (n=0; n<3; n++) {
                     if (system.molecules[i].vel[n] >= 0) system.molecules[i].vel[n] = system.constants.md_vel_goal;
                     else system.molecules[i].vel[n] = -system.constants.md_vel_goal;
                 }
             }
         }
         } else if (system.constants.md_mode == "atomic") {
-            for (int i =0; i<system.molecules.size(); i++) {
-                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-                    if (system.molecules[i].atoms[j].MF == "F") continue; // skip frozen atoms
+            for (i =0; i<system.molecules.size(); i++) {
+                for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                    if (system.molecules[i].atoms[j].frozen) continue; // skip frozen atoms
                     ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
                     if (ranf <probab) {
-                        for (int n=0; n<3; n++) {
+                        for (n=0; n<3; n++) {
                             if (system.molecules[i].atoms[j].vel[n] >= 0) system.molecules[i].atoms[j].vel[n] = system.constants.md_vel_goal;
                             else system.molecules[i].atoms[j].vel[n] = -system.constants.md_vel_goal;
                         }

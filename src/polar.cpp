@@ -237,7 +237,7 @@ void thole_field(System &system) {
             for(int k=i+1; k<system.molecules.size(); k++) { // molecules not allowed to self-polarize
             for (int l=0; l<system.molecules[k].atoms.size(); l++) {
 
-                if ( system.molecules[i].MF == "F" && system.molecules[k].MF == "F" ) continue; //don't let the MOF polarize itself
+                if ( system.molecules[i].frozen && system.molecules[k].frozen ) continue; //don't let the MOF polarize itself
 
                 double* distances = getDistanceXYZ(system, i,j,k,l);
                 r = distances[3];
@@ -300,7 +300,7 @@ void thole_field_nopbc(System &system) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             for (k=i+1; k<system.molecules.size(); k++) {
                 for (l=0; l<system.molecules[k].atoms.size(); l++) {
-                    if (system.molecules[i].MF == "F" && system.molecules[k].MF == "F") continue;
+                    if (system.molecules[i].frozen && system.molecules[k].frozen) continue;
                     double* distances = getDistanceXYZ(system,i,j,k,l);
                     r = distances[3];
                     //r = system.pairs[i][j][k][l].r;

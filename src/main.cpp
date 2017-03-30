@@ -391,7 +391,7 @@ int main(int argc, char **argv) {
             printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
-			printf("Time elapsed = %.2f s = %.3f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
+			printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
             KE, Klin, Krot, PE, TE,  
             Temp, v_avg, system.constants.md_init_vel,

@@ -16,7 +16,7 @@ double self_lj_lrc(System &system) {
     if (system.stats.MCstep == 0 || system.constants.ensemble == "uvt" || system.constants.ensemble == "npt") { // only changes if N or V changes
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
-           if (system.molecules[i].MF != "F") {
+           if (!system.molecules[i].frozen) {
             sig = system.molecules[i].atoms[j].sig;
             eps = system.molecules[i].atoms[j].eps;
     
@@ -111,7 +111,7 @@ double lj(System &system) {
         for (int k=0; k <system.molecules.size(); k++) {
         for (int l=0; l <system.molecules[k].atoms.size(); l++) {
 
-        if (system.molecules[i].MF == "F" && system.molecules[k].MF == "F") continue; // skip frozens
+        if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // skip frozens
         if (i<k || (i==k && j<l)) {
 
         // do mixing rules

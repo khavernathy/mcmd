@@ -20,14 +20,14 @@ void computeInitialValues(System &system) {
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
-		    if (system.molecules[c].MF == "M") {
+		    if (!system.molecules[c].frozen) {
                 for (int i=0; i<system.proto.size(); i++) {
                     if (system.proto[i].name == thismolname)
                         system.stats.movablemass[i].value += thismass;
                 }
                                
             }
-            else if (system.molecules[c].MF == "F")
+            else if (system.molecules[c].frozen)
                 system.stats.frozenmass.value += thismass;
         }
 	}
@@ -35,7 +35,7 @@ void computeInitialValues(System &system) {
     // N_movables (sorbates, usually)
     system.constants.initial_sorbates = system.stats.count_movables;
     for (int i=0; i<system.molecules.size(); i++) {
-        if (system.molecules[i].MF == "F") continue;
+        if (system.molecules[i].frozen) continue;
         string thismolname = system.molecules[i].name;
         for (int j=0; j<system.proto.size(); j++) 
             if (thismolname == system.proto[j].name)
@@ -138,14 +138,14 @@ void computeAverages(System &system) {
 		for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
-		    if (system.molecules[c].MF == "M") {
+		    if (!system.molecules[c].frozen) {
                 for (int i=0; i<system.proto.size(); i++) {
                     if (system.proto[i].name == thismolname)
                         system.stats.movablemass[i].value += thismass;
                 }
                                
             }
-            else if (system.molecules[c].MF == "F")
+            else if (system.molecules[c].frozen)
                 system.stats.frozenmass.value += thismass;
         }
 	}
@@ -153,7 +153,7 @@ void computeAverages(System &system) {
     // N_movables (sorbates, usually)
     for (int i=0; i<system.proto.size(); i++) system.stats.Nmov[i].value = 0; // initialize b4 counting. 
     for (int i=0; i<system.molecules.size(); i++) {
-        if (system.molecules[i].MF == "F") continue;
+        if (system.molecules[i].frozen) continue;
         string thismolname = system.molecules[i].name;
         for (int j=0; j<system.proto.size(); j++) 
             if (thismolname == system.proto[j].name)

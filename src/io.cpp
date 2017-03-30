@@ -70,14 +70,17 @@ void readInAtoms(System &system, string filename) {
 			current_atom.E = 0.0;
 			current_atom.PDBID = stoi(myvector[1]); // pulled from input pdb column 2
 			current_atom.mol_name = myvector[3];
-			current_atom.MF = myvector[4];
+            if (myvector[4] == "F")
+			    current_atom.frozen = 1;
+            else
+                current_atom.frozen = 0;
 			// flag the first moving molecule as prototype sorbate
 			// this will only return true once.
 			if (myvector[4] == "M" && first_mover_passed == false) {
 				first_mover_passed = true;
 				first_mover_id = stoi(myvector[5]);
 				system.proto[0].name = myvector[3];
-				system.proto[0].MF = myvector[4];
+				system.proto[0].frozen = 0;
 				system.proto[0].PDBID = stoi(myvector[5]);
 			}
 			current_atom.mol_PDBID = stoi(myvector[5]);
@@ -103,7 +106,10 @@ void readInAtoms(System &system, string filename) {
 				Molecule current_molecule;
 				current_molecule.PDBID = current_mol_id;
 				current_molecule.name = myvector[3];
-				current_molecule.MF = myvector[4];
+                if (myvector[4] == "M")
+				    current_molecule.frozen = 0;
+                else if (myvector[4] == "F")
+                    current_molecule.frozen = 1;
 				//current_molecule.init_ang_vel(); // for rotations in MD
                 system.molecules.push_back(current_molecule); // make the molecule
 
@@ -206,7 +212,7 @@ void writePDBtraj(System &system, string restartfile, string trajfile, int step)
 /* WRITE PDB RESTART FILE EVERY CORRTIME */
 void writePDB(System &system, string filename) {
 	remove ( filename.c_str() );
-	
+	string frozenstring;
 FILE *f = fopen(filename.c_str(), "w");
 if (f == NULL)
 {
@@ -215,13 +221,17 @@ if (f == NULL)
 }
 	for (int j=0; j<system.molecules.size(); j++) {
 		for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+        if (system.molecules[j].atoms[i].frozen)
+                frozenstring = "F";
+        else if (!system.molecules[j].atoms[i].frozen)
+                frozenstring = "M";
         if (!system.constants.pdb_long) {
         // this is default. VMD requires the "true" %8.3f
 		fprintf(f, "ATOM  %5i %4s %3s %1s %3i    %8.3f%8.3f%8.3f %3.5f %3.5f %f %f %f\n",
             system.molecules[j].atoms[i].PDBID, // col 2
             system.molecules[j].atoms[i].name.c_str(), // 3
             system.molecules[j].atoms[i].mol_name.c_str(), // 4
-            system.molecules[j].atoms[i].MF.c_str(), // 5
+            frozenstring.c_str(), // 5
             system.molecules[j].atoms[i].mol_PDBID, // 6
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
@@ -237,7 +247,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].PDBID, // col 2
             system.molecules[j].atoms[i].name.c_str(), // 3
             system.molecules[j].atoms[i].mol_name.c_str(), // 4
-            system.molecules[j].atoms[i].MF.c_str(), // 5
+            frozenstring.c_str(), // 5
             system.molecules[j].atoms[i].mol_PDBID, // 6
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8

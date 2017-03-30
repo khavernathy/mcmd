@@ -306,7 +306,8 @@ void addAtomToProto(System &system, int protoid, string name, string molname, st
 
     atom.name = name;
     atom.mol_name = molname;
-    atom.MF = MF;
+    if (MF == "M") atom.frozen = 0;
+    else if (MF == "F") atom.frozen = 1;
     atom.pos[0] = x;
     atom.pos[1] = y;
     atom.pos[2] = z;
@@ -361,7 +362,7 @@ void moleculePrintout(System &system) {
                 last_mol_pdbid = system.molecules[last_mol_index].PDBID;
             }
             system.proto[i].PDBID = last_mol_pdbid+1;
-            system.proto[i].MF = "M";           
+            system.proto[i].frozen = 0;           
 
             std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
             // each call takes 12 arguments
@@ -557,8 +558,13 @@ void moleculePrintout(System &system) {
        
         // finally, zero the prototype coordinates and set fugacities (from user input)
 
-        if (system.proto.size() > 0 && system.constants.sorbate_fugacity.size() > 0) { // this is needed to avoid seg fault when input_atoms has, e.g.
-        for (int i=0; i<system.proto.size(); i++) {
+        if (system.proto.size() > 0 && system.constants.sorbate_fugacity.size() > 0) { // this is needed to avoid seg fault
+            // error out if the sorbates do not all have fugacities
+            if (system.proto.size() != system.constants.sorbate_fugacity.size()) {
+                printf("ERROR: The sorbate molecule count does not match the assigned fugacities count. Check your input file to see if all sorbates have a fugacity assigned.\n");
+                std::exit(0);
+            }
+            for (int i=0; i<system.proto.size(); i++) {
             system.proto[i].fugacity = system.constants.sorbate_fugacity[i];
             system.proto[i].calc_center_of_mass();
             for (int j=0; j<system.proto[i].atoms.size(); j++) {

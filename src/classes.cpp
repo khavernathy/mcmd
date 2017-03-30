@@ -474,7 +474,7 @@ class Atom {
 		Atom();
         string name; // element or label, e.g. H or H2G
         string mol_name; // molecule name that the atom belongs to
-        string MF; // movable/frozen (M or F)
+        int_fast8_t frozen; // movable/frozen (0 or 1)
 		int mol_PDBID; // the molecule's PDBID that this atom belongs to
 		double m=0.0; // mass, kg. This is the only one I'm keeping SI as of now.
         double eps=0.0; // LJ param in K
@@ -527,7 +527,7 @@ class Atom {
 
         /* for debugging */
         void printAll() {
-            printf("====================\natom (PDBID %i) %s on molecule %s (PBDID %i) is %s \n -----> m = %e; eps = %f; sig = %f; C = %f\nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, MF.c_str(), m, eps, sig,C, force[0], force[1], force[2], acc[0], acc[1], acc[2], old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2]);
+            printf("====================\natom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %e; eps = %f; sig = %f; C = %f\nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C, force[0], force[1], force[2], acc[0], acc[1], acc[2], old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2]);
         }
 };
 
@@ -540,7 +540,7 @@ class Molecule {
 		vector<Atom> atoms; // vector that holds this molecule's atoms
 		int PDBID; // the molecule's PDBID (from input)
 		string name; // the molecule name/label (from input), e.g. H2 or MOF
-        string MF; // movable/frozen: M or F
+        int_fast8_t frozen; //0 or 1
         double force[3];
         double torque[3];
         double com[3];
@@ -578,7 +578,7 @@ class Molecule {
             }
             name = "";
             PDBID=0;
-            MF = "M";
+            frozen = 0; // movable
             }
         }
 
@@ -704,8 +704,8 @@ class Molecule {
 
         // for debugging
         void printAll() {
-            printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e; movable = %s; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
-            PDBID,mass,inertia,MF.c_str(),
+            printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e; frozen = %i; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
+            PDBID,mass,inertia,frozen,
             force[0], force[1], force[2], acc[0], acc[1], acc[2], 
             old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2], com[0], com[1], com[2],
             torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2], 

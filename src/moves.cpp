@@ -257,12 +257,12 @@ void removeMolecule(System &system, string model) {
 
     system.checkpoint("getting random movable.");
     // select random movable molecule
-    string movable="notyet";
+    int_fast8_t frozen = 1;
     int randm = -1;
-    while (movable != "M") {
+    while (frozen != 0) {
             randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozen_molecules;
           //  printf("randm: %i\n",randm);
-            movable = system.molecules[randm].MF;
+            frozen = system.molecules[randm].frozen;
     }
     //printf("The molecule id to be deleted is %i\n",randm);
     system.checkpoint("random movable selected.");
@@ -310,12 +310,12 @@ void displaceMolecule(System &system, string model) {
     
     if (system.stats.count_movables == 0) return; // skip if no sorbate molecules are in the cell.
     system.stats.displace_attempts++;
-    string movable="notyet";
+    int_fast8_t frozen=1;
     int randm = -1;
-    while (movable != "M") {
+    while (frozen != 0) {
             randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozen_molecules;
             //printf("randm: %i\n",randm);
-            movable = system.molecules[randm].MF;
+            frozen = system.molecules[randm].frozen;
     }           
 	system.checkpoint("Got the random molecule.");
 
