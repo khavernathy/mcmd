@@ -340,7 +340,7 @@ void displaceMolecule(System &system, string model) {
             printf("H %f %f %f \n", system.molecules[randm].atoms[n].pos[0], system.molecules[randm].atoms[n].pos[1], system.molecules[randm].atoms[n].pos[2]);
 */
     // ROTATION
-    if (system.molecules[randm].atoms.size() > 1 && system.constants.rotate_option == "on") { // try rotation
+    if (system.molecules[randm].atoms.size() > 1 && system.constants.rotate_option) { // try rotation
         rotate(system, randm);    	
     } // end rotation option
 /*	

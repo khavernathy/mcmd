@@ -24,7 +24,7 @@ class System {
 
         // a function for de-bugging. Prints the current datetime and a string of text supplied in code.
         void checkpoint(string thetext) {
-            if (constants.checkpoints_option == "on") {
+            if (constants.checkpoints_option) {
             std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
             std::time_t thetime = std::chrono::system_clock::to_time_t(now);
             double time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(now - previous_checkpoint).count()) /1000.0; // in ms

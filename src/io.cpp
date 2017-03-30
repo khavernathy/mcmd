@@ -150,7 +150,7 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 	myfile.open (filename, ios_base::app);
 	//long unsigned int size = system.atoms.size();
 
-	if (system.constants.com_option == "on")
+	if (system.constants.com_option)
  		myfile << to_string(system.constants.total_atoms + 1) + "\nFrame " + to_string(frame) + "; Step count: " + to_string(step) + "; Realtime (MD) = " + to_string(realtime) + "fs\n";
 	else
 		myfile << to_string(system.constants.total_atoms) + "\nFrame " + to_string(frame) + "; Step count: " + to_string(step) + "; Realtime (MD) = " + to_string(realtime) + " fs\n";
@@ -168,7 +168,7 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 		}
 	}
 
-	if (system.constants.com_option == "on") {	
+	if (system.constants.com_option) {	
 		// get center of mass
         if (system.stats.count_movables > 0) {
 		    double* comfinal = centerOfMass(system);
@@ -215,7 +215,7 @@ if (f == NULL)
 }
 	for (int j=0; j<system.molecules.size(); j++) {
 		for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-        if (system.constants.pdb_long == "off") {
+        if (!system.constants.pdb_long) {
         // this is default. VMD requires the "true" %8.3f
 		fprintf(f, "ATOM  %5i %4s %3s %1s %3i    %8.3f%8.3f%8.3f %3.5f %3.5f %f %f %f\n",
             system.molecules[j].atoms[i].PDBID, // col 2
@@ -232,7 +232,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].eps,  //13
             system.molecules[j].atoms[i].sig); //14
 		}
-        else if (system.constants.pdb_long == "on") {
+        else if (system.constants.pdb_long) {
         fprintf(f, "ATOM  %5i %4s %3s %1s %3i %8.6f %8.6f %8.6f %3.6f %3.6f %f %f %f\n",
             system.molecules[j].atoms[i].PDBID, // col 2
             system.molecules[j].atoms[i].name.c_str(), // 3
@@ -254,7 +254,7 @@ if (f == NULL)
 
 
     // and draw the box if user desires
-    if (system.constants.draw_box_option == "on") {
+    if (system.constants.draw_box_option) {
 
         int i,j,k,p,q,diff,l,m,n;
         int box_labels[2][2][2];
@@ -290,7 +290,7 @@ if (f == NULL)
                         box_pos[p] += system.pbc.basis[q][p]*box_occupancy[q];
 
                 for(p = 0; p < 3; p++)
-                    if(system.constants.pdb_long != "on")
+                    if(!system.constants.pdb_long)
                         fprintf(f, "%8.3f", box_pos[p]);
                     else
                         fprintf(f, "%11.6f ", box_pos[p]);
@@ -502,7 +502,9 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "dist_within")) {
-                system.constants.dist_within_option = lc[1].c_str(); 
+                if (lc[1] == "on")
+                    system.constants.dist_within_option = 1;
+                else system.constants.dist_within_option = 0;
                 std::cout << "Got dist_within option = " << lc[1].c_str(); printf("\n");
         		
             } else if (!strcasecmp(lc[0].c_str(), "dist_within_target")) {
@@ -514,7 +516,10 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
-                system.constants.autocenter = lc[1].c_str();
+                if (lc[1] == "on") 
+                    system.constants.autocenter = 1;
+                else 
+                    system.constants.autocenter = 0;
                 std::cout << "Got auto-center-atoms-to-origin option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_corrtime")) {
@@ -529,7 +534,8 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD mode = " << lc[1].c_str(); printf("\n");
             
             } else if (!strcasecmp(lc[0].c_str(), "md_pbc")) {
-                system.constants.md_pbc = lc[1].c_str();
+                if (lc[1] == "on") system.constants.md_pbc = 1;
+                else system.constants.md_pbc = 0;
                 std::cout << "Got MD PBC option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "mc_pbc")) {
@@ -540,13 +546,14 @@ void readInput(System &system, char* filename) {
                     system.constants.mc_pbc = 0;
                 std::cout << "Got MC PBC option = " << lc[1].c_str(); printf("\n");
                 if (system.constants.mc_pbc == 0) {
-                    system.constants.ewald_es = "off";
-                    system.constants.rd_lrc = "off";
-                    system.constants.polar_pbc = "off";
+                    system.constants.ewald_es = 0;
+                    system.constants.rd_lrc = 0;
+                    system.constants.polar_pbc = 0;
                 }
 
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing")) {
-                system.constants.simulated_annealing = lc[1].c_str();
+                if (lc[1] == "on") system.constants.simulated_annealing = 1;
+                else system.constants.simulated_annealing = 0;
                 std::cout << "Got simulated annealing option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing_target")) {
@@ -558,7 +565,8 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got simulated annealing schedule = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "draw_box_option")) {
-                system.constants.draw_box_option = lc[1].c_str();
+                if (lc[1] == "on") system.constants.draw_box_option = 1;
+                else system.constants.draw_box_option = 0;
                 std::cout << "Got draw-box-option for PDB output = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "mc_corrtime")) {
@@ -582,11 +590,12 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got volume change factor = " << lc[1].c_str(); printf("\n");
 			
 			} else if (!strcasecmp(lc[0].c_str(), "rotate_option")) {
-				system.constants.rotate_option = lc[1].c_str();
+				if (lc[1] == "on") system.constants.rotate_option = 1;
+                else system.constants.rotate_option = 0;
 				std::cout << "Got rotate option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "rotate_angle_factor")) {
-				system.constants.rotate_angle_factor = atof(lc[1].c_str());
+                system.constants.rotate_angle_factor = atof(lc[1].c_str());
 				std::cout << "Got rotate angle factor = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "output_traj")) {
@@ -614,7 +623,8 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got polarization iterations = " << lc[1].c_str(); printf("\n");
 			
 			} else if (!strcasecmp(lc[0].c_str(), "com_option")) {
-				system.constants.com_option = lc[1].c_str();
+				if (lc[1] == "on") system.constants.com_option = 1;
+                else system.constants.com_option = 0;
 				std::cout << "Got center-of-mass option = " << lc[1].c_str(); printf("\n");
 			
             /* DEPRECATED
@@ -634,7 +644,8 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got MD final step = " << lc[1].c_str() << " fs"; printf("\n");
 			
 			} else if (!strcasecmp(lc[0].c_str(), "md_rotations")) {
-                system.constants.md_rotations = lc[1].c_str();
+                if (lc[1] == "on") system.constants.md_rotations = 1;
+                else system.constants.md_rotations = 0;
                 std::cout << "Got MD rotations option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {		
@@ -646,7 +657,8 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");
 			
 			} else if (!strcasecmp(lc[0].c_str(), "radial_dist")) { 
-                system.stats.radial_dist = lc[1].c_str();
+                if (lc[1] == "on") system.stats.radial_dist = 1;    
+                else system.stats.radial_dist = 0;
                 std::cout << "Got radial distribution option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_bin_size")) {
@@ -670,7 +682,8 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got radial dist. file = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "checkpoints_option")) {
-                system.constants.checkpoints_option = lc[1].c_str();
+                if (lc[1] == "on") system.constants.checkpoints_option = 1;
+                else system.constants.checkpoints_option = 0;
                 std::cout << "Got checkpoints option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "total_energy")) {
@@ -678,15 +691,18 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got NVE total energy constant = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "rd_lrc")) {
-                system.constants.rd_lrc = lc[1].c_str();
+                if (lc[1] == "on") system.constants.rd_lrc = 1;
+                else system.constants.rd_lrc = 0;
                 std::cout << "Got RD long range correction option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "ewald_es")) {
-                system.constants.ewald_es = lc[1].c_str();
+                if (lc[1] == "on") system.constants.ewald_es = 1;
+                else system.constants.ewald_es = 0;
                 std::cout << "Got Ewald electrostatics option = " << lc[1].c_str(); printf("\n");        
         
             } else if (!strcasecmp(lc[0].c_str(), "pdb_long")) {
-                system.constants.pdb_long = lc[1].c_str();
+                if (lc[1] == "on") system.constants.pdb_long =1;
+                else system.constants.pdb_long = 0;
                 std::cout << "Got option for PDB long float output = " << lc[1].c_str(); printf("\n");
 
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}

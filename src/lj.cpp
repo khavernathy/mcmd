@@ -80,7 +80,7 @@ double lj(System &system) {
         // ============================ LJ potential =============================
 
         // 1) Normal LJ: only apply if long range corrections are off, or if on and r<cutoff
-        if ((system.constants.rd_lrc == "off" || r <= cutoff)) {
+        if ((!system.constants.rd_lrc || r <= cutoff)) {
             this_lj = 4.0*eps*(sr6*sr6 - sr6);
             total_lj += this_lj;    //;
             total_pot += this_lj;
@@ -104,7 +104,7 @@ double lj(System &system) {
 
     // 2) Long range corr.: apply RD long range correction if needed
         // http://www.seas.upenn.edu/~amyers/MolPhys.pdf
-    if (system.constants.rd_lrc == "on") {
+    if (system.constants.rd_lrc) {
         if (system.stats.MCstep == 0 || system.constants.ensemble == "npt" || system.constants.ensemble == "uvt") { // lrc only changes if volume or N changes.
         for (int i=0; i < system.molecules.size(); i++) {
         for (int j=0; j< system.molecules[i].atoms.size(); j++) {
@@ -146,7 +146,7 @@ double lj(System &system) {
 
     // 3) LJ LRC self energy
     // only do for individual non-frozen atoms
-    if (system.constants.rd_lrc == "on") {  
+    if (system.constants.rd_lrc) {  
         total_rd_self_lrc = self_lj_lrc(system);
         total_pot += total_rd_self_lrc;
     } // end LRC self contribution.
@@ -195,7 +195,7 @@ void lj_force(System &system) {
                     sr6 = sr2*sr2*sr2;
                 }
 
-        if ((system.constants.rd_lrc == "off" || r <= cutoff)) {
+        if ((!system.constants.rd_lrc || r <= cutoff)) {
             for (int n=0; n<3; n++) {
                 f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                 system.molecules[i].atoms[j].force[n] += f[n];

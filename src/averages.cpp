@@ -45,7 +45,7 @@ void computeInitialValues(System &system) {
     for (int i=0; i<system.proto.size(); i++)
         system.stats.Nmov[i].average = system.stats.Nmov[i].value;
 
-    if (system.constants.dist_within_option == "on") {
+    if (system.constants.dist_within_option) {
         countAtomInRadius(system, system.constants.dist_within_target, system.constants.dist_within_radius);
         system.stats.dist_within.average = system.stats.dist_within.value;
     }
@@ -163,7 +163,7 @@ void computeAverages(System &system) {
     for (int i=0; i<system.proto.size(); i++)
         system.stats.Nmov[i].calcNewStats();
 
-    if (system.constants.dist_within_option == "on") {
+    if (system.constants.dist_within_option) {
         countAtomInRadius(system, system.constants.dist_within_target, system.constants.dist_within_radius);
         system.stats.dist_within.calcNewStats();
     }

@@ -31,7 +31,7 @@ double * getTotalPotential(System &system, string model) {
     }
     // ELECTROSTATIC
     if (model == "ljes" || model == "ljespolar") {
-        if (system.constants.ewald_es == "on") 
+        if (system.constants.ewald_es) 
             total_es = coulombic_ewald(system); // using ewald method for es
         else 
             total_es = coulombic(system); // plain old coloumb

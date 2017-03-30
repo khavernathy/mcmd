@@ -30,7 +30,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             K_total += 0.5 * system.molecules[j].mass * vsq; // linear
             Klin += 0.5 * system.molecules[j].mass * vsq;            
 
-            if (system.constants.md_rotations == "on") {
+            if (system.constants.md_rotations) {
             K_total += 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10; // rotational
             Krot += 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
             }
@@ -123,7 +123,7 @@ void calculateForces(System &system, string model, double dt) {
     // atomic forces are done, so now calc molecular values
     for (int i=0; i<system.molecules.size(); i++) {
         system.molecules[i].calc_force();
-        if (system.constants.md_rotations == "on" && system.molecules[i].atoms.size() > 1) 
+        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1) 
             system.molecules[i].calc_torque();
     }
 
@@ -164,7 +164,7 @@ void integrate(System &system, double dt) {
             system.molecules[j].calc_pos(dt);
             
               // ROTATION
-            if (system.constants.md_rotations == "on" && system.molecules[j].atoms.size() > 1) {
+            if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
             system.molecules[j].calc_ang_pos(dt);
 
             // rotate molecules
@@ -213,7 +213,7 @@ void integrate(System &system, double dt) {
     // END POSITION CHANGES
 
     // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
-    if (system.constants.md_pbc == "on") {
+    if (system.constants.md_pbc) {
         for (int j=0; j<system.molecules.size(); j++) {
             if (system.molecules[j].MF == "M") {
                 checkInTheBox(system,j);
@@ -245,7 +245,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].calc_vel(dt, system.constants.md_vel_goal);
     
                 // rotational
-                if (system.constants.md_rotations == "on") {
+                if (system.constants.md_rotations) {
                     system.molecules[j].calc_ang_acc();
                     system.molecules[j].calc_ang_vel(dt);
                 }

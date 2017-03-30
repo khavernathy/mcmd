@@ -56,10 +56,10 @@ int main(int argc, char **argv) {
     readInput(system, argv[1]); // executable takes the input file as only argument.
 	readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);	
-	if (system.constants.autocenter == "on")
+	if (system.constants.autocenter)
         centerCoordinates(system);
     setupBox(system);
-    if (system.stats.radial_dist == "on")   
+    if (system.stats.radial_dist)   
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
     initialize(system); // these are just system name sets, 
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     fclose(f);
 
     // Prep pdb trajectory if needed
-    if (system.constants.pdb_traj_option == "on") {
+    if (system.constants.pdb_traj_option) {
         FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
         fclose(f); 
     }
@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
                     
                     if (system.stats.MCmoveAccepted == false)
                         revertToCheckpoint(system);
-                    else if (system.constants.simulated_annealing == "on") { // S.A. only goes when move is accepted.
+                    else if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
                         system.constants.temp = 
                             system.constants.sa_target + 
                             (system.constants.temp - system.constants.sa_target) *
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
 			// PRINT MAIN OUTPUT
 			printf("MONTE CARLO\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
-            if (system.constants.simulated_annealing == "off")
+            if (!system.constants.simulated_annealing)
 			    printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
 			else
                 printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on); P = %.3f atm\n",system.constants.ensemble.c_str(), system.constants.temp, system.constants.pres);
@@ -229,7 +229,7 @@ int main(int argc, char **argv) {
             */
             if (system.proto.size() == 1) 
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
-            if (system.constants.dist_within_option == "on") {
+            if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
             }
 
@@ -252,11 +252,11 @@ int main(int argc, char **argv) {
             writeXYZ(system,system.constants.output_traj,frame,t,0);
             frame++;
             writePDB(system, system.constants.restart_pdb);
-            if (system.constants.pdb_traj_option == "on")
+            if (system.constants.pdb_traj_option)
                 writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);    
             // ONLY WRITES DENSITY FOR FIRST SORBATE
             writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density[0].average*1000, system.constants.temp, system.constants.pres, t);
-            if (system.stats.radial_dist == "on") {
+            if (system.stats.radial_dist) {
                 radialDist(system);
                 writeRadialDist(system);        
             }
@@ -303,7 +303,7 @@ int main(int argc, char **argv) {
         int frame = 2; // weird way to initialize but it works for the output file.
         // and initial PDB
         writePDB(system,system.constants.restart_pdb);
-            if (system.constants.pdb_traj_option == "on")
+            if (system.constants.pdb_traj_option)
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
 	// assign initial velocities
@@ -402,9 +402,9 @@ int main(int argc, char **argv) {
             frame++;
             writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, count_md_steps); 
             writePDB(system,system.constants.restart_pdb);	
-            if (system.constants.pdb_traj_option == "on") 
+            if (system.constants.pdb_traj_option) 
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, count_md_steps);
-            if (system.stats.radial_dist == "on") {
+            if (system.stats.radial_dist) {
                 radialDist(system);
                 writeRadialDist(system);
             }

@@ -16,7 +16,7 @@ class Constants {
             DEBYE2SKA, JL2ATM,A32L; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md" 
-        string checkpoints_option="off"; // enables checkpoints for debuggin
+        int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
         string ensemble; // "nve", "nvt", "nvp", "uvt"
         string atom_file; // input atoms .pdb file
         string output_traj="traj.xyz"; // system trajectory in xyz 
@@ -27,18 +27,18 @@ class Constants {
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
-        string pdb_traj_option="on"; // option to write PDB trajectory (in addition to xyz). default on
-        string com_option="off"; // enables computation of center-of-mass and logs in output_traj
-        string rotate_option="on"; // MC ONLY: can deactivate rotates if wanted. 
-        string draw_box_option="on"; // option to draw the box for visualization in restart.pdb
-        string rd_lrc="on"; // long range corrections for LJ RD
-        string ewald_es="on"; // ewald method for electrostatic potential calculation.
-        string pdb_long="off"; // on would force long coordinate/charge output
-        string dist_within_option="off"; // a function to calculate atom distances within a certain radius of origin
+        int_fast8_t pdb_traj_option=1; // option to write PDB trajectory (in addition to xyz). default on
+        int_fast8_t com_option=0; // enables computation of center-of-mass and logs in output_traj
+        int_fast8_t rotate_option=1; // MC ONLY: can deactivate rotates if wanted. 
+        int_fast8_t draw_box_option=1; // option to draw the box for visualization in restart.pdb
+        int_fast8_t rd_lrc=1; // long range corrections for LJ RD
+        int_fast8_t ewald_es=1; // ewald method for electrostatic potential calculation.
+        int_fast8_t pdb_long=0; // on would force long coordinate/charge output
+        int_fast8_t dist_within_option=0; // a function to calculate atom distances within a certain radius of origin
         string dist_within_target; // the atom to find in above option
         double dist_within_radius; // the radius within which to search from origin
-        string autocenter = "on"; // center all atoms about origin automatically. can opt out of it.
-        string simulated_annealing = "off"; // sim. ann.
+        int_fast8_t autocenter = 1; // center all atoms about origin automatically. can opt out of it.
+        int_fast8_t simulated_annealing = 0; // sim. ann.
         double sa_target = 0.0; // target temperature for annealing.
         double sa_schedule = 0.9999; // T-change factor for annealing.
 
@@ -66,8 +66,8 @@ class Constants {
 
         // MD STUFF
         int  md_corrtime=50; // user defined for MD
-        string md_pbc="on"; // PBC in molecular dynamics. default on.
-        string md_rotations="on"; // MD only.
+        int_fast8_t md_pbc=1; // PBC in molecular dynamics. default on.
+        int_fast8_t md_rotations=1; // MD only.
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_vel_goal=0; // 1D vector component of the velocity (which has magnitude md_init_vel)
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
@@ -94,12 +94,12 @@ class Constants {
         double **A_matrix, **B_matrix, C_matrix[3][3];
         int polar_precision=0;
         int iter_success;
-        int polar_rrms =0;
+        int_fast8_t polar_rrms =0;
         double dipole_rrms = 0.0;
-        int polar_gs_ranked = 1;
-        int polar_gs = 0;
-        int polar_palmo = 1;
-        string polar_pbc = "on"; // default periodic polar
+        int_fast8_t polar_gs_ranked = 1;
+        int_fast8_t polar_gs = 0;
+        int_fast8_t polar_palmo = 1;
+        int_fast8_t polar_pbc = 1; // default periodic polar
         //int thole_total_atoms = 0;
 };
 
@@ -358,7 +358,7 @@ class Stats {
         bool MCmoveAccepted;
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
 
-        string radial_dist = "off"; // default is no radial distribution
+        int_fast8_t radial_dist = 0; // default is no radial distribution
         string radial_file = "radial_distribution.dat"; // default filename for output.
         double radial_bin_size = 0.1; // bin counts will be considered for this range in A
         double radial_max_dist = 10.0; // maximum r to consider in rad. dist.
