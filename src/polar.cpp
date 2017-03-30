@@ -9,10 +9,11 @@ using namespace std;
 
 void makeAtomMap(System &system) {
     int count =0;
+    vector<int> local = vector<int>(2);
+    //int v[2];
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-            vector<int> local = {i,j};
-            
+            local = {i,j};
             system.atommap.push_back(local);
 
         //printf("system.atommap[%i] = {%i,%i}\n", count, system.atommap[count][0], system.atommap[count][1]);
@@ -97,8 +98,8 @@ void thole_amatrix(System &system) {
 
     makeAtomMap(system); // re-calculates unique indices for atoms
 
-    int i, j, ii, jj, N, p, q;
-    int w, x, y, z;
+    unsigned int i, j, ii, jj, N, p, q;
+    unsigned int w, x, y, z;
     double damp1=0, damp2=0, wdamp1=0, wdamp2=0, v, s; //, distancesp[3], rp;
     double r, r2, ir3, ir5, ir=0;
     double rcut, rcut2, rcut3;
@@ -206,20 +207,9 @@ void thole_amatrix(System &system) {
 
 void thole_field(System &system) {
     // wolf thole field
-
-    // first zero-out field vectors
-    for (int i=0; i<system.molecules.size(); i++) {
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-            for (int p=0; p<3; p++) {
-                system.molecules[i].atoms[j].efield[p] = 0;
-                system.molecules[i].atoms[j].efield_self[p] = 0;
-            }
-        }
-    }
-
+    int i,j,k,l,p;
     double SMALL_dR = 1e-12;
     double OneOverSqrtPi = 1.0/sqrt(M_PI);
-    int p; //dimensionality
     double r, rr; //r and 1/r (reciprocal of r)
     double R = system.pbc.cutoff;
     double rR = 1./R;
@@ -230,12 +220,22 @@ void thole_field(System &system) {
     double cutoffterm = (erR*rR*rR + 2.0*a*OneOverSqrtPi*exp(-a*a*R*R)*rR);
     double bigmess=0;
 
-    //printf("R = %f; a = %f; erR = %f; cutoffterm = %f\n", R, a, erR, cutoffterm);
 
-    for(int i=0; i<system.molecules.size(); i++) {
-        for(int j=0; j<system.molecules[i].atoms.size(); j++) {
-            for(int k=i+1; k<system.molecules.size(); k++) { // molecules not allowed to self-polarize
-            for (int l=0; l<system.molecules[k].atoms.size(); l++) {
+    // first zero-out field vectors
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            for (p=0; p<3; p++) {
+                system.molecules[i].atoms[j].efield[p] = 0;
+                system.molecules[i].atoms[j].efield_self[p] = 0;
+            }
+        }
+    }
+    
+
+    for(i=0; i<system.molecules.size(); i++) {
+        for(j=0; j<system.molecules[i].atoms.size(); j++) {
+            for(k=i+1; k<system.molecules.size(); k++) { // molecules not allowed to self-polarize
+            for (l=0; l<system.molecules[k].atoms.size(); l++) {
 
                 if ( system.molecules[i].frozen && system.molecules[k].frozen ) continue; //don't let the MOF polarize itself
 
@@ -244,7 +244,7 @@ void thole_field(System &system) {
                 //r = system.pairs[i][j][k][l].r;
                 //for (int n=0;n<3;n++) distances[n] = system.pairs[i][j][k][l].d[n];
 
-                if((r - SMALL_dR  < system.pbc.cutoff) && (r != 0.)) {
+                if((r - SMALL_dR  < R) && (r != 0.)) {
                     rr = 1./r;
 
                     if ( a != 0 )   
@@ -253,22 +253,30 @@ void thole_field(System &system) {
                     for ( p=0; p<3; p++ ) {
                         //see JCP 124 (234104)
                         if ( a == 0 ) {
-                            system.molecules[i].atoms[j].efield[p] += 
-                            (system.molecules[k].atoms[l].C)*
-                            (rr*rr-rR*rR)*distances[p]*rr;
-                        
-                            system.molecules[k].atoms[l].efield[p] -= 
-                            (system.molecules[i].atoms[j].C )*
-                            (rr*rr-rR*rR)*distances[p]*rr;
+
+                            // the commented-out charge=0 check here doesn't save time really.
+                            //if (system.molecules[k].atoms[l].C != 0) {
+                                system.molecules[i].atoms[j].efield[p] += 
+                                (system.molecules[k].atoms[l].C)*
+                                (rr*rr-rR*rR)*distances[p]*rr;
+                            //}
+                            //if (system.molecules[i].atoms[j].C != 0) {
+                                system.molecules[k].atoms[l].efield[p] -= 
+                                (system.molecules[i].atoms[j].C )*
+                                (rr*rr-rR*rR)*distances[p]*rr;
+                            //}
 
                         } else {
-                            system.molecules[i].atoms[j].efield[p] +=
-                            (system.molecules[k].atoms[l].C )*
-                            (bigmess-cutoffterm)*distances[p]*rr;
-
-                            system.molecules[k].atoms[l].efield[p] -= 
-                            (system.molecules[i].atoms[j].C )*
-                            (bigmess-cutoffterm)*distances[p]*rr;
+                            //if (system.molecules[k].atoms[l].C != 0) {
+                                system.molecules[i].atoms[j].efield[p] +=
+                                (system.molecules[k].atoms[l].C )*
+                                (bigmess-cutoffterm)*distances[p]*rr;
+                            //}
+                            //if (system.molecules[i].atoms[j].C != 0) {
+                                system.molecules[k].atoms[l].efield[p] -= 
+                                (system.molecules[i].atoms[j].C )*
+                                (bigmess-cutoffterm)*distances[p]*rr;
+                            //}
                          }
                       //      printf("efield[%i]: %f\n", p,system.molecules[i].atoms[j].efield[p]);
 

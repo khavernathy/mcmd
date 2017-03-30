@@ -16,6 +16,8 @@ class System {
 		Pbc pbc;
         Stats stats;
         Last last; // to hold previous values for reversion if needed (checkpointing variables)
+        
+        //int **atommap;
         vector<vector<int>> atommap;
         vector<vector<vector<vector<Pair>>>> pairs; // r
         
