@@ -223,6 +223,10 @@ void computeAverages(System &system) {
                 system.stats.qst.value = qst;
                 system.stats.qst.calcNewStats();
 
+            double qst_nvt = -system.stats.potential.average * system.constants.NA * system.constants.kb * 1e-3 / system.stats.Nmov[0].average;
+                system.stats.qst_nvt.value = qst_nvt;
+                system.stats.qst_nvt.calcNewStats();
+
             }
     }
 

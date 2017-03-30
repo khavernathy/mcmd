@@ -429,7 +429,7 @@ class Stats {
             }
 
 
-        } Nsq,NU,qst,rd,es,polar,potential,volume,z,
+        } Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass, pressure,temperature, fdotrsum, dist_within;
 
@@ -468,7 +468,7 @@ Pair::Pair() {}
 class Last {
     public:
         Last();
-        double Nsq,NU,qst,rd,es,polar,potential,volume,z,
+        double Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass,pressure,temperature, fdotrsum, dist_within;
     

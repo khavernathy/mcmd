@@ -631,6 +631,8 @@ void setCheckpoint(System &system) {
     system.last.z = system.stats.z.value;
         // QST
     system.last.qst = system.stats.qst.value;
+    system.last.qst_nvt = system.stats.qst_nvt.value;
+
     for (int i=0; i<system.proto.size(); i++) {
         // DENSITY // Nmov
         system.last.density[i] = system.stats.density[i].value;
@@ -664,7 +666,8 @@ void revertToCheckpoint(System &system) {
     system.stats.z.value = system.last.z;
         // QST
     system.stats.qst.value = system.last.qst;    
-    
+    system.stats.qst_nvt.value = system.last.qst_nvt;    
+
     for (int i=0; i<system.proto.size(); i++) {
         // DENSITY // Nmov
         system.stats.density[i].value = system.last.density[i];
