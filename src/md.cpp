@@ -171,29 +171,29 @@ void integrate(System &system, double dt) {
             // rotate molecules
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 // ROTATE IN X
-                double* rotatedx = rotatePoint(system, 
+                double* rotatedx = rotatePointRadians(system, 
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                0, system.molecules[j].ang_pos[0] * 180.0/M_PI); 
+                0, system.molecules[j].ang_pos[0] ); 
                 for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedx[n] + system.molecules[j].com[n];
 
                 // ROTATE IN Y
-                double* rotatedy = rotatePoint(system, 
+                double* rotatedy = rotatePointRadians(system, 
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                1, system.molecules[j].ang_pos[1] * 180.0/M_PI); 
+                1, system.molecules[j].ang_pos[1] ); 
                 for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedy[n] + system.molecules[j].com[n];
 
                 // ROTATE IN Z
-                double* rotatedz = rotatePoint(system, 
+                double* rotatedz = rotatePointRadians(system, 
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                2, system.molecules[j].ang_pos[2] * 180.0/M_PI); 
+                2, system.molecules[j].ang_pos[2] ); 
                 for (n=0; n<3; n++) 
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
             } // end loop over atoms i 
