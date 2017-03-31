@@ -362,17 +362,17 @@ int main(int argc, char **argv) {
 		integrate(system,dt);
 		
 		if (count_md_steps % system.constants.md_corrtime == 0) {  // print every x steps 
-				
+
             // get KE and PE and T at this step.
             double* ETarray = calculateEnergyAndTemp(system, t);
-            double KE = ETarray[0];
-            double PE = ETarray[1];
+            double KE = ETarray[0] * system.constants.K2KJMOL;
+            double PE = ETarray[1] * system.constants.K2KJMOL;
             double TE = KE+PE;
             double Temp = ETarray[2];
             double v_avg = ETarray[3];
             double Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
-            double Klin = ETarray[5];
-            double Krot = ETarray[6];
+            double Klin = ETarray[5] * system.constants.K2KJMOL;
+            double Krot = ETarray[6] * system.constants.K2KJMOL;
             double pressure = ETarray[7]; // only good for NVT. Frenkel p84
 
             // PRESSURE (my pathetic nRT/V method)
@@ -389,16 +389,20 @@ int main(int argc, char **argv) {
             printf("MOLECULAR DYNAMICS\n");
             //printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
-            printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
-            printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
+            printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
-			printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("KE: %.3f K (lin: %.3f , rot: %.3e ); PE: %.3f K; Total E: %.3f K; \nEmergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
-            KE, Klin, Krot, PE, TE,  
+            printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
+			printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
+            printf("KE: %.3e kJ/mol (lin: %.3e , rot: %.3e )\n",
+                  KE, Klin, Krot );
+            printf("PE: %.3e kJ/mol; Total E: %.3e kJ/mol; \n",
+                  PE, TE  
+                  );
+            printf("Emergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
             Temp, v_avg, system.constants.md_init_vel,
-            pressure);			
-
+            pressure);
+            printf("Specific heat: %.3f J/gK\n", (TE*1000/system.constants.NA) / ((Temp)*system.proto[0].mass*1000*system.stats.count_movables));            
 			printf("--------------------\n\n");
 
             // WRITE OUTPUT FILES 

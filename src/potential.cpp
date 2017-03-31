@@ -46,11 +46,8 @@ double * getTotalPotential(System &system, string model) {
     
     // save values to vars
     system.stats.rd.value = total_rd;
-    
     system.stats.es.value = total_es; 
-    
     system.stats.polar.value = total_polar; 
-    
     system.stats.potential.value = total_potential; 
 
 

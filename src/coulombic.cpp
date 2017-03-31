@@ -113,7 +113,7 @@ void coulombic_real_force(System &system) {
                 system.molecules[k].atoms[l].force[n] -= holder;
 
             }
-            system.molecules[i].atoms[j].V += charge1 * charge2 * erfc_term / r;
+            //system.molecules[i].atoms[j].V += charge1 * charge2 * erfc_term / r;
         } else if (i == k && j != l) { // self molecule interaction
             for (int n=0; n<3; n++) {
                 holder = charge1*charge2*erf(alpha*r) / rsq * u[n];
@@ -122,7 +122,7 @@ void coulombic_real_force(System &system) {
                 
             }
 
-            system.molecules[i].atoms[j].V -= (charge1 * charge2 * erf(alpha*r) / r); // negative (intra)
+            //system.molecules[i].atoms[j].V -= (charge1 * charge2 * erf(alpha*r) / r); // negative (intra)
         }
     } // end if not frozen
     } // end l

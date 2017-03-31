@@ -15,6 +15,11 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	double T=0.0, pressure=0;
 	
 
+    // grab fixed potential energy of system
+        double* potentials=getTotalPotential(system, system.constants.potential_form);
+        V_total += potentials[0]+potentials[1]+potentials[2];
+
+
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
     for (int j=0; j<system.molecules.size(); j++) {
        if (system.constants.md_mode == "molecular") {
@@ -47,16 +52,21 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             }
         }
 
+        /*
+         * I'm getting the state potential by the MC function instead of dynamic quantities.
+         * It's more foolproof.
         // iteratively sum ROTATIONAL POTENTIAL
         for (int n=0; n<3; n++) {
             V_total += -system.molecules[j].torque[n] * system.molecules[j].d_theta[n];
             //printf("rot pot: %e\n", -system.molecules[j].torque[n] * system.molecules[j].d_theta[n]);
         }
 
+        
         // iteratively sum LINEAR POTENTIAL
         for (int i=0; i<system.molecules[j].atoms.size(); i++) {
             V_total += system.molecules[j].atoms[i].V;
         }
+        */
     }
 
     avg_v = v_sum / system.molecules.size(); // A/fs

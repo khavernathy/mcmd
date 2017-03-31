@@ -213,7 +213,7 @@ void lj_force(System &system) {
 */
         }
 
-        system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
+        //system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
         } // if nonzero sig/eps
     }  // loop l
     } // loop k 

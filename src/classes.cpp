@@ -26,7 +26,7 @@ class Constants {
 		Constants();
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
             ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED, 
-            DEBYE2SKA, JL2ATM,A32L; // all defined below.
+            DEBYE2SKA, JL2ATM, A32L, K2KJMOL; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md" 
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
@@ -760,6 +760,7 @@ Constants::Constants() {
     DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
     JL2ATM = 0.00986923297; // J/L to atm
     A32L = 1e-27; // A^3 to liters.
+    K2KJMOL = kb*NA/1000; // K -> kJ/mol
 
     // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle
