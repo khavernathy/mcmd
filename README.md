@@ -23,9 +23,9 @@ To run (in base dir "mcmd") <br />
 TODO<br /><br />
 
 -> MC: fix weird NPT bug where ES energy gets really low, quickly
-&emsp;-> definitely in the volume-change function..
+&emsp;-> in the volume-change function..
 -> MC: add multi-sorb Qst calculator<br />
--> MC: add LJ Feynmann-Hibbs corrections<br />
+-> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
 &emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.
