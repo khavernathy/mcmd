@@ -1,6 +1,6 @@
 # mcmd
 This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
-It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6)<br />
+It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6).<br />
 
 --> MC Currently fully supporting NPT,NVT,NVE,uVT ensembles.  <br />
 --> MD supporting NVT.  <br />
