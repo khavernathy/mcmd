@@ -117,6 +117,9 @@ class Constants {
         int_fast8_t polar_palmo = 1;
         int_fast8_t polar_pbc = 1; // default periodic polar
         //int thole_total_atoms = 0;
+        
+        int all_pbc=1;
+
 };
 
 class Pbc {

@@ -5,7 +5,7 @@
 
 // by giving molecule/atom IDs
 double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
-    if (system.constants.mc_pbc || system.constants.md_pbc) {
+    if (system.constants.all_pbc) {
    // calculate distance between atoms
         double rimg;
         double d[3],di[3],img[3],dimg[3];

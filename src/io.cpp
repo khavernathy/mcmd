@@ -559,21 +559,31 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD mode = " << lc[1].c_str(); printf("\n");
             
             } else if (!strcasecmp(lc[0].c_str(), "md_pbc")) {
-                if (lc[1] == "on") system.constants.md_pbc = 1;
-                else system.constants.md_pbc = 0;
+                if (lc[1] == "on") {
+                    system.constants.md_pbc = 1;
+                    system.constants.all_pbc =1;
+                }
+                else {
+                    system.constants.md_pbc = 0;
+                    system.constants.all_pbc = 0;
+                }
                 std::cout << "Got MD PBC option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "mc_pbc")) {
                 if (lc[1] == "on") {
                     system.constants.mc_pbc = 1;
+                    system.constants.all_pbc = 1;
                 }
-                else
+                else {
                     system.constants.mc_pbc = 0;
+                    system.constants.all_pbc = 0;
+                }
                 std::cout << "Got MC PBC option = " << lc[1].c_str(); printf("\n");
                 if (system.constants.mc_pbc == 0) {
                     system.constants.ewald_es = 0;
                     system.constants.rd_lrc = 0;
                     system.constants.polar_pbc = 0;
+                    system.constants.all_pbc = 0;
                 }
 
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing")) {
