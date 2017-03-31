@@ -21,4 +21,18 @@ double * crossprod( double * a, double * b) {
     return output;
 }
 
+// custom erf^-1(x)
+// http://stackoverflow.com/questions/27229371/inverse-error-function-in-c
+double erfInverse(double x) {
+    
+    double tt1, tt2, lnx, sgn;
+    sgn = (x < 0) ? -1.0 : 1.0;
 
+    x = (1 -x)*(1 + x);
+    lnx = log(x);
+
+    tt1 = 2/(M_PI*0.147) + 0.5 * lnx;
+    tt2 = 1/(0.147) * lnx;
+
+    return (sgn*sqrt(-tt1 + sqrt(tt1*tt1 - tt2)));
+}
