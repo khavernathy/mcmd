@@ -373,7 +373,7 @@ class Stats {
 	public:
 		Stats();
         
-        int MCstep, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
+        int MCstep=0, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
         bool MCmoveAccepted;
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
 
