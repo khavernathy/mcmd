@@ -374,6 +374,9 @@ int main(int argc, char **argv) {
             double Klin = ETarray[5] * system.constants.K2KJMOL;
             double Krot = ETarray[6] * system.constants.K2KJMOL;
             double pressure = ETarray[7]; // only good for NVT. Frenkel p84
+            system.stats.csp.value = (TE*1000/system.constants.NA);
+                system.stats.csp.value /= -((Temp)*system.proto[0].mass*1000*system.stats.count_movables);
+                system.stats.csp.calcNewStats(); // the minus above i think is needed.
 
             // PRESSURE (my pathetic nRT/V method)
             //double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
@@ -402,7 +405,7 @@ int main(int argc, char **argv) {
             printf("Emergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
             Temp, v_avg, system.constants.md_init_vel,
             pressure);
-            printf("Specific heat: %.3f J/gK\n", (TE*1000/system.constants.NA) / ((Temp)*system.proto[0].mass*1000*system.stats.count_movables));            
+            printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );            
 			printf("--------------------\n\n");
 
             // WRITE OUTPUT FILES 
