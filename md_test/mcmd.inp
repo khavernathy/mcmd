@@ -24,10 +24,10 @@ carbasis 15 15 15 90 90 90
       
 ! radial distribution option      
 radial_dist         on   ! turns on/off radial distribution function. off for speedup        
-radial_bin_size     0.1  ! in A       
+radial_bin_size     0.05  ! in A       
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)        
 radial_centroid     OXY   ! element name      
-radial_counterpart  OXY   ! element name to get distance of w/centroid        
+radial_counterpart  HYD   ! element name to get distance of w/centroid        
 radial_file         radialdist.dat        
        
 temperature 298.0   

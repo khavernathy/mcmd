@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
             if (system.constants.ensemble == ENSEMBLE_UVT) {
                 if (system.proto.size() == 1) {
                     printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
-                    printf("Qst_nvt avg = %.5f +- %.5f kJ/mol\n", system.stats.qst_nvt.average, system.stats.qst_nvt.sd);
+                    printf("U/N avg = %.5f +- %.5f kJ/mol\n", system.stats.qst_nvt.average, system.stats.qst_nvt.sd);
                 }
                 printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             }
