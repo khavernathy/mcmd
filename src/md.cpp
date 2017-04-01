@@ -20,7 +20,8 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
 
     // assuming mean velocity is zero (+ or - boltzmann velocity for particles yields net 0)
     double ranf = 2*(((double)rand() / (double)RAND_MAX)-0.5); // -1 to +1
-    return abs(sigma*SQRT2*erfInverse(ranf)); // I'm doing absolute value here bc +- is determined by velocity.
+    //return abs(sigma*SQRT2*erfInverse(ranf)); // I'm doing absolute value here bc +- is determined by velocity.
+    return sigma*SQRT2*erfInverse(ranf);
     // if mean was nonzero it would be
     // mean + sigma*SQRT2*erfInverse(ranf);
     // my green notebook ("Space Group Research #2") has notes on this in 2nd divider.
@@ -292,7 +293,7 @@ void integrate(System &system, double dt) {
         double probab = system.constants.md_thermostat_probab;
         double ranf; //, sigma = sqrt(system.constants.kb * system.constants.temp /  system.proto[0].mass) *1e-5; // to A/s
         double sigma = system.constants.md_vel_goal;
-        double newvel;
+        //double newvel;
         if (system.constants.md_mode == "molecular") {
         for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue; // skip frozens
@@ -301,9 +302,9 @@ void integrate(System &system, double dt) {
                 // adjust the velocity components of the molecule.
                 for (n=0; n<3; n++) {
                     //printf("gauss(sigma, mean) = gauss(%f, %f) = %f\n", sigma, mean_velocity, gaussian(sigma, mean_velocity));
-                    newvel = gaussian(sigma);
-                    if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
-                    else system.molecules[i].vel[n] = newvel;
+                    system.molecules[i].vel[n] = gaussian(sigma);
+                    //if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
+                    //else system.molecules[i].vel[n] = newvel;
                     /*
                     if (system.molecules[i].vel[n] >= 0) {
                         //system.molecules[i].vel[n] = system.constants.md_vel_goal;
@@ -324,9 +325,9 @@ void integrate(System &system, double dt) {
                     ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
                     if (ranf <probab) {
                         for (n=0; n<3; n++) {
-                            newvel = gaussian(sigma);
-                            if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
-                            else system.molecules[i].vel[n] = newvel; 
+                            system.molecules[i].vel[n] = gaussian(sigma);
+                            //if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
+                            //else system.molecules[i].vel[n] = newvel; 
                     //      if (system.molecules[i].atoms[j].vel[n] >= 0) system.molecules[i].atoms[j].vel[n] = system.constants.md_vel_goal;
                        //     else system.molecules[i].atoms[j].vel[n] = -system.constants.md_vel_goal;
                         }

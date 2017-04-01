@@ -378,6 +378,9 @@ int main(int argc, char **argv) {
                 system.stats.csp.value /= -((Temp)*system.proto[0].mass*1000*system.stats.count_movables);
                 system.stats.csp.calcNewStats(); // the minus above i think is needed.
 
+            system.stats.temperature.value = Temp;
+            system.stats.temperature.calcNewStats();
+
             // PRESSURE (my pathetic nRT/V method)
             //double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
 
@@ -402,9 +405,10 @@ int main(int argc, char **argv) {
             printf("PE: %.3e kJ/mol; Total E: %.3e kJ/mol; \n",
                   PE, TE  
                   );
-            printf("Emergent T: %.3f K; Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
-            Temp, v_avg, system.constants.md_init_vel,
-            pressure);
+            printf("Emergent T avg = %.4f +- %.4f K (inst. T = %.4f K)\n",
+                system.stats.temperature.average, system.stats.temperature.sd, Temp);
+            printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
+                v_avg, system.constants.md_init_vel, pressure);
             printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );            
 			printf("--------------------\n\n");
 
