@@ -7,8 +7,8 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms     ../pdbs/50h2bssp.pdb 50ne.pdb    h2bssp.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
-potential_form 		ljes polar   !ljespolar 	!phast2    !!lj
+input_atoms    ../pdbs/50h2bssp.pdb 50ne.pdb    h2bssp.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+potential_form 		ljespolar   !ljespolar 	!phast2    !!lj
 
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
@@ -22,7 +22,7 @@ z_length   150   15.669    60    27.4876  150.97371
 ! MONTE CARLO ONLY ======================================
 ensemble		    npt
 
-mc_corrtime	        50
+mc_corrtime	 50  100     50
 finalstep		    5000000
 temperature 	    273.15   !77.0  ! K
 pressure		    1.0     ! atm

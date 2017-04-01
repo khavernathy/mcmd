@@ -10,7 +10,7 @@ using namespace std;
 /* THE BOLTZMANN FACTOR FUNCTION */
 // ==================================================================================
 double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t movetype) {
-    double bf, MAXVALUE=1e4; // we won't care about huge bf's
+    double bf, MAXVALUE=1e4; // we won't care about huge bf's for averaging
     double energy_delta = e_f - e_i;
     double fugacity;
 
@@ -49,12 +49,23 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     }
     else if (system.constants.ensemble == ENSEMBLE_NPT) {
         if (movetype == MOVETYPE_VOLUME) {
+            /*
+            system.pbc.old_volume = 200000;
+            system.pbc.volume = 210000;
+            system.constants.pres = 1.;
+            energy_delta = -13.5;
+            system.constants.temp = 300;
+            system.stats.count_movables = 50;
+*/
             // Frenkel Smit p118
             bf= exp(-( (energy_delta)
             + system.constants.pres * system.constants.ATM2REDUCED * 
             (system.pbc.volume - system.pbc.old_volume)
             - (system.stats.count_movables + 1) * system.constants.temp * 
                 log(system.pbc.volume/system.pbc.old_volume))/system.constants.temp);
+
+//            printf("\n\nvolume boltz: %f; v_old %f; v_new %f; vdiff %f; Udiff %f\n\n", bf, system.pbc.old_volume, system.pbc.volume, system.pbc.volume - system.pbc.old_volume, energy_delta);
+            
             if (bf < MAXVALUE) system.stats.volume_change_bf_sum += bf;
             else system.stats.volume_change_bf_sum += MAXVALUE;
         }

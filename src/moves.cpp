@@ -116,11 +116,12 @@ void changeVolumeMove(System &system) {
         double* energies = getTotalPotential(system,system.constants.potential_form);
         old_energy=energies[0]+energies[1]+energies[2];
 
-    double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
+    //double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
     system.pbc.old_volume = system.pbc.volume;
 
     // change the volume to test new energy.
     double new_volume = exp(log(system.pbc.volume) + (ranv-0.5)*system.constants.volume_change);// mpmc default = 2.5
+    //printf("CALCULATED NEW VOL: %f; constant: %f\n", new_volume, system.constants.volume_change);
 
     //double new_volume = 1e-30*new_volume_A3;
     double basis_scale_factor = pow(new_volume/system.pbc.volume, 1.0/3.0);
@@ -128,6 +129,7 @@ void changeVolumeMove(System &system) {
     system.pbc.y_length *= basis_scale_factor;
     system.pbc.z_length *= basis_scale_factor;
     defineBox(system);
+    //printf("defineBox NEW VOL (should match): %f\n", system.pbc.volume);
         
     // scale molecule positions
     for (i=0; i<system.molecules.size(); i++) {
@@ -144,6 +146,7 @@ void changeVolumeMove(System &system) {
             }
         }
         system.molecules[i].calc_center_of_mass();
+//        checkInTheBox(system, i);
     }
     
         double* potentials = getTotalPotential(system,system.constants.potential_form);
@@ -178,6 +181,7 @@ void changeVolumeMove(System &system) {
                     system.molecules[i].atoms[j].pos[n] += delta_pos[n];
             }
             system.molecules[i].calc_center_of_mass();
+  //          checkInTheBox(system,i);
         }
 	}
 }

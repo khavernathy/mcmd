@@ -39,7 +39,7 @@ double coulombic_self(System &system) {
     else {
         potential = system.stats.es_self.value;
     }
-    return potential; // i dont think it should be multiplied by ke
+    return potential;
 }
 
 /* coloumbic_real Ewald result */
@@ -48,7 +48,7 @@ double coulombic_real(System &system) {
     double potential=0.0, pair_potential=0.0;
     double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
-    double r;    
+    double r;  //  int count =0;
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -57,6 +57,7 @@ double coulombic_real(System &system) {
         if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // skip frozens
         if (system.molecules[i].atoms[j].C == 0 || system.molecules[k].atoms[l].C == 0) continue; // skip 0-energy
        
+//        count++;
         pair_potential = 0; 
                 
         // calculate distance between atoms
@@ -78,7 +79,8 @@ double coulombic_real(System &system) {
     } // end k
     } // end j
     } // end i 
-    return potential; // I think it's double counted. Compared to MPMC this is correct. 
+//    printf("alpha = %f; es_real = %f; count = %i\n", alpha, potential, count);
+    return potential; 
 }
 
 void coulombic_real_force(System &system) {

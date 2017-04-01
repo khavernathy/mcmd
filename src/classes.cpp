@@ -68,7 +68,7 @@ class Constants {
         double temp=0.0; //273.15; // in K
         double prevtemp = 0.0; // previous temp for NVT MD thermostat
         double pres=1.0; // in atm
-        double volume_change=2.5; // a factor used in volume change BF, mpmc default 2.5
+        double volume_change=0.25; // a factor used in volume change BF, mpmc default 0.25
         double vcp_factor=1.0; // a factor used in probability for volume change. this / num_sorbates is good per Frenkel
         double displace_factor=2.5; // up to +- this number in A 
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
@@ -130,7 +130,7 @@ class Pbc {
         double x_min,x_max,y_min,y_max,z_min,z_max;
         double basis[3][3];
         double reciprocal_basis[3][3];
-		double cutoff;
+		double cutoff=0.;
         double volume, inverse_volume, old_volume;
         double a, b, c, alpha, beta, gamma;
         double box_vertices[8][3];
@@ -225,6 +225,7 @@ class Pbc {
         }
 
         void calcCutoff() {
+            if (cutoff != 0.) return; // mpmc only changes the cutoff if it's nonzero
             double MAXVALUE = 1e40; int MAX_VECT_COEF = 5;
 			int i, j, k, p;
 			double curr_mag;
