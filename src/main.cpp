@@ -324,9 +324,14 @@ int main(int argc, char **argv) {
     } else {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
-        double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / 
-            (M_PI*system.proto[0].mass*system.constants.NA)) / 1e5; // THIS IS NOT GOOD FOR MULTISORBATE SYSTEM YET. A/fs
-        double v_component = sqrt(v_init*v_init / 3.0);
+        
+        // Frenkel method for NVT v_alpha determination (converted to A/fs) p140
+        double v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass); 
+        double v_init = sqrt(3*v_component*v_component);
+
+//double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / 
+  //          (M_PI*system.proto[0].mass*system.constants.NA)) / 1e5; // THIS IS NOT GOOD FOR MULTISORBATE SYSTEM YET. A/fs
+    //    double v_component = sqrt(v_init*v_init / 3.0);
 
         double pm = 0;
         for (int i=0; i<system.molecules.size(); i++) {

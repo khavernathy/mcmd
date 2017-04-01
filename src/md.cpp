@@ -91,7 +91,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
         */
     }
 
-    avg_v = v_sum / system.molecules.size(); // A/fs
+    avg_v = v_sum / system.stats.count_movables; //system.molecules.size(); // A/fs
     K_total = K_total / system.constants.kb * 1e10; // convert to K 
     Klin = Klin / system.constants.kb * 1e10;
     Krot = Krot / system.constants.kb * 1e10;
