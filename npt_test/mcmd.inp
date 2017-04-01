@@ -7,8 +7,8 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms     ../pdbs/50h2bssp.pdb  50ne.pdb   h2bssp.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
-potential_form 		ljespolar   !ljespolar 	!phast2    !!lj
+input_atoms     ../pdbs/50h2bssp.pdb 50ne.pdb    h2bssp.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+potential_form 		ljes polar   !ljespolar 	!phast2    !!lj
 
 
 ! P.B.C. will be 1/2 of these lengths for each dimension

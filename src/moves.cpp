@@ -84,13 +84,13 @@ void defineBox(System &system) { // takes input in A
 		system.pbc.z_max = system.pbc.z_length/2.0;
 		system.pbc.z_min = -system.pbc.z_max;
 
+	    system.pbc.calcVolume();
+        system.pbc.calcRecip();
         system.pbc.calcCutoff();
-		//system.pbc.cutoff = system.pbc.x_max; // crude method but good for cubes (and only cubes!!)
-		// need to make basis vector system later.
 		system.constants.ewald_alpha = 3.5/system.pbc.cutoff; // update ewald_alpha if we have a vol change
-
-		system.pbc.volume = system.pbc.x_length * system.pbc.y_length * system.pbc.z_length; // in A^3
-	}
+        // no need for vertices and planes for 90/90/90
+        
+    }
 	// universal definitions
 	else {
 		// this could forseeably be a problem if, for some weird reason, someone wants to do NPT with a weird box.
@@ -110,9 +110,11 @@ void changeVolumeMove(System &system) {
 	double ranf = (double)rand() / (double)RAND_MAX; // for boltz check	
     double ranv = (double)rand() / (double)RAND_MAX; // for volume change
     double old_energy, new_energy;
+    double new_com[3], old_com[3], delta_pos[3];
+    int i,j,n;
 
         double* energies = getTotalPotential(system,system.constants.potential_form);
-        old_energy=energies[0]+energies[1]+energies[2]+energies[3];
+        old_energy=energies[0]+energies[1]+energies[2];
 
     double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
     system.pbc.old_volume = system.pbc.volume;
@@ -121,14 +123,31 @@ void changeVolumeMove(System &system) {
     double new_volume = exp(log(system.pbc.volume) + (ranv-0.5)*system.constants.volume_change);// mpmc default = 2.5
 
     //double new_volume = 1e-30*new_volume_A3;
-    double new_side = pow(new_volume, 1.0/3.0);
-    system.pbc.x_length = new_side;
-    system.pbc.y_length = new_side;
-    system.pbc.z_length = new_side;
+    double basis_scale_factor = pow(new_volume/system.pbc.volume, 1.0/3.0);
+    system.pbc.x_length *= basis_scale_factor;
+    system.pbc.y_length *= basis_scale_factor;
+    system.pbc.z_length *= basis_scale_factor;
     defineBox(system);
-    //printf("OLDV before energy call: %f; NEWV before energy call: %f\n", system.pbc.old_volume, system.pbc.volume);        
+        
+    // scale molecule positions
+    for (i=0; i<system.molecules.size(); i++) {
+        for (n=0; n<3; n++) {
+            old_com[n] = system.molecules[i].com[n];
+            new_com[n] = system.molecules[i].com[n]*basis_scale_factor;
+            delta_pos[n] = new_com[n] - old_com[n];
+        }
+        // move atoms one by one
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            for (n=0; n<3; n++) {
+                system.molecules[i].atoms[j].pos[n] += delta_pos[n];
+                // wrapped pos????
+            }
+        }
+        system.molecules[i].calc_center_of_mass();
+    }
+    
         double* potentials = getTotalPotential(system,system.constants.potential_form);
-        new_energy=potentials[0]+potentials[1]+potentials[2]+potentials[3];
+        new_energy=potentials[0]+potentials[1]+potentials[2];
 
     //printf("OLDV before bf call: %f; NEWV before bf call: %f\n", system.pbc.old_volume, system.pbc.volume); 
     double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, MOVETYPE_VOLUME);
@@ -142,10 +161,24 @@ void changeVolumeMove(System &system) {
 	} else {
         //printf("REJECTED\n");
 		// reject move (move volume back)
-        system.pbc.x_length = old_side;
-        system.pbc.y_length = old_side;
-        system.pbc.z_length = old_side;
+        system.pbc.x_length /= basis_scale_factor;
+        system.pbc.y_length /= basis_scale_factor;
+        system.pbc.z_length /= basis_scale_factor;
         defineBox(system);
+
+        // move molecules back
+        for (i=0; i<system.molecules.size(); i++) {
+            for (n=0; n<3; n++) {
+                old_com[n] = system.molecules[i].com[n];
+                new_com[n] = system.molecules[i].com[n]/basis_scale_factor;
+                delta_pos[n] = new_com[n] - old_com[n];
+            }
+            for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                for (n=0; n<3; n++)
+                    system.molecules[i].atoms[j].pos[n] += delta_pos[n];
+            }
+            system.molecules[i].calc_center_of_mass();
+        }
 	}
 }
 
@@ -161,7 +194,7 @@ void addMolecule(System &system, string model) {
 
 	// get current energy.
 	double* old_potentials = getTotalPotential(system, model);
-	double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2] + old_potentials[3];
+	double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2];
 
     // select a random prototype molecule
     if (system.proto.size() == 1) protoid=0;
@@ -218,8 +251,7 @@ void addMolecule(System &system, string model) {
 	
 	// FULLY DONE ADDING MOLECULE TO SYSTEM IN PLACE. NOW GET NEW ENERGY		
 	double* new_potentials = getTotalPotential(system, model);
-	double new_potential = new_potentials[0] + new_potentials[1] + new_potentials[2] + new_potentials[3];
-	double energy_delta = (new_potential - old_potential);
+	double new_potential = new_potentials[0] + new_potentials[1] + new_potentials[2];
 	
 	// BOLTZMANN ACCEPT OR REJECT
     double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);     
@@ -324,7 +356,7 @@ void displaceMolecule(System &system, string model) {
 
 	// first calculate the system's current potential energy
 		double* oldpotentials = getTotalPotential(system,model); //new double[2];
-		old_V = (oldpotentials[0]+oldpotentials[1]+oldpotentials[2]+oldpotentials[3]);	// keep in K
+		old_V = (oldpotentials[0]+oldpotentials[1]+oldpotentials[2]);	// keep in K
         
     // save a temporary copy of molecule to go back if needed
     Molecule tmp_molecule = system.molecules[randm];
@@ -352,7 +384,7 @@ void displaceMolecule(System &system, string model) {
     checkInTheBox(system, randm);
 
 		double* newpotentials = getTotalPotential(system,model); //new double[2];
-                new_V = (newpotentials[0]+newpotentials[1]+newpotentials[2]+newpotentials[3]); // keep in K
+                new_V = (newpotentials[0]+newpotentials[1]+newpotentials[2]); // keep in K
 
 	// now accept or reject the move based on Boltzmann probability
 	double boltzmann_factor = get_boltzmann_factor(system, old_V, new_V, MOVETYPE_DISPLACE);
