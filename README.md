@@ -22,6 +22,7 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
+-> MD: diffusion deltaR^2 needs to be computed with PBC in mind; i.e. add diff_corr[n] to molecules<br />
 -> MD: maybe don't even apply initial velocities in NVT (because the thermostat kicks in quick)<br />
 &emsp;-> needs to account for periodicity (track distance traveled from original COM)<br />
 -> MC: add multi-sorb Qst calculator<br />
