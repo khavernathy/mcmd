@@ -301,7 +301,8 @@ int main(int argc, char **argv) {
 	
 	// ===================== MOLECULAR DYNAMICS ==============================================
 	else if (system.constants.mode == "md") {
-    
+        double v_component=0., v_init=0.;
+
         // write initial XYZ
         if (system.constants.xyz_traj_option)
             writeXYZ(system,system.constants.output_traj, 1, 0, 0);	
@@ -327,8 +328,8 @@ int main(int argc, char **argv) {
         // default temp is zero so init. vel's will be 0 if no temp is given.
         
         // Frenkel method for NVT v_alpha determination (converted to A/fs) p140
-        double v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass); 
-        double v_init = sqrt(3*v_component*v_component);
+        v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass); 
+        v_init = sqrt(3*v_component*v_component);
 
 //double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / 
   //          (M_PI*system.proto[0].mass*system.constants.NA)) / 1e5; // THIS IS NOT GOOD FOR MULTISORBATE SYSTEM YET. A/fs
@@ -348,7 +349,12 @@ int main(int argc, char **argv) {
         system.constants.md_init_vel = v_init;
     } 
     system.constants.md_vel_goal = sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
-     // end initial velocities
+    printf("md_vel_goal = %f; v_component = %f; md_init_vel = %f; v_init = %f\n", 
+        system.constants.md_vel_goal,
+        v_component,
+        system.constants.md_init_vel,
+        v_init); 
+    // end initial velocities
 
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.

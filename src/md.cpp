@@ -76,7 +76,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 
         /*
          * I'm getting the state potential by the MC function instead of dynamic quantities.
-         * It's more foolproof.
+         * It's more foolproof, I do believe.
         // iteratively sum ROTATIONAL POTENTIAL
         for (int n=0; n<3; n++) {
             V_total += -system.molecules[j].torque[n] * system.molecules[j].d_theta[n];
