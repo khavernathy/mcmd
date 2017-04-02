@@ -35,42 +35,42 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
     double v_sum=0.0, avg_v = 0.0;
 	double T=0.0, pressure=0;
-	
+    double vsq=0., wsq=0.;
+    double energy_holder=0.;
+	int i,j,n;
 
     // grab fixed potential energy of system
         double* potentials=getTotalPotential(system, system.constants.potential_form);
         V_total += potentials[0]+potentials[1]+potentials[2];
 
-
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
-    for (int j=0; j<system.molecules.size(); j++) {
+    for (j=0; j<system.molecules.size(); j++) {
        if (system.constants.md_mode == MD_MOLECULAR) {
-            double vsq = 0, wsq = 0;
-           for (int n=0; n<3; n++) {
+            vsq = 0; wsq = 0;
+           for (n=0; n<3; n++) {
                 vsq += system.molecules[j].vel[n] * system.molecules[j].vel[n];
                 wsq += system.molecules[j].ang_vel[n] * system.molecules[j].ang_vel[n];
             }
-            vsq = sqrt(vsq); wsq = sqrt(wsq);
-            v_sum += vsq; // so we're adding up velocities.
-            vsq *= vsq;  wsq *= wsq;
+            v_sum += sqrt(vsq); // so we're adding up velocities.
 
-            K_total += 0.5 * system.molecules[j].mass * vsq; // linear
-            Klin += 0.5 * system.molecules[j].mass * vsq;            
+            energy_holder = 0.5 * system.molecules[j].mass * vsq;
+            K_total += energy_holder; // linear: kg A^2 / fs^2
+            Klin += energy_holder;            
 
             if (system.constants.md_rotations) {
-            K_total += 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10; // rotational
-            Krot += 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
+                energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
+                K_total += energy_holder; // rotational: kg A^2 / fs^2
+                Krot += energy_holder;
             }
         }
         else if (system.constants.md_mode == MD_ATOMIC) { 
-            for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-            double vsq=0;
-                for (int n=0; n<3; n++) vsq += system.molecules[j].atoms[i].vel[n] * system.molecules[j].atoms[i].vel[n];
-                vsq = sqrt(vsq);
-                v_sum += vsq; // sum velocities
-                vsq *= vsq;
-                K_total += 0.5 * system.molecules[j].atoms[i].m * vsq;
-                Klin += 0.5 * system.molecules[j].atoms[i].m * vsq;
+            for (i=0; i<system.molecules[j].atoms.size(); i++) {
+            vsq=0;
+                for (n=0; n<3; n++) vsq += system.molecules[j].atoms[i].vel[n] * system.molecules[j].atoms[i].vel[n];
+                v_sum += sqrt(vsq); // sum velocities
+                energy_holder = 0.5*system.molecules[j].atoms[i].m * vsq;
+                K_total += energy_holder;
+                Klin += energy_holder;
             }
         }
 
@@ -93,8 +93,8 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 
     avg_v = v_sum / system.stats.count_movables; //system.molecules.size(); // A/fs
     K_total = K_total / system.constants.kb * 1e10; // convert to K 
-    Klin = Klin / system.constants.kb * 1e10;
-    Krot = Krot / system.constants.kb * 1e10;
+    Klin = Klin / system.constants.kb * 1e10; // ""
+    Krot = Krot / system.constants.kb * 1e10; // ""
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
 
 	// calculate temperature from kinetic energy and number of particles

@@ -28,9 +28,9 @@ TODO<br /><br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
-&emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.
+&emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
--> MC: fix MC SD's maybe? Seem to be wrong<br />
+&emsp;-> RD is way faster than MPMC though. ES/polar are slower, roughly 2x/4x<br />
 -> both: NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
 &emsp;-> although I think it's always the case with crystalline systems.<br />
 -> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />

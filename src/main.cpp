@@ -348,14 +348,15 @@ int main(int argc, char **argv) {
         printf("Computed initial velocities from temperature: v_init = %f A/fs\n",v_init);
         system.constants.md_init_vel = v_init;
     } 
-    system.constants.md_vel_goal = sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
-    printf("md_vel_goal = %f; v_component = %f; md_init_vel = %f; v_init = %f\n", 
+    system.constants.md_vel_goal = v_component; //sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
+   /* 
+        printf("md_vel_goal = %f; v_component = %f; md_init_vel = %f; v_init = %f\n", 
         system.constants.md_vel_goal,
         v_component,
         system.constants.md_init_vel,
         v_init); 
+    */
     // end initial velocities
-
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond. 
@@ -363,6 +364,7 @@ int main(int argc, char **argv) {
 	int count_md_steps = 1;
     double diffusion_d[3] = {0,0,0}, diffusion_sum=0.;
 	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Ek=0., Klin=0., Krot=0., pressure=0.;
+    int i,n;
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
         printf("| ========================================= |\n\n");
@@ -395,8 +397,8 @@ int main(int argc, char **argv) {
 
             // calc diffusion
             diffusion_sum=0.;
-            for (int i=0; i<system.molecules.size(); i++) {
-                for (int n=0; n<3; n++) 
+            for (i=0; i<system.molecules.size(); i++) {
+                for (n=0; n<3; n++) 
                     diffusion_d[n] = system.molecules[i].com[n] - system.molecules[i].original_com[n];
 
                 diffusion_sum += sqrt(dddotprod(diffusion_d, diffusion_d)); // the net R from start -> now

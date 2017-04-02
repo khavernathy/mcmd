@@ -4,7 +4,7 @@ mode              md ! mc or md
 checkpoints_option  off       
        
 input_atoms ../pdbs/MPM1.pdb  ../pdbs/ethanol_0.63gcm3_15A.pdb    ../pdbs/MPM1.pdb   mof5h2.pdb  8h2bssp.pdb  ! PDB ONLY       
-!!!!!input_atoms ../pdbs/1gpercm3_water_15A.pdb 
+!!!input_atoms ../pdbs/1gpercm3_water_15A.pdb 
 
 potential_form        ljes   !ljespolar   !phast2    !!lj     
 com_option            off     ! center of mass        

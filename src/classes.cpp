@@ -578,7 +578,7 @@ class Molecule {
         double d_theta[3] = {0,0,0};
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
-        double inertia=0.0; //moment of inertia
+        double inertia=0.0; //moment of inertia. stored in K fs^2
         double fugacity;
 
         void reInitialize() {
