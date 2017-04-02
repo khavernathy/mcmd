@@ -22,7 +22,7 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
--> MD: diffusion calculator<br />
+-> MD: maybe don't even apply initial velocities in NVT (because the thermostat kicks in quick)<br />
 &emsp;-> needs to account for periodicity (track distance traveled from original COM)<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />

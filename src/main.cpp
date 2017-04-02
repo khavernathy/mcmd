@@ -362,7 +362,7 @@ int main(int argc, char **argv) {
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond. 
 	int total_steps = floor(tf/dt);
 	int count_md_steps = 1;
-    double diffusion_d[3] = {0,0,0}, diffusion_sum=0.;
+    double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D=0.0;
 	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Ek=0., Klin=0., Krot=0., pressure=0.;
     int i,n;
         printf("\n| ========================================= |\n");
@@ -396,14 +396,17 @@ int main(int argc, char **argv) {
                 system.stats.temperature.calcNewStats();
 
             // calc diffusion
+            // R^2 as a function of time should be linear.
             diffusion_sum=0.;
             for (i=0; i<system.molecules.size(); i++) {
                 for (n=0; n<3; n++) 
                     diffusion_d[n] = system.molecules[i].com[n] - system.molecules[i].original_com[n];
 
-                diffusion_sum += sqrt(dddotprod(diffusion_d, diffusion_d)); // the net R from start -> now
+                diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now
             }
-            system.stats.diffusion.value = diffusion_sum / system.stats.count_movables; // average
+            D = (diffusion_sum / system.stats.count_movables)/(6.0*t); // 6 because 2*dimensionality = 2*3
+            D *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
+            system.stats.diffusion.value = D; 
             system.stats.diffusion.calcNewStats();
 
             // PRESSURE (my pathetic nRT/V method)
@@ -435,7 +438,7 @@ int main(int argc, char **argv) {
             printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
                 v_avg, system.constants.md_init_vel, pressure);
             printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
-            printf("Diffusion distance avg = %.4f +- %.4f A (homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd);           
+            printf("Diffusion coefficient = %.4e +- %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd, system.proto[0].name.c_str());           
 			printf("--------------------\n\n");
 
             // WRITE OUTPUT FILES 
