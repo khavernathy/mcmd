@@ -445,7 +445,7 @@ int main(int argc, char **argv) {
             if (system.constants.xyz_traj_option)
 			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
             frame++;
-            writeThermo(system, TE, Klin, Krot, PE, 0.0, Temp, pressure, count_md_steps); 
+            writeThermo(system, TE, Klin, Krot, PE, 0.0, system.stats.temperature.average, pressure, count_md_steps); 
             writePDB(system,system.constants.restart_pdb);	
             if (system.constants.pdb_traj_option) 
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, count_md_steps);
