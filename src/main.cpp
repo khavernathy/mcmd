@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
     for (int i=0; i<system.molecules.size(); i++) {
         system.molecules[i].calc_center_of_mass();
         if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
+        for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
 
 	// clobber files 
@@ -354,7 +355,8 @@ int main(int argc, char **argv) {
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond. 
 	int total_steps = floor(tf/dt);
 	int count_md_steps = 1;
-	
+    double diffusion_d[3] = {0,0,0}, diffusion_sum=0.;
+	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Ek=0., Klin=0., Krot=0., pressure=0.;
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
         printf("| ========================================= |\n\n");
@@ -370,21 +372,31 @@ int main(int argc, char **argv) {
 
             // get KE and PE and T at this step.
             double* ETarray = calculateEnergyAndTemp(system, t);
-            double KE = ETarray[0] * system.constants.K2KJMOL;
-            double PE = ETarray[1] * system.constants.K2KJMOL;
-            double TE = KE+PE;
-            double Temp = ETarray[2];
-            double v_avg = ETarray[3];
-            double Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
-            double Klin = ETarray[5] * system.constants.K2KJMOL;
-            double Krot = ETarray[6] * system.constants.K2KJMOL;
-            double pressure = ETarray[7]; // only good for NVT. Frenkel p84
+            KE = ETarray[0] * system.constants.K2KJMOL;
+            PE = ETarray[1] * system.constants.K2KJMOL;
+            TE = KE+PE;
+            Temp = ETarray[2];
+            v_avg = ETarray[3];
+            Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
+            Klin = ETarray[5] * system.constants.K2KJMOL;
+            Krot = ETarray[6] * system.constants.K2KJMOL;
+            pressure = ETarray[7]; // only good for NVT. Frenkel p84
             system.stats.csp.value = (TE*1000/system.constants.NA);
                 system.stats.csp.value /= -((Temp)*system.proto[0].mass*1000*system.stats.count_movables);
                 system.stats.csp.calcNewStats(); // the minus above i think is needed.
-
             system.stats.temperature.value = Temp;
-            system.stats.temperature.calcNewStats();
+                system.stats.temperature.calcNewStats();
+
+            // calc diffusion
+            diffusion_sum=0.;
+            for (int i=0; i<system.molecules.size(); i++) {
+                for (int n=0; n<3; n++) 
+                    diffusion_d[n] = system.molecules[i].com[n] - system.molecules[i].original_com[n];
+
+                diffusion_sum += sqrt(dddotprod(diffusion_d, diffusion_d)); // the net R from start -> now
+            }
+            system.stats.diffusion.value = diffusion_sum / system.stats.count_movables; // average
+            system.stats.diffusion.calcNewStats();
 
             // PRESSURE (my pathetic nRT/V method)
             //double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
@@ -414,7 +426,8 @@ int main(int argc, char **argv) {
                 system.stats.temperature.average, system.stats.temperature.sd, Temp);
             printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
                 v_avg, system.constants.md_init_vel, pressure);
-            printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );            
+            printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
+            printf("Diffusion distance avg = %.4f +- %.4f A (homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd);           
 			printf("--------------------\n\n");
 
             // WRITE OUTPUT FILES 

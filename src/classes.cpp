@@ -439,7 +439,7 @@ class Stats {
 
         } Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass, pressure,temperature, fdotrsum, dist_within, csp;
+            frozenmass, pressure,temperature, fdotrsum, dist_within, csp, diffusion;
 
         vector<obs_t> wtp = vector<obs_t>(10);
         vector<obs_t> wtpME = vector<obs_t>(10);
@@ -478,7 +478,7 @@ class Last {
         Last();
         double Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass,pressure,temperature, fdotrsum, dist_within, csp;
+            frozenmass,pressure,temperature, fdotrsum, dist_within, csp, diffusion;
     
         int total_atoms, thole_total_atoms;
 
@@ -567,6 +567,7 @@ class Molecule {
         double force[3] = {0,0,0};
         double torque[3] = {0,0,0};
         double com[3] = {0,0,0};
+        double original_com[3] = {0,0,0};
         double acc[3] = {0,0,0};
         double old_acc[3] = {0,0,0};
         double vel[3] = {0,0,0};

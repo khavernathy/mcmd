@@ -22,14 +22,12 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
--> MC: fix weird NPT bug where ES energy gets really low, quickly
-&emsp;-> in the volume-change function..
+-> MD: diffusion calculator
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
 &emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.
--> MC: fix atom-stuck-at-origin issue in uVT<br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
 -> MC: fix MC SD's maybe? Seem to be wrong<br />
 -> both: NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
