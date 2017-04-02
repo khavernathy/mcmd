@@ -555,7 +555,10 @@ void readInput(System &system, char* filename) {
                 system.constants.md_init_vel = atof(lc[1].c_str());
                 std::cout << "Got MD initial velocity for all molecules = " << lc[1].c_str(); printf("\n");        
 			} else if (!strcasecmp(lc[0].c_str(), "md_mode")) {
-                system.constants.md_mode = lc[1].c_str();
+                if (lc[1] == "atomic")
+                    system.constants.md_mode = MD_ATOMIC;
+                else if (lc[1] == "molecular")
+                    system.constants.md_mode = MD_MOLECULAR;
                 std::cout << "Got MD mode = " << lc[1].c_str(); printf("\n");
             
             } else if (!strcasecmp(lc[0].c_str(), "md_pbc")) {

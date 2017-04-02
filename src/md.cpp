@@ -44,7 +44,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
     for (int j=0; j<system.molecules.size(); j++) {
-       if (system.constants.md_mode == "molecular") {
+       if (system.constants.md_mode == MD_MOLECULAR) {
             double vsq = 0, wsq = 0;
            for (int n=0; n<3; n++) {
                 vsq += system.molecules[j].vel[n] * system.molecules[j].vel[n];
@@ -62,7 +62,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             Krot += 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
             }
         }
-        else if (system.constants.md_mode == "atomic") { 
+        else if (system.constants.md_mode == MD_ATOMIC) { 
             for (int i=0; i<system.molecules[j].atoms.size(); i++) {
             double vsq=0;
                 for (int n=0; n<3; n++) vsq += system.molecules[j].atoms[i].vel[n] * system.molecules[j].atoms[i].vel[n];
@@ -170,9 +170,9 @@ void integrate(System &system, double dt) {
     int_fast8_t debug=0;
     if (debug == 1) {
         for (j=0; j<system.molecules.size(); j++) {
-            if (system.constants.md_mode == "molecular") system.molecules[j].printAll();
+            if (system.constants.md_mode == MD_MOLECULAR) system.molecules[j].printAll();
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
-                if (system.constants.md_mode == "atomic") system.molecules[j].atoms[i].printAll();
+                if (system.constants.md_mode == MD_ATOMIC) system.molecules[j].atoms[i].printAll();
             }
         }
     }
@@ -190,7 +190,7 @@ void integrate(System &system, double dt) {
     // done saving old positions
 
     // if molecular motion
-    if (system.constants.md_mode == "molecular") {
+    if (system.constants.md_mode == MD_MOLECULAR) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
 
@@ -234,7 +234,7 @@ void integrate(System &system, double dt) {
         } // end for molecules j
     } // end if molecular motion
     // if atomic motion
-    else if (system.constants.md_mode == "atomic") {
+    else if (system.constants.md_mode == MD_ATOMIC) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
@@ -265,14 +265,14 @@ void integrate(System &system, double dt) {
 		if (!system.molecules[j].frozen) { // only movable atoms should move.
 
             // if atoms allowed to move from molecules
-            if (system.constants.md_mode == "atomic") {
+            if (system.constants.md_mode == MD_ATOMIC) {
                 for (i=0; i<system.molecules[j].atoms.size(); i++) {
                     system.molecules[j].atoms[i].calc_acc();
                     system.molecules[j].atoms[i].calc_vel(dt); 
             } // end atomic loop i
             } // end if atomic
             // otherwise handle molecular movement with rigidity.
-            else if (system.constants.md_mode == "molecular") {
+            else if (system.constants.md_mode == MD_MOLECULAR) {
                 // linear
                 system.molecules[j].calc_acc();
                 system.molecules[j].calc_vel(dt, system.constants.md_vel_goal);
@@ -294,7 +294,7 @@ void integrate(System &system, double dt) {
         double ranf; //, sigma = sqrt(system.constants.kb * system.constants.temp /  system.proto[0].mass) *1e-5; // to A/s
         double sigma = system.constants.md_vel_goal;
         //double newvel;
-        if (system.constants.md_mode == "molecular") {
+        if (system.constants.md_mode == MD_MOLECULAR) {
         for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue; // skip frozens
             ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
@@ -318,7 +318,7 @@ void integrate(System &system, double dt) {
                 }
             }
         }
-        } else if (system.constants.md_mode == "atomic") {
+        } else if (system.constants.md_mode == MD_ATOMIC) {
             for (i =0; i<system.molecules.size(); i++) {
                 for (j=0; j<system.molecules[i].atoms.size(); j++) {
                     if (system.molecules[i].atoms[j].frozen) continue; // skip frozen atoms
