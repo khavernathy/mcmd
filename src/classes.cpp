@@ -225,9 +225,6 @@ class Pbc {
             calcPlane(2,3,6,3);
             calcPlane(0,2,4,4);
             calcPlane(1,3,5,5);
-
-
-
         }
 
         void calcVolume() {
@@ -575,6 +572,7 @@ class Molecule {
 		int PDBID; // the molecule's PDBID (from input)
 		string name; // the molecule name/label (from input), e.g. H2 or MOF
         int_fast8_t frozen; //0 or 1
+        // arrays are way faster than vectors.
         double force[3] = {0,0,0};
         double torque[3] = {0,0,0};
         double com[3] = {0,0,0};
