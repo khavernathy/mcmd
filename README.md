@@ -22,14 +22,13 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
--> MD: in a MOF, rotatations tend to get fast and max out. Maybe thermostat should adjust angular vel. too.<br />
+-> MD: in a MOF (MPM1+CO2), rotatations tend to get fast and max out. Maybe thermostat should adjust angular vel. too.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
 &emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
--> both: NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
 &emsp;-> although I think it's always the case with crystalline systems.<br />
 -> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />
 -> MD: Use GPU for MD force calculations? (add option)<br />
