@@ -14,46 +14,41 @@
 
 // =================== MAIN FUNCTION ======================
 // ---------------POTENTIAL OF ENTIRE SYSTEM --------------
-double * getTotalPotential(System &system, string model) {
-
+double getTotalPotential(System &system) {
+    int_fast8_t model = system.constants.potential_form;
     // compute all interaction distances
     //make_pairs(system);
 
-    // initializers 
-    double total_potential=0;    	
+    // initializers
+    double total_potential=0;
     double total_rd=0.0; double total_es = 0.0; double total_polar=0.0;
 
 
 // =========================================================================
     // REPULSION DISPERSION.
-    if (model == "lj" || model == "ljes" || model == "ljespolar") {
+    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) {
         total_rd = lj(system);
     }
     // ELECTROSTATIC
-    if (model == "ljes" || model == "ljespolar") {
-        if (system.constants.ewald_es) 
+    if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) {
+        if (system.constants.ewald_es)
             total_es = coulombic_ewald(system); // using ewald method for es
-        else 
+        else
             total_es = coulombic(system); // plain old coloumb
     }
-    // POLARIZATION 
-    if (model == "ljespolar") {
+    // POLARIZATION
+    if (model == POTENTIAL_LJESPOLAR) {
         total_polar = polarization(system); // yikes
-    } 
+    }
 // ==========================================================================
 
     total_potential = total_rd + total_es + total_polar;
-    
+
     // save values to vars
     system.stats.rd.value = total_rd;
-    system.stats.es.value = total_es; 
-    system.stats.polar.value = total_polar; 
-    system.stats.potential.value = total_potential; 
+    system.stats.es.value = total_es;
+    system.stats.polar.value = total_polar;
+    system.stats.potential.value = total_potential;
 
-
-	static double output[3];
-        output[0] = total_rd;
-        output[1] = total_es;
-        output[2] = total_polar;
-	return output;
+	return total_rd + total_es + total_polar;
 }

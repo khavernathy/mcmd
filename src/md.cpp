@@ -12,7 +12,7 @@
 // returns a gaussian-probability-generated velocity basied on mean (temperature goal) velocity and S.D.
 double gaussian(double sigma) { // sigma is SD of the gaussian curve
 
-    /* NOTE TO SELF 
+    /* NOTE TO SELF
         the usage of erfInverse here may explode if rand()/RAND_MAX ever yields exactly -1 or +1
         because erf^-1( +-1) = +-inf
         if that ever happens I just need to check for abs(ranf) == 1 and avoid it.
@@ -40,8 +40,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	int i,j,n;
 
     // grab fixed potential energy of system
-        double* potentials=getTotalPotential(system, system.constants.potential_form);
-        V_total += potentials[0]+potentials[1]+potentials[2];
+        V_total += getTotalPotential(system);
 
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
     for (j=0; j<system.molecules.size(); j++) {
@@ -55,7 +54,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 
             energy_holder = 0.5 * system.molecules[j].mass * vsq;
             K_total += energy_holder; // linear: kg A^2 / fs^2
-            Klin += energy_holder;            
+            Klin += energy_holder;
 
             if (system.constants.md_rotations) {
                 energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
@@ -63,7 +62,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
                 Krot += energy_holder;
             }
         }
-        else if (system.constants.md_mode == MD_ATOMIC) { 
+        else if (system.constants.md_mode == MD_ATOMIC) {
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
             vsq=0;
                 for (n=0; n<3; n++) vsq += system.molecules[j].atoms[i].vel[n] * system.molecules[j].atoms[i].vel[n];
@@ -83,7 +82,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             //printf("rot pot: %e\n", -system.molecules[j].torque[n] * system.molecules[j].d_theta[n]);
         }
 
-        
+
         // iteratively sum LINEAR POTENTIAL
         for (int i=0; i<system.molecules[j].atoms.size(); i++) {
             V_total += system.molecules[j].atoms[i].V;
@@ -92,7 +91,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     }
 
     avg_v = v_sum / system.stats.count_movables; //system.molecules.size(); // A/fs
-    K_total = K_total / system.constants.kb * 1e10; // convert to K 
+    K_total = K_total / system.constants.kb * 1e10; // convert to K
     Klin = Klin / system.constants.kb * 1e10; // ""
     Krot = Krot / system.constants.kb * 1e10; // ""
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
@@ -101,7 +100,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
 
-   
+
 /*
     if (system.constants.ensemble == "nvt") {
         // grab the sum of F.r's
@@ -132,8 +131,9 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 }
 
 
-void calculateForces(System &system, string model, double dt) {
-	
+void calculateForces(System &system, double dt) {
+  int_fast8_t model = system.constants.potential_form;
+
     // initialize variable for pressure calc in NVT
     // loop through all atoms
 	for (int j=0; j <system.molecules.size(); j++) {
@@ -145,17 +145,17 @@ void calculateForces(System &system, string model, double dt) {
 		system.molecules[j].atoms[i].V = 0.0;
 	}
 	}
-	
-    if (model == "lj" || model == "ljes" || model == "ljespolar")
-        lj_force(system);    
-    if (model == "ljes" || model == "ljespolar")
+
+    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+        lj_force(system);
+    if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
         coulombic_real_force(system);
 
-    
+
     // atomic forces are done, so now calc molecular values
     for (int i=0; i<system.molecules.size(); i++) {
         system.molecules[i].calc_force();
-        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1) 
+        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1)
             system.molecules[i].calc_torque();
     }
 
@@ -195,7 +195,7 @@ void integrate(System &system, double dt) {
             if (!system.molecules[j].frozen) {
 
             system.molecules[j].calc_pos(dt);
-            
+
               // ROTATION
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
             system.molecules[j].calc_ang_pos(dt);
@@ -203,32 +203,32 @@ void integrate(System &system, double dt) {
             // rotate molecules
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 // ROTATE IN X
-                double* rotatedx = rotatePointRadians(system, 
+                double* rotatedx = rotatePointRadians(system,
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                0, system.molecules[j].ang_pos[0] ); 
-                for (n=0; n<3; n++) 
+                0, system.molecules[j].ang_pos[0] );
+                for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedx[n] + system.molecules[j].com[n];
 
                 // ROTATE IN Y
-                double* rotatedy = rotatePointRadians(system, 
+                double* rotatedy = rotatePointRadians(system,
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                1, system.molecules[j].ang_pos[1] ); 
-                for (n=0; n<3; n++) 
+                1, system.molecules[j].ang_pos[1] );
+                for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedy[n] + system.molecules[j].com[n];
 
                 // ROTATE IN Z
-                double* rotatedz = rotatePointRadians(system, 
+                double* rotatedz = rotatePointRadians(system,
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                2, system.molecules[j].ang_pos[2] ); 
-                for (n=0; n<3; n++) 
+                2, system.molecules[j].ang_pos[2] );
+                for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
-            } // end loop over atoms i 
+            } // end loop over atoms i
             } // end if rotations allowed and >1 atom
             } // end if movable molecule
         } // end for molecules j
@@ -250,15 +250,14 @@ void integrate(System &system, double dt) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
                 checkInTheBox(system,j);
+                // 2) GET NEW C.O.M. FOR MOLECULES
+                system.molecules[j].calc_center_of_mass();
             } // end if movable
 	    } // end loop j molecules
     } // end if PBC
-   
-    // 2) GET NEW C.O.M. for new positions.
-    for (j=0; j<system.molecules.size(); j++) system.molecules[j].calc_center_of_mass();
- 
+
     // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
-	calculateForces(system, system.constants.potential_form, dt);
+	calculateForces(system, dt);
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
 	for (j=0; j<system.molecules.size(); j++) {
@@ -268,7 +267,7 @@ void integrate(System &system, double dt) {
             if (system.constants.md_mode == MD_ATOMIC) {
                 for (i=0; i<system.molecules[j].atoms.size(); i++) {
                     system.molecules[j].atoms[i].calc_acc();
-                    system.molecules[j].atoms[i].calc_vel(dt); 
+                    system.molecules[j].atoms[i].calc_vel(dt);
             } // end atomic loop i
             } // end if atomic
             // otherwise handle molecular movement with rigidity.
@@ -276,7 +275,7 @@ void integrate(System &system, double dt) {
                 // linear
                 system.molecules[j].calc_acc();
                 system.molecules[j].calc_vel(dt, system.constants.md_vel_goal);
-    
+
                 // rotational
                 if (system.constants.md_rotations) {
                     system.molecules[j].calc_ang_acc();
@@ -327,11 +326,11 @@ void integrate(System &system, double dt) {
                         for (n=0; n<3; n++) {
                             system.molecules[i].vel[n] = gaussian(sigma);
                             //if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
-                            //else system.molecules[i].vel[n] = newvel; 
+                            //else system.molecules[i].vel[n] = newvel;
                     //      if (system.molecules[i].atoms[j].vel[n] >= 0) system.molecules[i].atoms[j].vel[n] = system.constants.md_vel_goal;
                        //     else system.molecules[i].atoms[j].vel[n] = -system.constants.md_vel_goal;
                         }
-                    }            
+                    }
                 }
             }
         }

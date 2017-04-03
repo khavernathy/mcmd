@@ -8,6 +8,11 @@
 using namespace std;
 
 enum {
+    POTENTIAL_LJ,
+    POTENTIAL_LJES,
+    POTENTIAL_LJESPOLAR,
+};
+enum {
     ENSEMBLE_UVT,
     ENSEMBLE_NVT,
     ENSEMBLE_NPT,
@@ -29,27 +34,27 @@ class Constants {
 	public:
 		Constants();
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
-            ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED, 
+            ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED,
             DEBYE2SKA, JL2ATM, A32L, K2KJMOL; // all defined below.
 		string jobname="default_jobname";
-        string mode; // "mc" or "md" 
+        string mode; // "mc" or "md"
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
-        int_fast8_t ensemble; 
+        int_fast8_t ensemble;
         string ensemble_str;
         //int_fast8_t movetype;
         string atom_file; // input atoms .pdb file
-        string output_traj="traj.xyz"; // system trajectory in xyz 
+        string output_traj="traj.xyz"; // system trajectory in xyz
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
-        string potential_form="lj"; // "lj", "ljes", "ljespolar", "phast2" models for potential
+        int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
         int_fast8_t pdb_traj_option=1; // option to write PDB trajectory (in addition to xyz). default on
         int_fast8_t xyz_traj_option=0; // option for xyz trajectory, default off
         int_fast8_t com_option=0; // enables computation of center-of-mass and logs in output_traj
-        int_fast8_t rotate_option=1; // MC ONLY: can deactivate rotates if wanted. 
+        int_fast8_t rotate_option=1; // MC ONLY: can deactivate rotates if wanted.
         int_fast8_t draw_box_option=1; // option to draw the box for visualization in restart.pdb
         int_fast8_t rd_lrc=1; // long range corrections for LJ RD
         int_fast8_t ewald_es=1; // ewald method for electrostatic potential calculation.
@@ -74,10 +79,10 @@ class Constants {
         double pres=1.0; // in atm
         double volume_change=0.25; // a factor used in volume change BF, mpmc default 0.25
         double vcp_factor=1.0; // a factor used in probability for volume change. this / num_sorbates is good per Frenkel
-        double displace_factor=2.5; // up to +- this number in A 
+        double displace_factor=2.5; // up to +- this number in A
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
         // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
-        double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected 
+        double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
 		int stepsize=1; // obvi
         int finalstep; // user defined for MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
@@ -97,7 +102,7 @@ class Constants {
 
         map <string,double> sig_override;
         map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
-	
+
     	int total_atoms=0; // actual sites, not "atoms" persay
                 int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
         double initial_energy=0.0; // "" ""
@@ -105,7 +110,7 @@ class Constants {
         // Ewald (for ES)
         double ewald_alpha; // =3.5/cutoff;
         double ewald_kmax = 7;
-        
+
         // Wolf (for polarization)
         double polar_wolf_alpha = 0.13;
         double polar_damp = 2.1304;
@@ -121,7 +126,7 @@ class Constants {
         int_fast8_t polar_palmo = 1;
         int_fast8_t polar_pbc = 1; // default periodic polar
         //int thole_total_atoms = 0;
-        
+
         int all_pbc=1;
 
 };
@@ -158,23 +163,25 @@ class Pbc {
             printf("basis2 %.5f %.5f %.5f\n", basis[1][0], basis[1][1], basis[1][2]);
             printf("basis3 %.5f %.5f %.5f\n", basis[2][0], basis[2][1], basis[2][2]);
             printf("Basis vectors: { a = %9.5f; b = %9.5f; c = %9.5f }\n", a, b,c);
-            printf("Basis angles:  { α = %9.5f; β = %9.5f; γ = %9.5f }\n", alpha,beta,gamma); 
+            printf("Basis angles:  { α = %9.5f; β = %9.5f; γ = %9.5f }\n", alpha,beta,gamma);
             printf("Box vertices ::\n");
             for (int n=0; n<8; n++)
                 printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
             printf("PBC Cutoff = %.5f\n", cutoff);
             for (int n=0; n<6; n++) {
-                printf("Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n", 
+                printf("Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n",
                     n, A[n], B[n], C[n], D[n]);
             }
             printf("x_length = %.5f; y_length = %.5f; z_length = %.5f\n", x_length, y_length, z_length);
-            printf("x_max = %.5f; y_max = %.5f; z_max = %.5f\n", x_max, y_max, z_max);
-            printf("x_min = %.5f; y_min = %.5f; z_min = %.5f\n", x_min, y_min, z_min);
+            if (alpha == 90 && beta == 90 && gamma == 90) { // these don't get calculated or used for weird (non 90-90-90) unit cells
+              printf("x_max = %.5f; y_max = %.5f; z_max = %.5f\n", x_max, y_max, z_max);
+              printf("x_min = %.5f; y_min = %.5f; z_min = %.5f\n", x_min, y_min, z_min);
+            }
         }
 
         void calcPlane(int p1index, int p2index, int p3index, int planeIndex) { // 3 points define a plane.
             double vector1[3], vector2[3];
-        
+
             // 1) get 3 points (indexes for box vertices provided in arguments)
             // 2) make 2 planar vectors AB, AC
             for (int n=0; n<3; n++) {
@@ -186,7 +193,7 @@ class Pbc {
             double* normal = crossprod(vector1, vector2);
 
             // 4) plane equation is thus defined
-            A[planeIndex] = normal[0]; 
+            A[planeIndex] = normal[0];
             B[planeIndex] = normal[1];
             C[planeIndex] = normal[2];
             D[planeIndex] = -dddotprod(normal,box_vertices[p1index]);
@@ -196,26 +203,26 @@ class Pbc {
         void calcPlanes() {
             /* i drew a cube :-)
                                     The A[6],B[6],C[6],D[6] arrays will be used to make plane equations
-             2 /------------/ 6     0 :   0123 plane (-x) 
+             2 /------------/ 6     0 :   0123 plane (-x)
               /|           /|       1 :   4567 plane (+x)
-             / |          / |       2 :   0145 plane (-y)   
+             / |          / |       2 :   0145 plane (-y)
           3 |------------|7 |       3 :   2367 plane (+y)
-            |  |         |  |       4 :   0246 plane (-z) 
+            |  |         |  |       4 :   0246 plane (-z)
             |  |---------|--| 4     5 :   1357 plane (+z)
-            | / 0        |  / 
+            | / 0        |  /
             |/           | /        The vertices are defined in box_vertices[8][3].
           1 |____________|/ 5       3 points define a plane, so I'll use the first 3 for the above planes
 
             */
-          
-            // 3 points and plane index 
-            calcPlane(0,1,2,0); // I'm not sure if I'll ever have a system where the 4th point 
+
+            // 3 points and plane index
+            calcPlane(0,1,2,0); // I'm not sure if I'll ever have a system where the 4th point
             calcPlane(4,5,6,1); // results in a different plane than the first 3...
             calcPlane(0,1,4,2);
             calcPlane(2,3,6,3);
             calcPlane(0,2,4,4);
             calcPlane(1,3,5,5);
-           
+
 
         }
 
@@ -236,7 +243,7 @@ class Pbc {
 			double short_mag = MAXVALUE;
 			double curr_vec[3];
 			if ( volume <= 0 ) cutoff = MAXVALUE;
-    
+
             // smallest vector problem
 			for ( i=-MAX_VECT_COEF; i<=MAX_VECT_COEF; i++ ) {
 				for ( j=-MAX_VECT_COEF; j<=MAX_VECT_COEF; j++ ) {
@@ -283,34 +290,34 @@ class Pbc {
         }
 
         void calcNormalBasis() {
-                double b0[3] = {0,0,0}; 
-                double b1[3] = {0,0,0}; 
-                double b2[3] = {0,0,0}; 
- 
-                b0[0] = a; 
-                b0[1] = b*cos(M_PI/180.0 * gamma); 
-                b0[2] = c*cos(M_PI/180.0 * beta); 
- 
-                b1[0] = 0; 
-                b1[1] = b*sin(M_PI/180.0 * gamma); 
-                b1[2] = ( (0*0 + b*0 + 0*c) - (b0[1]*b0[2]) )/b1[1]; 
- 
-                b2[0] = 0; 
-                b2[1] = 0; 
-                b2[2] = sqrt( c*c - b0[2]*b0[2] - b1[2]*b1[2] ); 
- 
-                // I'm transposing it manually 
-                basis[0][0] = b0[0]; 
-                basis[0][1] = b1[0]; 
-                basis[0][2] = b2[0]; 
- 
-                basis[1][0] = b0[1]; 
-                basis[1][1] = b1[1]; 
-                basis[1][2] = b2[1]; 
-                 
-                basis[2][0] = b0[2]; 
-                basis[2][1] = b1[2]; 
-                basis[2][2] = b2[2]; 
+                double b0[3] = {0,0,0};
+                double b1[3] = {0,0,0};
+                double b2[3] = {0,0,0};
+
+                b0[0] = a;
+                b0[1] = b*cos(M_PI/180.0 * gamma);
+                b0[2] = c*cos(M_PI/180.0 * beta);
+
+                b1[0] = 0;
+                b1[1] = b*sin(M_PI/180.0 * gamma);
+                b1[2] = ( (0*0 + b*0 + 0*c) - (b0[1]*b0[2]) )/b1[1];
+
+                b2[0] = 0;
+                b2[1] = 0;
+                b2[2] = sqrt( c*c - b0[2]*b0[2] - b1[2]*b1[2] );
+
+                // I'm transposing it manually
+                basis[0][0] = b0[0];
+                basis[0][1] = b1[0];
+                basis[0][2] = b2[0];
+
+                basis[1][0] = b0[1];
+                basis[1][1] = b1[1];
+                basis[1][2] = b2[1];
+
+                basis[2][0] = b0[2];
+                basis[2][1] = b1[2];
+                basis[2][2] = b2[2];
 
         }
 
@@ -336,10 +343,10 @@ class Pbc {
 		                        box_pos[p] += basis[q][p]*box_occupancy[q];
                             }
                         }
-                   
-                        for (int n=0; n<3; n++) 
+
+                        for (int n=0; n<3; n++)
                             box_vertices[count][n] = box_pos[n]; // box_points[0 -> 7] will be defined.
-                    
+
                         count++;
 		            } // for k
 		        } // for j
@@ -377,7 +384,7 @@ Pbc::Pbc() {}
 class Stats {
 	public:
 		Stats();
-        
+
         int MCstep=0, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
         bool MCmoveAccepted;
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
@@ -386,9 +393,9 @@ class Stats {
         string radial_file = "radial_distribution.dat"; // default filename for output.
         double radial_bin_size = 0.1; // bin counts will be considered for this range in A
         double radial_max_dist = 10.0; // maximum r to consider in rad. dist.
-        vector<long unsigned int> radial_bins; // holds the counters       
+        vector<long unsigned int> radial_bins; // holds the counters
         string radial_centroid, radial_counterpart; // the two atoms to get distance between, user def.
-		
+
 		double insert_bf_sum = 0; // insert boltzmanns added up in boltzmann.cpp
 		double remove_bf_sum = 0; // ...
 		double displace_bf_sum = 0;
@@ -427,11 +434,11 @@ class Stats {
                 average = ((counter-1.0)*average + x)/counter;
                 //sd = sqrt( ((counter-2.0)*prevsd + (x - average)*(x - prevavg) ) / (counter-1.0));
                 double operand =  prevsd*prevsd + prevavg*prevavg - average*average +((x*x - prevsd*prevsd - prevavg*prevavg)/counter);
-                (operand > 0) ? sd = sqrt( operand ) : sd = 0;       
-    
+                (operand > 0) ? sd = sqrt( operand ) : sd = 0;
+
                 //if (name == "es") {
                 //if (name == "es" || name == "es_self" || name == "es_real" || name == "es_recip") {
-                //printf("observable %14s :: counter = %5f; value = %-10.5f; prevavg = %-10.5f; average = %-10.5f; prevsd = %-10.5f; sd = %-10.5f\n", 
+                //printf("observable %14s :: counter = %5f; value = %-10.5f; prevavg = %-10.5f; average = %-10.5f; prevsd = %-10.5f; sd = %-10.5f\n",
                 //    name.c_str(), counter, value, prevavg, average, prevsd, sd);
                 //}
             }
@@ -444,9 +451,9 @@ class Stats {
         vector<obs_t> wtp = vector<obs_t>(10);
         vector<obs_t> wtpME = vector<obs_t>(10);
         vector<obs_t> Nmov = vector<obs_t>(10);
-        vector<obs_t> movablemass = vector<obs_t>(10); 
+        vector<obs_t> movablemass = vector<obs_t>(10);
         vector<obs_t> density = vector<obs_t>(10); // gotta have multiples for multi-sorbate.
-        vector<obs_t> selectivity = vector<obs_t>(10); 
+        vector<obs_t> selectivity = vector<obs_t>(10);
 
 };
 
@@ -479,7 +486,7 @@ class Last {
         double Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass,pressure,temperature, fdotrsum, dist_within, csp, diffusion;
-    
+
         int total_atoms, thole_total_atoms;
 
         vector<double> wtp = vector<double>(10);
@@ -501,15 +508,15 @@ class Atom {
 		int mol_PDBID; // the molecule's PDBID that this atom belongs to
 		double m=0.0; // mass, kg. This is the only one I'm keeping SI as of now.
         double eps=0.0; // LJ param in K
-        double sig=0.0; // LJ param in A -- the real sigma, not r_m (as in UFF) 
+        double sig=0.0; // LJ param in A -- the real sigma, not r_m (as in UFF)
         double polar=0.0; // polarizability in A^3
         double C=0.0; // charge in e
         double V=0.0; // potential energy in K
         double K=0.0; // kinetic energy in K
         double E=0.0; // total energy in K
 		int PDBID; // the atom's PDBID (from input)
-        double rank_metric;  // for polarization sorting     
- 
+        double rank_metric;  // for polarization sorting
+
         double pos[3] = {0,0,0};
 		double prevpos[3] = {0,0,0};
         double force[3] = {0,0,0};
@@ -538,7 +545,7 @@ class Atom {
                 old_acc[n] = acc[n];
                 acc[n] = force[n]*1.3806488e-33 / m; // to A / fs^2
             }
-        } 
+        }
 
         void calc_vel(double dt) {
             for (int n=0; n<3; n++) vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // that's where VV comes into play. 1/2 * (a - prev_a)
@@ -567,7 +574,8 @@ class Molecule {
         double force[3] = {0,0,0};
         double torque[3] = {0,0,0};
         double com[3] = {0,0,0};
-        double original_com[3] = {0,0,0};
+        double original_com[3] = {0,0,0}; // for diffision calc
+        double diffusion_corr[3] = {0,0,0}; // for diffusion calc (accounts for PBC)
         double acc[3] = {0,0,0};
         double old_acc[3] = {0,0,0};
         double vel[3] = {0,0,0};
@@ -610,11 +618,11 @@ class Molecule {
             // ( mass is generated at input in io.cpp )
             return mass;
         }
-            
+
         void calc_inertia() {
             for (int i=0; i<atoms.size(); i++) {
                 double rsq = (atoms[i].pos[0] - com[0])*(atoms[i].pos[0] - com[0]) + (atoms[i].pos[1] - com[1])*(atoms[i].pos[1] - com[1]) + (atoms[i].pos[2] - com[2])*(atoms[i].pos[2] - com[2]);
-                inertia += atoms[i].m * rsq; // kg * A^2 
+                inertia += atoms[i].m * rsq; // kg * A^2
             }
             inertia = inertia/1.3806488e-23/1e20*1e30; // to K fs^2
         }
@@ -664,7 +672,7 @@ class Molecule {
             }
             */
         }
-   
+
         // angular position // in rad
         void calc_ang_pos(double dt) {
             double theta[3];
@@ -678,19 +686,19 @@ class Molecule {
             }
         }
 
-        // linear position 
+        // linear position
         void calc_pos(double dt) {
             for (int i=0; i<atoms.size(); i++) {
               for (int n=0; n<3; n++) atoms[i].pos[n] = atoms[i].pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
             }
-        }        
+        }
 
         void calc_force() {
             // A molecule's force IS the sum of its atoms' forces
             // this is external force on the molecule.
             force[0]=0; force[1]=0; force[2]=0;
             for (int i=0; i<atoms.size(); i++) {
-                for (int n=0; n<3; n++) force[n] += atoms[i].force[n]; // in K/A 
+                for (int n=0; n<3; n++) force[n] += atoms[i].force[n]; // in K/A
             }
         }
 
@@ -710,7 +718,7 @@ class Molecule {
             double comx = x_mass_sum/mass_sum;
             double comy = y_mass_sum/mass_sum;
             double comz = z_mass_sum/mass_sum;
-            
+
             com[0] = comx; com[1] = comy; com[2] = comz;
         }
 
@@ -722,7 +730,7 @@ class Molecule {
                 atoms[i].torque[1] = (atoms[i].pos[2]-com[2]) * atoms[i].force[0] - (atoms[i].pos[0]-com[0]) * atoms[i].force[2];
                 atoms[i].torque[2] = (atoms[i].pos[0]-com[0]) * atoms[i].force[1] - (atoms[i].pos[1]-com[1]) * atoms[i].force[0];
                 // molecular torque = sum of atomic torques
-                for (int n=0; n<3; n++) torque[n] += atoms[i].torque[n]; // in K            
+                for (int n=0; n<3; n++) torque[n] += atoms[i].torque[n]; // in K
             } // end atomic loop
         } // end calc_torque()
 
@@ -730,12 +738,12 @@ class Molecule {
         void printAll() {
             printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e; frozen = %i; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
             PDBID,mass,inertia,frozen,
-            force[0], force[1], force[2], acc[0], acc[1], acc[2], 
+            force[0], force[1], force[2], acc[0], acc[1], acc[2],
             old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2], com[0], com[1], com[2],
-            torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2], 
+            torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2],
             old_ang_acc[0], old_ang_acc[1], old_ang_acc[2], ang_vel[0], ang_vel[1], ang_vel[2],
             ang_pos[0]*180.0/M_PI, ang_pos[1]*180.0/M_PI, ang_pos[2]*180.0/M_PI); //com[0], com[1], com[2]);
-        
+
         }
 };
 
@@ -746,8 +754,8 @@ Constants::Constants() {
 	kb = 1.3806488e-23; // Boltzmann's in J/K
 	kbk = 0.0019872041; // Boltzmann's in kcal/(mol K)
     fs = 1.0e-15; // fs -> second
-	cC = 1.60217662e-19; //  e -> coulombs 
-	keSI = 8.9875517873681764e9; // ke, Coulomb's constant, Nm^2/C^2 or Jm/C^2.     
+	cC = 1.60217662e-19; //  e -> coulombs
+	keSI = 8.9875517873681764e9; // ke, Coulomb's constant, Nm^2/C^2 or Jm/C^2.
 	ke = keSI/kb*1e10*cC*cC; // ke in KA / e^2
     eV = 6.242e18; // 1J = eV electron volts
 	cM = 1.660578e-27; // kg / particle from g/mol
@@ -872,7 +880,7 @@ Constants::Constants() {
 	sigs["Ru"] = 2.963*uff2mpmc;
 //per5
 	sigs["Xe"] = 4.404*uff2mpmc;
-//per6	
+//per6
 	sigs["Rn"] = 4.765*uff2mpmc;
 
 
@@ -903,7 +911,7 @@ Constants::Constants() {
 	eps["O"] = 0.06/kbk;
 	eps["O2"] = 0.06/kbk; // my O2 model
     eps["OW"] = 0.06/kbk; // O in water (my model)
-    eps["OT"] = 0.6364/0.0083144621; // O in TIP3P 
+    eps["OT"] = 0.6364/0.0083144621; // O in TIP3P
 	eps["O_sp3"] = 30.01345; // O SAPT
     eps["O_sp2"] = 21.81177;
     eps["F"] = 0.05/kbk;
@@ -927,7 +935,7 @@ Constants::Constants() {
 //per6
 	eps["Rn"] = 0.248/kbk;
 
-	// POLARIZABILITIES  // in A^3 
+	// POLARIZABILITIES  // in A^3
 	polars["H"] = 0.41380;//*cV/ke;
 	polars["HW"] = 0.41380;//*cV/ke; // H in water (my model)
     polars["HS"] = 0.41380; // H SAPT

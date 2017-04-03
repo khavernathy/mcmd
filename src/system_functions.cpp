@@ -31,7 +31,7 @@ double getBoxLimit(System &system, int planeid, double x, double y, double z) {
     else if (planeid == 4) return (-system.pbc.D[4] - system.pbc.A[4]*x - system.pbc.B[4]*y)/system.pbc.C[4]; // -z
     else if (planeid == 5) return (-system.pbc.D[5] - system.pbc.A[5]*x - system.pbc.B[5]*y)/system.pbc.C[5]; // +z
     else {
-        printf("error: planeid is not valid.\n"); 
+        printf("error: planeid is not valid.\n");
         std::exit(0);
     }
 }
@@ -40,7 +40,7 @@ double getBoxLimit(System &system, int planeid, double x, double y, double z) {
 /* MOVE ALL ATOMS SUCH THAT THEY ARE CENTERED ABOUT 0,0,0 */
 void centerCoordinates(System &system) {
 	printf("Centering all coordinates...\n");
-    int size = system.constants.total_atoms;	
+    int size = system.constants.total_atoms;
 	double xtemp[size];
 	double ytemp[size];
 	double ztemp[size];
@@ -101,8 +101,8 @@ double * centerOfMass(System &system) {
         double comz = z_mass_sum/mass_sum;
 
         double* output = new double[3];
-        output[0] = comx; 
-        output[1] = comy; 
+        output[0] = comx;
+        output[1] = comy;
         output[2] = comz;
         return output;
 }
@@ -114,40 +114,44 @@ void checkInTheBox(System &system, int i) { // i is molecule id passed in functi
 // first the easy systems, alpha=beta=gamma=90
 // saves some time because box limits need not be recomputed
 if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
-    for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-        if (system.molecules[i].atoms[j].pos[0]  > system.pbc.x_max) {
+    //for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+        if (system.molecules[i].com[0] > system.pbc.x_max) { // right of box
+            system.molecules[i].diffusion_corr[0] += system.pbc.x_length;
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[0] -= system.pbc.x_length;
                 }
         }
-        else if (system.molecules[i].atoms[j].pos[0] < system.pbc.x_min) {
+        else if (system.molecules[i].com[0] < system.pbc.x_min) {
+            system.molecules[i].diffusion_corr[0] -= system.pbc.x_length;
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
 	                system.molecules[i].atoms[k].pos[0] += system.pbc.x_length;
                 }
         }
-
-        if (system.molecules[i].atoms[j].pos[1] > system.pbc.y_max) {
+        if (system.molecules[i].com[1] > system.pbc.y_max) {
+            system.molecules[i].diffusion_corr[1] += system.pbc.y_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
                 }
         }
-        else if (system.molecules[i].atoms[j].pos[1] < system.pbc.y_min) {
+        else if (system.molecules[i].com[1] < system.pbc.y_min) {
+            system.molecules[i].diffusion_corr[1] -= system.pbc.y_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
                 }
         }
-
-        if (system.molecules[i].atoms[j].pos[2]  > system.pbc.z_max) {
+        if (system.molecules[i].com[2]  > system.pbc.z_max) {
+            system.molecules[i].diffusion_corr[2] += system.pbc.z_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
                 }
         }
-        else if (system.molecules[i].atoms[j].pos[2] < system.pbc.z_min) {
+        else if (system.molecules[i].com[2] < system.pbc.z_min) {
+            system.molecules[i].diffusion_corr[2] -= system.pbc.z_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
                 }
-        }	
-    } // end atom loop
+        }
+    //} // end atom loop
 } // end if alpha=beta=gamma=90
 
 // the universal treatment, alpha != beta ?= gamma
@@ -158,7 +162,7 @@ else {
 
     for (int n=0; n<3; n++) comv[n] = system.molecules[i].com[n];
 
-  
+
     // find appropriate values for box limits based on atom coordinates.
     // check in this order: (-x, +x, -y, +y, -z, +z)
     for (int n=0; n<6; n++)
@@ -171,6 +175,7 @@ else {
     // NOTE: the r_c cutoff is not actually used in MD
 
         if (system.molecules[i].com[0] < box_limit[0]) { // left of box
+            system.molecules[i].diffusion_corr[0] -= system.pbc.x_length;
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -186,9 +191,8 @@ else {
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
              }
         }
-
-
-        if (system.molecules[i].com[0] > box_limit[1]) { // right of box
+        else if (system.molecules[i].com[0] > box_limit[1]) { // right of box
+            system.molecules[i].diffusion_corr[0] += system.pbc.x_length;
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -203,10 +207,9 @@ else {
                 system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
             }
-
         }
-
         if (system.molecules[i].com[1] < box_limit[2]) { // below box
+            system.molecules[i].diffusion_corr[1] -= system.pbc.y_length;
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -216,17 +219,14 @@ else {
 
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] + system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] + system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
-    
+
                 system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
                 system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
-
             }
-
         }
-
-        if (system.molecules[i].com[1] > box_limit[3]) { // above box
-
+        else if (system.molecules[i].com[1] > box_limit[3]) { // above box
+            system.molecules[i].diffusion_corr[1] += system.pbc.y_length;
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -237,20 +237,18 @@ else {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] - system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1] - system.pbc.y_length, system.molecules[i].atoms[k].pos[2]);
 
-    
+
                 system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
                 system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
-        
             }
         }
-
         if (system.molecules[i].com[2] < box_limit[4]) { // behind box
-        
+            system.molecules[i].diffusion_corr[2] -= system.pbc.z_length;
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
-        
+
                 double xdiff = system.molecules[i].atoms[k].pos[0] - newlimit[0];
                 double ydiff = system.molecules[i].atoms[k].pos[1] - newlimit[2];
 
@@ -258,13 +256,12 @@ else {
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2] + system.pbc.z_length);
 
                 system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
-                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff; 
+                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
-
             }
         }
-
-        if (system.molecules[i].com[2] > box_limit[5]) { // in front of box
+        else if (system.molecules[i].com[2] > box_limit[5]) { // in front of box
+            system.molecules[i].diffusion_corr[2] += system.pbc.z_length;
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -276,14 +273,11 @@ else {
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2] - system.pbc.z_length);
 
                 system.molecules[i].atoms[k].pos[0] = newlimit[0] + xdiff;
-                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff; 
+                system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
-
             }
         }
-
-
-} // end if non-90/90/90 
+} // end if non-90/90/90
 } // end pbc function
 
 
@@ -320,28 +314,28 @@ void addAtomToProto(System &system, int protoid, string name, string molname, st
     system.proto[protoid].mass += atom.m;
     // send it over
     system.proto[protoid].atoms.push_back(atom);
-    
+
 }
 
 void moleculePrintout(System &system) {
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
 
     // an excessive full list of atoms/molecules.
-/*    
+/*
     for (int b=0; b<system.molecules.size(); b++) {
         printf("Molecule PDBID = %i: %s has %i atoms and is %s; The first atom has PDBID = %i\n", system.molecules[b].PDBID, system.molecules[b].name.c_str(), (int)system.molecules[b].atoms.size(), system.molecules[b].MF.c_str(), system.molecules[b].atoms[0].PDBID);
         for (int c=0; c<system.molecules[b].atoms.size(); c++) {
             system.molecules[b].atoms[c].printAll();
             printf("\n");
         }
-        
-    } 
+
+    }
 */
     if (system.constants.mode == "mc") { // prototype is only used for MC.
     // CHANGE THE PROTOTYPE IF USER SUPPLIED A KEYWORD IN INPUT
     // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
         if (system.constants.sorbate_name.size() > 0) {
-            // clear the initial prototype 
+            // clear the initial prototype
             // THIS CAUSES SEG FAULT ERROR IF INPUT FILE IS EMPTY OR DOESN'T EXIST
             if (system.proto.size() > 0) {
                 system.proto[0].reInitialize();
@@ -349,7 +343,7 @@ void moleculePrintout(System &system) {
             else if (system.proto.size() == 0) {
                 Molecule firstie;
                 system.proto.push_back(firstie);
-            }           
+            }
         for (int i=0; i<system.constants.sorbate_name.size(); i++) {
             Molecule noobie;
             if (i>0) system.proto.push_back(noobie);
@@ -362,7 +356,7 @@ void moleculePrintout(System &system) {
                 last_mol_pdbid = system.molecules[last_mol_index].PDBID;
             }
             system.proto[i].PDBID = last_mol_pdbid+1;
-            system.proto[i].frozen = 0;           
+            system.proto[i].frozen = 0;
 
             std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
             // each call takes 12 arguments
@@ -413,7 +407,7 @@ void moleculePrintout(System &system) {
             else if (sorbmodel == "co2_trappe") {
                 addAtomToProto(system,i, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.01, 0.7, 0.0, 27.0, 2.80);
                 addAtomToProto(system,i, "COE", "CO2", "M", 1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05);
-                addAtomToProto(system,i, "COE", "CO2", "M", -1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05); 
+                addAtomToProto(system,i, "COE", "CO2", "M", -1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05);
                 system.proto[i].name = "CO2";
             }
             // NITROGEN N2
@@ -438,7 +432,7 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "MOV", "CH4", "M", -0.385,   0.668,  -0.271,  0.00000,  0.00000,  0.00000, 16.85422,  2.96286);
                 system.proto[i].name = "CH4";
             }
-            else if (sorbmodel == "ch4_9site*") {  
+            else if (sorbmodel == "ch4_9site*") {
                 addAtomToProto(system,i, "CHG",  "CH4", "M", 0.000,  -0.000,  -0.000, 12.01100, -0.58680,  1.09870, 45.09730,  2.16247); //  0.00000  0.00000
                 addAtomToProto(system,i, "CHE", "CH4", "M", 0.000,  0.000,1.099,  1.00790,  0.14670,  0.42460,  0.00000,  0.0000);
                 addAtomToProto(system,i, "CHE",  "CH4", "M",  1.036,  -0.000,  -0.366,  1.00790,  0.14670,  0.42460, 0.00000,  0.00000); //  0.00000  0.00000
@@ -521,12 +515,12 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "HME", "MET", "M", -1.086272, 0.976083, 0.0, 1.00794, 0.085798, 0.41380, 22.14, 2.571);
                 addAtomToProto(system,i, "HME", "MET", "M", 0.437877, 1.070546, 0.888953, 1.00794, 0.015921, 0.41380, 22.14, 2.571);
                 addAtomToProto(system,i, "HME", "MET", "M", 0.437877, 1.070546, -0.888953, 1.00794, 0.016558, 0.41380, 22.14, 2.571);
-                addAtomToProto(system,i, "HME", "MET", "M", 0.861794, -1.055796, 0.0, 1.00794, 0.383895, 0.41380, 22.14, 2.571); 
-                addAtomToProto(system,i, "CoM", "MET", "M", -0.020179, -0.063588, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);    
+                addAtomToProto(system,i, "HME", "MET", "M", 0.861794, -1.055796, 0.0, 1.00794, 0.383895, 0.41380, 22.14, 2.571);
+                addAtomToProto(system,i, "CoM", "MET", "M", -0.020179, -0.063588, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 system.proto[i].name = "MET";
             }
             // ETHANOL C2H5OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz pbe0 on CCSDT aug-cc-pvtz geomtry (CCCBDB); van Deuynen polariz's
-                
+
             else if (sorbmodel == "ethanol" || sorbmodel == "c2h5oh" || sorbmodel == "c2h6o") {
                 addAtomToProto(system,i, "CET", "ETH", "M", 1.161583, -0.406755, 0.0, 12.0107, -0.352167, 1.2886, 52.84, 3.431);
                 addAtomToProto(system,i, "CET", "ETH", "M", 0.0, 0.552718, 0.0, 12.0107, 0.362477, 1.2886, 52.84, 3.431);
@@ -554,8 +548,8 @@ void moleculePrintout(System &system) {
             }
 
         } // end for all sorbate names
-        } // end if sorbate name vector<string> has values (user inputs) 
-       
+        } // end if sorbate name vector<string> has values (user inputs)
+
         // finally, zero the prototype coordinates and set fugacities (from user input)
 
         if (system.proto.size() > 0 && system.constants.sorbate_fugacity.size() > 0) { // this is needed to avoid seg fault
@@ -570,7 +564,7 @@ void moleculePrintout(System &system) {
             for (int j=0; j<system.proto[i].atoms.size(); j++) {
                 for (int k=0; k<3; k++) system.proto[i].atoms[j].pos[k] -= system.proto[i].com[k];
             }
-            system.proto[i].calc_center_of_mass(); 
+            system.proto[i].calc_center_of_mass();
 
         } // end protos loop
         } // end if we have protos yet
@@ -586,7 +580,7 @@ void moleculePrintout(System &system) {
         }
 
     } // end if MC
-    
+
     // END MOLECULE PRINTOUT
 }
 
@@ -598,7 +592,7 @@ void setupBox(System &system) {
 	system.pbc.y_min = -system.pbc.y_max;
 	system.pbc.z_max = system.pbc.z_length/2.0;
 	system.pbc.z_min = -system.pbc.z_max;
-    } 
+    }
     system.pbc.calcVolume();
     system.pbc.calcRecip();
     system.pbc.calcCutoff();
@@ -645,7 +639,7 @@ void setCheckpoint(System &system) {
 
 void revertToCheckpoint(System &system) {
     // reverts variables of interest if needed
-    
+
     // VALUES
         // ENERGY
     system.stats.rd.value = system.last.rd;
@@ -657,7 +651,7 @@ void revertToCheckpoint(System &system) {
         system.stats.es_real.value = system.last.es_real;
         system.stats.es_recip.value = system.last.es_recip;
     system.stats.polar.value = system.last.polar;
-    system.stats.potential.value = system.last.potential;    
+    system.stats.potential.value = system.last.potential;
         // VOLUME
     system.stats.volume.value = system.last.volume;
             // CHEMICAL POTENTIAL
@@ -665,8 +659,8 @@ void revertToCheckpoint(System &system) {
         // Z
     system.stats.z.value = system.last.z;
         // QST
-    system.stats.qst.value = system.last.qst;    
-    system.stats.qst_nvt.value = system.last.qst_nvt;    
+    system.stats.qst.value = system.last.qst;
+    system.stats.qst_nvt.value = system.last.qst_nvt;
 
     for (int i=0; i<system.proto.size(); i++) {
         // DENSITY // Nmov
@@ -676,11 +670,11 @@ void revertToCheckpoint(System &system) {
 
         // N
     system.constants.total_atoms = system.last.total_atoms;
-    
+
 }
 
 void initialize(System &system) {
-        
+
         // i only needed these for testing, I think they're useless right now,
         // so I'm not dealing with the problem of adding a name to each vector
         // instance of Nmov
@@ -691,7 +685,7 @@ void initialize(System &system) {
         system.stats.rd.name = "rd";
         system.stats.es.name = "es";
         system.stats.polar.name = "polar";
-        system.stats.potential.name = "potential"; 
+        system.stats.potential.name = "potential";
         system.stats.volume.name = "volume";
         system.stats.z.name = "z";
         for (int i=0; i<system.proto.size(); i++) {

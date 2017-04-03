@@ -15,8 +15,9 @@
 
 // ================== MAIN MC FUNCTION. HANDLES MOVE TYPES AND BOLTZMANN ACCEPTANCE =================
 // ACCORDING TO DIFFERENT ENSEMBLES
-void runMonteCarloStep(System &system, string model) {
+void runMonteCarloStep(System &system) {
     system.checkpoint("Entered runMonteCarloStep().");
+    int_fast8_t model = system.constants.potential_form;
     system.stats.MCmoveAccepted = false; // reset acceptance checker
 
 	// VOLUME MOVE (only NPT)
@@ -34,7 +35,7 @@ void runMonteCarloStep(System &system, string model) {
 	// ADD / REMOVE (only uVT)
 	// We'll choose 0-0.5 for add; 0.5-1 for remove (equal prob.)
 	if (system.constants.ensemble == ENSEMBLE_UVT) {
-		double IRP = system.constants.insert_factor;  
+		double IRP = system.constants.insert_factor;
 		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
 		if (ranf < IRP) {
             //system.checkpoint("doing an add or remove.");
@@ -43,24 +44,24 @@ void runMonteCarloStep(System &system, string model) {
 			// ADD A MOLECULE
 			if (ranf2 < 0.5) {
                 system.checkpoint("doing molecule add move.");
-				addMolecule(system, model);			
+				addMolecule(system);
                 system.checkpoint("done with molecule add move.");
 			} // end add
- 
+
 			else { // REMOVE MOLECULE
                 system.checkpoint("doing molecule delete move.");
-				removeMolecule(system, model);
+				removeMolecule(system);
                 system.checkpoint("done with molecule delete move.");
-			} // end add vs. remove		
+			} // end add vs. remove
 		return; // we did the add or remove so exit MC step.
-		} // end doing an add/remove. 
-	} // end if uVT		
+		} // end doing an add/remove.
+	} // end if uVT
 
-	
+
 	// DISPLACE / ROTATE :: final default (for all: NPT, uVT, NVT, NVE); NVE has special BoltzFact tho.
 	// make sure it's a movable molecule
 	system.checkpoint("NOT volume/add/remove :: Starting displace or rotate..");
-    displaceMolecule(system, model);
+    displaceMolecule(system);
     system.checkpoint("done with displace/rotate");
-    return; // done with move, so exit MC step	
+    return; // done with move, so exit MC step
 }

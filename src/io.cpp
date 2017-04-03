@@ -36,13 +36,13 @@ void readInAtoms(System &system, string filename) {
 		{
 			vector<string> myvector;
       			istringstream iss(line);
-			//ostream_iterator<string> out_it (cout,",");	
+			//ostream_iterator<string> out_it (cout,",");
 			copy(
 				istream_iterator<string>(iss),
 				istream_iterator<string>(),
 				back_inserter(myvector) // "normally" out_it goes here.
 			);
-	
+
             // skip blank lines
             if (myvector.size() != 0) {
                 if (myvector[0] != "ATOM") continue; // skip anything in file that isn't an atom
@@ -54,15 +54,15 @@ void readInAtoms(System &system, string filename) {
             // I have a database of defaults in classes.cpp
             // Those defaults will load unless the input column is there
             if (9 < myvector.size() && myvector[9] != "default") current_atom.m = stod(myvector[9])*system.constants.cM;
-            else current_atom.m = system.constants.masses[current_atom.name]; 
-			
+            else current_atom.m = system.constants.masses[current_atom.name];
+
             if (12 < myvector.size() && myvector[12] != "default") current_atom.eps = stod(myvector[12]);
             else current_atom.eps = system.constants.eps[current_atom.name];
-			
+
             if (13 < myvector.size() && myvector[13] != "default") current_atom.sig = stod(myvector[13]);
             else current_atom.sig = system.constants.sigs[current_atom.name];
 
-            if (11 < myvector.size() && myvector[11] != "default") current_atom.polar = stod(myvector[11]);			
+            if (11 < myvector.size() && myvector[11] != "default") current_atom.polar = stod(myvector[11]);
             else current_atom.polar = system.constants.polars[current_atom.name];
             //==============================================================
             current_atom.V = 0.0;
@@ -85,7 +85,7 @@ void readInAtoms(System &system, string filename) {
 			}
 			current_atom.mol_PDBID = stoi(myvector[5]);
 			//current_mol_id = stoi(myvector[5]);
-			current_atom.pos[0] = stod(myvector[6]); 
+			current_atom.pos[0] = stod(myvector[6]);
 			current_atom.pos[1] = stod(myvector[7]);
 			current_atom.pos[2] = stod(myvector[8]);
 			current_atom.prevpos[0] = current_atom.pos[0];
@@ -93,13 +93,13 @@ void readInAtoms(System &system, string filename) {
 			current_atom.prevpos[2] = current_atom.pos[2];
             current_atom.C = stod(myvector[10]) * system.constants.E2REDUCED;
 			//system.atoms.push_back(current_atom); // to master atom list
-			
+
 			// create new molecule if needed.
 			if (current_mol_id != stoi(myvector[5])) {
 				// first save the previous molecule only if not the first instance
 				//if (current_mol_id != -1)
-				//	system.molecules.push_back(current_molecule);	
-				
+				//	system.molecules.push_back(current_molecule);
+
 				// make a new molecule.
 				mol_counter++;
 				current_mol_id = stoi(myvector[5]);
@@ -120,7 +120,7 @@ void readInAtoms(System &system, string filename) {
                 }
 
 			}
-					
+
 			// add atom to current molecule by default
 			system.molecules[mol_counter].atoms.push_back(current_atom);
             system.molecules[mol_counter].mass += current_atom.m;
@@ -128,30 +128,30 @@ void readInAtoms(System &system, string filename) {
 			// and add current atom to prototype only if its in the first mover
 			if (current_mol_id == first_mover_id) {
 				system.proto[0].atoms.push_back(current_atom);
-                system.proto[0].mass += current_atom.m;	
+                system.proto[0].mass += current_atom.m;
 			}
 			system.constants.total_atoms++;	// add +1 to master atoms count
 
             if (myvector[4] == "F")
-                system.stats.count_frozens++; // add +1 to frozen atoms count	
+                system.stats.count_frozens++; // add +1 to frozen atoms count
 			// this would print the whole line.
 			//cout << line << '\n';
             } // end if vector size nonzero
 		}
 		myfile.close();
-		
+
 	}
 	else {
         if (system.constants.sorbate_name.size() > 0) return;
-  
-        printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0); 
-    } 
+
+        printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0);
+    }
 }
 
 
 /* WRITE FRAME COORDINATE FOR TRAJECTORY FILE */
 void writeXYZ(System &system, string filename, int frame, int step, double realtime) {
-	
+
 	ofstream myfile;
 	myfile.open (filename, ios_base::app);
 	//long unsigned int size = system.atoms.size();
@@ -165,16 +165,16 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 		for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
 		myfile << system.molecules[j].atoms[i].name;
 		myfile <<  "   ";
-		myfile << system.molecules[j].atoms[i].pos[0]; 
+		myfile << system.molecules[j].atoms[i].pos[0];
 		myfile <<  "   ";
 		myfile << system.molecules[j].atoms[i].pos[1];
-		myfile <<  "   "; 
+		myfile <<  "   ";
 		myfile << system.molecules[j].atoms[i].pos[2];
 		myfile << "\n";
 		}
 	}
 
-	if (system.constants.com_option) {	
+	if (system.constants.com_option) {
 		// get center of mass
         if (system.stats.count_movables > 0) {
 		    double* comfinal = centerOfMass(system);
@@ -236,7 +236,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10 
+            system.molecules[j].atoms[i].m/system.constants.cM, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -252,7 +252,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10 
+            system.molecules[j].atoms[i].m/system.constants.cM, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -281,7 +281,7 @@ if (f == NULL)
             for(j = 0; j < 2; j++) {
                 for(k = 0; k < 2; k++) {
 
-                // make this frozen 
+                // make this frozen
                 fprintf(f, "ATOM  ");
                 fprintf(f, "%5d", atom_box);
                 fprintf(f, " %-4.45s", "X");
@@ -289,12 +289,12 @@ if (f == NULL)
                 fprintf(f, "%-1.1s", "F");
                 fprintf(f, " %4d   ", molecule_box);
 
-                // box coords 
+                // box coords
                 box_occupancy[0] = ((double)i) - 0.5;
                 box_occupancy[1] = ((double)j) - 0.5;
                 box_occupancy[2] = ((double)k) - 0.5;
 
-                
+
                 for(p = 0; p < 3; p++)
                     for(q = 0, box_pos[p] = 0; q < 3; q++)
                         box_pos[p] += system.pbc.basis[q][p]*box_occupancy[q];
@@ -305,7 +305,7 @@ if (f == NULL)
                     else
                         fprintf(f, "%11.6f ", box_pos[p]);
 
-                // null interactions 
+                // null interactions
                 fprintf(f, " %8.4f", 0.0);
                 fprintf(f, " %8.4f", 0.0);
                 fprintf(f, " %8.5f", 0.0);
@@ -333,14 +333,14 @@ if (f == NULL)
                                     if(diff == 1)
                                         fprintf(f, "CONECT %4d %4d\n", box_labels[i][j][k], box_labels[l][m][n]);
 
-                            } // n 
-                        } // m 
-                    } // l 
+                            } // n
+                        } // m
+                    } // l
 
 
                 } // k
-            } // j 
-        } // i 
+            } // j
+        } // i
 
     } // if draw box is on
     // (end drawing the box in .pbd restart)
@@ -353,7 +353,7 @@ void writeThermo(System &system, double TE, double LKE, double RKE, double PE, d
     FILE *f = fopen(system.constants.thermo_output.c_str(), "a");
     if (f == NULL) { printf("Error opening thermo data file!\n"); exit(1); }
 
-    fprintf(f, "%i  %f  %f  %f  %f  %f  %f  %f\n", 
+    fprintf(f, "%i  %f  %f  %f  %f  %f  %f  %f\n",
         step, TE, LKE, RKE, PE, density, temp, pressure);
 
     fclose(f);
@@ -380,20 +380,20 @@ void readInput(System &system, char* filename) {
 			);
 
 			//std::cout << lc[0] << ' ';
-			//printf("%\n",lc[0].c_str());			
-			if (!lc.empty()) { // ignore blank lines	
-	
+			//printf("%\n",lc[0].c_str());
+			if (!lc.empty()) { // ignore blank lines
+
 			if (!strncasecmp(lc[0].c_str(), "!", 1) || (!strncasecmp(lc[0].c_str(), "#", 1))) {
 				continue; // treat ! and # as comments
-			
+
 			} else if (!strcasecmp(lc[0].c_str(),"name")) {
 				system.constants.jobname = lc[1].c_str();
 				std::cout << "Got job name = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "mode")) {
 				system.constants.mode = lc[1].c_str();
 				std::cout << "Got mode = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
                 if (lc[1] == "nvt") {
                     system.constants.ensemble = ENSEMBLE_NVT;
@@ -412,7 +412,7 @@ void readInput(System &system, char* filename) {
                     system.constants.ensemble_str = "NPT";
                 }
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
-			
+
             } else if (!strcasecmp(lc[0].c_str(), "sorbate_name")) {
                 system.constants.sorbate_name.push_back(lc[1].c_str());
                 std::cout << "Got sorbate model name 1 = " << lc[1].c_str(); printf("\n");
@@ -423,7 +423,7 @@ void readInput(System &system, char* filename) {
                         std::cout << "Got sorbate model name " << i << " = " << lc[i].c_str(); printf("\n");
                     }
                 }
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "sorbate_fugacities")) {
                 system.constants.sorbate_fugacity.push_back(atof(lc[1].c_str()));
                 std::cout << "Got fugacity for sorbate 1 = " << lc[1].c_str(); printf("\n");
@@ -435,7 +435,7 @@ void readInput(System &system, char* filename) {
                     }
                 }
 
-            // BASIS STUFF. 
+            // BASIS STUFF.
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {
                 system.pbc.x_length = atof(lc[1].c_str());
@@ -443,21 +443,21 @@ void readInput(System &system, char* filename) {
                 system.pbc.basis[0][1] = 0;
                 system.pbc.basis[0][2] = 0;
                 std::cout << "Got x_length = " << lc[1].c_str() << " A"; printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "y_length")) {
                 system.pbc.y_length = atof(lc[1].c_str());
                 system.pbc.basis[1][1] = atof(lc[1].c_str());
                 system.pbc.basis[1][0] = 0;
                 system.pbc.basis[1][2] = 0;
                 std::cout << "Got y_length = " << lc[1].c_str() << " A"; printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "z_length")) {
                 system.pbc.z_length = atof(lc[1].c_str());
                 system.pbc.basis[2][2] = atof(lc[1].c_str());
                 system.pbc.basis[2][0] = 0;
                 system.pbc.basis[2][1] = 0;
                 std::cout << "Got z_length = " << lc[1].c_str() << " A"; printf("\n");
-        
+
                 system.pbc.calcCarBasis();
 
             // OR EXACT BASIS INPUT (by vectors)
@@ -505,23 +505,23 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got .car basis: a,b,c = " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str(); printf("\n");
                 std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");
 
-	
+
 			} else if (!strcasecmp(lc[0].c_str(), "input_atoms")) {
 				system.constants.atom_file = lc[1].c_str();
 				std::cout << "Got input atoms file name = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "restart_pdb")) {
 				system.constants.restart_pdb = lc[1].c_str();
 				std::cout << "Got restart output file = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "thermo_output")) {
 				system.constants.thermo_output = lc[1].c_str();
 				std::cout << "Got thermo output file = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "stepsize")) {
 				system.constants.stepsize = atoi(lc[1].c_str());
 				std::cout << "Got step size = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "finalstep")) {
 				system.constants.finalstep = atoi(lc[1].c_str());
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
@@ -531,7 +531,7 @@ void readInput(System &system, char* filename) {
                     system.constants.dist_within_option = 1;
                 else system.constants.dist_within_option = 0;
                 std::cout << "Got dist_within option = " << lc[1].c_str(); printf("\n");
-        		
+
             } else if (!strcasecmp(lc[0].c_str(), "dist_within_target")) {
                 system.constants.dist_within_target = lc[1].c_str();
                 std::cout << "Got dist_within_target atom = " << lc[1].c_str(); printf("\n");
@@ -541,26 +541,26 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
-                if (lc[1] == "on") 
+                if (lc[1] == "on")
                     system.constants.autocenter = 1;
-                else 
+                else
                     system.constants.autocenter = 0;
                 std::cout << "Got auto-center-atoms-to-origin option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_corrtime")) {
 				system.constants.md_corrtime = atoi(lc[1].c_str());
 				std::cout << "Got MD corrtime = " << lc[1].c_str(); printf("\n");
-			
+
             } else if (!strcasecmp(lc[0].c_str(), "md_init_vel")) {
                 system.constants.md_init_vel = atof(lc[1].c_str());
-                std::cout << "Got MD initial velocity for all molecules = " << lc[1].c_str(); printf("\n");        
+                std::cout << "Got MD initial velocity for all molecules = " << lc[1].c_str(); printf("\n");
 			} else if (!strcasecmp(lc[0].c_str(), "md_mode")) {
                 if (lc[1] == "atomic")
                     system.constants.md_mode = MD_ATOMIC;
                 else if (lc[1] == "molecular")
                     system.constants.md_mode = MD_MOLECULAR;
                 std::cout << "Got MD mode = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "md_pbc")) {
                 if (lc[1] == "on") {
                     system.constants.md_pbc = 1;
@@ -597,7 +597,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing_target")) {
                 system.constants.sa_target = atof(lc[1].c_str());
                 std::cout << "Got simulated annealing target temperature = " << lc[1].c_str() << " K"; printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing_schedule")) {
                 system.constants.sa_schedule = atof(lc[1].c_str());
                 std::cout << "Got simulated annealing schedule = " << lc[1].c_str(); printf("\n");
@@ -610,15 +610,15 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "mc_corrtime")) {
 				system.constants.mc_corrtime = atoi(lc[1].c_str());
 				std::cout << "Got MC corrtime = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "temperature")) {
 				system.constants.temp = atof(lc[1].c_str());
 				std::cout << "Got temperature = " << lc[1].c_str() << " K"; printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "pressure")) {
 				system.constants.pres = atof(lc[1].c_str());
 				std::cout << "Got pressure = " << lc[1].c_str() << " atm"; printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "insert_factor")) {
 				system.constants.insert_factor = atof(lc[1].c_str());
 				std::cout << "Got insert/delete factor = " << lc[1].c_str(); printf("\n");
@@ -626,7 +626,7 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "volume_change")) {
 				system.constants.volume_change = atof(lc[1].c_str());
 				std::cout << "Got volume change factor = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "rotate_option")) {
 				if (lc[1] == "on") system.constants.rotate_option = 1;
                 else system.constants.rotate_option = 0;
@@ -639,7 +639,7 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "output_traj")) {
 				system.constants.output_traj = lc[1].c_str();
 				std::cout << "Got output trajectory XYZ filename = " << lc[1].c_str(); printf("\n");
-			
+
             } else if (!strcasecmp(lc[0].c_str(), "output_traj_pdb")) {
                 system.constants.output_traj_pdb = lc[1].c_str();
                 std::cout << "Got output trajectory PDB filename = " << lc[1].c_str(); printf("\n");
@@ -652,24 +652,30 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "vcp_factor")) {
 				system.constants.vcp_factor = atof(lc[1].c_str());
 				std::cout << "Got volume change probability factor = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "displace_factor")) {
 				system.constants.displace_factor = atof(lc[1].c_str());
 				std::cout << "Got displace factor = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
-				system.constants.potential_form = lc[1].c_str();
+				if (lc[1] == "lj")
+					system.constants.potential_form = POTENTIAL_LJ;
+				else if (lc[1] == "ljes")
+					system.constants.potential_form = POTENTIAL_LJES;
+				else if (lc[1] == "ljespolar")
+					system.constants.potential_form = POTENTIAL_LJESPOLAR;
+					
 				std::cout << "Got potential form = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "polar_iter")) {
 				system.constants.polar_max_iter = atoi(lc[1].c_str());
 				std::cout << "Got polarization iterations = " << lc[1].c_str(); printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "com_option")) {
 				if (lc[1] == "on") system.constants.com_option = 1;
                 else system.constants.com_option = 0;
 				std::cout << "Got center-of-mass option = " << lc[1].c_str(); printf("\n");
-			
+
             /* DEPRECATED
 			} else if (!strcasecmp(lc[0].c_str(),  "rotate_prob")) {
 				system.constants.rotate_prob = atof(lc[1].c_str());
@@ -678,30 +684,30 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "md_dt")) {
 				system.constants.md_dt = atof(lc[1].c_str());
 				std::cout << "Got MD timestep = " << lc[1].c_str() << " fs"; printf("\n");
-			
-                system.constants.md_thermostat_probab = system.constants.md_thermostat_freq * 
+
+                system.constants.md_thermostat_probab = system.constants.md_thermostat_freq *
                     exp(-system.constants.md_thermostat_freq * system.constants.md_dt);
                 std::cout << "The MD thermostat heat-bath collision probability is " << system.constants.md_thermostat_probab; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_ft")) {
 				system.constants.md_ft = atof(lc[1].c_str());
 				std::cout << "Got MD final step = " << lc[1].c_str() << " fs"; printf("\n");
-			
+
 			} else if (!strcasecmp(lc[0].c_str(), "md_rotations")) {
                 if (lc[1] == "on") system.constants.md_rotations = 1;
                 else system.constants.md_rotations = 0;
                 std::cout << "Got MD rotations option = " << lc[1].c_str(); printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {		
+            } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {
 				system.constants.sig_override[lc[1]] = atof(lc[2].c_str());
-				std::cout << "Got LJ sigma override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");	
-			
+				std::cout << "Got LJ sigma override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");
+
 			} else if (!strcasecmp(lc[0].c_str(), "eps_override")) {
 				system.constants.eps_override[lc[1]] = atof(lc[2].c_str());
 				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");
-			
-			} else if (!strcasecmp(lc[0].c_str(), "radial_dist")) { 
-                if (lc[1] == "on") system.stats.radial_dist = 1;    
+
+			} else if (!strcasecmp(lc[0].c_str(), "radial_dist")) {
+                if (lc[1] == "on") system.stats.radial_dist = 1;
                 else system.stats.radial_dist = 0;
                 std::cout << "Got radial distribution option = " << lc[1].c_str(); printf("\n");
 
@@ -711,13 +717,13 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_max_dist")) {
                 system.stats.radial_max_dist = atof(lc[1].c_str());
-                std::cout << "Got radial maximum distance = " << lc[1].c_str(); printf("\n");        
-    
+                std::cout << "Got radial maximum distance = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "radial_centroid")) {
                 system.stats.radial_centroid = lc[1].c_str();
                 std::cout << "Got radial centroid = " << lc[1].c_str(); printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "radial_counterpart")) { 
+            } else if (!strcasecmp(lc[0].c_str(), "radial_counterpart")) {
                 system.stats.radial_counterpart = lc[1].c_str();
                 std::cout << "Got radial counterpart = " << lc[1].c_str(); printf("\n");
 
@@ -742,8 +748,8 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "ewald_es")) {
                 if (lc[1] == "on") system.constants.ewald_es = 1;
                 else system.constants.ewald_es = 0;
-                std::cout << "Got Ewald electrostatics option = " << lc[1].c_str(); printf("\n");        
-        
+                std::cout << "Got Ewald electrostatics option = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "pdb_long")) {
                 if (lc[1] == "on") system.constants.pdb_long =1;
                 else system.constants.pdb_long = 0;
@@ -756,8 +762,8 @@ void readInput(System &system, char* filename) {
 } // end read input function
 
 void paramOverrideCheck(System &system) {
-	// LJ sigma/eps override if needed. 
-	if ((int)system.constants.sig_override.size() > 0) {	
+	// LJ sigma/eps override if needed.
+	if ((int)system.constants.sig_override.size() > 0) {
        map<string, double>::iterator it;
        for ( it = system.constants.sig_override.begin(); it != system.constants.sig_override.end(); it++ ) {
             for (int i=0; i<system.molecules.size(); i++) {
@@ -765,8 +771,8 @@ void paramOverrideCheck(System &system) {
                 if (system.molecules[i].atoms[j].name == it->first)
                     system.molecules[i].atoms[j].sig = it->second;
             }
-            }            
-        } // end map loop     
+            }
+        } // end map loop
     } // end if sigma overrides
 
 	if ((int)system.constants.eps_override.size() > 0) {
@@ -781,4 +787,3 @@ void paramOverrideCheck(System &system) {
         } // end map loop
     } // end if epsilon override
 }
-

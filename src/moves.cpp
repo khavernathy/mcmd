@@ -26,10 +26,10 @@ void translate(System &system, int molid) {
 
 void rotate(System &system, int molid) {
     system.checkpoint("doing a rotation move.");
-        double com[3];		
+        double com[3];
 
         // 1) GET RANDOM ANGLE AND PLANE OF ROTATION.
-        double randangle; int plane; 
+        double randangle; int plane;
 		randangle = system.constants.rotate_angle_factor*((double)rand()/(double)RAND_MAX); // angle of rotation from 0 -> rotate_angle_factor
 		double randxyz = (double)rand()/(double)RAND_MAX;
 		// 1/3 change for a given plane
@@ -45,11 +45,11 @@ void rotate(System &system, int molid) {
         // 3) MOVE MOLECULE TO ORIGIN TEMPORARILY
         for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
             for (int n=0; n<3; n++) {
-                system.molecules[molid].atoms[i].pos[n] -= com[n]; 
+                system.molecules[molid].atoms[i].pos[n] -= com[n];
                 //printf("com[%i]: %f\n", n,system.molecules[molid].com[n]);
             }
         }
-        
+
         // 4) ROTATE THE MOLECULE ABOUT ORIGIN
 		for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
 				double* rotated = rotatePoint(system, system.molecules[molid].atoms[i].pos[0], system.molecules[molid].atoms[i].pos[1], system.molecules[molid].atoms[i].pos[2], plane, randangle);
@@ -59,8 +59,8 @@ void rotate(System &system, int molid) {
 		} // end for i
 
         // 5) MOVE MOLECULE BACK TO COM POSITION, BUT ROTATED
-        for (int i=0; i<system.molecules[molid].atoms.size(); i++) 
-            for (int n=0; n<3; n++) 
+        for (int i=0; i<system.molecules[molid].atoms.size(); i++)
+            for (int n=0; n<3; n++)
                 system.molecules[molid].atoms[i].pos[n] += com[n];
 
 } // end rotate();
@@ -74,7 +74,7 @@ void defineBox(System &system) { // takes input in A
 		// i.e. the volume-change function does that before calling this function
 
 		system.pbc.basis[0][0] = system.pbc.x_length;
-		system.pbc.basis[1][1] = system.pbc.y_length;   
+		system.pbc.basis[1][1] = system.pbc.y_length;
 		system.pbc.basis[2][2] = system.pbc.z_length;
 
 		system.pbc.x_max = system.pbc.x_length/2.0;
@@ -89,7 +89,7 @@ void defineBox(System &system) { // takes input in A
         system.pbc.calcCutoff();
 		system.constants.ewald_alpha = 3.5/system.pbc.cutoff; // update ewald_alpha if we have a vol change
         // no need for vertices and planes for 90/90/90
-        
+
     }
 	// universal definitions
 	else {
@@ -107,14 +107,13 @@ void defineBox(System &system) { // takes input in A
 void changeVolumeMove(System &system) {
 	system.stats.volume_attempts++;
 	// generate small randam distance change for volume adjustment
-	double ranf = (double)rand() / (double)RAND_MAX; // for boltz check	
+	double ranf = (double)rand() / (double)RAND_MAX; // for boltz check
     double ranv = (double)rand() / (double)RAND_MAX; // for volume change
     double old_energy, new_energy;
     double new_com[3], old_com[3], delta_pos[3];
     int i,j,n;
 
-        double* energies = getTotalPotential(system,system.constants.potential_form);
-        old_energy=energies[0]+energies[1]+energies[2];
+        old_energy=getTotalPotential(system);
 
     //double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
     system.pbc.old_volume = system.pbc.volume;
@@ -130,7 +129,7 @@ void changeVolumeMove(System &system) {
     system.pbc.z_length *= basis_scale_factor;
     defineBox(system);
     //printf("defineBox NEW VOL (should match): %f\n", system.pbc.volume);
-        
+
     // scale molecule positions
     for (i=0; i<system.molecules.size(); i++) {
         for (n=0; n<3; n++) {
@@ -148,11 +147,10 @@ void changeVolumeMove(System &system) {
         system.molecules[i].calc_center_of_mass();
 //        checkInTheBox(system, i);
     }
-    
-        double* potentials = getTotalPotential(system,system.constants.potential_form);
-        new_energy=potentials[0]+potentials[1]+potentials[2];
 
-    //printf("OLDV before bf call: %f; NEWV before bf call: %f\n", system.pbc.old_volume, system.pbc.volume); 
+        new_energy=getTotalPotential(system);
+
+    //printf("OLDV before bf call: %f; NEWV before bf call: %f\n", system.pbc.old_volume, system.pbc.volume);
     double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, MOVETYPE_VOLUME);
 
     //printf("ranf < bf? %f < %f ?\n", ranf, boltzmann_factor);
@@ -190,25 +188,24 @@ void changeVolumeMove(System &system) {
 
 
 /* ADD A MOLECULE */
-void addMolecule(System &system, string model) {
-
+void addMolecule(System &system) {
+  int_fast8_t model = system.constants.potential_form;
     system.checkpoint("starting addMolecule");
 	system.stats.insert_attempts++;
     int protoid;
 
 	// get current energy.
-	double* old_potentials = getTotalPotential(system, model);
-	double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2];
+	double old_potential = getTotalPotential(system);
 
     // select a random prototype molecule
     if (system.proto.size() == 1) protoid=0;
     else {
         protoid = (rand() % (int)(system.proto.size()));
         //printf("rand proto id selected: %i\n", protoid);
-    }	
+    }
     system.molecules.push_back(system.proto[protoid]);
     system.constants.currentprotoid = protoid; // for getting boltz factor later.
-	system.stats.count_movables += 1;	
+	system.stats.count_movables += 1;
 
     //make_pairs(system); // re-make pairs for energy calc.
 
@@ -218,11 +215,11 @@ void addMolecule(System &system, string model) {
 	int last_molecule_PDBID = system.molecules[last_molecule_id].PDBID;
 	//printf("The last (added) molecule id is %i\n", last_molecule_id);
 	//printf("And its .ID is %i\n", last_molecule_ID);
-    
+
     // set mol_id variable on individual atoms
     for (int i=0; i<system.molecules[last_molecule_id].atoms.size(); i++) {
         system.molecules[last_molecule_id].atoms[i].mol_PDBID = last_molecule_PDBID;
-        system.molecules[last_molecule_id].atoms[i].PDBID = system.constants.total_atoms + 1; 
+        system.molecules[last_molecule_id].atoms[i].PDBID = system.constants.total_atoms + 1;
         system.constants.total_atoms += 1;
         // make sure charge is there
         //printf("the added molecule atom %i has charge = %f\n", i, system.molecules[last_molecule_id].atoms[i].C);
@@ -246,19 +243,18 @@ void addMolecule(System &system, string model) {
         for (int n=0; n<3; n++)
 		    system.molecules[last_molecule_id].atoms[i].pos[n] += move[n];
 	}
-	
+
 	// rotate the molecule here by random amount.
     rotate(system, last_molecule_id);
 
-    // **IMPORTANT: MAKE SURE THE MOLECULE IS IN THE BOX** 
+    // **IMPORTANT: MAKE SURE THE MOLECULE IS IN THE BOX**
     checkInTheBox(system, last_molecule_id);
-	
-	// FULLY DONE ADDING MOLECULE TO SYSTEM IN PLACE. NOW GET NEW ENERGY		
-	double* new_potentials = getTotalPotential(system, model);
-	double new_potential = new_potentials[0] + new_potentials[1] + new_potentials[2];
-	
+
+	// FULLY DONE ADDING MOLECULE TO SYSTEM IN PLACE. NOW GET NEW ENERGY
+	double new_potential = getTotalPotential(system);
+
 	// BOLTZMANN ACCEPT OR REJECT
-    double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);     
+    double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);
 
 	double ranf = (double)rand()/(double)RAND_MAX;
 	if (ranf < boltz_factor) {
@@ -267,7 +263,7 @@ void addMolecule(System &system, string model) {
         system.molecules[last_molecule_id].calc_center_of_mass();
     } else {
 		// remove the new molecule.
-		system.molecules.pop_back(); 
+		system.molecules.pop_back();
 		system.constants.total_atoms -= (int)system.proto[protoid].atoms.size();
 		system.stats.count_movables--;
 	}
@@ -277,18 +273,18 @@ return;
 
 
 /* REMOVE A MOLECULE */
-void removeMolecule(System &system, string model) {
+void removeMolecule(System &system) {
+    int_fast8_t model = system.constants.potential_form;
     system.checkpoint("starting removeMolecule");
-    
+
     if (system.stats.count_movables == 0) return; // skip if no molecules are there to be removed.
     system.stats.remove_attempts++;
-    
+
     //if ((int)system.stats.count_movables == 1) // IMPORTANT: CANCEL THE DELETE IF ONLY 1 MOVABLE MOLECULE LEFT
     //    return;
-   
+
     // get original energy.
-    double* old_potentials = getTotalPotential(system, model);
-    double old_potential = old_potentials[0] + old_potentials[1] + old_potentials[2];
+    double old_potential = getTotalPotential(system);
 
     system.checkpoint("getting random movable.");
     // select random movable molecule
@@ -313,8 +309,7 @@ void removeMolecule(System &system, string model) {
     //make_pairs(system); // recompute pairs for new energy calc.
 
     // get new energy
-    double* new_potentials = getTotalPotential(system, model);
-    double new_potential = new_potentials[0] + new_potentials[1] + new_potentials[2];
+    double new_potential = getTotalPotential(system);
     double energy_delta = (new_potential - old_potential);
 
     //printf("doing boltzmann -- ");
@@ -339,10 +334,10 @@ return;
 
 
 /* DISPLACE (TRANSLATE AND ROTATE) */
-void displaceMolecule(System &system, string model) {
-
+void displaceMolecule(System &system) {
+    int_fast8_t model = system.constants.potential_form;
     double tmpcom[3], d[3], rsq;
-    
+
     if (system.stats.count_movables == 0) return; // skip if no sorbate molecules are in the cell.
     system.stats.displace_attempts++;
     int_fast8_t frozen=1;
@@ -351,24 +346,23 @@ void displaceMolecule(System &system, string model) {
             randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozen_molecules;
             //printf("randm: %i\n",randm);
             frozen = system.molecules[randm].frozen;
-    }           
+    }
 	system.checkpoint("Got the random molecule.");
 
     for (int n=0; n<3; n++) tmpcom[n] = system.molecules[randm].com[n];
-	
+
 	double old_V=0.0; double new_V=0.0;
 
 	// first calculate the system's current potential energy
-		double* oldpotentials = getTotalPotential(system,model); //new double[2];
-		old_V = (oldpotentials[0]+oldpotentials[1]+oldpotentials[2]);	// keep in K
-        
+		old_V = getTotalPotential(system);
+
     // save a temporary copy of molecule to go back if needed
     Molecule tmp_molecule = system.molecules[randm];
 
 	// do rotation AND translation
     // TRANSLATE
     system.checkpoint("doing translate move.");
-	    translate(system, randm);	
+	    translate(system, randm);
 /*
      printf("before rotating: \n");
         for (int n=0; n<5; n++)
@@ -376,9 +370,9 @@ void displaceMolecule(System &system, string model) {
 */
     // ROTATION
     if (system.molecules[randm].atoms.size() > 1 && system.constants.rotate_option) { // try rotation
-        rotate(system, randm);    	
+        rotate(system, randm);
     } // end rotation option
-/*	
+/*
     printf("after rotating: \n");
     for (int n=0; n<5; n++)
         printf("H %f %f %f \n", system.molecules[randm].atoms[n].pos[0], system.molecules[randm].atoms[n].pos[1], system.molecules[randm].atoms[n].pos[2]);
@@ -387,8 +381,7 @@ void displaceMolecule(System &system, string model) {
 	// check P.B.C. (move the molecule back in the box if needed)
     checkInTheBox(system, randm);
 
-		double* newpotentials = getTotalPotential(system,model); //new double[2];
-                new_V = (newpotentials[0]+newpotentials[1]+newpotentials[2]); // keep in K
+                new_V = getTotalPotential(system);
 
 	// now accept or reject the move based on Boltzmann probability
 	double boltzmann_factor = get_boltzmann_factor(system, old_V, new_V, MOVETYPE_DISPLACE);
@@ -396,7 +389,7 @@ void displaceMolecule(System &system, string model) {
 	// make ranf for probability pick
 	double ranf = (double)rand() / (double)RAND_MAX; // a value between 0 and 1
 
-	// apply selection Frenkel Smit p. 30 
+	// apply selection Frenkel Smit p. 30
 	// accept move
 	if (ranf < boltzmann_factor) {
 			system.stats.displace_accepts++;
@@ -406,8 +399,8 @@ void displaceMolecule(System &system, string model) {
             // for MC efficiency measurement (Frenkel p44)
             for (int n=0; n<3; n++) d[n] = (system.molecules[randm].com[n] - tmpcom[n]);
             system.stats.MCeffRsq += dddotprod(d, d);
-            
-            
+
+
 	} // end accept
 	else {
 		// reject for whole molecule
@@ -419,7 +412,6 @@ void displaceMolecule(System &system, string model) {
         system.molecules[randm].calc_center_of_mass();
         // check P.B.C. (move the molecule back in the box if needed)
         checkInTheBox(system, randm);
-	} // end reject 
+	} // end reject
     return;
 }
-

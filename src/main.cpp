@@ -41,8 +41,8 @@ using namespace std;
 int main(int argc, char **argv) {
 
 	// start timing
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();	
-	double time_elapsed;		
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	double time_elapsed;
 	double sec_per_step;
 
 	srand((unsigned)time(NULL)); // initiate random seed
@@ -50,31 +50,31 @@ int main(int argc, char **argv) {
 	// disable output buffering (print everything immediately to output)
 	setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.
 
-    // SET UP THE SYSTEM 
+    // SET UP THE SYSTEM
     System system;
 	system.checkpoint("setting up system with main functions...");
     readInput(system, argv[1]); // executable takes the input file as only argument.
 	readInAtoms(system, system.constants.atom_file);
-	paramOverrideCheck(system);	
+	paramOverrideCheck(system);
 	if (system.constants.autocenter)
         centerCoordinates(system);
     setupBox(system);
-    if (system.stats.radial_dist)   
+    if (system.stats.radial_dist)
         setupRadialDist(system);
-    moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly. 
-    initialize(system); // these are just system name sets, 
+    moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
+    initialize(system); // these are just system name sets,
     printf("VERSION NUMBER: %i\n", 163);
     system.checkpoint("Done with system setup functions.");
 
     // compute inital COM for all molecules, and moment of inertia
-    // (io.cpp handles molecular masses // 
+    // (io.cpp handles molecular masses //
     for (int i=0; i<system.molecules.size(); i++) {
         system.molecules[i].calc_center_of_mass();
         if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
         for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
 
-	// clobber files 
+	// clobber files
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() );
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
     // Prep pdb trajectory if needed
     if (system.constants.pdb_traj_option) {
         FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
-        fclose(f); 
+        fclose(f);
     }
     // END INTIAL WRITEOUTS
 
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
 
     // RESIZE A MATRIX IF POLAR IS ACTIVE
-    if (system.constants.potential_form == "ljespolar") {
+    if (system.constants.potential_form == POTENTIAL_LJESPOLAR) {
         system.last.total_atoms = system.constants.total_atoms;
         int N = 3 * system.constants.total_atoms;
         system.constants.A_matrix= (double **) calloc(N,sizeof(double*));
@@ -122,12 +122,12 @@ int main(int argc, char **argv) {
     }
 
     // begin timing for steps "begin_steps"
-	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();	
-	
+	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();
+
 	// MAIN MC STEP LOOP
 	int corrtime_iter=1;
 	for (int t=0; t <= finalstep; t+=stepsize) { // 0 is initial step
-		system.checkpoint("New MC step starting."); //printf("Step %i\n",t);	
+		system.checkpoint("New MC step starting."); //printf("Step %i\n",t);
         system.stats.MCstep = t;
         system.stats.MCcorrtime_iter = corrtime_iter;
 
@@ -136,17 +136,17 @@ int main(int argc, char **argv) {
                     setCheckpoint(system); // save all the relevant values in case we need to revert something.
                     //make_pairs(system); // establish pair quantities
                     //computeDistances(system);
-                    runMonteCarloStep(system,system.constants.potential_form);
+                    runMonteCarloStep(system);
                     system.checkpoint("...finished runMonteCarloStep");
-                    
+
                     if (system.stats.MCmoveAccepted == false)
                         revertToCheckpoint(system);
                     else if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
-                        system.constants.temp = 
-                            system.constants.sa_target + 
+                        system.constants.temp =
+                            system.constants.sa_target +
                             (system.constants.temp - system.constants.sa_target) *
                             system.constants.sa_schedule;
-                        
+
                     }
 
                     //computeAverages(system);
@@ -159,11 +159,11 @@ int main(int argc, char **argv) {
 
             computeAverages(system);
 
-            /* -------------------------------- */	
-			// [[[[ PRINT OUTPUT VALUES ]]]]		
+      /* -------------------------------- */
+			// [[[[ PRINT OUTPUT VALUES ]]]]
 			/* -------------------------------- */
 
-            // TIMING 
+            // TIMING
             std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
             time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin_steps).count()) /1000000.0;
             sec_per_step = time_elapsed/t;
@@ -183,22 +183,22 @@ int main(int argc, char **argv) {
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep,finalstep,progress,efficiency);
 			printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			
+
             printf("BF avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol ) \n",
 				system.stats.bf_avg,
 				system.stats.ibf_avg,
 				system.stats.rbf_avg,
 				system.stats.dbf_avg,
 				system.stats.vbf_avg);
-			
+
 			printf("AR avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol )  \n",
-				(system.stats.ar_tot), 
-				(system.stats.ar_ins), 
-				(system.stats.ar_rem), 
-				(system.stats.ar_dis), 
-				(system.stats.ar_vol)); 
-			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n", 
-				(int)system.stats.total_accepts, 
+				(system.stats.ar_tot),
+				(system.stats.ar_ins),
+				(system.stats.ar_rem),
+				(system.stats.ar_dis),
+				(system.stats.ar_vol));
+			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n",
+				(int)system.stats.total_accepts,
 			    system.stats.ins_perc,
                 system.stats.rem_perc,
                 system.stats.dis_perc,
@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
                 printf("-> %s wt %% = %.5f +- %.5f %%; wt %% ME = %.5f +- %.5f %% = %.5f mmol/g\n",system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
-                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0); 
+                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 printf("      N_movables avg = %.3f +- %.3f\n",
                 system.stats.Nmov[i].average, system.stats.Nmov[i].sd);
                 printf("      Selectivity = %.3f +- %.3f\n",
@@ -227,10 +227,10 @@ int main(int argc, char **argv) {
             }
             /*
             if (system.constants.ensemble != "npt") {
-                printf("Chemical potential avg = %.4f +- %.4f K / sorbate molecule \n", system.stats.chempot.average, system.stats.chempot.sd); 
+                printf("Chemical potential avg = %.4f +- %.4f K / sorbate molecule \n", system.stats.chempot.average, system.stats.chempot.sd);
             }
             */
-            if (system.proto.size() == 1) 
+            if (system.proto.size() == 1)
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
@@ -257,18 +257,18 @@ int main(int argc, char **argv) {
             frame++;
             writePDB(system, system.constants.restart_pdb);
             if (system.constants.pdb_traj_option)
-                writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);    
+                writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);
             // ONLY WRITES DENSITY FOR FIRST SORBATE
             writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density[0].average*1000, system.constants.temp, system.constants.pres, t);
             if (system.stats.radial_dist) {
                 radialDist(system);
-                writeRadialDist(system);        
+                writeRadialDist(system);
             }
 
             // count the corrtime occurences.
             corrtime_iter++;
 
-		} // END IF CORRTIME	
+		} // END IF CORRTIME
 	} // END MC STEPS LOOP.
 
 	// FINAL EXIT OUTPUT
@@ -279,13 +279,13 @@ int main(int argc, char **argv) {
 	printf("Insert accepts:        %i\n", system.stats.insert_accepts);
 	printf("Remove accepts:        %i\n", system.stats.remove_accepts);
 	printf("Displace accepts:      %i\n", system.stats.displace_accepts);
-	printf("Volume change accepts: %i\n", system.stats.volume_change_accepts);	
+	printf("Volume change accepts: %i\n", system.stats.volume_change_accepts);
 
 	std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
         time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
 	printf("Total wall time = %f s\n",time_elapsed);
 
-    if (system.constants.potential_form == "ljespolar") {
+    if (system.constants.potential_form == POTENTIAL_LJESPOLAR) {
         printf("Freeing data structures... ");
         for (int i=0; i< 3* system.constants.total_atoms; i++) {
             free(system.constants.A_matrix[i]);
@@ -296,16 +296,16 @@ int main(int argc, char **argv) {
 	printf("MC steps completed. Exiting program.\n"); std::exit(0);
 	}
 	// ===================== END MONTE CARLO ================================================
-	
 
-	
+
+
 	// ===================== MOLECULAR DYNAMICS ==============================================
 	else if (system.constants.mode == "md") {
         double v_component=0., v_init=0.;
 
         // write initial XYZ
         if (system.constants.xyz_traj_option)
-            writeXYZ(system,system.constants.output_traj, 1, 0, 0);	
+            writeXYZ(system,system.constants.output_traj, 1, 0, 0);
         int frame = 2; // weird way to initialize but it works for the output file.
         // and initial PDB
         writePDB(system,system.constants.restart_pdb);
@@ -323,15 +323,23 @@ int main(int argc, char **argv) {
             }
         }
         printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
+				system.constants.md_vel_goal = sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
     } else {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
-        
-        // Frenkel method for NVT v_alpha determination (converted to A/fs) p140
-        v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass); 
+
+        //v_init = 1e-5 * sqrt(8.0*system.constants.temp*system.constants.kb/system.proto[0].mass/M_PI);
+				//v_component = sqrt(v_init*v_init / 3.0);
+
+//THIS IS WORKING BEFORE BUT SEEMED TO HAVE HIGH INITIAL v
+// when i swap to the above, the equilibrium T seems much lower.
+				// Frenkel method for NVT v_alpha determination (converted to A/fs) p140
+				v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
         v_init = sqrt(3*v_component*v_component);
 
-//double v_init = sqrt(8.0 * system.constants.R * system.constants.temp / 
+
+// GARBAGE
+//double v_init = sqrt(8.0 * system.constants.R * system.constants.temp /
   //          (M_PI*system.proto[0].mass*system.constants.NA)) / 1e5; // THIS IS NOT GOOD FOR MULTISORBATE SYSTEM YET. A/fs
     //    double v_component = sqrt(v_init*v_init / 3.0);
 
@@ -345,21 +353,22 @@ int main(int argc, char **argv) {
                 system.molecules[i].vel[n] = v_component * pm;
             }
         }
+
         printf("Computed initial velocities from temperature: v_init = %f A/fs\n",v_init);
         system.constants.md_init_vel = v_init;
-    } 
+    }
     system.constants.md_vel_goal = v_component; //sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
-   /* 
-        printf("md_vel_goal = %f; v_component = %f; md_init_vel = %f; v_init = %f\n", 
+   /*
+        printf("md_vel_goal = %f; v_component = %f; md_init_vel = %f; v_init = %f\n",
         system.constants.md_vel_goal,
         v_component,
         system.constants.md_init_vel,
-        v_init); 
+        v_init);
     */
     // end initial velocities
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
-	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond. 
+	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
 	int total_steps = floor(tf/dt);
 	int count_md_steps = 1;
     double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D=0.0;
@@ -368,15 +377,14 @@ int main(int argc, char **argv) {
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
         printf("| ========================================= |\n\n");
-	
 
 	// begin timing for steps
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();
 	for (double t=dt; t < tf; t=t+dt) {
 		//printf("%f\n",t);
 		integrate(system,dt);
-		
-		if (count_md_steps % system.constants.md_corrtime == 0) {  // print every x steps 
+
+		if (count_md_steps % system.constants.md_corrtime == 0 || t==dt) {  // print every x steps and first.
 
             // get KE and PE and T at this step.
             double* ETarray = calculateEnergyAndTemp(system, t);
@@ -399,27 +407,32 @@ int main(int argc, char **argv) {
             // R^2 as a function of time should be linear.
             diffusion_sum=0.;
             for (i=0; i<system.molecules.size(); i++) {
-                for (n=0; n<3; n++) 
-                    diffusion_d[n] = system.molecules[i].com[n] - system.molecules[i].original_com[n];
+                for (n=0; n<3; n++)
+                    diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
 
                 diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now
             }
             D = (diffusion_sum / system.stats.count_movables)/(6.0*t); // 6 because 2*dimensionality = 2*3
             D *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
-            system.stats.diffusion.value = D; 
+            system.stats.diffusion.value = D;
             system.stats.diffusion.calcNewStats();
 
             // PRESSURE (my pathetic nRT/V method)
-            //double pressure = TE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
+						// using this until i get a decent NVT frenkel method working.
+						// PE since it's I.G. approximation.
+						double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
+						system.stats.pressure.value = nmol*system.constants.R*system.stats.temperature.value/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
+						system.stats.pressure.calcNewStats();
+						//pressure = -PE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
 
 			// PRINT OUTPUT
 			std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
 			time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin_steps).count()) /1000000.0;
-			sec_per_step = time_elapsed/(double)count_md_steps;				
+			sec_per_step = time_elapsed/(double)count_md_steps;
 			double progress = (((float)count_md_steps)/(float)total_steps*100);
 			double ETA = ((time_elapsed*(float)total_steps/(float)count_md_steps) - time_elapsed)/60.0;
 			double ETA_hrs = ETA/60.0;
-       
+
             printf("MOLECULAR DYNAMICS\n");
             //printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
@@ -428,26 +441,26 @@ int main(int argc, char **argv) {
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
-            printf("KE: %.3e kJ/mol (lin: %.3e , rot: %.3e )\n",
+            printf("KE: %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
                   KE, Klin, Krot );
-            printf("PE: %.3e kJ/mol; Total E: %.3e kJ/mol; \n",
-                  PE, TE  
+            printf("PE: %.3f kJ/mol; Total E: %.3f kJ/mol; \n",
+                  PE, TE
                   );
             printf("Emergent T avg = %.4f +- %.4f K (inst. T = %.4f K)\n",
                 system.stats.temperature.average, system.stats.temperature.sd, Temp);
-            printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure: %.3f atm (RD only)\n", 
-                v_avg, system.constants.md_init_vel, pressure);
+            printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure avg: %.3f +- %.3f atm (I.G. approx)\n",
+                v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
             printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
-            printf("Diffusion coefficient = %.4e +- %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd, system.proto[0].name.c_str());           
+            printf("Diffusion coefficient = %.4e +- %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd, system.proto[0].name.c_str());
 			printf("--------------------\n\n");
 
-            // WRITE OUTPUT FILES 
+            // WRITE OUTPUT FILES
             if (system.constants.xyz_traj_option)
 			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
             frame++;
-            writeThermo(system, TE, Klin, Krot, PE, 0.0, system.stats.temperature.average, pressure, count_md_steps); 
-            writePDB(system,system.constants.restart_pdb);	
-            if (system.constants.pdb_traj_option) 
+            writeThermo(system, TE, Klin, Krot, PE, 0.0, system.stats.temperature.average, pressure, count_md_steps);
+            writePDB(system,system.constants.restart_pdb);
+            if (system.constants.pdb_traj_option)
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, count_md_steps);
             if (system.stats.radial_dist) {
                 radialDist(system);
@@ -457,4 +470,4 @@ int main(int argc, char **argv) {
 		count_md_steps++;
 	} // end MD timestep loop
 	}
-}        
+}
