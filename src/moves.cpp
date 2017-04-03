@@ -248,6 +248,7 @@ void addMolecule(System &system) {
     rotate(system, last_molecule_id);
 
     // **IMPORTANT: MAKE SURE THE MOLECULE IS IN THE BOX**
+    system.molecules[last_molecule_id].calc_center_of_mass();
     checkInTheBox(system, last_molecule_id);
 
 	// FULLY DONE ADDING MOLECULE TO SYSTEM IN PLACE. NOW GET NEW ENERGY
@@ -379,6 +380,7 @@ void displaceMolecule(System &system) {
 */
 
 	// check P.B.C. (move the molecule back in the box if needed)
+    system.molecules[randm].calc_center_of_mass();
     checkInTheBox(system, randm);
 
                 new_V = getTotalPotential(system);
