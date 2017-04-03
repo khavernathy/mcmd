@@ -4,25 +4,27 @@ It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6
 
 --> MC Currently fully supporting NPT, NVT, NVE, uVT ensembles.  <br />
 --> MD supporting NVT.  <br />
+--> Any periodic cell is supported for both MC and MD.<br />
+--> Sample inputs are included.<br />
 
 PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
 &emsp;-> gcc compiler 6.2.0 (circe)  <br />
 &emsp;-> gcc compiler 4.9.3 (stampede)  <br />
 
-To download: <br />
+Quick start:<br />
+1) Download: <br />
 `git clone https://github.com/khavernathy/mcmd` <br />
 
-To compile: (in src dir "src")<br />
+2) Compile: (in src dir "src")<br />
 `g++ main.cpp -lm -o ../t -I. -std=c++11`  <br />
 
-To run (in base dir "mcmd") <br />
+3) Run (in base dir "mcmd") <br />
 `./t mcmd.inp`<br /><br />  
   
 <hr />
   
 TODO<br /><br />
 
--> MD: in a MOF (MPM1+CO2), rotatations tend to get fast and max out. Maybe thermostat should adjust angular vel. too.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
