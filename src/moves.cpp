@@ -261,7 +261,6 @@ void addMolecule(System &system) {
 	if (ranf < boltz_factor) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
 	    system.stats.MCmoveAccepted = true;
-        system.molecules[last_molecule_id].calc_center_of_mass();
     } else {
 		// remove the new molecule.
 		system.molecules.pop_back();
@@ -396,7 +395,6 @@ void displaceMolecule(System &system) {
 	if (ranf < boltzmann_factor) {
 			system.stats.displace_accepts++;
             system.stats.MCmoveAccepted = true;
-            system.molecules[randm].calc_center_of_mass();
 
             // for MC efficiency measurement (Frenkel p44)
             for (int n=0; n<3; n++) d[n] = (system.molecules[randm].com[n] - tmpcom[n]);
@@ -413,7 +411,7 @@ void displaceMolecule(System &system) {
 		}
         system.molecules[randm].calc_center_of_mass();
         // check P.B.C. (move the molecule back in the box if needed)
-        checkInTheBox(system, randm);
+        //checkInTheBox(system, randm);
 	} // end reject
     return;
 }
