@@ -77,13 +77,16 @@ void computeInitialValues(System &system) {
 		system.stats.density[i].average = system.stats.density[i].value;
     }
 
-    // WT %
+    // WT % 
     for (int i=0; i<system.proto.size(); i++) {
-    system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
-    system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
+        system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
+        system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
         system.stats.wtp[i].average = system.stats.wtp[i].value;
         system.stats.wtpME[i].average = system.stats.wtpME[i].value;
+
     }
+
+
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
@@ -240,12 +243,21 @@ void computeAverages(System &system) {
         system.stats.density[i].calcNewStats();
     }
 
-    // WT %
+    // WT % / excess adsorption
     for (int i=0; i<system.proto.size(); i++) {
         system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
             system.stats.wtp[i].calcNewStats();
             system.stats.wtpME[i].calcNewStats();
+
+            
+            double mm = system.proto[i].mass * 1000 * system.constants.NA; // molar mass
+            double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
+            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) / 
+            frozmm;  // to mg/g
+
+        system.stats.excess[i].calcNewStats();
+
     }
 
 

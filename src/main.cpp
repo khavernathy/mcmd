@@ -203,15 +203,17 @@ int main(int argc, char **argv) {
                 system.stats.rem_perc,
                 system.stats.dis_perc,
                 system.stats.vol_perc);
-            printf("RD avg =              %.5f +- %.5f K (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",
-                system.stats.rd.average, system.stats.rd.sd, system.stats.lj.average, system.stats.lj_lrc.average, system.stats.lj_self_lrc.average);
-			printf("ES avg =              %.5f +- %.5f K (real = %.4f, recip = %.4f, self = %.4f)\n",
-                system.stats.es.average, system.stats.es.sd, system.stats.es_real.average, system.stats.es_recip.average, system.stats.es_self.average);
+            printf("RD avg =              %.5f +- %.5f K\n", // (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",
+                system.stats.rd.average, system.stats.rd.sd); //, system.stats.lj.average, system.stats.lj_lrc.average, system.stats.lj_self_lrc.average);
+			printf("ES avg =              %.5f +- %.5f K\n", //(real = %.4f, recip = %.4f, self = %.4f)\n",
+                system.stats.es.average, system.stats.es.sd); //, system.stats.es_real.average, system.stats.es_recip.average, system.stats.es_self.average);
 			printf("Polar avg =           %.5f +- %.5f K\n",system.stats.polar.average, system.stats.polar.sd);
 			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
                 printf("-> %s wt %% = %.5f +- %.5f %%; wt %% ME = %.5f +- %.5f %% = %.5f mmol/g\n",system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
+                if (system.stats.excess[i].average > 0)
+                    printf("      Excess adsorption ratio = %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 printf("      N_movables avg = %.3f +- %.3f\n",
                 system.stats.Nmov[i].average, system.stats.Nmov[i].sd);

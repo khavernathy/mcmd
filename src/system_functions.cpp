@@ -336,7 +336,6 @@ void moleculePrintout(System &system) {
     // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
         if (system.constants.sorbate_name.size() > 0) {
             // clear the initial prototype
-            // THIS CAUSES SEG FAULT ERROR IF INPUT FILE IS EMPTY OR DOESN'T EXIST
             if (system.proto.size() > 0) {
                 system.proto[0].reInitialize();
             }

@@ -82,6 +82,7 @@ void readInAtoms(System &system, string filename) {
 				system.proto[0].name = myvector[3];
 				system.proto[0].frozen = 0;
 				system.proto[0].PDBID = stoi(myvector[5]);
+                system.proto[0].fugacity = system.constants.pres;
 			}
 			current_atom.mol_PDBID = stoi(myvector[5]);
 			//current_mol_id = stoi(myvector[5]);
@@ -681,7 +682,12 @@ void readInput(System &system, char* filename) {
 				system.constants.rotate_prob = atof(lc[1].c_str());
 				std::cout << "Got rotate probability = " << lc[1].c_str(); printf("\n");
 			*/
-			} else if (!strcasecmp(lc[0].c_str(), "md_dt")) {
+			} else if (!strcasecmp(lc[0].c_str(), "free_volume")) {
+                system.constants.free_volume = atof(lc[1].c_str());
+                std::cout << "Got free volume = " << lc[1].c_str() << " A^3."; printf("\n");
+
+
+            } else if (!strcasecmp(lc[0].c_str(), "md_dt")) {
 				system.constants.md_dt = atof(lc[1].c_str());
 				std::cout << "Got MD timestep = " << lc[1].c_str() << " fs"; printf("\n");
 

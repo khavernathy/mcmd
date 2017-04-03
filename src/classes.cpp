@@ -66,6 +66,7 @@ class Constants {
         int_fast8_t simulated_annealing = 0; // sim. ann.
         double sa_target = 0.0; // target temperature for annealing.
         double sa_schedule = 0.9999; // T-change factor for annealing.
+        double free_volume=0; // for excess adsorption calculation, A^3. must be user-input
 
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. NOT r_m (as in UFF). Defined below
@@ -449,12 +450,14 @@ class Stats {
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass, pressure,temperature, fdotrsum, dist_within, csp, diffusion;
 
-        vector<obs_t> wtp = vector<obs_t>(10);
-        vector<obs_t> wtpME = vector<obs_t>(10);
-        vector<obs_t> Nmov = vector<obs_t>(10);
-        vector<obs_t> movablemass = vector<obs_t>(10);
-        vector<obs_t> density = vector<obs_t>(10); // gotta have multiples for multi-sorbate.
-        vector<obs_t> selectivity = vector<obs_t>(10);
+        int max_sorbs=10;
+        vector<obs_t> wtp = vector<obs_t>(max_sorbs);
+        vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
+        vector<obs_t> Nmov = vector<obs_t>(max_sorbs);
+        vector<obs_t> movablemass = vector<obs_t>(max_sorbs);
+        vector<obs_t> density = vector<obs_t>(max_sorbs); // gotta have multiples for multi-sorbate.
+        vector<obs_t> selectivity = vector<obs_t>(max_sorbs);
+        vector<obs_t> excess = vector<obs_t>(max_sorbs);
 
 };
 
@@ -490,12 +493,14 @@ class Last {
 
         int total_atoms, thole_total_atoms;
 
-        vector<double> wtp = vector<double>(10);
-        vector<double> wtpME = vector<double>(10);
-        vector<double> Nmov = vector<double>(10);
-        vector<double> movablemass = vector<double>(10);
-        vector<double> density = vector<double>(10); // for multi-sorbate
-        vector<double> selectivity = vector<double>(10);
+        int max_sorbs = 10;
+        vector<double> wtp = vector<double>(max_sorbs);
+        vector<double> wtpME = vector<double>(max_sorbs);
+        vector<double> Nmov = vector<double>(max_sorbs);
+        vector<double> movablemass = vector<double>(max_sorbs);
+        vector<double> density = vector<double>(max_sorbs); // for multi-sorbate
+        vector<double> selectivity = vector<double>(max_sorbs);
+        vector<double> excess = vector<double>(max_sorbs);
 };
 
 Last::Last() {}
@@ -589,7 +594,7 @@ class Molecule {
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
         double inertia=0.0; //moment of inertia. stored in K fs^2
-        double fugacity;
+        double fugacity=0.0;
 
         void reInitialize() {
             // if there are no atoms, don't bother
