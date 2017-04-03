@@ -8,7 +8,8 @@ input_atoms ../pdbs/MPM1.pdb  ../pdbs/ethanol_0.63gcm3_15A.pdb    ../pdbs/MPM1.p
 
 potential_form        ljes   !ljespolar   !phast2    !!lj     
 com_option            off     ! center of mass        
-       
+ 
+!!!!!carbasis 18.402 11.428 13.038 87.33 19.108 90.0      
 !carbasis 23.441   20.414   29.911  90.00 91.44  90.00
 !carbasis 25.669 25.669 25.669 90 90 90
 carbasis 27.1979   27.1979   30.9998 90.0000   90.0000  120.0000

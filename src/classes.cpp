@@ -127,7 +127,7 @@ class Constants {
         int_fast8_t polar_pbc = 1; // default periodic polar
         //int thole_total_atoms = 0;
 
-        int all_pbc=1;
+        int_fast8_t all_pbc=1;
 
 };
 
@@ -203,25 +203,29 @@ class Pbc {
         void calcPlanes() {
             /* i drew a cube :-)
                                     The A[6],B[6],C[6],D[6] arrays will be used to make plane equations
-             2 /------------/ 6     0 :   0123 plane (-x)
-              /|           /|       1 :   4567 plane (+x)
-             / |          / |       2 :   0145 plane (-y)
-          3 |------------|7 |       3 :   2367 plane (+y)
-            |  |         |  |       4 :   0246 plane (-z)
-            |  |---------|--| 4     5 :   1357 plane (+z)
-            | / 0        |  /
-            |/           | /        The vertices are defined in box_vertices[8][3].
+             2 /------------/ 6     p0 :   0123 plane (-x)
+              /|   p3      /|       p1 :   4567 plane (+x)
+             / |          / |       p2 :   0145 plane (-y)
+          3 |------------|7 |   p1  p3 :   2367 plane (+y)
+            |  |         |  |       p4 :   0246 plane (-z) (not shown)
+      p0    |  |---------|--| 4     p5 :   1357 plane (+z) (not shown)
+            | / 0  ___   |  /
+            |/    /p2/   | /        The vertices are defined in box_vertices[8][3].
           1 |____________|/ 5       3 points define a plane, so I'll use the first 3 for the above planes
+
 
             */
 
             // 3 points and plane index
-            calcPlane(0,1,2,0); // I'm not sure if I'll ever have a system where the 4th point
-            calcPlane(4,5,6,1); // results in a different plane than the first 3...
+            // quite sure that the plane NEVER differs if a different set of 3 points is used (even for triclinic cells)
+            // so it's safe to just pick the first 3 points of the plane.
+            calcPlane(0,1,2,0);
+            calcPlane(4,5,6,1);
             calcPlane(0,1,4,2);
             calcPlane(2,3,6,3);
             calcPlane(0,2,4,4);
             calcPlane(1,3,5,5);
+
 
 
         }

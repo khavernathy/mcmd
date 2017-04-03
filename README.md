@@ -2,7 +2,7 @@
 This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
 It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6).<br />
 
---> MC Currently fully supporting NPT,NVT,NVE,uVT ensembles.  <br />
+--> MC Currently fully supporting NPT, NVT, NVE, uVT ensembles.  <br />
 --> MD supporting NVT.  <br />
 
 PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
@@ -12,7 +12,7 @@ PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
 To download: <br />
 `git clone https://github.com/khavernathy/mcmd` <br />
 
-To compile:  (in src dir "src")<br />
+To compile: (in src dir "src")<br />
 `g++ main.cpp -lm -o ../t -I. -std=c++11`  <br />
 
 To run (in base dir "mcmd") <br />
@@ -22,8 +22,6 @@ To run (in base dir "mcmd") <br />
   
 TODO<br /><br />
 
--> MD: diffusion deltaR^2 needs to be computed with PBC in mind; i.e. add diff_corr[n] to molecules<br />
--> MD: maybe don't even apply initial velocities in NVT (because the thermostat kicks in quick)<br />
 -> MD: in a MOF, rotatations tend to get fast and max out. Maybe thermostat should adjust angular vel. too.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
@@ -31,7 +29,6 @@ TODO<br /><br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
 &emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
-&emsp;-> RD is way faster than MPMC though. ES/polar are slower, roughly 2x/4x<br />
 -> both: NEED TO CHECK IF 4TH POINT OF PLANE MAKES THE SAME PLANE AS PREVIOUS 3 BEFORE MOVING ON<br />
 &emsp;-> although I think it's always the case with crystalline systems.<br />
 -> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />
