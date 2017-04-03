@@ -217,13 +217,15 @@ int main(int argc, char **argv) {
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 printf("      N_movables avg = %.3f +- %.3f\n",
                 system.stats.Nmov[i].average, system.stats.Nmov[i].sd);
-                printf("      Selectivity = %.3f +- %.3f\n",
-                system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
+                if (system.proto.size() > 1)
+                    printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             }
             if (system.constants.ensemble == ENSEMBLE_UVT) {
                 if (system.proto.size() == 1) {
-                    printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
-                    printf("U/N avg = %.5f +- %.5f kJ/mol\n", system.stats.qst_nvt.average, system.stats.qst_nvt.sd);
+                    if (system.stats.qst.average > 0)
+                        printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
+                    if (system.stats.qst_nvt.average > 0)
+                        printf("U/N avg = %.5f +- %.5f kJ/mol\n", system.stats.qst_nvt.average, system.stats.qst_nvt.sd);
                 }
                 printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             }
