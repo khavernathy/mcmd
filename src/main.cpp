@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
                 printf("Chemical potential avg = %.4f +- %.4f K / sorbate molecule \n", system.stats.chempot.average, system.stats.chempot.sd);
             }
             */
-            if (system.proto.size() == 1)
+            if (system.proto.size() == 1 && system.stats.count_frozen_molecules == 0)
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
