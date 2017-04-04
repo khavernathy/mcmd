@@ -21,6 +21,7 @@ Quick start:<br />
 `cd src` <br />
 `g++ main.cpp -lm -o ../t -I. -std=c++11`, or simply  <br />
 `bash compile.sh` <br />
+`cd ..` <br />
 
 3) Run: <br />
 `./t mcmd.inp`<br /><br />  
