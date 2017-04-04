@@ -30,6 +30,7 @@ Quick start:<br />
   
 TODO<br /><br />
 
+-> MC: add dipole output and histogram output functions<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
