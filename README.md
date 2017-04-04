@@ -2,9 +2,10 @@
 This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
 It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6).<br />
 
---> MC Currently fully supporting NPT, NVT, NVE, uVT ensembles.  <br />
---> MD supporting NVT.  <br />
---> Any periodic cell is supported for both MC and MD.<br />
+--> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
+--> MD supports NVT.  <br />
+--> Any periodic cell is supported for both MC and MD; non-periodic systems also supported.<br />
+--> Force-fields available are Lennard-Jones (12-6), (Ewald) electrostatics, and Thole-Applequist polarization.<br />
 --> Sample inputs are included. The program takes just one argument: the input file.<br />
 
 PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
