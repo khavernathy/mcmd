@@ -30,7 +30,8 @@ Quick start:<br />
   
 TODO<br /><br />
 
--> MC: add dipole output and histogram output functions<br />
+-> MC: histogram works but output cell is rotated for non 90-90-90 system.<br />
+-> MC: add dipole (maybe field) output functions<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />

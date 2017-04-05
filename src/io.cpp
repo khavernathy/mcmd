@@ -608,6 +608,18 @@ void readInput(System &system, char* filename) {
                 else system.constants.draw_box_option = 0;
                 std::cout << "Got draw-box-option for PDB output = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "histogram")) {
+                if (lc[1] == "on") system.constants.histogram_option = 1;
+                else system.constants.histogram_option = 0;
+                std::cout << "Got histogram option = " << lc[1].c_str(); printf("\n");
+
+						} else if (!strcasecmp(lc[0].c_str(), "histogram_output")) {
+								system.constants.output_histogram = lc[1].c_str();
+								std::cout << "Got histogram output file = " << lc[1].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "histogram_resolution")) {
+                system.hist_resolution = atof(lc[1].c_str());
+                std::cout << "Got histogram resolution = " << lc[1].c_str() << " A"; printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "mc_corrtime")) {
 				system.constants.mc_corrtime = atoi(lc[1].c_str());
 				std::cout << "Got MC corrtime = " << lc[1].c_str(); printf("\n");
@@ -665,7 +677,7 @@ void readInput(System &system, char* filename) {
 					system.constants.potential_form = POTENTIAL_LJES;
 				else if (lc[1] == "ljespolar")
 					system.constants.potential_form = POTENTIAL_LJESPOLAR;
-					
+
 				std::cout << "Got potential form = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "polar_iter")) {

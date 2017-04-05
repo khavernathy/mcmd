@@ -34,7 +34,7 @@
 #include <io.cpp>
 #include <radial_dist.cpp>
 #include <averages.cpp>
-
+#include <histogram.cpp>
 
 using namespace std;
 
@@ -62,8 +62,15 @@ int main(int argc, char **argv) {
     if (system.stats.radial_dist)
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
+    if (system.constants.histogram_option) {
+        system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
+        system.grids.avg_histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
+        setup_histogram(system);
+        allocate_histogram_grid(system);
+    }
+
     initialize(system); // these are just system name sets,
-    printf("VERSION NUMBER: %i\n", 163);
+    printf("VERSION NUMBER: %i\n", 250);
     system.checkpoint("Done with system setup functions.");
 
     // compute inital COM for all molecules, and moment of inertia
@@ -77,19 +84,21 @@ int main(int argc, char **argv) {
 	// clobber files
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
-	remove( system.stats.radial_file.c_str() );
+	remove( system.stats.radial_file.c_str() ); remove( system.constants.output_histogram.c_str() );
 
     // INITIAL WRITEOUTS
     // Prep thermo output file
     FILE *f = fopen(system.constants.thermo_output.c_str(), "w");
     fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K)  #density(g/mL) #temp(K) #pres(atm)\n");
     fclose(f);
-
     // Prep pdb trajectory if needed
     if (system.constants.pdb_traj_option) {
         FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
         fclose(f);
     }
+		// Prep histogram if needed
+		if (system.constants.histogram_option)
+			system.file_pointers.fp_histogram = fopen(system.constants.output_histogram.c_str(), "w");
     // END INTIAL WRITEOUTS
 
     system.checkpoint("Initial protocols complete. Starting MC or MD.");
@@ -158,7 +167,11 @@ int main(int argc, char **argv) {
         if (t==0 || t % corrtime == 0 || t == finalstep) { /// write every x steps
 
             computeAverages(system);
-
+						if (system.constants.histogram_option) {
+							zero_grid(system.grids.histogram->grid,system);
+                            population_histogram(system);
+                            if (t != 0) update_root_histogram(system);
+                        }
       /* -------------------------------- */
 			// [[[[ PRINT OUTPUT VALUES ]]]]
 			/* -------------------------------- */
@@ -268,6 +281,8 @@ int main(int argc, char **argv) {
                 radialDist(system);
                 writeRadialDist(system);
             }
+						if (t != 0 && system.constants.histogram_option)
+							write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
 
             // count the corrtime occurences.
             corrtime_iter++;
@@ -389,6 +404,11 @@ int main(int argc, char **argv) {
 		integrate(system,dt);
 
 		if (count_md_steps % system.constants.md_corrtime == 0 || t==dt) {  // print every x steps and first.
+            if (system.constants.histogram_option) {
+							zero_grid(system.grids.histogram->grid,system);
+                            population_histogram(system);
+                            if (t != dt) update_root_histogram(system);
+            }
 
             // get KE and PE and T at this step.
             double* ETarray = calculateEnergyAndTemp(system, t);
@@ -470,6 +490,10 @@ int main(int argc, char **argv) {
                 radialDist(system);
                 writeRadialDist(system);
             }
+            if (t != dt && system.constants.histogram_option)
+				write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
+
+
 		}
 		count_md_steps++;
 	} // end MD timestep loop

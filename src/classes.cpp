@@ -29,6 +29,36 @@ enum {
     MD_MOLECULAR
 };
 
+/* the below stuff was more-or-less adopted from mpmc code */
+typedef struct _histogram {
+    int ***grid;
+    int x_dim=0, y_dim=0, z_dim=0;
+    double origin[3] = {0,0,0};
+    double delta[3][3] = { {0,0,0},{0,0,0},{0,0,0} };
+    int count[3];
+    int n_data_points=0;
+    int norm_total=0;
+} histogram_t;
+
+class FilePointer {
+  public:
+    FilePointer();
+    FILE *fp_histogram;
+};
+FilePointer::FilePointer() {}
+
+// grids (for histogram)
+class Grid {
+    public:
+        Grid();
+
+        histogram_t *histogram;
+        histogram_t *avg_histogram;
+
+};
+Grid::Grid() {}
+/* end stuff for histogram */
+
 // Constants is sort-of a misnomer for some things in this class but you get the idea.
 class Constants {
 	public:
@@ -47,6 +77,7 @@ class Constants {
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
+        string output_histogram="histogram.dx"; // histogram information, viewable in VMD
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
@@ -62,6 +93,7 @@ class Constants {
         int_fast8_t dist_within_option=0; // a function to calculate atom distances within a certain radius of origin
         string dist_within_target; // the atom to find in above option
         double dist_within_radius; // the radius within which to search from origin
+        int_fast8_t histogram_option = 1; // output histogram data which can be plotted in VMD
         int_fast8_t autocenter = 1; // center all atoms about origin automatically. can opt out of it.
         int_fast8_t simulated_annealing = 0; // sim. ann.
         double sa_target = 0.0; // target temperature for annealing.

@@ -16,13 +16,19 @@ class System {
 		Pbc pbc;
         Stats stats;
         Last last; // to hold previous values for reversion if needed (checkpointing variables)
-        
+
         //int **atommap;
         vector<vector<int>> atommap;
         vector<vector<vector<vector<Pair>>>> pairs; // r
-        
-        // defines the "previous checkpoint time object
-        std::chrono::time_point<std::chrono::system_clock> previous_checkpoint = std::chrono::system_clock::now();       
+
+        // histogram stuff
+        int n_histogram_bins=0;
+				double hist_resolution=0.7; // default 0.7 A
+        Grid grids;
+				FilePointer file_pointers;
+
+        // defines the "previous checkpoint" time object
+        std::chrono::time_point<std::chrono::system_clock> previous_checkpoint = std::chrono::system_clock::now();
 
         // a function for de-bugging. Prints the current datetime and a string of text supplied in code.
         void checkpoint(string thetext) {

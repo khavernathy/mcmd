@@ -5,20 +5,22 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option  off
-input_atoms ../pdbs/mof5+11h2bssp.pdb   naclh2o.pdb	  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
-potential_form 		ljespolar   !ljespolar 	!phast2    !!lj
+input_atoms   ../pdbs/MPM1.pdb   ../pdbs/mof5+h2bssp.pdb   naclh2o.pdb	  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+potential_form 		lj  espolar   !ljespolar 	!phast2    !!lj
 com_option		    off  	! center of mass
 
 ! P.B.C. will be 1/2 of these lengths for each dimension
-carbasis 25.669 25.669 25.669 90 90 90
+!carbasis 25.669 25.669 25.669 90 90 90
+carbasis 27.1979   27.1979   30.9998 90.0000   90.0000  120.0000
+
 
 ! MONTE CARLO ONLY ======================================
 ensemble		    nvt
 
 mc_pbc              on
-mc_corrtime	        100
+mc_corrtime	        25
 finalstep		    5000000
-temperature 	    77.0   !77.0  ! K
+temperature 	    298.0   !77.0  ! K
 pressure		    1.0     ! atm
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
