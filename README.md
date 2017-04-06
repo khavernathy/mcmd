@@ -29,9 +29,6 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
-
--> MC: histogram works but output cell is rotated for non 90-90-90 system.<br />
-&emsp;-> MC has same problem <br />
 -> MC: add dipole (maybe field) output functions<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
