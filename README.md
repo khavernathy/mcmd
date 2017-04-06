@@ -29,7 +29,6 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
--> MC: add dipole (maybe field) output functions<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
