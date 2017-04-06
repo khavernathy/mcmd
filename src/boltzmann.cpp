@@ -22,7 +22,8 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
             bf = system.pbc.volume * fugacity * 
             system.constants.ATM2REDUCED/(system.constants.temp * 
             (double)(system.stats.count_movables)) *
-                exp(-energy_delta/system.constants.temp);
+                exp(-energy_delta/system.constants.temp) *
+                (double)system.proto.size(); // bias for multisorbate (thus no change for single)
             if (bf < MAXVALUE) system.stats.insert_bf_sum += bf;
             else system.stats.insert_bf_sum += MAXVALUE;
         } 
@@ -30,7 +31,8 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
             bf = system.constants.temp * 
             ((double)(system.stats.count_movables) + 1.0)/
             (system.pbc.volume* fugacity *system.constants.ATM2REDUCED) *
-                exp(-energy_delta/system.constants.temp);
+                exp(-energy_delta/system.constants.temp) /
+                (double)system.proto.size(); // bias for multisorbate (thus no change for single)
             if (bf < MAXVALUE) system.stats.remove_bf_sum += bf;
             else system.stats.remove_bf_sum += MAXVALUE;
         }

@@ -73,6 +73,8 @@ int main(int argc, char **argv) {
     printf("VERSION NUMBER: %i\n", 250);
     system.checkpoint("Done with system setup functions.");
 
+    printf("SORBATE COUNT: %i\n", (int)system.proto.size());
+
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses //
     for (int i=0; i<system.molecules.size(); i++) {
