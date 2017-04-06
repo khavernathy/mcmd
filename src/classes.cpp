@@ -78,12 +78,14 @@ class Constants {
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
         string output_histogram="histogram.dx"; // histogram information, viewable in VMD
+        string dipole_output="dipoles.dat"; // only used when polarization is on.
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
         //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
         int_fast8_t pdb_traj_option=1; // option to write PDB trajectory (in addition to xyz). default on
         int_fast8_t xyz_traj_option=0; // option for xyz trajectory, default off
+        int_fast8_t dipole_output_option=1; // for dipole output (polar only)
         int_fast8_t com_option=0; // enables computation of center-of-mass and logs in output_traj
         int_fast8_t rotate_option=1; // MC ONLY: can deactivate rotates if wanted.
         int_fast8_t draw_box_option=1; // option to draw the box for visualization in restart.pdb

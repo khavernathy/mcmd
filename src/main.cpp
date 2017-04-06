@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() ); remove( system.constants.output_histogram.c_str() );
+	remove( system.constants.dipole_output.c_str() );
 
     // INITIAL WRITEOUTS
     // Prep thermo output file
@@ -117,9 +118,11 @@ int main(int argc, char **argv) {
     int finalstep = system.constants.finalstep;
     int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
-
-    // RESIZE A MATRIX IF POLAR IS ACTIVE
+    // RESIZE A MATRIX IF POLAR IS ACTIVE (and initialize the dipole file)
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR) {
+				FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
+				fclose(fp);
+
         system.last.total_atoms = system.constants.total_atoms;
         int N = 3 * system.constants.total_atoms;
         system.constants.A_matrix= (double **) calloc(N,sizeof(double*));
@@ -166,12 +169,15 @@ int main(int argc, char **argv) {
         // CHECK FOR CORRTIME
         if (t==0 || t % corrtime == 0 || t == finalstep) { /// write every x steps
 
+						// get all observable averages
             computeAverages(system);
+
+						// prep histogram for writing.
 						if (system.constants.histogram_option) {
 							zero_grid(system.grids.histogram->grid,system);
-                            population_histogram(system);
-                            if (t != 0) update_root_histogram(system);
-                        }
+              population_histogram(system);
+              if (t != 0) update_root_histogram(system);
+            }
       /* -------------------------------- */
 			// [[[[ PRINT OUTPUT VALUES ]]]]
 			/* -------------------------------- */
@@ -283,6 +289,9 @@ int main(int argc, char **argv) {
             }
 						if (t != 0 && system.constants.histogram_option)
 							write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
+
+						if (system.constants.potential_form == POTENTIAL_LJESPOLAR && system.constants.dipole_output_option)
+							write_dipole(system);
 
             // count the corrtime occurences.
             corrtime_iter++;

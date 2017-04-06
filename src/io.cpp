@@ -805,3 +805,26 @@ void paramOverrideCheck(System &system) {
         } // end map loop
     } // end if epsilon override
 }
+
+void write_dipole(System &system) {
+
+    int p,i,j;
+    FILE * fp;
+		double DEBYE2SKA = system.constants.DEBYE2SKA;
+
+    double dipole[3];
+
+    fp = fopen(system.constants.dipole_output.c_str(), "a");
+
+    for(i=0; i<system.molecules.size(); i++) {
+        for(p = 0; p < 3; p++) dipole[p] = 0;
+        for(j=0; j<system.molecules[i].atoms.size(); j++) {
+            for(p = 0; p < 3; p++)
+                dipole[p] += system.molecules[i].atoms[j].dip[p];
+        }
+        if(!system.molecules[i].frozen) fprintf(fp, "%f %f %f\n", dipole[0]/DEBYE2SKA, dipole[1]/DEBYE2SKA, dipole[2]/DEBYE2SKA);
+    }
+    fflush(fp);
+    fclose(fp);
+    return;
+}
