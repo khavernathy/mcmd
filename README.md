@@ -8,7 +8,7 @@ It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6
 --> Force-fields available are Lennard-Jones (12-6), (Ewald) electrostatics, and Thole-Applequist polarization.<br />
 --> Sample inputs are included. The program takes just one argument: the input file.<br />
 
-PRE-COMPILED EXECUTABLE WORKS WITH THE FOLLOWING COMPILERS:  <br />
+On computer clusters, you may need to load a compiler module first:  <br />
 &emsp;-> gcc compiler 6.2.0 (circe)  <br />
 &emsp;-> gcc compiler 4.9.3 (stampede)  <br />
 
