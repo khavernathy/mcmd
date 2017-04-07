@@ -15,27 +15,27 @@ On computer clusters, you may need to load a compiler module first:  <br />
 Quick start:<br />
 1) Download: <br />
 `git clone https://github.com/khavernathy/mcmd` <br />
-`cd mcmd` <br />
 
 2) Compile: <br />
+`cd mcmd` <br />
 `cd src` <br />
-`g++ main.cpp -lm -o ../t -I. -std=c++11`, or simply `bash compile.sh` <br />
+`g++ main.cpp -lm -o ../mcmd -I. -std=c++11`, or simply `bash compile.sh` <br />
 `cd ..` <br />
 
 3) Run: <br />
-`./t mcmd.inp`<br /><br />  
+`./mcmd mcmd.inp`<br /><br />  
   
 <hr />
   
 TODO<br /><br />
+-> MC: add fugacity calculator as default for uVT when pressure is given (instead of IG approx.)
 -> MC: minimize calculations by just accounting for single-molecule energy changes for moves.
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
-&emsp;-> Aperiodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
+&emsp;-> Non-periodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
 -> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
-&emsp;-> although I think it's always the case with crystalline systems.<br />
 -> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />
 -> MD: Use GPU for MD force calculations? (add option)<br />
 -> MC: Use GPU for polarization routine (later)<br />

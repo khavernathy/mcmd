@@ -1,4 +1,4 @@
 #!/bin/bash
 
 
-g++ main.cpp -lm -o ../t -I. -std=c++11; 
+g++ main.cpp -lm -o ../mcmd -I. -std=c++11; 

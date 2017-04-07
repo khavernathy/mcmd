@@ -1,0 +1,34 @@
+! Douglas Franz, Space group, USF
+! all input params are defined only by the second column
+! except multisorbate lines 
+! 2017
+
+name			    mcmd_development
+mode	 		    mc ! mc or md
+checkpoints_option off 
+input_atoms  ../pdbs/mof5.pdb  ! PDB ONLY 
+sorbate_name    co2_phast* h2_bssp ch4_9site* water  ethane*
+sorbate_fugacities 5.0      5.0      5.0      5.0     5.0
+
+free_volume  11595.4   ! A^3; for excess adsorption calc.
+
+potential_form 		ljespolar
+xyz_traj_option on   ! use 'topo readvarxyz traj.xyz' to view VMD changing-N traj.
+
+carbasis 25.669 25.669 25.669 90 90 90
+
+radial_dist on
+radial_centroid     OXY
+radial_counterpart  ZN
+
+ensemble		    uvt
+
+mc_corrtime	        25
+finalstep		    5000000
+temperature 	    295.0      ! K
+!!!pressure		    2.0     ! atm, not needed for multi-sorb or manual fugacity.
+
+insert_factor		0.667     ! uVT: prob to insert/delete in uVT
+displace_factor     2.5
+rotate_angle_factor 360.0
+! =======================================================

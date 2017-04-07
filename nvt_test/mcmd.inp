@@ -5,13 +5,11 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option  off
-input_atoms ../pdbs/mof5+co2_2.1mmolg.pdb   ../pdbs/MPM1.pdb  ../pdbs/mof5+h2bssp.pdb   naclh2o.pdb	  pdbs/50ne.pdb    pdbs/mof5+h2.pdb    ! PDB ONLY 
+input_atoms ../pdbs/mof5+co2_2.1mmolg.pdb      ! PDB ONLY 
 potential_form 		ljes   polar   !ljespolar 	!phast2    !!lj
 com_option		    off  	! center of mass
 
-! P.B.C. will be 1/2 of these lengths for each dimension
 carbasis 25.669 25.669 25.669 90 90 90
-!carbasis 27.1979   27.1979   30.9998 90 90 120.0   
 
 
 ! MONTE CARLO ONLY ======================================

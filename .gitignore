@@ -27,6 +27,8 @@ callgrin*
 *ods
 .~lock*
 t
+mcmd
 *.vmd
 histogram.dx
 dipoles.dat
+*.ods

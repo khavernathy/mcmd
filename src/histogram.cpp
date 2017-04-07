@@ -301,9 +301,9 @@ void setup_deltas(histogram_t *hist, System &system)
 			hist->delta[i][j]=system.pbc.basis[j][i]/hist->count[i];
 	/* we divide by the count to get our actual step size in each dimension */
 
-    /* IMPORTANT: CORRECTIONS FOR NON-ORTHORHOMBIC SYSTEMS */
+    /* dfranz: IMPORTANT: CORRECTIONS FOR NON-ORTHORHOMBIC SYSTEMS */
     // that is to say, the above is fine for cubic systems but results 
-    // in a weird rotated DX cell for non 90/90/90
+    // are a weird and rotated DX cell for non 90/90/90
     hist->delta[1][0] = hist->delta[0][1];
         hist->delta[0][1] = 0.0;
     hist->delta[2][0] = hist->delta[0][2];
