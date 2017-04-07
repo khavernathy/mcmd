@@ -32,3 +32,4 @@ mcmd
 histogram.dx
 dipoles.dat
 *.ods
+*.par
