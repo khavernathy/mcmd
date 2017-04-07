@@ -409,6 +409,12 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "COE", "CO2", "M", -1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05);
                 system.proto[i].name = "CO2";
             }
+            else if (sorbmodel == "co2_becker") {
+                // A polar model adapted from TraPPE. Becker et al. 10.1021/acs.jpcc.6b12052
+                addAtomToProto(system,i, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.01, 0.7, 0.916, 23.4, 2.8);
+                addAtomToProto(system, i, "COE", "CO2", "M", 1.16, 0.0, 0.0, 16.0, -0.35, 0.575, 73.08, 3.05);
+                addAtomToProto(system, i, "COE", "CO2", "M", -1.16, 0.0, 0.0, 16.0, -0.35, 0.575, 73.08, 3.05);
+            }
             // NITROGEN N2
             else if (sorbmodel == "n2_mcquarrie") {
                 addAtomToProto(system,i, "N2G", "N2", "M", 0.0, 0.0, 0.0, 28.01344, 0.0, 0.0, 95.1, 3.7);
