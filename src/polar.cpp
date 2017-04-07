@@ -8,16 +8,17 @@
 using namespace std;
 
 void makeAtomMap(System &system) {
-    int count =0;
+    //int count =0;
+    int i,j;
     vector<int> local = vector<int>(2);
     //int v[2];
-    for (int i=0; i<system.molecules.size(); i++) {
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local = {i,j};
             system.atommap.push_back(local);
 
         //printf("system.atommap[%i] = {%i,%i}\n", count, system.atommap[count][0], system.atommap[count][1]);
-            count++;
+          //  count++;
         }
     }
     return;  
@@ -48,9 +49,9 @@ void zero_out_amatrix(System &system, int N) {
 double get_dipole_rrms (System &system) {
     double N, dipole_rrms;
     dipole_rrms = N = 0;
-
-    for (int i=0; i<system.molecules.size(); i++) {
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+    int i,j;
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
             if (isfinite(system.molecules[i].atoms[j].dipole_rrms))
                 dipole_rrms += system.molecules[i].atoms[j].dipole_rrms;
             N++;
@@ -137,10 +138,9 @@ void thole_amatrix(System &system) {
     /* calculate each Tij tensor component for each dipole pair */
     for(i = 0; i < (N - 1); i++) {
         ii = i*3;
+        w = system.atommap[i][0]; x = system.atommap[i][1];
         for(j = (i + 1);  j < N; j++) {
             jj = j*3;
-
-            w = system.atommap[i][0]; x = system.atommap[i][1];
             y = system.atommap[j][0]; z = system.atommap[j][1];
 
             //printf("i %i j %i ======= w %i x %i y %i z %i \n",i,j,w,x,y,z);
@@ -332,7 +332,7 @@ double polarization(System &system) {
     // POLAR ITERATIVE METHOD IS WHAT I USE.
     // THERE ARE OTHERS, E.G. MATRIX INVERSION OR FULL EWALD
     // MPMC CAN DO THOSE TOO, BUT WE ALMOST ALWAYS USE ITERATIVE.
-    double potential; int num_iterations;
+    double potential; int i,j,num_iterations;
 
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
@@ -364,8 +364,8 @@ double polarization(System &system) {
 
     // 3) CALCULATE POLARIZATION ENERGY 1/2 mu*E
     potential=0;
-    for (int i=0; i<system.molecules.size(); i++) {
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
             potential += (
             (system.molecules[i].atoms[j].dip[0] * system.molecules[i].atoms[j].efield[0]) +
             (system.molecules[i].atoms[j].dip[1] * system.molecules[i].atoms[j].efield[1]) +
