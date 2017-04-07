@@ -29,6 +29,7 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
+-> MC: minimize calculations by just accounting for single-molecule energy changes for moves.
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
