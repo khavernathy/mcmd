@@ -193,7 +193,7 @@ void update_ranking (System &system, int * ranked_array ) {
 /* iterative solver of the dipole field tensor */
 /* returns the number of iterations required */
 int thole_iterative(System &system) {
-    unsigned int i, N, p, ti, tj;
+    unsigned int i, j, N, p, ti, tj;
     unsigned int iteration_counter, keep_iterating;
     int *ranked_array;
 
@@ -236,11 +236,18 @@ int thole_iterative(System &system) {
         }
 
         //zero out induced e-field
+        for (i=0; i<system.molecules.size(); i++) {
+            for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                for (p=0; p<3; p++)
+                    system.molecules[i].atoms[j].efield_induced[p] = 0;
+            }
+        }
+        /*
         for ( i=0; i<N; i++ ) {
             ti = system.atommap[i][0]; tj = system.atommap[i][1];
             for ( p=0; p<3; p++ ) 
                 system.molecules[ti].atoms[tj].efield_induced[p] = 0;
-        }
+        }*/
 
         //save the current dipole information if we want to calculate precision (or if needed for relaxation)
         if ( system.constants.polar_rrms || system.constants.polar_precision > 0)  { 
