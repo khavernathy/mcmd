@@ -72,21 +72,22 @@ void contract_dipoles (System &system, int * ranked_array ) {
 }
 
 void calc_dipole_rrms (System &system) {
-    unsigned int i, p, ti, tj;
+    unsigned int i, j, p;
     double carry;
 
-    /* get the dipole RRMS */
+    /*
+    // get the dipole RRMS 
     for(i = 0; i < system.constants.total_atoms; i++) {
         ti = system.atommap[i][0]; tj = system.atommap[i][1];
 
-        /* mean square difference */
+        // mean square difference 
         system.molecules[ti].atoms[tj].dipole_rrms = 0;
         for(p = 0; p < 3; p++) {
             carry = system.molecules[ti].atoms[tj].newdip[p] - system.molecules[ti].atoms[tj].olddip[p];
             system.molecules[ti].atoms[tj].dipole_rrms += carry*carry;
         }
 
-        /* normalize */
+        // normalize 
         system.molecules[ti].atoms[tj].dipole_rrms /= (
         (system.molecules[ti].atoms[tj].newdip[0] * system.molecules[ti].atoms[tj].newdip[0]) +
         (system.molecules[ti].atoms[tj].newdip[1] * system.molecules[ti].atoms[tj].newdip[1]) +
@@ -95,6 +96,26 @@ void calc_dipole_rrms (System &system) {
         system.molecules[ti].atoms[tj].dipole_rrms = sqrt(system.molecules[ti].atoms[tj].dipole_rrms);
         if ( !isfinite(system.molecules[ti].atoms[tj].dipole_rrms) ) system.molecules[ti].atoms[tj].dipole_rrms = 0;
     }
+    */
+
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            // mean square distance
+            system.molecules[i].atoms[j].dipole_rrms=0;
+            for (p=0; p<3; p++) {
+                carry = system.molecules[i].atoms[j].newdip[p] - system.molecules[i].atoms[j].olddip[p];
+                system.molecules[i].atoms[j].dipole_rrms += carry*carry;
+
+                // normalize
+                system.molecules[i].atoms[j].dipole_rrms /= sqrt(dddotprod(system.molecules[i].atoms[j].newdip, system.molecules[i].atoms[j].newdip));
+
+                if (!isfinite(system.molecules[i].atoms[j].dipole_rrms)) system.molecules[i].atoms[j].dipole_rrms=0;
+                
+            }
+        }
+    }
+
+
     return;
 }
 
