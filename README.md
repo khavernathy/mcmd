@@ -1,6 +1,6 @@
 # mcmd
 This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
-It works on Linux (tested on Ubuntu) and Mac (tested on OS X El Capitan v10.11.6).<br />
+It works on Linux (tested on Ubuntu 16.04 and ) and Mac (tested on OS X El Capitan v10.11.6).<br />
 
 --> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
 --> MD supports NVT.  <br />
@@ -28,8 +28,8 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
--> MC: add fugacity calculator as default for uVT when pressure is given (instead of IG approx.)
--> MC: minimize calculations by just accounting for single-molecule energy changes for moves.
+-> MC: add fugacity calculator as default for uVT when pressure is given (instead of IG approx.)<br />
+-> MC: minimize calculations by just accounting for single-molecule energy changes for moves.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
 -> MC: got polarization working but:<br />
