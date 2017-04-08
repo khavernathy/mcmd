@@ -1,0 +1,16 @@
+debug notes
+
+polar explosion. ONLY polar. only high pressure (discovered @ 30atm in MOF5) -- seems new
+co2 phast / phast*
+h2 bssp
+    -> user inputs
+Trying with sorbate in input (not user)
+    -> mpmc = mcmd initial energies ljespolar 
+    if it explodes, check that state and mpmc energy compare
+    it exploded (linux/mac and h2*/co2*).
+    energies are equal mcmd/mpmc.
+    it must be in acceptance condition or polarization energy calc after initial
+    at 30atm
+        -> testing 1atm 77k h2bssp user-input fugacity.
+
+

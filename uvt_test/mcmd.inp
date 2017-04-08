@@ -12,7 +12,7 @@ free_volume  11595.4
 potential_form 		ljespolar   polar  polar   !ljespolar 	!phast2    !!lj
 xyz_traj_option on
 sorbate_name h2_bssp   
-sorbate_fugacities 30.0
+sorbate_fugacities 1.0
 
 carbasis 25.669 25.669 25.669 90 90 90
 
@@ -24,8 +24,7 @@ ensemble		    uvt
 
 mc_corrtime	        25
 finalstep		    5000000
-temperature 	80    298  ! K
-!!!pressure		    2.0     ! atm
+temperature   77 	    298  ! K
 
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT
 displace_factor     2.5

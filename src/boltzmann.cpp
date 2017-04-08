@@ -17,6 +17,8 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     if (system.proto.size() == 1 && system.constants.sorbate_name.size() == 0) fugacity = system.constants.pres;
     else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
+    //printf("fugac: %f\n", fugacity);
+
     if (system.constants.ensemble == ENSEMBLE_UVT) {
         if (movetype == MOVETYPE_INSERT) {
             bf = system.pbc.volume * fugacity * 
@@ -98,6 +100,6 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
         bf = MAXVALUE; 
         //printf("bf is INFINITE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111\n");
     }
-    //printf("bf: %f\n",bf);
+//    printf("bf: %f\n",bf);
     return bf;
 }
