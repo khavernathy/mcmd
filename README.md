@@ -28,7 +28,6 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
--> MC: add fugacity calculator as default for uVT when pressure is given (instead of IG approx.)<br />
 -> MC: there's a bug, at least for CO2-PHAST* user input ljes/ljespolar, where the polar energy gets super low and the system explodes<br />
 -> MC: minimize calculations by just accounting for single-molecule energy changes for moves.<br />
 -> MC: add multi-sorb Qst calculator<br />
