@@ -11,6 +11,9 @@ Trying with sorbate in input (not user)
     energies are equal mcmd/mpmc.
     it must be in acceptance condition or polarization energy calc after initial
     at 30atm
-        -> testing 1atm 77k h2bssp user-input fugacity.
+        -> testing 0-1atm 77k h2bssp user-input fugacity.
+            ->it's working with no explosions..
+        -> an old commit exploded at 30atm. I probably had this problem from the start.
+        -> current version exlplodes at 0.5 - 1.0atm after ~8hrs. It's unrelated to pressure. 
 
 

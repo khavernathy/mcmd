@@ -717,3 +717,21 @@ void initialize(System &system) {
         system.stats.csp.name = "csp";
         system.stats.diffusion.name="diffusion";
 }
+
+void setupFugacity(System &system) {
+    // called in main()
+    if (system.constants.fugacity_single == 1) {
+        // we don't do anything unless user put a fugacity sorbate in input.
+        if (system.constants.fugacity_single_sorbate == "h2") system.proto[0].fugacity = h2_fugacity(system.constants.temp, system.constants.pres);
+        else if (system.constants.fugacity_single_sorbate == "n2") system.proto[0].fugacity = n2_fugacity(system.constants.temp, system.constants.pres);
+        else if (system.constants.fugacity_single_sorbate == "co2") system.proto[0].fugacity = co2_fugacity(system.constants.temp, system.constants.pres);
+        else if (system.constants.fugacity_single_sorbate == "ch4") system.proto[0].fugacity = ch4_fugacity(system.constants.temp, system.constants.pres); 
+
+    }
+    
+    printf("INPUT: fugacity for prototype %s = %f\n", system.constants.fugacity_single_sorbate.c_str(), system.proto[0].fugacity);
+
+    return;
+
+
+}

@@ -436,6 +436,16 @@ void readInput(System &system, char* filename) {
                     }
                 }
 
+            } else if (!strcasecmp(lc[0].c_str(), "fugacity_single")) {
+                system.constants.fugacity_single = 1;
+                system.constants.fugacity_single_sorbate = lc[1];
+                if (lc[1] != "h2" && lc[1] != "co2" && lc[1] != "ch4" && lc[1] != "n2") {
+                    std::cout << "ERROR: fugacity_single input not recognized. Available options are h2, co2, ch4, and n2.";
+                    std::exit(0);                    
+                } else {
+                    std::cout << "Got fugacity_single sorbate selection = " << lc[1].c_str(); printf("\n");
+                }
+
             // BASIS STUFF.
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {

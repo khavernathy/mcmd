@@ -28,6 +28,7 @@
 #include <usefulmath.cpp>
 #include <classes.cpp>
 #include <system.cpp>
+#include <fugacity.cpp>
 #include <system_functions.cpp>
 #include <mc.cpp> // this will include potential.cpp, which includes lj, coulombic, polar
 #include <md.cpp>
@@ -68,6 +69,7 @@ int main(int argc, char **argv) {
         setup_histogram(system);
         allocate_histogram_grid(system);
     }
+    setupFugacity(system);
 
     initialize(system); // these are just system name sets,
     printf("VERSION NUMBER: %i\n", 250);
@@ -197,9 +199,9 @@ int main(int argc, char **argv) {
 			printf("MONTE CARLO\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             if (!system.constants.simulated_annealing)
-			    printf("ENSEMBLE: %s; T = %.3f K; P = %.3f atm\n",system.constants.ensemble_str.c_str(), system.constants.temp, system.constants.pres);
+			    printf("ENSEMBLE: %s; T = %.3f K\n", system.constants.ensemble_str.c_str(), system.constants.temp);
 			else
-                printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on); P = %.3f atm\n",system.constants.ensemble_str.c_str(), system.constants.temp, system.constants.pres);
+                printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on)\n",system.constants.ensemble_str.c_str(), system.constants.temp);
 
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
 			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep,finalstep,progress,efficiency);

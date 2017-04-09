@@ -101,6 +101,8 @@ class Constants {
         double sa_target = 0.0; // target temperature for annealing.
         double sa_schedule = 0.9999; // T-change factor for annealing.
         double free_volume=0; // for excess adsorption calculation, A^3. must be user-input
+        int fugacity_single=0; // set for single-sorbate fugacity calculation at startup.
+        string fugacity_single_sorbate; // the sorbate molecule to get fugacity of. h2/n2/co2/ch4
 
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. NOT r_m (as in UFF). Defined below

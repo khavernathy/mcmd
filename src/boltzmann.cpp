@@ -14,7 +14,8 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     double energy_delta = e_f - e_i;
     double fugacity;
 
-    if (system.proto.size() == 1 && system.constants.sorbate_name.size() == 0) fugacity = system.constants.pres;
+    if (system.proto.size() == 1 && system.constants.sorbate_name.size() == 0 && system.constants.fugacity_single == 0) fugacity = system.constants.pres;
+    else if (system.constants.fugacity_single == 1) fugacity = system.proto[0].fugacity;
     else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
     //printf("fugac: %f\n", fugacity);
