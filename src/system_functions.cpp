@@ -729,7 +729,7 @@ void setupFugacity(System &system) {
 
     }
     
-    printf("INPUT: fugacity for prototype %s = %f\n", system.constants.fugacity_single_sorbate.c_str(), system.proto[0].fugacity);
+    printf("INPUT: Calculated fugacity for prototype %s = %f atm\n", system.constants.fugacity_single_sorbate.c_str(), system.proto[0].fugacity);
 
     return;
 
