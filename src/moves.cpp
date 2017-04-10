@@ -154,7 +154,7 @@ void changeVolumeMove(System &system) {
     double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, MOVETYPE_VOLUME);
 
     //printf("ranf < bf? %f < %f ?\n", ranf, boltzmann_factor);
-	if (ranf < boltzmann_factor) {
+	if (ranf < boltzmann_factor && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		// accept move
         //printf("ACCEPTED\n");
 		system.stats.volume_change_accepts++;
@@ -258,7 +258,7 @@ void addMolecule(System &system) {
     double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);
 
 	double ranf = (double)rand()/(double)RAND_MAX;
-	if (ranf < boltz_factor) {
+	if (ranf < boltz_factor && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
 	    system.stats.MCmoveAccepted = true;
     } else {
@@ -318,7 +318,7 @@ void removeMolecule(System &system) {
 
     // accept or reject
     double ranf = (double)rand()/(double)RAND_MAX;
-    if (ranf < boltz_factor) {
+    if (ranf < boltz_factor && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 	    //printf("accepted remove.\n");
 	    system.stats.remove_accepts++;
         system.stats.MCmoveAccepted = true;
@@ -391,8 +391,8 @@ void displaceMolecule(System &system) {
 	double ranf = (double)rand() / (double)RAND_MAX; // a value between 0 and 1
 
 	// apply selection Frenkel Smit p. 30
-	// accept move
-	if (ranf < boltzmann_factor) {
+	// accept move. // a crude way to make sure polar energy does not explode
+	if (ranf < boltzmann_factor && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100. ) {
 			system.stats.displace_accepts++;
             system.stats.MCmoveAccepted = true;
 

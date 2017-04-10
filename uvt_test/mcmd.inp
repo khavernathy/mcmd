@@ -5,11 +5,11 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option off 
-input_atoms  ../pdbs/mof5+h2bss.pdb     ! PDB ONLY 
+input_atoms  ../pdbs/mof5+h2bssp.pdb     ! PDB ONLY 
 
 free_volume  11595.4
 
-potential_form 		ljes   polar   polar  polar   !ljespolar 	!phast2    !!lj
+potential_form 		ljespolar   polar   polar  polar   !ljespolar 	!phast2    !!lj
 xyz_traj_option on
 fugacity_single h2
 
