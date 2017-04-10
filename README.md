@@ -28,6 +28,7 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
+-> MC: reduce energy calculations to adjust by the 1 particle that is changed.<br /> 
 -> MC: there's a bug, at least for CO2-PHAST* user input ljes/ljespolar, where the polar energy gets super low and the system explodes<br />
 -> MC: minimize calculations by just accounting for single-molecule energy changes for moves.<br />
 -> MC: add multi-sorb Qst calculator<br />
@@ -35,8 +36,6 @@ TODO<br /><br />
 -> MC: got polarization working but:<br />
 &emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
 &emsp;-> Non-periodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
--> MC: make pair lists for MC to run faster AND to do stuff like pressure calculation in MD. <br />
--> MD: Emergent pressure seems large.. (Frenkel method p.84)<br />
 -> MD: Use GPU for MD force calculations? (add option)<br />
 -> MC: Use GPU for polarization routine (later)<br />
 -> MC: Implement Phast2 model?<br />
