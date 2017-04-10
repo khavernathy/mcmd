@@ -251,7 +251,8 @@ int thole_iterative(System &system) {
             }
             //set convergence failure flag
             system.constants.iter_success = 1;
-            
+            printf("POLAR CONVERGENCE FAILURE\n");           
+ 
             free(ranked_array);
             return(iteration_counter);
         }

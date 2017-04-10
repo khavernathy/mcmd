@@ -118,7 +118,7 @@ class Constants {
         double vcp_factor=1.0; // a factor used in probability for volume change. this / num_sorbates is good per Frenkel
         double displace_factor=2.5; // up to +- this number in A
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
-        // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
+// DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
 		int stepsize=1; // obvi
         int finalstep; // user defined for MC
@@ -155,7 +155,7 @@ class Constants {
         int polar_max_iter = 4;
         double **A_matrix, **B_matrix, C_matrix[3][3];
         int polar_precision=0;
-        int iter_success;
+        int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
         int_fast8_t polar_rrms =0;
         double dipole_rrms = 0.0;
         int_fast8_t polar_gs_ranked = 1;

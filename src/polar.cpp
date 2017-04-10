@@ -116,6 +116,7 @@ void thole_amatrix(System &system) {
 
     system.checkpoint("in thole_amatrix() --> zeroing out");
     zero_out_amatrix(system,N);
+    //print_matrix(system, 3*N, system.constants.A_matrix);
     system.checkpoint("done with zero_out_amatrix()");
 
     //system.checkpoint("setting diagonals in A");
@@ -366,20 +367,14 @@ double polarization(System &system) {
     potential=0;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            potential += (
-            (system.molecules[i].atoms[j].dip[0] * system.molecules[i].atoms[j].efield[0]) +
-            (system.molecules[i].atoms[j].dip[1] * system.molecules[i].atoms[j].efield[1]) +
-            (system.molecules[i].atoms[j].dip[2] * system.molecules[i].atoms[j].efield[2])
-            );
-            
-            if (system.constants.polar_palmo) { 
-                potential += (
-                    system.molecules[i].atoms[j].dip[0] * system.molecules[i].atoms[j].efield_induced_change[0] +
-                    system.molecules[i].atoms[j].dip[1] * system.molecules[i].atoms[j].efield_induced_change[1] +
-                    system.molecules[i].atoms[j].dip[2] * system.molecules[i].atoms[j].efield_induced_change[2]
-                );
+            potential += 
+                dddotprod(system.molecules[i].atoms[j].dip, system.molecules[i].atoms[j].efield);
+
+            if (system.constants.polar_palmo) {
+                potential += dddotprod(system.molecules[i].atoms[j].dip, system.molecules[i].atoms[j].efield_induced_change);
             }
         }
+//        printf("molecule %i dip %f efield %f indchang %f\n", i, system.molecules[i].atoms[0].dip[0], system.molecules[i].atoms[0].efield[0], system.molecules[i].atoms[0].efield_induced_change[0]);
     }
     system.checkpoint("POLARIZATION POTENTIAL CALCULATED.");
     

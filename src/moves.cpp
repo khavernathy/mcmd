@@ -13,8 +13,8 @@ void printEnergies(System &system) {
     int debug=0;
     if (debug) {
     printf("rd: %f es: %f pol: %f tot: %f\n", system.stats.rd.value, system.stats.es.value, system.stats.polar.value, system.stats.potential.value);
-    printf(" ---> lj: %f lj_self: %f lj_lrc: %f\n", system.stats.lj.value, system.stats.lj_self_lrc.value, system.stats.lj_lrc.value);
-    printf(" ---> es_real: %f es_recip: %f es_self: %f\n", system.stats.es_real.value, system.stats.es_recip.value, system.stats.es_self.value);
+    //printf(" ---> lj: %f lj_self: %f lj_lrc: %f\n", system.stats.lj.value, system.stats.lj_self_lrc.value, system.stats.lj_lrc.value);
+    //printf(" ---> es_real: %f es_recip: %f es_self: %f\n", system.stats.es_real.value, system.stats.es_recip.value, system.stats.es_self.value);
     }
 
     return;
@@ -167,7 +167,7 @@ void changeVolumeMove(System &system) {
     double boltzmann_factor = get_boltzmann_factor(system, old_energy, new_energy, MOVETYPE_VOLUME);
 
     //printf("ranf < bf? %f < %f ?\n", ranf, boltzmann_factor);
-	if (ranf < boltzmann_factor) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
+	if (ranf < boltzmann_factor && system.constants.iter_success == 0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		// accept move
         //printf("ACCEPTED\n");
 		system.stats.volume_change_accepts++;
@@ -175,7 +175,8 @@ void changeVolumeMove(System &system) {
 	    printEnergies(system);
     } else {
         //printf("REJECTED\n");
-		// reject move (move volume back)
+		system.constants.iter_success = 0;
+        // reject move (move volume back)
         system.pbc.x_length /= basis_scale_factor;
         system.pbc.y_length /= basis_scale_factor;
         system.pbc.z_length /= basis_scale_factor;
@@ -272,11 +273,12 @@ void addMolecule(System &system) {
     double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);
 
 	double ranf = (double)rand()/(double)RAND_MAX;
-	if (ranf < boltz_factor) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
+	if (ranf < boltz_factor && system.constants.iter_success ==0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
 	    system.stats.MCmoveAccepted = true;
         printEnergies(system);
     } else {
+        system.constants.iter_success = 0;
 		// remove the new molecule.
 		system.molecules.pop_back();
 		system.constants.total_atoms -= (int)system.proto[protoid].atoms.size();
@@ -333,12 +335,13 @@ void removeMolecule(System &system) {
 
     // accept or reject
     double ranf = (double)rand()/(double)RAND_MAX;
-    if (ranf < boltz_factor) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
+    if (ranf < boltz_factor && system.constants.iter_success == 0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 	    //printf("accepted remove.\n");
 	    system.stats.remove_accepts++;
         system.stats.MCmoveAccepted = true;
         printEnergies(system);
     } else {
+        system.constants.iter_success = 0;
 	    //printf("rejected remove.\n");
 	    // put the molecule back.
 	    system.molecules.push_back(tmp_molecule);
@@ -408,7 +411,7 @@ void displaceMolecule(System &system) {
 
 	// apply selection Frenkel Smit p. 30
 	// accept move. // a crude way to make sure polar energy does not explode
-	if (ranf < boltzmann_factor) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100. ) {
+	if (ranf < boltzmann_factor && system.constants.iter_success == 0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100. ) {
 			system.stats.displace_accepts++;
             system.stats.MCmoveAccepted = true;
 
@@ -420,6 +423,7 @@ void displaceMolecule(System &system) {
 
 	} // end accept
 	else {
+        system.constants.iter_success =0;
 		// reject for whole molecule
 		for (int i=0; i<system.molecules[randm].atoms.size(); i++) {
             for (int n=0; n<3; n++) {

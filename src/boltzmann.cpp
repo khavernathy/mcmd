@@ -18,7 +18,7 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     else if (system.constants.fugacity_single == 1) fugacity = system.proto[0].fugacity;
     else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
-    //printf("fugac: %f\n", fugacity);
+//    printf("fugac: %f\n", fugacity);
 
     if (system.constants.ensemble == ENSEMBLE_UVT) {
         if (movetype == MOVETYPE_INSERT) {
@@ -96,11 +96,14 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
             //printf("bf %f \n", bf);
         }
     }
-  
-    if (std::isinf(bf)) {
-        bf = MAXVALUE; 
-        //printf("bf is INFINITE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111\n");
+ 
+    if (bf > MAXVALUE) {
+        bf = MAXVALUE;
+    } 
+    else if (std::isinf(bf)) {
+        printf("GOT INF! bf = %f\n", bf);
+        //bf = MAXVALUE; 
     }
-    //printf("bf: %f\n",bf);
+    //printf("bf: %f initial %f final %f\n",bf, e_i, e_f);
     return bf;
 }
