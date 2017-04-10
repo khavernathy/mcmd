@@ -101,6 +101,6 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
         bf = MAXVALUE; 
         //printf("bf is INFINITE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111\n");
     }
-//    printf("bf: %f\n",bf);
+    //printf("bf: %f\n",bf);
     return bf;
 }

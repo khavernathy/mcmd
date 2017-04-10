@@ -7,6 +7,19 @@
 #include <string>
 #include <stdlib.h>
 
+// for debuggin
+void printEnergies(System &system) {
+
+    int debug=0;
+    if (debug) {
+    printf("rd: %f es: %f pol: %f tot: %f\n", system.stats.rd.value, system.stats.es.value, system.stats.polar.value, system.stats.potential.value);
+    printf(" ---> lj: %f lj_self: %f lj_lrc: %f\n", system.stats.lj.value, system.stats.lj_self_lrc.value, system.stats.lj_lrc.value);
+    printf(" ---> es_real: %f es_recip: %f es_self: %f\n", system.stats.es_real.value, system.stats.es_recip.value, system.stats.es_self.value);
+    }
+
+    return;
+}
+
 void translate(System &system, int molid) {
     double randx,randy,randz;
         	randx = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
@@ -113,7 +126,7 @@ void changeVolumeMove(System &system) {
     double new_com[3], old_com[3], delta_pos[3];
     int i,j,n;
 
-        old_energy=getTotalPotential(system);
+        old_energy=system.stats.potential.value; //getTotalPotential(system);
 
     //double old_side = system.pbc.x_length; // in A; save just in case, to reset if move rejected.
     system.pbc.old_volume = system.pbc.volume;
@@ -159,7 +172,8 @@ void changeVolumeMove(System &system) {
         //printf("ACCEPTED\n");
 		system.stats.volume_change_accepts++;
         system.stats.MCmoveAccepted = true;
-	} else {
+	    printEnergies(system);
+    } else {
         //printf("REJECTED\n");
 		// reject move (move volume back)
         system.pbc.x_length /= basis_scale_factor;
@@ -195,7 +209,7 @@ void addMolecule(System &system) {
     int protoid;
 
 	// get current energy.
-	double old_potential = getTotalPotential(system);
+	double old_potential = system.stats.potential.value; //getTotalPotential(system);
 
     // select a random prototype molecule
     if (system.proto.size() == 1) protoid=0;
@@ -261,6 +275,7 @@ void addMolecule(System &system) {
 	if (ranf < boltz_factor) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
 	    system.stats.MCmoveAccepted = true;
+        printEnergies(system);
     } else {
 		// remove the new molecule.
 		system.molecules.pop_back();
@@ -284,7 +299,7 @@ void removeMolecule(System &system) {
     //    return;
 
     // get original energy.
-    double old_potential = getTotalPotential(system);
+    double old_potential = system.stats.potential.value; //getTotalPotential(system);
 
     system.checkpoint("getting random movable.");
     // select random movable molecule
@@ -322,6 +337,7 @@ void removeMolecule(System &system) {
 	    //printf("accepted remove.\n");
 	    system.stats.remove_accepts++;
         system.stats.MCmoveAccepted = true;
+        printEnergies(system);
     } else {
 	    //printf("rejected remove.\n");
 	    // put the molecule back.
@@ -354,7 +370,7 @@ void displaceMolecule(System &system) {
 	double old_V=0.0; double new_V=0.0;
 
 	// first calculate the system's current potential energy
-		old_V = getTotalPotential(system);
+		old_V = system.stats.potential.value; //getTotalPotential(system);
 
     // save a temporary copy of molecule to go back if needed
     Molecule tmp_molecule = system.molecules[randm];
@@ -399,7 +415,8 @@ void displaceMolecule(System &system) {
             // for MC efficiency measurement (Frenkel p44)
             for (int n=0; n<3; n++) d[n] = (system.molecules[randm].com[n] - tmpcom[n]);
             system.stats.MCeffRsq += dddotprod(d, d);
-
+    
+        printEnergies(system);
 
 	} // end accept
 	else {

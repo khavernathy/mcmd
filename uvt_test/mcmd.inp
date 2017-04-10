@@ -5,7 +5,7 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option off 
-input_atoms  ../pdbs/mof5+h2bssp.pdb     ! PDB ONLY 
+input_atoms  3426.pdb   ../pdbs/mof5+h2bssp.pdb     ! PDB ONLY 
 
 free_volume  11595.4
 
@@ -25,7 +25,7 @@ radial_counterpart H2G
 ! MONTE CARLO ONLY ======================================
 ensemble		    uvt
 
-mc_corrtime	        25
+mc_corrtime	        1
 finalstep		    5000000
 temperature   77 	    298  ! K
 pressure      1.0

@@ -50,5 +50,5 @@ double getTotalPotential(System &system) {
     system.stats.polar.value = total_polar;
     system.stats.potential.value = total_potential;
 
-	return total_rd + total_es + total_polar;
+	return total_potential;
 }
