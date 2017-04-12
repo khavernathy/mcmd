@@ -483,6 +483,11 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "H2G", "ETH", "M", -1.230, -0.921, 0.0, 1.0079, 0.17386, 0.19, 7.47472, 2.26449);
                 system.proto[i].name = "ETH";
             }
+            else if (sorbmodel == "c2h4_trappe") {
+                addAtomToProto(system,i, "CH2",  "ETH",  "M", -0.665,   0.000,   0.000, 14.02200, -0.000,  0.00000, 85.000,  3.675);
+                addAtomToProto(system,i, "CH2",  "ETH",  "M", 0.665,   0.000,   0.000, 14.02200, -0.000,  0.00000, 85.000,  3.675);
+            }
+
             // ETHANE C2H6
             else if (sorbmodel == "c2h6" || sorbmodel == "ethane") {
                 addAtomToProto(system,i, "C2G", "ETH", "M", -0.762,   0.000,   0.000, 12.01100, -0.04722,  0.00000, 141.80885,  3.28897); //  0.00000  0.00000
@@ -505,6 +510,10 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "H2G", "ETH", "M", 1.156, 0.508, -0.879, 1.0079, 0.01574, 0.4758, 2.60236, 2.57302);
                 addAtomToProto(system,i, "H2G", "ETH", "M", 1.156, -1.015, 0.0, 1.0079, 0.01574, 0.4758, 2.60236, 2.57302);
                 system.proto[i].name = "ETH";
+            }
+            else if (sorbmodel == "c2h6_trappe") {
+                addAtomToProto(system, i, "C2G",  "ETH",  "M", 0.770,   0.000,   0.000,  15.035, 0.0000,  0.00000, 98.00,  3.750);
+                addAtomToProto(system, i, "C2G",  "ETH",  "M", -0.770,   0.000,   0.000,  15.035, 0.0000,  0.00000, 98.00,  3.750);
             }
             // WATER H2O (TIP3P)
             else if (sorbmodel == "h2o" || sorbmodel == "water" || sorbmodel == "tip3p") {
