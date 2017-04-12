@@ -30,6 +30,7 @@ Quick start:<br />
 TODO<br /><br />
 -> MC: reduce energy calculations to adjust by the 1 particle that is changed.<br /> 
 -> MC: there's a bug, at least for CO2-PHAST* user input ljes/ljespolar, where the polar energy gets super low and the system explodes<br />
+&emsp;-> it only occurs for uVT, which tells me that the add/remove moves are culprit.
 -> MC: minimize calculations by just accounting for single-molecule energy changes for moves.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />

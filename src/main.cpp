@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
                 }
 
         // CHECK FOR CORRTIME
-        if (t==0 || t % corrtime == 0 || t == finalstep) { /// write every x steps
+        if (t==0 || t % corrtime == 0 || t == finalstep) { /// output every x steps
 
 						// get all observable averages
             computeAverages(system);

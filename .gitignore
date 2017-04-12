@@ -35,3 +35,5 @@ dipoles.dat
 *.par
 *.dat
 uvt_test/debug
+nvt_test/polartest
+uvt_test/2*
