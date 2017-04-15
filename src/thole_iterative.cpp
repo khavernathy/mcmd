@@ -3,6 +3,8 @@
 #include <math.h>
 #include <cmath>
 
+#define MAX_ITERATION_COUNT 128
+
 //set them to alpha*E_static
 void init_dipoles (System &system) {
 	unsigned int i, j, p;
@@ -236,7 +238,7 @@ int thole_iterative(System &system) {
 
         /* divergence detection */
         /* if we fail to converge, then return dipoles as alpha*E */
-        if(iteration_counter >= system.constants.polar_max_iter && system.constants.polar_precision) // && system.constants.polar_precision != 0) {
+        if(iteration_counter >= MAX_ITERATION_COUNT && system.constants.polar_precision) // && system.constants.polar_precision != 0) {
         {
            // printf("GOT TO MAX ITER COUNT");
             for(i = 0; i < N; i++) {

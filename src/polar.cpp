@@ -5,6 +5,8 @@
 
 #include <thole_iterative.cpp>
 
+#define OneOverSqrtPi 0.56418958354
+
 using namespace std;
 
 void makeAtomMap(System &system) {
@@ -68,10 +70,10 @@ void thole_resize_matrices(System &system) {
 
     /* determine how the number of atoms has changed and realloc matrices */
     oldN = 3*system.last.thole_total_atoms; //will be set to zero if first time called
-    N = 3*system.constants.total_atoms;
-    dN = N-oldN;
     system.last.thole_total_atoms = system.constants.total_atoms;
-
+    N = 3*system.last.thole_total_atoms;
+    dN = N-oldN;
+ 
     //printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
 
     if(!dN) { return; }
@@ -210,12 +212,11 @@ void thole_field(System &system) {
     // wolf thole field
     int i,j,k,l,p;
     double SMALL_dR = 1e-12;
-    double OneOverSqrtPi = 1.0/sqrt(M_PI);
     double r, rr; //r and 1/r (reciprocal of r)
     double R = system.pbc.cutoff;
     double rR = 1./R;
     //used for polar_wolf_alpha (aka polar_wolf_damp)
-    double a = system.constants.polar_wolf_alpha, distances[3];
+    double a = system.constants.polar_wolf_alpha; //, distances[3];
     double erR; //complementary error functions
         erR=erfc(a*R);
     double cutoffterm = (erR*rR*rR + 2.0*a*OneOverSqrtPi*exp(-a*a*R*R)*rR);
@@ -245,7 +246,7 @@ void thole_field(System &system) {
                 //r = system.pairs[i][j][k][l].r;
                 //for (int n=0;n<3;n++) distances[n] = system.pairs[i][j][k][l].d[n];
 
-                if((r - SMALL_dR  < R) && (r != 0.)) {
+                if((r - SMALL_dR  < system.pbc.cutoff) && (r != 0.)) {
                     rr = 1./r;
 
                     if ( a != 0 )   
@@ -303,7 +304,7 @@ void thole_field(System &system) {
 
 void thole_field_nopbc(System &system) {
     int p, i, j, k,l;
-    double r, SMALL_dR = 1e-12, distances[3];
+    double r, SMALL_dR = 1e-12; //, distances[3];
 
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -344,14 +345,14 @@ double polarization(System &system) {
 
     system.checkpoint("running thole_amatrix().");
     // 0) MAKE THOLE A MATRIX
-    thole_amatrix(system); // this function also makes the i,j -> single-index atommap.
+    thole_amatrix(system); // ***this function also makes the i,j -> single-index atommap.
     system.checkpoint("done running thole_amatrix(). Running thole_field()");
 
     // 1) CALCULATE ELECTRIC FIELD AT EACH SITE
     if (system.constants.mc_pbc)
         thole_field(system);
     else
-        thole_field_nopbc(system);
+        thole_field_nopbc(system); // maybe in wrong place? doubt it. 4-13-17
     system.checkpoint("done with thole_field(). Doing dipole iterations");
 
 
