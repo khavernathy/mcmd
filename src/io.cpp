@@ -687,6 +687,12 @@ void readInput(System &system, char* filename) {
 					system.constants.potential_form = POTENTIAL_LJES;
 				else if (lc[1] == "ljespolar")
 					system.constants.potential_form = POTENTIAL_LJESPOLAR;
+                else if (lc[1] == "commy")
+                    system.constants.potential_form = POTENTIAL_COMMY;
+                else if (lc[1] == "commyes") 
+                    system.constants.potential_form = POTENTIAL_COMMYES;
+                else if (lc[1] == "commyespolar") 
+                    system.constants.potential_form = POTENTIAL_COMMYESPOLAR;
 
 				std::cout << "Got potential form = " << lc[1].c_str(); printf("\n");
 

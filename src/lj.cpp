@@ -51,10 +51,10 @@ double lj(System &system) {
     double this_lj;
     double r,sr6;
     
-    for (int i = 0; i < system.molecules.size(); i++) {
-    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
-    for (int k = i+1; k < system.molecules.size(); k++) {
-    for (int l =0; l < system.molecules[k].atoms.size(); l++) {
+    for (i = 0; i < system.molecules.size(); i++) {
+    for (j = 0; j < system.molecules[i].atoms.size(); j++) {
+    for (k = i+1; k < system.molecules.size(); k++) {
+    for (l =0; l < system.molecules[k].atoms.size(); l++) {
 
         //if (system.pairs[i][j][k][l].recalculate) {
 
@@ -106,10 +106,10 @@ double lj(System &system) {
         // http://www.seas.upenn.edu/~amyers/MolPhys.pdf
     if (system.constants.rd_lrc) {
         if (system.stats.MCstep == 0 || system.constants.ensemble == ENSEMBLE_NPT || system.constants.ensemble == ENSEMBLE_UVT) { // lrc only changes if volume or N changes.
-        for (int i=0; i < system.molecules.size(); i++) {
-        for (int j=0; j< system.molecules[i].atoms.size(); j++) {
-        for (int k=0; k <system.molecules.size(); k++) {
-        for (int l=0; l <system.molecules[k].atoms.size(); l++) {
+        for (i=0; i < system.molecules.size(); i++) {
+        for (j=0; j< system.molecules[i].atoms.size(); j++) {
+        for (k=0; k <system.molecules.size(); k++) {
+        for (l=0; l <system.molecules[k].atoms.size(); l++) {
 
         if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // skip frozens
         if (i<k || (i==k && j<l)) {

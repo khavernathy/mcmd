@@ -11,6 +11,9 @@ enum {
     POTENTIAL_LJ,
     POTENTIAL_LJES,
     POTENTIAL_LJESPOLAR,
+    POTENTIAL_COMMY, // the communist potential 
+    POTENTIAL_COMMYES,
+    POTENTIAL_COMMYESPOLAR
 };
 enum {
     ENSEMBLE_UVT,
@@ -65,7 +68,7 @@ class Constants {
 		Constants();
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
             ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED,
-            DEBYE2SKA, JL2ATM, A32L, K2KJMOL; // all defined below.
+            DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md"
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
@@ -149,6 +152,7 @@ class Constants {
         double ewald_kmax = 7;
 
         // Wolf (for polarization)
+        //int polar_iterative=1; // turn iterative on. If off, will just do one iteration of dipole calc and get polar energy
         double polar_wolf_alpha = 0.13;
         double polar_damp = 2.1304;
         double polar_gamma = 1.03;
@@ -817,6 +821,7 @@ Constants::Constants() {
     JL2ATM = 0.00986923297; // J/L to atm
     A32L = 1e-27; // A^3 to liters.
     K2KJMOL = kb*NA/1000; // K -> kJ/mol
+    HBARC = 22898848.135746032; // in K*A
 
     // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle

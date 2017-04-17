@@ -12,7 +12,7 @@ using namespace std;
 void makeAtomMap(System &system) {
     //int count =0;
     int i,j;
-    // delete all elements from the atommap!! (i wasn't doing this before.)
+    // delete all elements from the atommap!! (i wasn't doing this before. This was the bug)
     system.atommap.clear();
 
     vector<int> local = vector<int>(2);
