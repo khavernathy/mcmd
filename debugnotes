@@ -15,5 +15,22 @@ Trying with sorbate in input (not user)
             ->it's working with no explosions..
         -> an old commit exploded at 30atm. I probably had this problem from the start.
         -> current version exlplodes at 0.5 - 1.0atm after ~8hrs. It's unrelated to pressure. 
+    -> problem occurs independent of palmo on/off
+        -> but explosion is exaggerated when palmo on
+    -> I checked all functions vs mpmc; no apparent difference.
+    -> Explodes whether manual sorbate is supplied or not.
+-> THE FIRST POLARIZATION CALC IS CORRECT BUT THE NEXT ONES ARE NOT..
+-> num_iterations is the same for both (4) every step
+-> It must be either dipole or efield value because it's independent of palmo.
+    -> checking if its efield by setting dipoles to 1 every time
+        -> slowly beginning to explode @ spte 3075... Polar=-1830; ES=-1820, RD=-32100
+        -> still under control @ 5150... POL=-3800, ES=-2580; RD=-36000
+        -> still tame at 5575. stopping.
 
+-> maybe test if its gauss-seidel ranking function?(turn off and compare to mpmc)
 
+-> no frozens test: 77k 30atm h2bssp (with dip=1 force) EXPLODED by step 5725
+    -> with palmo off: still tame @ 7750
+    -> without dipole=1 force (normal calc): going well @ 9300. exploded by 661000
+
+-> test AtomMap FOUND A BUG. wasn't clearing the atommap vector. probably fixed!!

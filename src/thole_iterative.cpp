@@ -107,13 +107,14 @@ void calc_dipole_rrms (System &system) {
             for (p=0; p<3; p++) {
                 carry = system.molecules[i].atoms[j].newdip[p] - system.molecules[i].atoms[j].olddip[p];
                 system.molecules[i].atoms[j].dipole_rrms += carry*carry;
-
+            }
                 // normalize
-                system.molecules[i].atoms[j].dipole_rrms /= sqrt(dddotprod(system.molecules[i].atoms[j].newdip, system.molecules[i].atoms[j].newdip));
+                system.molecules[i].atoms[j].dipole_rrms /= dddotprod(system.molecules[i].atoms[j].newdip, system.molecules[i].atoms[j].newdip);
+                system.molecules[i].atoms[j].dipole_rrms = sqrt(system.molecules[i].atoms[j].dipole_rrms);
 
                 if (!isfinite(system.molecules[i].atoms[j].dipole_rrms)) system.molecules[i].atoms[j].dipole_rrms=0;
                 
-            }
+            
         }
     }
 
@@ -167,13 +168,13 @@ void palmo_contraction (System &system, int * ranked_array ) {
             jj = j*3;
             if(index != j) {
                 tk = system.atommap[j][0]; tl = system.atommap[j][1];
-                for(p = 0; p < 3; p++)
+                for(p = 0; p < 3; p++) {
                     system.molecules[ti].atoms[tj].efield_induced_change[p] -= 
                         (system.constants.A_matrix[ii+p]+jj)[0] * system.molecules[tk].atoms[tl].dip[0] +
                         (system.constants.A_matrix[ii+p]+jj)[1] * system.molecules[tk].atoms[tl].dip[1] +
                         (system.constants.A_matrix[ii+p]+jj)[2] * system.molecules[tk].atoms[tl].dip[2];
-
-            }
+                }// end p
+            } 
         }
     }
 

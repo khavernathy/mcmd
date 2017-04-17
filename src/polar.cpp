@@ -12,6 +12,9 @@ using namespace std;
 void makeAtomMap(System &system) {
     //int count =0;
     int i,j;
+    // delete all elements from the atommap!! (i wasn't doing this before.)
+    system.atommap.clear();
+
     vector<int> local = vector<int>(2);
     //int v[2];
     for (i=0; i<system.molecules.size(); i++) {
@@ -23,6 +26,7 @@ void makeAtomMap(System &system) {
           //  count++;
         }
     }
+    //printf("SIZE OF ATOM MAP: %i\n", (int)system.atommap.size());
     return;  
 }
 
@@ -101,8 +105,8 @@ void thole_amatrix(System &system) {
 
     makeAtomMap(system); // re-calculates unique indices for atoms
 
-    unsigned int i, j, ii, jj, N, p, q;
-    unsigned int w, x, y, z;
+    int i, j, ii, jj, N, p, q;
+    int w, x, y, z;
     double damp1=0, damp2=0, wdamp1=0, wdamp2=0, v, s; //, distancesp[3], rp;
     double r, r2, ir3, ir5, ir=0;
     double rcut, rcut2, rcut3;
@@ -336,6 +340,26 @@ double polarization(System &system) {
     // MPMC CAN DO THOSE TOO, BUT WE ALMOST ALWAYS USE ITERATIVE.
     double potential; int i,j,num_iterations;
 
+    // zero out everything on the atoms that pertains to polarness.
+    // except static vars (like charge, polarizability, name, blah)
+    // hopefully this fixes the issue but it will be redundant.
+    // it did not fix the issue but i'm leaving it 
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            system.molecules[i].atoms[j].rank_metric=0;
+            for (int p=0; p<3; p++) {
+                system.molecules[i].atoms[j].dip[p] =0;
+                system.molecules[i].atoms[j].newdip[p]=0;
+                system.molecules[i].atoms[j].olddip[p]=0;
+                system.molecules[i].atoms[j].efield[p]=0;
+                system.molecules[i].atoms[j].efield_self[p]=0;
+                system.molecules[i].atoms[j].efield_induced[p]=0;
+                system.molecules[i].atoms[j].efield_induced_change[p]=0;
+            }
+            system.molecules[i].atoms[j].dipole_rrms=0;
+        }
+    }
+
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
     if (system.constants.ensemble == ENSEMBLE_UVT) {
@@ -358,7 +382,7 @@ double polarization(System &system) {
 
     // 2) DO DIPOLE ITERATIONS
     num_iterations = thole_iterative(system);    
-    //printf("num_iterations = %f\n", (double)num_iterations);
+//    printf("num_iterations = %f\n", (double)num_iterations);
     system.stats.polar_iterations = (double)num_iterations;
     system.constants.dipole_rrms = get_dipole_rrms(system);
     system.checkpoint("done with dipole iters. Calculating polarization energy");

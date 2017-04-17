@@ -491,7 +491,7 @@ class Stats {
         vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
         vector<obs_t> Nmov = vector<obs_t>(max_sorbs);
         vector<obs_t> movablemass = vector<obs_t>(max_sorbs);
-        vector<obs_t> density = vector<obs_t>(max_sorbs); // gotta have multiples for multi-sorbate.
+        vector<obs_t> density = vector<obs_t>(max_sorbs); 
         vector<obs_t> selectivity = vector<obs_t>(max_sorbs);
         vector<obs_t> excess = vector<obs_t>(max_sorbs);
 
@@ -534,7 +534,7 @@ class Last {
         vector<double> wtpME = vector<double>(max_sorbs);
         vector<double> Nmov = vector<double>(max_sorbs);
         vector<double> movablemass = vector<double>(max_sorbs);
-        vector<double> density = vector<double>(max_sorbs); // for multi-sorbate
+        vector<double> density = vector<double>(max_sorbs); 
         vector<double> selectivity = vector<double>(max_sorbs);
         vector<double> excess = vector<double>(max_sorbs);
 };
@@ -574,8 +574,7 @@ class Atom {
         double efield_induced[3] = {0,0,0};
         double efield_induced_change[3] = {0,0,0};
         double dipole_rrms=0;
-		/*vector<double> force = vector<double>(3); // force, K / A
-*/
+		/*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
         double * get_acc() {
             static double output[3];
             for (int n=0; n<3; n++) output[n] = acc[n];

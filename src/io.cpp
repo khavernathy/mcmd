@@ -693,6 +693,11 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "polar_iter")) {
 				system.constants.polar_max_iter = atoi(lc[1].c_str());
 				std::cout << "Got polarization iterations = " << lc[1].c_str(); printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "polar_palmo")) {
+                if (lc[1] == "off") system.constants.polar_palmo = 0;
+                std::cout << "Got Palmo Polarization = " << lc[1].c_str(); printf("\n");
+
 
 			} else if (!strcasecmp(lc[0].c_str(), "com_option")) {
 				if (lc[1] == "on") system.constants.com_option = 1;

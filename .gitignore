@@ -37,3 +37,5 @@ dipoles.dat
 uvt_test/debug
 nvt_test/polartest
 uvt_test/2*
+uvt_test/mof5
+uvt_test/rhtrestart

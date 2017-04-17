@@ -162,7 +162,6 @@ int main(int argc, char **argv) {
                             system.constants.sa_target +
                             (system.constants.temp - system.constants.sa_target) *
                             system.constants.sa_schedule;
-
                     }
 
                     //computeAverages(system);

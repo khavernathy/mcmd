@@ -50,6 +50,6 @@ double getTotalPotential(System &system) {
     system.stats.polar.value = total_polar;
     system.stats.potential.value = total_potential;
 
-//    printf("rd %f es %f pol %f tot %f\n", total_rd, total_es, total_polar, total_potential);
+//    printf("MC STEP %i ::: rd %f es %f pol %f tot %f\n", system.stats.MCstep, total_rd, total_es, total_polar, total_potential);
 	return total_potential;
 }

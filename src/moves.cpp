@@ -211,6 +211,7 @@ void addMolecule(System &system) {
 
 	// get current energy.
 	double old_potential = system.stats.potential.value; //getTotalPotential(system);
+    //printf("INSERT stats pot %f calcd pot %f\n", old_potential, getTotalPotential(system));
 
     // select a random prototype molecule
     if (system.proto.size() == 1) protoid=0;
@@ -302,6 +303,7 @@ void removeMolecule(System &system) {
 
     // get original energy.
     double old_potential = system.stats.potential.value; //getTotalPotential(system);
+    //printf("REMOVE stats pot %f calcd pot %f\n", old_potential, getTotalPotential(system));
 
     system.checkpoint("getting random movable.");
     // select random movable molecule
@@ -374,6 +376,7 @@ void displaceMolecule(System &system) {
 
 	// first calculate the system's current potential energy
 		old_V = system.stats.potential.value; //getTotalPotential(system);
+    //    printf("DISPLACE stats pot %f calcd pot %f\n", old_V, getTotalPotential(system));
 
     // save a temporary copy of molecule to go back if needed
     Molecule tmp_molecule = system.molecules[randm];
