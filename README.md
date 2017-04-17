@@ -29,14 +29,8 @@ Quick start:<br />
   
 TODO<br /><br />
 -> MC: reduce energy calculations to adjust by the 1 particle that is changed.<br /> 
--> MC: there's a bug, at least for CO2-PHAST* user input ljes/ljespolar, where the polar energy gets super low and the system explodes<br />
-&emsp;-> it only occurs for uVT, which tells me that the add/remove moves are culprit.<br />
--> MC: minimize calculations by just accounting for single-molecule energy changes for moves.<br />
 -> MC: add multi-sorb Qst calculator<br />
 -> MC: add LJ Feynmann-Hibbs corrections for hydrogen<br />
--> MC: got polarization working but:<br />
-&emsp;-> 4x slower than mpmc. (def. need to make pair lists)<br />
-&emsp;-> Non-periodic energy is super low. (high magnitude, negative). Thole field for no PBC may be issue.<br />
 -> MD: Use GPU for MD force calculations? (add option)<br />
 -> MC: Use GPU for polarization routine (later)<br />
 -> MC: Implement Phast2 model?<br />
