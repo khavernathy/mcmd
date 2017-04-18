@@ -24,7 +24,7 @@ ensemble nvt
        
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
-md_dt             0.2  ! fs       
+md_dt             0.5  ! fs       
 md_ft             200000  ! fs        
 md_corrtime       20      ! steps        
 !md_init_vel         0    ! A / fs^2      

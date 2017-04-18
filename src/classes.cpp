@@ -428,6 +428,7 @@ class Stats {
 		Stats();
 
         int MCstep=0, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
+        double MDtime=0; // the time in fs of MD simulation
         bool MCmoveAccepted;
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
 

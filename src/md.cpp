@@ -99,7 +99,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	// calculate temperature from kinetic energy and number of particles
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
-
+    //T = 1e10*(avg_v*avg_v)*system.proto[0].mass / system.constants.kb;
 
 /*
     if (system.constants.ensemble == "nvt") {
@@ -289,7 +289,11 @@ void integrate(System &system, double dt) {
     if (system.constants.ensemble == ENSEMBLE_NVT) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like, which is good for equilibration results.
-        double probab = system.constants.md_thermostat_probab;
+        // the thermostat probability must be recalc'd every new step.
+        double probab = system.constants.md_thermostat_freq *
+                    exp(-system.constants.md_thermostat_freq * system.stats.MDtime);
+        //printf("MD thermostat probab = %f\n", probab);
+
         double ranf; //, sigma = sqrt(system.constants.kb * system.constants.temp /  system.proto[0].mass) *1e-5; // to A/s
         double sigma = system.constants.md_vel_goal;
         //double newvel;
@@ -302,6 +306,7 @@ void integrate(System &system, double dt) {
                 for (n=0; n<3; n++) {
                     //printf("gauss(sigma, mean) = gauss(%f, %f) = %f\n", sigma, mean_velocity, gaussian(sigma, mean_velocity));
                     system.molecules[i].vel[n] = gaussian(sigma);
+                    //printf("Gaussian molecular vel[%i]: %f\n",n, system.molecules[i].vel[n]);
                     //if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
                     //else system.molecules[i].vel[n] = newvel;
                     /*
