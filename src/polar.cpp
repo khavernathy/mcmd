@@ -344,6 +344,7 @@ double polarization(System &system) {
     // except static vars (like charge, polarizability, name, blah)
     // hopefully this fixes the issue but it will be redundant.
     // it did not fix the issue but i'm leaving it 
+/*
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             system.molecules[i].atoms[j].rank_metric=0;
@@ -359,7 +360,7 @@ double polarization(System &system) {
             system.molecules[i].atoms[j].dipole_rrms=0;
         }
     }
-
+*/
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
     if (system.constants.ensemble == ENSEMBLE_UVT) {
