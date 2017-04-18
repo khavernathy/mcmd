@@ -21,7 +21,14 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
     // assuming mean velocity is zero (+ or - boltzmann velocity for particles yields net 0)
     double ranf = 2*(((double)rand() / (double)RAND_MAX)-0.5); // -1 to +1
     //return abs(sigma*SQRT2*erfInverse(ranf)); // I'm doing absolute value here bc +- is determined by velocity.
-    return sigma*SQRT2*erfInverse(ranf);
+    
+    // USE THE SIGMA AS MEAN-VALUE, RANDOMIZE DIRECTION. Seems to overinflate the velocities..
+    //double pm=1.0;
+    //double ranfsign = (double)rand() / (double)RAND_MAX;
+    //if (ranfsign < 0.5) pm = -1.0;
+    //double displacement = sigma * pm; // this is +/- the goal component velocity (gaussian width is same as mean)
+
+    return sigma*SQRT2*erfInverse(ranf); //  + displacement;
     // if mean was nonzero it would be
     // mean + sigma*SQRT2*erfInverse(ranf);
     // my green notebook ("Space Group Research #2") has notes on this in 2nd divider.
@@ -290,12 +297,15 @@ void integrate(System &system, double dt) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like, which is good for equilibration results.
         // the thermostat probability must be recalc'd every new step.
-        double probab = system.constants.md_thermostat_freq *
-                    exp(-system.constants.md_thermostat_freq * system.stats.MDtime);
+        //double probab = system.constants.md_thermostat_freq *
+         //           exp(-system.constants.md_thermostat_freq * system.stats.MDtime);
         //printf("MD thermostat probab = %f\n", probab);
+        // or not? 
+        double probab = system.constants.md_thermostat_probab;
 
         double ranf; //, sigma = sqrt(system.constants.kb * system.constants.temp /  system.proto[0].mass) *1e-5; // to A/s
         double sigma = system.constants.md_vel_goal;
+        //printf("sigma = %f\n", sigma);
         //double newvel;
         if (system.constants.md_mode == MD_MOLECULAR) {
         for (i=0; i<system.molecules.size(); i++) {
