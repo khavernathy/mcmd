@@ -1,5 +1,5 @@
 # mcmd
-This is a Monte Carlo / Molecular Dynamics Simulation software.<br />
+This is a Monte Carlo / Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials.<br />
 It works on Linux (tested on Ubuntu 16.04 and ) and Mac (tested on OS X El Capitan v10.11.6).<br />
 
 --> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
