@@ -5,7 +5,7 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option off 
-input_atoms  restart.pdb  ../pdbs/rhtmof9.pdb  ../pdbs/mof5+h2bssp.pdb     ! PDB ONLY 
+input_atoms   ../pdbs/rhtmof9.pdb  ../pdbs/mof5+h2bssp.pdb     ! PDB ONLY 
 
 free_volume  11595.4
 
