@@ -7,7 +7,7 @@ mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            on
 rd_lrc              on
-input_atoms    ../pdbs/50ne.pdb       ! PDB ONLY 
+input_atoms    ../pdbs/100he.pdb       ! PDB ONLY 
 potential_form 		lj  
 
 carbasis 150 150 150 90 90 90
