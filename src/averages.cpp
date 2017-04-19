@@ -180,7 +180,7 @@ void computeAverages(System &system) {
             if (i == j) continue;
             denom += system.stats.Nmov[j].average;
         }
-        system.stats.selectivity[i].value = num/denom;
+        if (denom != 0.0) system.stats.selectivity[i].value = num/denom; // so selec. will remain unchanged if zero sorbates in system.
         system.stats.selectivity[i].calcNewStats();
     }
 
