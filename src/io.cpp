@@ -744,6 +744,13 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "eps_override")) {
 				system.constants.eps_override[lc[1]] = atof(lc[2].c_str());
 				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "lj_uff")) {
+                if (lc[1] == "on") system.constants.lj_uff = 1;
+                std::cout << "Got LJ UFF option = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "vand_polar")) {
+                if (lc[1] == "on") system.constants.polars_vand = 1;
+                std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str();
 
 			} else if (!strcasecmp(lc[0].c_str(), "radial_dist")) {
                 if (lc[1] == "on") system.stats.radial_dist = 1;
@@ -825,6 +832,28 @@ void paramOverrideCheck(System &system) {
             }
         } // end map loop
     } // end if epsilon override
+
+
+    // universal UFF LJ parameters override
+    if (system.constants.lj_uff == 1) {
+        for (int i=0; i<system.molecules.size(); i++) {
+            for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                system.molecules[i].atoms[j].sig = sigs[system.molecules[i].atoms[j].name.c_str()];
+                system.molecules[i].atoms[j].eps = eps[system.molecules[i].atoms[j].name.c_str()];
+            }
+        }
+        
+    }
+
+    // universal van Duijnen polarizability parameters
+    if (system.constants.polars_vand == 1) {
+        for (int i=0; i<system.molecules.size(); i++) {
+            for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                system.molecules[i].atoms[j].polar = polars[system.molecules[i].atoms[j].name.c_str()];
+            }
+        }
+
+    }
 }
 
 void write_dipole(System &system) {

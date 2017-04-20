@@ -107,12 +107,16 @@ class Constants {
         int fugacity_single=0; // set for single-sorbate fugacity calculation at startup.
         string fugacity_single_sorbate; // the sorbate molecule to get fugacity of. h2/n2/co2/ch4
 
+        // DEFAULT ELEMENT/SITE PARAMETERS
         map <string,double> masses; // mass database for defaults.
-		map <string,double> sigs; // LJ sigmas database for defaults. NOT r_m (as in UFF). Defined below
-		map <string,double> eps; // LJ epsions database for defaults. Defined lated
+		map <string,double> sigs; // LJ sigmas database for defaults. (mostly UFF). Defined below
+		map <string,double> eps; // LJ epsions database for defaults. (mostly UFF). Defined lated
 		map <string,double> phast2_c6; map <string,double> phast2_c8; map <string,double> phast2_c10; map <string,double> phast2_sigs; map <string,double> phast2_eps; map <string,double> phast2_polar; // phast2 defaults
-		map <string,double> polars; // polarizability database for defaults. Defined below
-		double total_energy=0.0; // for MC NVE, in K, user defined
+		map <string,double> polars; // polarizability database for defaults. Mostly vanD. Defined below
+        int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
+        int polars_vand=0; // 1 would defaul all atoms to van Duijnen polarizablitiy parameters
+
+        double total_energy=0.0; // for MC NVE, in K, user defined
         double volume; // in A^3
         double temp=0.0; //273.15; // in K
         double prevtemp = 0.0; // previous temp for NVT MD thermostat
@@ -823,6 +827,7 @@ Constants::Constants() {
     A32L = 1e-27; // A^3 to liters.
     K2KJMOL = kb*NA/1000; // K -> kJ/mol
     HBARC = 22898848.135746032; // in K*A
+    vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
 
     // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle
@@ -885,15 +890,9 @@ Constants::Constants() {
 	sigs["H2G"] = 3.2293; // mpmc -> meters
     sigs["H2E"] = 0.0;
     sigs["H2N"] = 2.3406;
-    sigs["H"] = 2.886*uff2mpmc; // Rappe=2.886; I changed to 0.5 for MD water model; 0.3 for MOF5.
 	sigs["HW"] = 0.5; // H in water, my model; old (sticky MD) 0.4
     sigs["HT"] = 0.0; // H in TIP3P
     sigs["HS"] = 3.09061; // H SAPT (Adam)
-    sigs["He"] = 2.362*uff2mpmc;
-	sigs["Li"] = 2.451*uff2mpmc;
-	sigs["Be"] = 2.745*uff2mpmc;
-	sigs["B"] = 4.083*uff2mpmc;
-	sigs["C"] = 3.851*uff2mpmc; // Rappe = 3.851; I changed to 1.3 for MD MOF5
     sigs["C_s"] = 3.5786; // C SAPT
     sigs["C_p"] = 3.63956;
     sigs["C_t"] = 3.37707;
@@ -901,51 +900,127 @@ Constants::Constants() {
     sigs["C_en"] = 3.74892;
     sigs["C_yn"] = 3.79838;
     sigs["C_ony"] = 3.56023;
-	sigs["N"] = 3.66*uff2mpmc;
     sigs["N_sp3"] = 3.32588; // N SAPT
     sigs["N_sp2"] = 3.45133;
-	sigs["O"] = 3.5*uff2mpmc; // Rappe=3.5; I changed to 1.5 for MD water model (SPC = 3.166); 1.3 for MOF5
-	sigs["O2"] = 4.0*uff2mpmc; // my O2 model // roughly accurate for densities -> 10atm
 	sigs["OW"] = 1.5; // O in water (my model) -- old (sticky MD) 1.4
     sigs["OT"] = 3.15061; // O in TIP3P
     sigs["O_sp3"] = 3.15611; // O SAPT
     sigs["O_sp2"] = 3.34161;
-    sigs["F"] = 3.364*uff2mpmc;
-	sigs["Ne"] = 3.243*uff2mpmc;
-    sigs["Cu"] = 3.495*uff2mpmc;
-	sigs["Na"] = 2.983*uff2mpmc;
-// mg al ...
     sigs["SS"] = 3.8899; // S SAPT
-	sigs["Cl"] = 3.947*uff2mpmc;
-	sigs["Ar"] = 3.868*uff2mpmc;
     sigs["ArS"] = 3.37191; // Ar SAPT
-// k ca ..
-	sigs["Fe"] = 2.912*uff2mpmc;
-// co ni..
-	sigs["Zn"] = 2.763*uff2mpmc;
-// ga ge ..
-	sigs["Kr"] = 4.141*uff2mpmc;
-	sigs["Ru"] = 2.963*uff2mpmc;
-//per5
-	sigs["Xe"] = 4.404*uff2mpmc;
-//per6
-	sigs["Rn"] = 4.765*uff2mpmc;
+    // UFF
+   sigs["H"] = 2.886*uff2mpmc;
+sigs["He"] = 2.362*uff2mpmc;
+sigs["Li"] = 2.451*uff2mpmc;
+sigs["Be"] = 2.745*uff2mpmc;
+sigs["B"] = 4.083*uff2mpmc;
+sigs["C"] = 3.851*uff2mpmc;
+sigs["N"] = 3.660*uff2mpmc;
+sigs["O"] = 3.50*uff2mpmc;
+sigs["F"] = 3.364*uff2mpmc;
+sigs["Ne"] = 3.243*uff2mpmc;
+sigs["Na"] = 2.983*uff2mpmc;
+sigs["Mg"] = 3.021*uff2mpmc;
+sigs["Al"] = 4.499*uff2mpmc;
+sigs["Si"] = 4.295*uff2mpmc;
+sigs["P"] = 4.147*uff2mpmc;
+sigs["S"] = 4.035*uff2mpmc;
+sigs["Cl"] = 3.947*uff2mpmc;
+sigs["Ar"] = 3.868*uff2mpmc;
+sigs["K"] = 3.812*uff2mpmc;
+sigs["Ca"] = 3.399*uff2mpmc;
+sigs["Sc"] = 3.295*uff2mpmc;
+sigs["Ti"] = 3.175*uff2mpmc;
+sigs["V"] = 3.144*uff2mpmc;
+sigs["Cr"] = 3.023*uff2mpmc;
+sigs["Mn"] = 2.961*uff2mpmc;
+sigs["Fe"] = 2.912*uff2mpmc;
+sigs["Co"] = 2.872*uff2mpmc;
+sigs["Ni"] = 2.834*uff2mpmc;
+sigs["Cu"] = 3.495*uff2mpmc;
+sigs["Zn"] = 2.763*uff2mpmc;
+sigs["Ga"] = 4.383*uff2mpmc;
+sigs["Ge"] = 4.280*uff2mpmc;
+sigs["As"] = 4.230*uff2mpmc;
+sigs["Se"] = 4.205*uff2mpmc;
+sigs["Br"] = 4.189*uff2mpmc;
+sigs["Kr"] = 4.141*uff2mpmc;
+sigs["Rb"] = 4.114*uff2mpmc;
+sigs["Sr"] = 3.641*uff2mpmc;
+sigs["Y"] = 3.345*uff2mpmc;
+sigs["Zr"] = 3.124*uff2mpmc;
+sigs["Nb"] = 3.165*uff2mpmc;
+sigs["Mo"] = 3.052*uff2mpmc;
+sigs["Tc"] = 2.998*uff2mpmc;
+sigs["Ru"] = 2.963*uff2mpmc;
+sigs["Rh"] = 2.929*uff2mpmc;
+sigs["Pd"] = 2.899*uff2mpmc;
+sigs["Ag"] = 3.148*uff2mpmc;
+sigs["Cd"] = 2.848*uff2mpmc;
+sigs["In"] = 4.463*uff2mpmc;
+sigs["Sn"] = 4.392*uff2mpmc;
+sigs["Sb"] = 4.420*uff2mpmc;
+sigs["Te"] = 4.470*uff2mpmc;
+sigs["I"] = 4.5*uff2mpmc;
+sigs["Xe"] = 4.404*uff2mpmc;
+sigs["Cs"] = 4.517*uff2mpmc;
+sigs["Ba"] = 3.703*uff2mpmc;
+sigs["La"] = 3.522*uff2mpmc;
+sigs["Ce"] = 3.556*uff2mpmc;
+sigs["Pr"] = 3.606*uff2mpmc;
+sigs["Nd"] = 3.575*uff2mpmc;
+sigs["Pm"] = 3.547*uff2mpmc;
+sigs["Sm"] = 3.52*uff2mpmc;
+sigs["Eu"] = 3.493*uff2mpmc;
+sigs["Gd"] = 3.368*uff2mpmc;
+sigs["Tb"] = 3.451*uff2mpmc;
+sigs["Dy"] = 3.428*uff2mpmc;
+sigs["Ho"] = 3.409*uff2mpmc;
+sigs["Er"] = 3.391*uff2mpmc;
+sigs["Tm"] = 3.374*uff2mpmc;
+sigs["Yb"] = 3.355*uff2mpmc;
+sigs["Lu"] = 3.64*uff2mpmc;
+sigs["Hf"] = 3.141*uff2mpmc;
+sigs["Ta"] = 3.17*uff2mpmc;
+sigs["W"] = 3.069*uff2mpmc;
+sigs["Re"] = 2.954*uff2mpmc;
+sigs["Os"] = 3.12*uff2mpmc;
+sigs["Ir"] = 2.84*uff2mpmc;
+sigs["Pt"] = 2.754*uff2mpmc;
+sigs["Au"] = 3.293*uff2mpmc;
+sigs["Hg"] = 2.705*uff2mpmc;
+sigs["Tl"] = 4.347*uff2mpmc;
+sigs["Pb"] = 4.297*uff2mpmc;
+sigs["Bi"] = 4.37*uff2mpmc;
+sigs["Po"] = 4.709*uff2mpmc;
+sigs["At"] = 4.750*uff2mpmc;
+sigs["Rn"] = 4.765*uff2mpmc;
+sigs["Fr"] = 4.90*uff2mpmc;
+sigs["Ra"] = 3.677*uff2mpmc;
+sigs["Ac"] = 3.478*uff2mpmc;
+sigs["Th"] = 3.396*uff2mpmc;
+sigs["Pa"] = 3.424*uff2mpmc;
+sigs["U"] = 3.395*uff2mpmc;
+sigs["Np"] = 3.424*uff2mpmc;
+sigs["Pu"] = 3.424*uff2mpmc;
+sigs["Am"] = 3.381*uff2mpmc;
+sigs["Cm"] = 3.326*uff2mpmc;
+sigs["Bk"] = 3.339*uff2mpmc;
+sigs["Cf"] = 3.313*uff2mpmc;
+sigs["Es"] = 3.299*uff2mpmc;
+sigs["Fm"] = 3.286*uff2mpmc;
+sigs["Md"] = 3.274*uff2mpmc;
+sigs["No"] = 3.248*uff2mpmc;
+sigs["Lr"] = 3.236*uff2mpmc; 
 
 
-	// LJ EPSILON VALUES (kcal/mol) -> K
+	// LJ EPSILON VALUES ( /kbk means kcal/mol -> K)
 	eps["HB"] = 34.20; // buch model h2
     eps["H2G"] = 8.8516; // bss model h2
     eps["H2E"] = 0.0; // bss
     eps["H2N"] = 4.0659; // bss
-	eps["H"] = 0.044/kbk; // rappe verbatim
-	eps["HW"] = 0.044/kbk; // H in water (my model)
     eps["HT"] = 0.0; // H in TIP3P
     eps["HS"] = 0.66563; // H SAPT
-    eps["He"] = 0.056/kbk;
-	eps["Li"] = 0.025/kbk;
-	eps["Be"] = 0.085/kbk;
-	eps["B"] = 0.18/kbk;
-	eps["C"] = 0.105/kbk;
     eps["C_p"] = 36.692; // C SAPT
     eps["C_s"] = 31.35824;
     eps["C_t"] = 41.45435;
@@ -953,46 +1028,143 @@ Constants::Constants() {
     eps["C_en"] = 26.88878;
     eps["C_yn"] = 22.40343;
     eps["C_ony"] = 18.09254;
-	eps["N"] = 0.069/kbk;
     eps["N_sp3"] = 36.97995; // N SAPT
     eps["N_sp2"] = 24.25732;
-	eps["O"] = 0.06/kbk;
-	eps["O2"] = 0.06/kbk; // my O2 model
-    eps["OW"] = 0.06/kbk; // O in water (my model)
     eps["OT"] = 0.6364/0.0083144621; // O in TIP3P
 	eps["O_sp3"] = 30.01345; // O SAPT
     eps["O_sp2"] = 21.81177;
-    eps["F"] = 0.05/kbk;
-	eps["Ne"] = 0.042/kbk;
-    eps["Na"] = 0.03/kbk;
-//mg al si ...
     eps["SS"] = 53.02994; // S SAPT
-	eps["Cl"] = 0.227/kbk;
-	eps["Ar"] = 0.185/kbk;
     eps["ArS"] = 128.32680; // Ar SAPT
-// k ca sc ..
-	eps["Fe"] = 0.013/kbk;
-// co ni..
-    eps["Cu"] = 0.005/kbk;
-	eps["Zn"] = 0.124/kbk;
-// ga ge ..
-	eps["Kr"] = 0.220/kbk;
-//per5
-	eps["Ru"] = 0.056/kbk;
-	eps["Xe"] = 0.332/kbk;
-//per6
-	eps["Rn"] = 0.248/kbk;
 
-	// POLARIZABILITIES  // in A^3
-	polars["H"] = 0.41380;//*cV/ke;
+// UFF eps
+eps["H"] = 0.044/kbk;
+eps["He"] = 0.056/kbk;
+eps["Li"] = 0.025/kbk;
+eps["Be"] = 0.085/kbk;
+eps["B"] = 0.180/kbk;
+eps["C"] = 0.105/kbk;
+eps["N"] = 0.069/kbk;
+eps["O"] = 0.06/kbk;
+eps["F"] = 0.05/kbk;
+eps["Ne"] = 0.042/kbk;
+eps["Na"] = 0.03/kbk;
+eps["Mg"] = 0.111/kbk;
+eps["Al"] = 0.505/kbk;
+eps["Si"] = 0.402/kbk;
+eps["P"] = 0.305/kbk;
+eps["S"] = 0.274/kbk;
+eps["Cl"] = 0.227/kbk;
+eps["Ar"] = 0.185/kbk;
+eps["K"] = 0.035/kbk;
+eps["Ca"] = 0.238/kbk;
+eps["Sc"] = 0.019/kbk;
+eps["Ti"] = 0.017/kbk;
+eps["V"] = 0.016/kbk;
+eps["Cr"] = 0.015/kbk;
+eps["Mn"] = 0.013/kbk;
+eps["Fe"] = 0.013/kbk;
+eps["Co"] = 0.014/kbk;
+eps["Ni"] = 0.015/kbk;
+eps["Cu"] = 0.005/kbk;
+eps["Zn"] = 0.124/kbk;
+eps["Ga"] = 0.415/kbk;
+eps["Ge"] = 0.379/kbk;
+eps["As"] = 0.309/kbk;
+eps["Se"] = 0.291/kbk;
+eps["Br"] = 0.251/kbk;
+eps["Kr"] = 0.220/kbk;
+eps["Rb"] = 0.04/kbk;
+eps["Sr"] = 0.235/kbk;
+eps["Y"] = 0.072/kbk;
+eps["Zr"] = 0.069/kbk;
+eps["Nb"] = 0.059/kbk;
+eps["Mo"] = 0.056/kbk;
+eps["Tc"] = 0.048/kbk;
+eps["Ru"] = 0.056/kbk;
+eps["Rh"] = 0.053/kbk;
+eps["Pd"] = 0.048/kbk;
+eps["Ag"] = 0.036/kbk;
+eps["Cd"] = 0.228/kbk;
+eps["In"] = 0.599/kbk;
+eps["Sn"] = 0.567/kbk;
+eps["Sb"] = 0.449/kbk;
+eps["Te"] = 0.398/kbk;
+eps["I"] = 0.339/kbk;
+eps["Xe"] = 0.332/kbk;
+eps["Cs"] = 0.045/kbk;
+eps["Ba"] = 0.364/kbk;
+eps["La"] = 0.017/kbk;
+eps["Ce"] = 0.013/kbk;
+eps["Pr"] = 0.010/kbk;
+eps["Nd"] = 0.009/kbk;
+eps["Pm"] = 0.008/kbk;
+eps["Sm"] = 0.008/kbk;
+eps["Eu"] = 0.008/kbk;
+eps["Gd"] = 0.009/kbk;
+eps["Tb"] = 0.007/kbk;
+eps["Dy"] = 0.007/kbk;
+eps["Ho"] = 0.007/kbk;
+eps["Er"] = 0.007/kbk;
+eps["Tm"] = 0.006/kbk;
+eps["Yb"] = 0.228/kbk;
+eps["Lu"] = 0.041/kbk;
+eps["Hf"] = 0.072/kbk;
+eps["Ta"] = 0.081/kbk;
+eps["W"] = 0.067/kbk;
+eps["Re"] = 0.066/kbk;
+eps["Os"] = 0.037/kbk;
+eps["Ir"] = 0.073/kbk;
+eps["Pt"] = 0.080/kbk;
+eps["Au"] = 0.039/kbk;
+eps["Hg"] = 0.385/kbk;
+eps["Tl"] = 0.680/kbk;
+eps["Pb"] = 0.663/kbk;
+eps["Bi"] = 0.518/kbk;
+eps["Po"] = 0.325/kbk;
+eps["At"] = 0.284/kbk;
+eps["Rn"] = 0.248/kbk;
+eps["Fr"] = 0.050/kbk;
+eps["Ra"] = 0.404/kbk;
+eps["Ac"] = 0.033/kbk;
+eps["Th"] = 0.026/kbk;
+eps["Pa"] = 0.022/kbk;
+eps["U"] = 0.022/kbk;
+eps["Np"] = 0.019/kbk;
+eps["Pu"] = 0.016/kbk;
+eps["Am"] = 0.014/kbk;
+eps["Cm"] = 0.013/kbk;
+eps["Bk"] = 0.013/kbk;
+eps["Cf"] = 0.013/kbk;
+eps["Es"] = 0.012/kbk;
+eps["Fm"] = 0.012/kbk;
+eps["Md"] = 0.011/kbk;
+eps["No"] = 0.011/kbk;
+eps["Lr"] = 0.011/kbk;
+
+
+	// POLARIZABILITIES  // in A^3 
+    // these are VAN DUIJNEN EXPONENTIAL DAMPING POLARIZABILITIES
+    // IT WOULD BE DIFFERENT FOR LINEAR DAMPING
+    polars["H"] = 2.7927*vand2mpmc;    
+    polars["C"] = 8.6959*vand2mpmc;
+    polars["N"] = 6.5565*vand2mpmc;
+    polars["O"] = 5.7494*vand2mpmc;
+    polars["F"] = 3.0013*vand2mpmc;
+    polars["S"] = 16.6984*vand2mpmc;
+    polars["Cl"] = 16.1979*vand2mpmc;
+    polars["Br"] = 23.5714*vand2mpmc;
+    polars["I"] = 36.9880*vand2mpmc;
+
+
+	//polars["H"] = 0.41380;//*cV/ke;
 	polars["HW"] = 0.41380;//*cV/ke; // H in water (my model)
     polars["HS"] = 0.41380; // H SAPT
     polars["B"] = 0.6634;//*cV/ke;
-	polars["C"] = 1.2866;//*cV/ke;
+	//polars["C"] = 1.2866;//*cV/ke;
     polars["C_p"] = polars["C_s"] = polars["C_t"] = polars["C_a"] = polars["C_en"] = polars["C_yn"] = polars["C_ony"] = 1.2866; // C SAPT
-	polars["N"] = 0.97157;//*cV/ke;
+	//polars["N"] = 0.97157;//*cV/ke;
     polars["N_sp3"] = polars["N_sp2"] = 0.97157; // N SAPT
-	polars["O"] = 0.852;//*cV/ke;
+	//polars["O"] = 0.852;//*cV/ke;
     polars["OW"] = 0.852;//*cV/ke; // O in water (my model)
     polars["O_sp3"] = polars["O_sp2"] = 0.852; // O SAPT
 	polars["Na"] = 24.11;//*cV/ke; // from paper https://www.researchgate.net/publication/45896756_Absolute_and_ratio_measurements_of_the_polarizability_of_Na_K_and_Rb_with_an_atom_interferometer
@@ -1016,4 +1188,9 @@ Constants::Constants() {
 	phast2_sigs["He"] = 2.18205*cA; // A -> m
 	phast2_eps["He"] = 4.49880*kb; // K -> J
 	phast2_polar["He"] = 0.20494*cV/ke; // A^3 -> m^3 -> C^2 m^2 / J
+
+
+    
+
+
 }
