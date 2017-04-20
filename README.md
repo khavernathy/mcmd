@@ -16,7 +16,7 @@ The software outputs several averaged quantities of interest:<br />
 &emsp;->Diffusion coefficient and specific heat (MD)<br />
 &emsp;->Emergent pressure approximation (MD)<br />
 
-It works on Linux (tested on Ubuntu 16.04 and ) and Mac (tested on OS X El Capitan v10.11.6).<br />
+It works on Linux (tested on Ubuntu 16.04) and Mac (tested on OS X El Capitan v10.11.6).<br />
 
 --> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
 --> MD supports NVT.  <br />
