@@ -838,8 +838,8 @@ void paramOverrideCheck(System &system) {
     if (system.constants.lj_uff == 1) {
         for (int i=0; i<system.molecules.size(); i++) {
             for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-                system.molecules[i].atoms[j].sig = sigs[system.molecules[i].atoms[j].name.c_str()];
-                system.molecules[i].atoms[j].eps = eps[system.molecules[i].atoms[j].name.c_str()];
+                system.molecules[i].atoms[j].sig = system.constants.sigs[system.molecules[i].atoms[j].name.c_str()];
+                system.molecules[i].atoms[j].eps = system.constants.eps[system.molecules[i].atoms[j].name.c_str()];
             }
         }
         
@@ -849,7 +849,7 @@ void paramOverrideCheck(System &system) {
     if (system.constants.polars_vand == 1) {
         for (int i=0; i<system.molecules.size(); i++) {
             for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-                system.molecules[i].atoms[j].polar = polars[system.molecules[i].atoms[j].name.c_str()];
+                system.molecules[i].atoms[j].polar = system.constants.polars[system.molecules[i].atoms[j].name.c_str()];
             }
         }
 

@@ -68,7 +68,7 @@ class Constants {
 		Constants();
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
             ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED,
-            DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC; // all defined below.
+            DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC, vand2mpmc; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md"
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
