@@ -35,7 +35,7 @@ Quick start:<br />
 2) Compile: <br />
 `cd mcmd` <br />
 `cd src` <br />
-`g++ main.cpp -lm -o ../mcmd -I. -std=c++11`, or simply `bash compile.sh` <br />
+`bash compile.sh` <br />
 `cd ..` <br />
 
 3) Run: <br />
