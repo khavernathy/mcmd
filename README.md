@@ -24,9 +24,9 @@ It works on Linux (tested on Ubuntu 16.04) and Mac (tested on OS X El Capitan v1
 --> Force-fields available are Lennard-Jones (12-6), (Ewald) electrostatics, and Thole-Applequist polarization.<br />
 --> Sample inputs are included. The program takes just one argument: the input file (which itself usually points to a file containing starting atoms).<br />
 
-On computer clusters, you may need to load a compiler module first:  <br />
-&emsp;-> gcc compiler 6.2.0 (circe)  <br />
-&emsp;-> gcc compiler 4.9.3 (stampede)  <br />
+On HPC clusters, you may need to load a compiler module first:  <br />
+&emsp;-> `module load compilers/gcc/6.2.0` (circe)  <br />
+&emsp;-> `module load gcc/6.3.0` (bridges) <br />
 
 Quick start:<br />
 1) Download: <br />
