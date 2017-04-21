@@ -391,6 +391,7 @@ void moleculePrintout(System &system) {
             // and our paper ESI http://pubs.rsc.org/en/Content/ArticleLanding/2014/CC/c4cc03070b#!divAbstract
             else if (sorbmodel == "he" || sorbmodel == "He") {
                 addAtomToProto(system, i,"He", "He", "M", 0.0, 0.0, 0.0, 4.002602, 0.0, 0.0, 10.220, 2.280);
+                system.proto[i].name = "He";
             }
             // CARBON DIOXIDE CO2
             else if (sorbmodel == "co2_phast") {
