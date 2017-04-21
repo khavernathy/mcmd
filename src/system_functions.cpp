@@ -426,6 +426,10 @@ void moleculePrintout(System &system) {
             else if (sorbmodel == "n2_mcquarrie") {
                 addAtomToProto(system,i, "N2G", "N2", "M", 0.0, 0.0, 0.0, 28.01344, 0.0, 0.0, 95.1, 3.7);
                 system.proto[i].name = "N2";
+            } else if (sorbmodel == "n2_trappe") {
+                addAtomToProto(system,i, "N2G", "N2", "M", 0.0, 0.0, 0.0, 0.0, 0.964, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i, "N2E", "N2", "M", 0.550, 0.0, 0.0, 14.0067, -0.482, 0.0, 36.0, 3.31);
+                addAtomToProto(system,i, "N2E", "N2", "M", -0.550, 0.0, 0.0, 14.0067, -0.482, 0.0, 36.0, 3.31);
             }
             // METHANE CH4
             else if (sorbmodel == "ch4_trappe") {
