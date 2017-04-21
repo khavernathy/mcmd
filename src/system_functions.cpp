@@ -386,6 +386,12 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "H2N", "H2", "M", -0.363, 0.0, 0.0, 0.0, 0.0, 0.0, 2.16726, 2.37031);
                 system.proto[i].name = "H2";
             }
+            // HELIUM He (useful for theor. calc. of pore vol.). See http://pubs.acs.org/doi/abs/10.1021/jp050948l
+            // and http://onlinelibrary.wiley.com/doi/10.1002/aic.690470521/abstract
+            // and our paper ESI http://pubs.rsc.org/en/Content/ArticleLanding/2014/CC/c4cc03070b#!divAbstract
+            else if (sorbmodel == "he" || sorbmodel == "He") {
+                addAtomToProto(system, i,"He", "He", "M", 0.0, 0.0, 0.0, 4.002602, 0.0, 0.0, 10.220, 2.280);
+            }
             // CARBON DIOXIDE CO2
             else if (sorbmodel == "co2_phast") {
                 addAtomToProto(system, i,"COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.77106, 0.0, 8.52238, 3.05549);
