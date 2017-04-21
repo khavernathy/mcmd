@@ -18,7 +18,7 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     else if (system.constants.fugacity_single == 1) fugacity = system.proto[0].fugacity;
     else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
-//    printf("fugac: %f\n", fugacity);
+      //printf("fugac: %f\n", fugacity);
 
     if (system.constants.ensemble == ENSEMBLE_UVT) {
         if (movetype == MOVETYPE_INSERT) {

@@ -746,7 +746,10 @@ void setupFugacity(System &system) {
         else if (system.constants.fugacity_single_sorbate == "n2") system.proto[0].fugacity = n2_fugacity(system.constants.temp, system.constants.pres);
         else if (system.constants.fugacity_single_sorbate == "co2") system.proto[0].fugacity = co2_fugacity(system.constants.temp, system.constants.pres);
         else if (system.constants.fugacity_single_sorbate == "ch4") system.proto[0].fugacity = ch4_fugacity(system.constants.temp, system.constants.pres); 
-
+        
+    } else if (system.proto.size() == 1) {
+        // presumably this means we want to use use I.G. approx for the sorbate
+        system.proto[0].fugacity = system.constants.pres;
     }
     
     printf("INPUT: Calculated fugacity for prototype %s = %f atm\n", system.constants.fugacity_single_sorbate.c_str(), system.proto[0].fugacity);
