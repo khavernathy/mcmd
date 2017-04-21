@@ -470,13 +470,23 @@ int main(int argc, char **argv) {
 			double progress = (((float)count_md_steps)/(float)total_steps*100);
 			double ETA = ((time_elapsed*(float)total_steps/(float)count_md_steps) - time_elapsed)/60.0;
 			double ETA_hrs = ETA/60.0;
+            double outputTime; string timeunit;
+            if (t > 1e9) {
+                outputTime = t/1e9; timeunit="us";
+            } else if (t > 1e6) {
+                outputTime = t/1e6; timeunit="ns";
+            } else if (t > 1e3) {
+                outputTime = t/1e3; timeunit="ps";
+            } else {
+                outputTime = t; timeunit="fs";
+            }
 
             printf("MOLECULAR DYNAMICS\n");
             //printf("testing angular velocity\n");
             printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
             printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-            printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.2f fs\n",count_md_steps,total_steps,progress,t);
+            printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
             printf("KE: %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
