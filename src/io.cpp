@@ -186,6 +186,11 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
         }
 	}
 
+    if (!myfile.is_open()) {
+        printf("Error opening XYZ restart file!\n");
+        exit(1);
+    }
+
   	myfile.close();
 }
 
@@ -200,7 +205,7 @@ void writePDBtraj(System &system, string restartfile, string trajfile, int step)
     ofile << "REMARK frozen_atoms=" << system.stats.count_frozens << ", movable_atoms=" << (system.constants.total_atoms - system.stats.count_frozens) << "\n";
 
     if (!ifile.is_open()) {
-        printf("Error opening restart file!\n");
+        printf("Error opening PDB restart file! (in trajectory-writing function).\n");
         exit(1);
     } else {
         ofile << ifile.rdbuf(); // append contents of restartfile into trajfile
@@ -217,7 +222,7 @@ void writePDB(System &system, string filename) {
 FILE *f = fopen(filename.c_str(), "w");
 if (f == NULL)
 {
-    printf("Error opening PDB restart file!\n");
+    printf("Error opening PDB restart file! (in restart-writing function).\n");
     exit(1);
 }
 	for (int j=0; j<system.molecules.size(); j++) {
