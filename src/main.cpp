@@ -233,8 +233,10 @@ int main(int argc, char **argv) {
 			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
-                printf("-> %s wt %%    = %.5f +- %.5f %%\n", system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd);
-                printf("      wt %% ME = %.5f +- %.5f %% = %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, system.stats.wtpME[i].average * 10 / (system.proto[i].mass * 1000 * system.constants.NA));
+                double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
+                double cm3gSTP = mmolg*22.4;
+                printf("-> %s wt %%    = %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
+                printf("      wt %% ME = %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
                 if (system.stats.excess[i].average > 0)
                     printf("      Excess adsorption ratio = %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
