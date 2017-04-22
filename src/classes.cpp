@@ -83,7 +83,6 @@ class Constants {
         string output_histogram="histogram.dx"; // histogram information, viewable in VMD
         string dipole_output="dipoles.dat"; // only used when polarization is on.
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
-        //string xyz_traj_option="off"; // default no xyz traj because we'll use the PDB traj instead.
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
         int_fast8_t pdb_traj_option=1; // option to write PDB trajectory (in addition to xyz). default on
