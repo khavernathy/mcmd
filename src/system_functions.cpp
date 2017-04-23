@@ -393,6 +393,25 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, i,"He", "He", "M", 0.0, 0.0, 0.0, 4.002602, 0.0, 0.0, 10.220, 2.280);
                 system.proto[i].name = "He";
             }
+            else if (sorbmodel == "he_hogan") {
+                addAtomToProto(system, i,"He", "He", "M", 0.0, 0.0, 0.0, 4.0026, 0.0, 0.2049407, 9.071224, 2.653089);
+                system.proto[i].name = "He";
+            }
+            // OTHER NOBLE GASES
+            else if (sorbmodel == "ne_hogan") {
+                addAtomToProto(system, i, "Ne", "Ne", "M", 0.0, 0.0, 0.0, 20.1797, 0.0, 0.3913212, 36.824138, 2.785823); 
+                system.proto[i].name = "Ne";
+            }
+            else if (sorbmodel == "ar_hogan") {
+                addAtomToProto(system, i, "Ar", "Ar", "M", 0.0, 0.0, 0.0, 39.948, 0.0, 1.6392212, 128.326802, 3.371914);
+                system.proto[i].name = "Ar";
+            } else if (sorbmodel == "kr_hogan") {
+                addAtomToProto(system, i, "Kr", "Kr", "M", 0.0, 0.0, 0.0, 83.798, 0.0, 2.5004096, 183.795833, 3.601271);
+               system.proto[i].name = "Kr"; 
+            } else if (sorbmodel == "xe_hogan") {
+                addAtomToProto(system, i, "Xe", "Xe", "M", 0.0, 0.0, 0.0, 131.293, 0.0, 4.0232578, 237.985247, 3.956802);
+                system.proto[i].name = "Xe"; 
+            }
             // CARBON DIOXIDE CO2
             else if (sorbmodel == "co2_phast") {
                 addAtomToProto(system, i,"COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.77106, 0.0, 8.52238, 3.05549);
