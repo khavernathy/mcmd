@@ -27,7 +27,7 @@ double getTotalPotential(System &system) {
 
 // =========================================================================
     // REPULSION DISPERSION.
-    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) {
+    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR) {
         total_rd = lj(system);
     } else if (model == POTENTIAL_COMMY || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
         total_rd = commy(system);
@@ -40,7 +40,7 @@ double getTotalPotential(System &system) {
             total_es = coulombic(system); // plain old coloumb
     }
     // POLARIZATION
-    if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYESPOLAR) {
+    if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR) {
         total_polar = polarization(system); // yikes
     }
 // ==========================================================================

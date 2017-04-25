@@ -10,6 +10,7 @@ using namespace std;
 enum {
     POTENTIAL_LJ,
     POTENTIAL_LJES,
+    POTENTIAL_LJPOLAR,
     POTENTIAL_LJESPOLAR,
     POTENTIAL_COMMY, // the communist potential 
     POTENTIAL_COMMYES,

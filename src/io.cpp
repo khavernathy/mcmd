@@ -694,6 +694,8 @@ void readInput(System &system, char* filename) {
 					system.constants.potential_form = POTENTIAL_LJ;
 				else if (lc[1] == "ljes")
 					system.constants.potential_form = POTENTIAL_LJES;
+                else if (lc[1] == "ljpolar")
+                    system.constants.potential_form = POTENTIAL_LJPOLAR;
 				else if (lc[1] == "ljespolar")
 					system.constants.potential_form = POTENTIAL_LJESPOLAR;
                 else if (lc[1] == "commy")
