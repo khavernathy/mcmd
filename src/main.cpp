@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
 
 	// MAIN MC STEP LOOP
 	int corrtime_iter=1;
-	for (int t=0; t <= finalstep; t+=stepsize) { // 0 is initial step
+	for (int t=0; t <= (finalstep-system.constants.step_offset); t+=stepsize) { // 0 is initial step
 		system.checkpoint("New MC step starting."); //printf("Step %i\n",t);
         system.stats.MCstep = t;
         system.stats.MCcorrtime_iter = corrtime_iter;
