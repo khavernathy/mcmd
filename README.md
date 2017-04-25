@@ -53,3 +53,4 @@ TODO<br /><br />
 -> MC: speed up via GPU for polarization routine <br />
 -> MC: add Phast2 model<br />
 -> MD: Make correct(ed) force (most important), pressure, specific heat, temperature calculators<br />
+&emsp;-> Corrected periodic (e.g. ewald) force would probably solve several MD bugs at once<br />
