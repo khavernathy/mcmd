@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
     int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
     // RESIZE A MATRIX IF POLAR IS ACTIVE (and initialize the dipole file)
-    if (system.constants.potential_form == POTENTIAL_LJESPOLAR) {
+    if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
 				FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
 				fclose(fp);
 
@@ -296,7 +296,7 @@ int main(int argc, char **argv) {
 						if (t != 0 && system.constants.histogram_option)
 							write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
 
-						if (system.constants.potential_form == POTENTIAL_LJESPOLAR && system.constants.dipole_output_option)
+						if ((system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_LJESPOLAR) && system.constants.dipole_output_option)
 							write_dipole(system);
 
             // count the corrtime occurences.
@@ -319,7 +319,7 @@ int main(int argc, char **argv) {
         time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
 	printf("Total wall time = %f s\n",time_elapsed);
 
-    if (system.constants.potential_form == POTENTIAL_LJESPOLAR) {
+    if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
         printf("Freeing data structures... ");
         for (int i=0; i< 3* system.constants.total_atoms; i++) {
             free(system.constants.A_matrix[i]);

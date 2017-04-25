@@ -153,7 +153,7 @@ void calculateForces(System &system, double dt) {
 	}
 	}
 
-    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
         lj_force(system);
     if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
         coulombic_real_force(system);
