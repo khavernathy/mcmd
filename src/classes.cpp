@@ -131,6 +131,7 @@ class Constants {
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
         int currentprotoid=0; // for getting fugacity for the boltzmann factor.
+        int step_offset=0; // a parameter used to change the step output in the output files (e.g. after a restart) 
 
         // MD STUFF
         int  md_corrtime=50; // user defined for MD

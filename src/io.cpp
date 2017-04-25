@@ -618,6 +618,10 @@ void readInput(System &system, char* filename) {
                 system.constants.sa_schedule = atof(lc[1].c_str());
                 std::cout << "Got simulated annealing schedule = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "step_offset")) {
+                system.constants.step_offset = atoi(lc[1].c_str());
+                std::cout << "Got step offset = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "draw_box_option")) {
                 if (lc[1] == "on") system.constants.draw_box_option = 1;
                 else system.constants.draw_box_option = 0;
