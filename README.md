@@ -45,10 +45,8 @@ Quick start:<br />
   
 TODO<br /><br />
 -> MC: add "desired N" option to fill a system until a desired N is reached, then do NVT<br />
--> MC: add default parametrization option (UFF, OPLS, DREIDING, van D polar) <br />
 -> MC: speed up by adjusting energy by the 1 particle that is changed.<br /> 
 -> MC: add multi-sorb Qst calculator<br />
--> MC: add Feynmann-Hibbs corrections for hydrogen<br />
 -> MD: speed up via GPU for MD force calculations<br />
 -> MC: speed up via GPU for polarization routine <br />
 -> MC: add Phast2 model<br />
