@@ -6,6 +6,46 @@
 #include <string>
 #include <stdlib.h>
 
+#define HBAR2 1.11211999e-68
+#define HBAR4 1.23681087e-136
+#define KB2 1.90619525e-46
+#define KB 1.3806503e-23
+
+// get the Feynman-Hibbs correction for a pair of atoms
+double lj_fh_corr(System &system, int i,int k, double r, double term12, double term6, double sig, double eps) {
+    double reduced_mass;
+    double dE, d2E, d3E, d4E; //energy derivatives
+    double corr;
+    double ir = 1.0/r;
+    double ir2 = ir*ir;
+    double ir3 = ir2*ir;
+    double ir4 = ir3*ir;
+    int order = system.constants.fh_order;
+
+    if (order != 2 && order != 4) return NAN;
+
+    reduced_mass = system.molecules[i].mass*system.molecules[k].mass / (system.molecules[i].mass + system.molecules[k].mass);
+    dE = -24.0*eps*(2.0*term12 - term6)*ir;
+    d2E = 24.0*eps*(26.0*term12 - 7.0*term6)*ir2;
+
+    // 2nd order corr
+    corr = 1.0e20 *
+        (HBAR2/(24.0*KB*system.constants.temp * reduced_mass)) *
+        (d2E + 2.0*dE/r);
+
+    if (order == 4) {
+        d3E = -1344.0*eps*(6.0*term12 - term6) * ir3;
+        d4E = 12096.0*eps*(10.0*term12 - term6) * ir4;
+
+        // 4th order corr
+        corr += 1.0e40 *
+            (HBAR4/(1152.0*KB2*system.constants.temp*system.constants.temp*reduced_mass*reduced_mass)) *
+            ( 15.0*dE*ir3 + 4.0*d3E*ir + d4E);
+    }
+
+    return corr;
+}
+
 double self_lj_lrc(System &system) {
     double potential=0;
     double cutoff = system.pbc.cutoff;
@@ -84,6 +124,9 @@ double lj(System &system) {
             this_lj = 4.0*eps*(sr6*sr6 - sr6);
             total_lj += this_lj;    //;
             total_pot += this_lj;
+
+            if (system.constants.feynman_hibbs)
+                total_pot += lj_fh_corr(system, i,k, r, sr6*sr6, sr6, sig, eps);
         }
         
         /*

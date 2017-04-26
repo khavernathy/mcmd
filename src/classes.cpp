@@ -107,6 +107,9 @@ class Constants {
         int fugacity_single=0; // set for single-sorbate fugacity calculation at startup.
         string fugacity_single_sorbate; // the sorbate molecule to get fugacity of. h2/n2/co2/ch4
 
+        int_fast8_t feynman_hibbs = 0;
+        int fh_order = 4;
+
         // DEFAULT ELEMENT/SITE PARAMETERS
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. (mostly UFF). Defined below

@@ -3,7 +3,7 @@
 
 name			    hitherebuddy 
 mode	 		    mc 
-input_atoms         ../pdbs/rhtmof9.pdb 
+input_atoms         ../pdbs/rhtmof9+30h2bssp.pdb 
 
 free_volume         11595.4
 
@@ -27,6 +27,7 @@ insert_factor		0.667
 displace_factor     2.5
 rotate_angle_factor 360.0
 
-
+feynman_hibbs on
+fh_order 4
 
 

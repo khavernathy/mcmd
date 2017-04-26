@@ -8,10 +8,48 @@ using namespace std;
 /* THE THREE FUNCTIONS coulombic_self, coulombic_real,
 coulombic_reciprocal are using EWALD method for computation
 of electrostatic energy. 
-
-I borrowed these functions, more or less, from Belof & McLaughlin et. al.
-
 */
+
+#define SQRTPI 1.77245385091
+#define HBAR2 1.11211999e-68
+#define HBAR4 1.23681087e-136
+#define KB2 1.90619525e-46
+#define KB 1.3806503e-23
+
+double es_fh_corr(System &system, int i, int k, double r, double gaussian_term, double erfc_term) {
+    double dE, d2E, d3E, d4E; 
+    double corr;
+    double rr = r*r;
+    double ir = 1.0/r;
+    double ir2 = ir*ir;
+    double ir3 = ir*ir2;
+    double ir4 = ir2*ir2;
+    double order = system.constants.fh_order;
+    double alpha = system.constants.ewald_alpha;
+    double a2 = alpha*alpha;
+    double a3 = a2*alpha;
+    double a4 = a3*alpha;
+    double reduced_mass = (system.molecules[i].mass * system.molecules[k].mass)/(system.molecules[i].mass + system.molecules[k].mass);
+
+    if (order != 2 && order != 4) return NAN;
+
+    dE = -2.0*alpha*gaussian_term/(r*SQRTPI) - erfc_term*ir2;
+    d2E = (4.0/SQRTPI)*gaussian_term*(a3 + 1.0*ir2) + 2.0*erfc_term*ir3;
+
+    corr = 1.0e20 * (HBAR2/(24.0*KB*system.constants.temp*reduced_mass)) * (d2E + 2.0*dE/r);
+
+    if (order == 4) {
+        d3E = (gaussian_term/SQRTPI) * (-8.0*(a3*a2)*r - 8.0*(a3)/r - 12.0*alpha*ir3) 
+            - 6.0*erfc(alpha*r)*ir4;
+        d4E = (gaussian_term/SQRTPI) * (-8.0*a3*a2 + 16.0*a3*a4*rr + 32.0*a3
+            *ir2 + 48.0*ir4 ) + 24.0*erfc_term*(ir4*ir);
+    
+        corr += 1.0e40*(HBAR4/(1152.0*(KB2*system.constants.temp*system.constants.temp * reduced_mass*reduced_mass))) * (15.0*dE*ir3 + 4.0*d3E/r + d4E);
+    }
+
+    return corr;
+
+}
 
 
 /* entire system self potential sum */
@@ -49,6 +87,7 @@ double coulombic_real(System &system) {
     double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
     double r;  //  int count =0;
+    double gaussian_term;
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -68,6 +107,12 @@ double coulombic_real(System &system) {
         if (r < system.pbc.cutoff && (i < k)) { // only pairs and not beyond cutoff
             erfc_term = erfc(alpha*r);
             pair_potential += system.molecules[i].atoms[j].C * system.molecules[k].atoms[l].C * erfc_term / r;  // positive (inter)
+        
+            if (system.constants.feynman_hibbs) {
+                gaussian_term = exp(-alpha*alpha*r*r);
+                pair_potential += es_fh_corr(system, i, k, r, gaussian_term, erfc_term);
+            }
+        
         } else if (i == k && j < l) { // self molecule interaction
             pair_potential -= (system.molecules[i].atoms[j].C * system.molecules[k].atoms[l].C * erf(alpha*r) / r); // negative (intra)
         }
