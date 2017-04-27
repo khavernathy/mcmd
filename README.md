@@ -44,6 +44,7 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
+-> Both: allow xyz input for ease of use. Default to LJ/vanD/mass params.<br />
 -> MC: add "desired N" option to fill a system until a desired N is reached, then do NVT<br />
 -> MC: speed up by adjusting energy by the 1 particle that is changed.<br /> 
 -> MC: add multi-sorb Qst calculator<br />
