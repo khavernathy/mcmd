@@ -9,6 +9,7 @@
 
 double commy(System &system) {
     // the communist potential from 1961 van der Waals paper
+    // http://iopscience.iop.org/article/10.1070/PU1961v004n02ABEH003330/meta;jsessionid=F9941A012802331F1E4FF488A0F004A9.c4.iopscience.cld.iop.org  
     double total_pot=0; 
     double cutoff = system.pbc.cutoff;
     double volume = system.pbc.volume;
