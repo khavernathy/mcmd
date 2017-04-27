@@ -6,7 +6,7 @@ checkpoints_option  off
 input_atoms ../../pdbs/mof5+11h2bss.pdb
 
 
-potential_form        lj   es   !ljespolar   !phast2    !!lj     
+potential_form        ljes   !ljespolar   !phast2    !!lj     
 com_option            off     ! center of mass        
  
 !!!!!carbasis 18.402 11.428 13.038 87.33 19.108 90.0      

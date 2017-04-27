@@ -47,7 +47,15 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	int i,j,n;
 
     // grab fixed potential energy of system
-        V_total += getTotalPotential(system);
+        if (system.constants.md_pbc)
+            V_total += getTotalPotential(system);
+        else {
+            for (i=0; i<system.molecules.size(); i++) {
+                for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                    V_total += system.molecules[i].atoms[j].V;
+                }
+            }
+        }
 
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
     for (j=0; j<system.molecules.size(); j++) {
@@ -141,7 +149,6 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 void calculateForces(System &system, double dt) {
   int_fast8_t model = system.constants.potential_form;
 
-    // initialize variable for pressure calc in NVT
     // loop through all atoms
 	for (int j=0; j <system.molecules.size(); j++) {
 	for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
@@ -153,10 +160,21 @@ void calculateForces(System &system, double dt) {
 	}
 	}
 
-    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
-        lj_force(system);
-    if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
-        coulombic_real_force(system);
+    // GET FORCES
+    // no pbc
+    if (!system.constants.md_pbc) {
+        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+            lj_force_nopbc(system);
+        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+            coulombic_force_nopbc(system);
+    } 
+    // pbc
+    else {
+        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+            lj_force(system);
+        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+            coulombic_real_force(system);
+    }
 
 
     // atomic forces are done, so now calc molecular values

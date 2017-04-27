@@ -264,3 +264,52 @@ void lj_force(System &system) {
     } // loop i
     // DONE WITH PAIR INTERACTIONS
 }
+
+void lj_force_nopbc(System &system) {
+
+    double cutoff = system.pbc.cutoff;
+    double volume = system.pbc.volume;
+    double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
+    int count=0; // for the pair values
+
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+    for (int k = i+1; k < system.molecules.size(); k++) {
+    for (int l =0; l < system.molecules[k].atoms.size(); l++) {
+
+        // do mixing rules
+        double eps,sig;
+        eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
+        sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+
+        if (!(sig == 0 || eps == 0)) {
+        // calculate distance between atoms
+        double* distances = getDistanceXYZ(system, i, j, k, l);
+        r = distances[3];    
+        rsq=r*r;
+        for (int n=0; n<3; n++) d[n] = distances[n];
+
+        r6 = rsq*rsq*rsq;
+        s2 = sig*sig;
+        s6 = s2*s2*s2;
+    
+                if (i != k) { // don't do self-interaction for potential.
+                    sr = sig/r;
+                    sr2 = sr*sr;    
+                    sr6 = sr2*sr2*sr2;
+                }
+
+            for (int n=0; n<3; n++) {
+                f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                system.molecules[i].atoms[j].force[n] += f[n];
+                system.molecules[k].atoms[l].force[n] -= f[n];
+            }
+
+            system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
+        } // if nonzero sig/eps
+    }  // loop l
+    } // loop k 
+    } //loop j
+    } // loop i
+    // DONE WITH PAIR INTERACTIONS
+}

@@ -501,8 +501,10 @@ int main(int argc, char **argv) {
             printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure avg: %.3f +- %.3f atm (I.G. approx)\n",
                 v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
             printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
-            printf("Diffusion coefficient = %.4e +- %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd, system.proto[0].name.c_str());
-			//printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
+            if (system.constants.md_pbc) {
+                printf("Diffusion coefficient = %.4e +- %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd, system.proto[0].name.c_str());
+			}
+            //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
             printf("--------------------\n\n");
 
             // WRITE OUTPUT FILES

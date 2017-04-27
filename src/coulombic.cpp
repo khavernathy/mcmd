@@ -128,8 +128,102 @@ double coulombic_real(System &system) {
     return potential; 
 }
 
-void coulombic_real_force(System &system) {
+// no pbc force
+void coulombic_force_nopbc(System &system) {
     
+    double charge1, charge2, r,rsq;
+    double u[3]; double holder;
+
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+    for (int k = i+1; k < system.molecules.size(); k++) {
+    for (int l = 0; l < system.molecules[k].atoms.size(); l++) {
+    if (!(system.molecules[i].frozen && system.molecules[k].frozen) &&
+        !(system.molecules[i].atoms[j].C == 0 || system.molecules[i].atoms[j].C == 0) ) { // don't do frozen-frozen or zero charge
+
+        charge1 = system.molecules[i].atoms[j].C;
+        charge2 = system.molecules[k].atoms[l].C;
+
+        // calculate distance between atoms
+        double* distances = getDistanceXYZ(system,i,j,k,l);
+        r = distances[3];
+
+        rsq = r*r;
+        for (int n=0; n<3; n++) u[n] = distances[n]/r;
+
+            for (int n=0; n<3; n++) {
+                holder = charge1*charge2/rsq * u[n];
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[k].atoms[l].force[n] -= holder;
+
+            }
+        system.molecules[i].atoms[j].V += charge1*charge2/r;
+
+    } // end if not frozen
+    } // end l
+    } // end k
+    } // end j
+    } // end i 
+}
+
+// pbc force via ewald -dU/dx, -dU/dy, -dU/dz
+void coulombic_real_force(System &system) {
+    double alpha=system.constants.ewald_alpha;
+    double erfc_term; // = erfc(alpha*r);
+    double charge1, charge2, chargeprod, r,rsq;
+    double u[3]; double holder;
+    double sqrtPI = sqrt(M_PI);
+
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+    for (int k = 0; k < system.molecules.size(); k++) {
+    for (int l = 0; l < system.molecules[k].atoms.size(); l++) {
+    if (!(system.molecules[i].frozen && system.molecules[k].frozen) &&
+        !(system.molecules[i].atoms[j].C == 0 || system.molecules[i].atoms[j].C == 0) ) { // don't do frozen-frozen or zero charge
+
+        charge1 = system.molecules[i].atoms[j].C;
+        charge2 = system.molecules[k].atoms[l].C;
+        chargeprod=charge1*charge2;
+
+        // calculate distance between atoms
+        double* distances = getDistanceXYZ(system,i,j,k,l);
+        r = distances[3];
+
+        rsq = r*r;
+        for (int n=0; n<3; n++) u[n] = distances[n]/r;
+
+        if (r < system.pbc.cutoff && (i < k)) { // only pairs and not beyond cutoff
+            erfc_term = erfc(alpha*r);
+            for (int n=0; n<3; n++) {
+                holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*r*r))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[k].atoms[l].force[n] -= holder;
+
+            }
+            //system.molecules[i].atoms[j].V += charge1 * charge2 * erfc_term / r;
+        } else if (i == k && j != l) { // self molecule interaction
+            for (int n=0; n<3; n++) {
+                holder = -((chargeprod*erf(alpha*r))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*r*r)/(sqrtPI*r)))*u[n];
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[k].atoms[l].force[n] -= holder;
+                
+            }
+
+            //system.molecules[i].atoms[j].V -= (charge1 * charge2 * erf(alpha*r) / r); // negative (intra)
+        }
+    } // end if not frozen
+    } // end l
+    } // end k
+    } // end j
+    } // end i    
+
+ 
+}
+
+// old MD pseudo-periodic coulombic force. probably wrong.
+// not being used
+/*
+void oldCoulombicForce(System &system) {
     double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
     double charge1, charge2, r,rsq;
@@ -177,6 +271,8 @@ void coulombic_real_force(System &system) {
     } // end j
     } // end i 
 }
+*/
+
 
 // Coulombic reciprocal electrostatic energy from Ewald //
 double coulombic_reciprocal(System &system) {   
