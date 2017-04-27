@@ -1,0 +1,27 @@
+! Douglas Franz, Space group, USF      
+name              mcmd_development        
+mode              md        
+       
+input_atoms ../../pdbs/utsa20+co2trappe.pdb       
+
+potential_form        ljes   !ljespolar       
+com_option            off     ! center of mass        
+ 
+
+basis1                 22.2866    0.0         0.0
+basis2                -11.1433   19.3007618   0.0
+basis3                  0.0       0.0        25.6328
+
+       
+temperature 300.0   
+pressure 1.0      
+ensemble nvt      
+       
+ ! MOLECULAR DYNAMICS ONLY ===============================     
+md_pbc              on
+md_dt             2  ! fs       
+md_ft             200000  ! fs        
+md_corrtime       1     ! steps        
+!md_init_vel         0    ! A / fs^2      
+md_mode             molecular      !atomic        
+md_rotations        on

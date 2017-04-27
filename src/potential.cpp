@@ -26,6 +26,7 @@ double getTotalPotential(System &system) {
 
 
 // =========================================================================
+if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     // REPULSION DISPERSION.
     if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR) {
         total_rd = lj(system);
@@ -43,6 +44,7 @@ double getTotalPotential(System &system) {
     if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR) {
         total_polar = polarization(system); // yikes
     }
+}
 // ==========================================================================
 
     total_potential = total_rd + total_es + total_polar;

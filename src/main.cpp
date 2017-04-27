@@ -269,6 +269,7 @@ int main(int argc, char **argv) {
 
             // CONSOLIDATE ATOM AND MOLECULE PDBID's
             // quick loop through all atoms to make PDBID's pretty (1->N)
+            if (system.molecules.size() > 0) {
             int molec_counter=1, atom_counter=1;
             for (int i=0; i<system.molecules.size(); i++) {
                 system.molecules[i].PDBID = molec_counter;
@@ -279,7 +280,6 @@ int main(int argc, char **argv) {
                 } // end loop j
                 molec_counter++;
             } // end loop i
-
             // WRITE RESTART FILE AND OTHER OUTPUTS
             if (system.constants.xyz_traj_option)
                 writeXYZ(system,system.constants.output_traj,frame,t,0);
@@ -298,7 +298,7 @@ int main(int argc, char **argv) {
 
 						if ((system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_LJESPOLAR) && system.constants.dipole_output_option)
 							write_dipole(system);
-
+            } // end if N > 0
             // count the corrtime occurences.
             corrtime_iter++;
 
