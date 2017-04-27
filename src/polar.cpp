@@ -409,3 +409,11 @@ double polarization(System &system) {
     return potential;
 
 } // end polarization() function
+
+
+
+void polarization_force(System &system) {
+    // gets force on atoms due to dipoles calculated before (via iterative method)
+    // TODO
+    // adam sent a code snippet that should help on slack
+}
