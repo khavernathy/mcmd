@@ -3,19 +3,20 @@
 
 name			    hitherebuddy 
 mode	 		    mc 
-input_atoms         ../pdbs/nott112+h2.pdb 
+input_atoms_xyz     ../pdbs/mof5.xyz 
 
 free_volume         11595.4
 
-potential_form 		commyes
+potential_form 		ljespolar
 xyz_traj_option     on
 sorbate_name        h2_bssp
 fugacity_single     h2
 
 !carbasis 27.934 27.934 41.081 90 90 90
-carbasis 47.005 47.005 47.005 90 90 90
+!carbasis 47.005 47.005 47.005 90 90 90
+carbasis 25.669 25.669 25.669 90 90 90
 
-radial_dist         on
+radial_dist         off
 radial_centroid     Cu
 radial_counterpart  H2G
 

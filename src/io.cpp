@@ -15,8 +15,88 @@
 #include <time.h>
 #include <chrono>
 
+/* xyz read-in of atoms */
+void readInAtomsXYZ(System &system, string filename) {
+	
+    // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY). 
+
+    string line;
+	ifstream myfile (filename); //("Neons.xyz"); // ("rhtMOF9Zn.xyz"); //("water_1527.dat"); // test2.dat
+	if (myfile.is_open())
+	{
+        //int master_index=-1;
+		std::string::size_type sz;     // alias of size_t
+		// loop through each line
+        Molecule whatev;
+        system.proto.push_back(whatev); // the first prototype.
+		Molecule current_molecule;  
+		system.molecules.push_back(whatev);
+        int line_count=0;
+        while ( getline (myfile,line) )
+		{
+			vector<string> myvector;
+      			istringstream iss(line);
+			//ostream_iterator<string> out_it (cout,",");
+			copy(
+				istream_iterator<string>(iss),
+				istream_iterator<string>(),
+				back_inserter(myvector) // "normally" out_it goes here.
+			);
+
+            line_count++;
+            if (line_count < 3) continue; // for .xyz, skip first 2 lines
+            // skip blank lines
+            if (myvector.size() != 0) {
+                if (myvector[2] == "X" && myvector[3] == "BOX") continue; // skip box vertices
+
+			//temporary class instance current_atom
+			Atom current_atom;
+			current_atom.name = myvector[0];
+            // I have a database of defaults in classes.cpp
+            current_atom.m = system.constants.masses[current_atom.name];
+            current_atom.eps = system.constants.eps[current_atom.name];
+            current_atom.sig = system.constants.sigs[current_atom.name];
+            current_atom.polar = system.constants.polars[current_atom.name];
+            //==============================================================
+            current_atom.V = 0.0;
+			current_atom.K = 0.0;
+			current_atom.E = 0.0;
+			current_atom.PDBID = line_count - 2; // skipping first 2 lines
+			current_atom.mol_name = "MOF";
+			    current_atom.frozen = 1;
+			current_atom.mol_PDBID = 1;
+			current_atom.pos[0] = stod(myvector[1]);
+			current_atom.pos[1] = stod(myvector[2]);
+			current_atom.pos[2] = stod(myvector[3]);
+			current_atom.prevpos[0] = current_atom.pos[0];
+			current_atom.prevpos[1] = current_atom.pos[1];
+			current_atom.prevpos[2] = current_atom.pos[2];
+            current_atom.C = stod(myvector[4]) * system.constants.E2REDUCED;
+			system.molecules[0].atoms.push_back(current_atom);
+            system.molecules[0].mass += current_atom.m;
+			system.constants.total_atoms++;	// add +1 to master atoms count
+            system.stats.count_frozens++; // add +1 to frozen atoms count
+            } // end if vector size nonzero
+		}
+		myfile.close();
+        system.stats.count_frozen_molecules=1; // add +1 frozen molecule
+	    system.molecules[0].frozen = 1;
+        system.molecules[0].PDBID = 1;
+    }
+	else {
+        if (system.constants.sorbate_name.size() > 0) return;
+
+        printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0);
+    }
+
+}
+
 /* READ IN THE STARTING COORDINATES, CHARGES, MOLECULE ID'S FROM PDB */
 void readInAtoms(System &system, string filename) {
+
+    if (system.constants.readinxyz) { readInAtomsXYZ(system, filename); }
+    else {
+
 	string line;
 	ifstream myfile (filename); //("Neons.xyz"); // ("rhtMOF9Zn.xyz"); //("water_1527.dat"); // test2.dat
 	if (myfile.is_open())
@@ -147,6 +227,7 @@ void readInAtoms(System &system, string filename) {
 
         printf("ERROR: Unable to open %s. Exiting.\n",filename.c_str()); std::exit(0);
     }
+    } // end PDB readin
 }
 
 
@@ -451,6 +532,16 @@ void readInput(System &system, char* filename) {
                     std::cout << "Got fugacity_single sorbate selection = " << lc[1].c_str(); printf("\n");
                 }
 
+            } else if (!strcasecmp(lc[0].c_str(), "input_atoms_xyz")) {
+                if (lc.size() > 1) {
+                    system.constants.readinxyz = 1;
+                    system.constants.atom_file = lc[1].c_str();
+                }
+
+                std::cout << "Got XYZ input option = " << lc[1].c_str(); printf("\n");
+                if (system.constants.readinxyz == 1)
+                    std::cout << "Got xyz input file = " << lc[1].c_str(); printf("\n");
+                
             // BASIS STUFF.
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {
