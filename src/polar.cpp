@@ -77,10 +77,13 @@ void thole_resize_matrices(System &system) {
     system.last.thole_total_atoms = system.constants.total_atoms;
     N = 3*system.last.thole_total_atoms;
     dN = N-oldN;
- 
+
     //printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
 
     if(!dN) { return; }
+
+    // re-make the AtomMap if needed
+    makeAtomMap(system); // re-calculates unique indices for atoms
 
     // grow A matricies by free/malloc (to prevent fragmentation)
     //free the A matrix
@@ -102,8 +105,6 @@ void thole_resize_matrices(System &system) {
 
 /* calculate the dipole field tensor */
 void thole_amatrix(System &system) {
-
-    makeAtomMap(system); // re-calculates unique indices for atoms
 
     int i, j, ii, jj, N, p, q;
     int w, x, y, z;

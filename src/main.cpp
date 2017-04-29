@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
     int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
     // RESIZE A MATRIX IF POLAR IS ACTIVE (and initialize the dipole file)
-    if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
+    if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_COMMYESPOLAR) {
 				FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
 				fclose(fp);
 
@@ -135,6 +135,8 @@ int main(int argc, char **argv) {
         }
 
         system.last.thole_total_atoms = system.constants.total_atoms;
+
+        makeAtomMap(system); // writes the atom indices
     }
 
     // begin timing for steps "begin_steps"

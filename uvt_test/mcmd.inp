@@ -3,11 +3,11 @@
 
 name			    hitherebuddy 
 mode	 		    mc 
-input_atoms    restart.pdb   ../pdbs/rhtmof9.pdb
+input_atoms    ../pdbs/rhtmof9.pdb
 
 free_volume         11595.4
 
-potential_form 		commyes
+potential_form 		ljespolar
 xyz_traj_option     off
 sorbate_name        c2h2*
 !fugacity_single     h2
@@ -21,8 +21,8 @@ radial_centroid     Cu
 radial_counterpart  H2G
 
 ensemble		    uvt
-mc_corrtime	        100
-finalstep		    5000000
+mc_corrtime	        10
+finalstep		    100
 temperature         298 	    
 pressure            1.0
 insert_factor		0.667
