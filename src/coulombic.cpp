@@ -24,11 +24,11 @@ double es_fh_corr(System &system, int i, int k, double r, double gaussian_term, 
     double ir2 = ir*ir;
     double ir3 = ir*ir2;
     double ir4 = ir2*ir2;
-    double order = system.constants.fh_order;
-    double alpha = system.constants.ewald_alpha;
-    double a2 = alpha*alpha;
-    double a3 = a2*alpha;
-    double a4 = a3*alpha;
+    const double order = system.constants.fh_order;
+    const double alpha = system.constants.ewald_alpha;
+    const double a2 = alpha*alpha;
+    const double a3 = a2*alpha;
+    const double a4 = a3*alpha;
     double reduced_mass = (system.molecules[i].mass * system.molecules[k].mass)/(system.molecules[i].mass + system.molecules[k].mass);
 
     if (order != 2 && order != 4) return NAN;
@@ -57,8 +57,8 @@ double es_fh_corr(System &system, int i, int k, double r, double gaussian_term, 
 double coulombic_self(System &system) {
     
     double potential=0.0, charge;
-    double alpha=system.constants.ewald_alpha;
-    double sqrtPI = sqrt(M_PI);
+    const double alpha=system.constants.ewald_alpha;
+    const double sqrtPI = sqrt(M_PI);
  
     // loop all atoms but skip frozen atoms   
     if (system.stats.MCstep == 0 || system.constants.ensemble == ENSEMBLE_UVT) { // only changes if N changes
@@ -84,7 +84,7 @@ double coulombic_self(System &system) {
 double coulombic_real(System &system) {
     
     double potential=0.0, pair_potential=0.0;
-    double alpha=system.constants.ewald_alpha;
+    const double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
     double r;  //  int count =0;
     double gaussian_term;
@@ -168,11 +168,11 @@ void coulombic_force_nopbc(System &system) {
 
 // pbc force via ewald -dU/dx, -dU/dy, -dU/dz
 void coulombic_real_force(System &system) {
-    double alpha=system.constants.ewald_alpha;
+    const double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
     double charge1, charge2, chargeprod, r,rsq;
     double u[3]; double holder;
-    double sqrtPI = sqrt(M_PI);
+    const double sqrtPI = sqrt(M_PI);
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -276,13 +276,13 @@ void oldCoulombicForce(System &system) {
 
 // Coulombic reciprocal electrostatic energy from Ewald //
 double coulombic_reciprocal(System &system) {   
-    int p, q, kmax, l[3], i, j;
-    double alpha, k[3], k_sq, position_product;
+    int p, q, l[3], i, j;
+    double k[3], k_sq, position_product;
     double SF_re=0, SF_im=0;
     double potential = 0.0;
 
-    alpha = system.constants.ewald_alpha;
-    kmax = system.constants.ewald_kmax;   
+    const double alpha = system.constants.ewald_alpha;
+    const int kmax = system.constants.ewald_kmax;   
 
    // get recip (re-calc only needed for NPT)
    if (system.constants.ensemble == ENSEMBLE_NPT) {

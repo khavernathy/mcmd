@@ -20,7 +20,7 @@ double lj_fh_corr(System &system, int i,int k, double r, double term12, double t
     double ir2 = ir*ir;
     double ir3 = ir2*ir;
     double ir4 = ir3*ir;
-    int order = system.constants.fh_order;
+    const int order = system.constants.fh_order;
 
     if (order != 2 && order != 4) return NAN;
 
@@ -48,8 +48,8 @@ double lj_fh_corr(System &system, int i,int k, double r, double term12, double t
 
 double self_lj_lrc(System &system) {
     double potential=0;
-    double cutoff = system.pbc.cutoff;
-    double volume = system.pbc.volume;
+    const double cutoff = system.pbc.cutoff;
+    const double volume = system.pbc.volume;
     double sig, eps, sig3,sigcut,sigcut3,sigcut9;
     double this_self_lrc;
 
@@ -85,8 +85,8 @@ double self_lj_lrc(System &system) {
 
 double lj(System &system) {
     double total_pot=0, total_lj=0, total_rd_lrc=0, total_rd_self_lrc = 0;
-    double cutoff = system.pbc.cutoff;
-    double volume = system.pbc.volume;
+    const double cutoff = system.pbc.cutoff;
+    const double volume = system.pbc.volume;
     int i,j,k,l,index;
     double this_lj;
     double r,sr6;
@@ -206,8 +206,7 @@ double lj(System &system) {
 
 void lj_force(System &system) {
 
-    double cutoff = system.pbc.cutoff;
-    double volume = system.pbc.volume;
+    const double cutoff = system.pbc.cutoff;
     double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
     int count=0; // for the pair values
 
@@ -267,8 +266,6 @@ void lj_force(System &system) {
 
 void lj_force_nopbc(System &system) {
 
-    double cutoff = system.pbc.cutoff;
-    double volume = system.pbc.volume;
     double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
     int count=0; // for the pair values
 

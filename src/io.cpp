@@ -830,16 +830,25 @@ void readInput(System &system, char* filename) {
 
 
             } else if (!strcasecmp(lc[0].c_str(), "md_dt")) {
-				system.constants.md_dt = atof(lc[1].c_str());
-				std::cout << "Got MD timestep = " << lc[1].c_str() << " fs"; printf("\n");
+
+				    system.constants.md_dt = atof(lc[1].c_str());
+				    std::cout << "Got MD timestep = " << system.constants.md_dt << " fs";  printf("\n");
 
                 system.constants.md_thermostat_probab = system.constants.md_thermostat_freq *
                     exp(-system.constants.md_thermostat_freq * system.constants.md_dt);
                 std::cout << "The MD thermostat heat-bath collision probability is starting at " << system.constants.md_thermostat_probab; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_ft")) {
-				system.constants.md_ft = atof(lc[1].c_str());
-				std::cout << "Got MD final step = " << lc[1].c_str() << " fs"; printf("\n");
+			    if (lc[2] == "s") system.constants.md_ft = atof(lc[1].c_str())*1e15;
+                else if (lc[2] == "ms") system.constants.md_ft = atof(lc[1].c_str())*1e12;
+                else if (lc[2] == "us") system.constants.md_ft = atof(lc[1].c_str())*1e9;
+                else if (lc[2] == "ns") system.constants.md_ft = atof(lc[1].c_str())*1e6;
+                else if (lc[2] == "ps") system.constants.md_ft = atof(lc[1].c_str())*1e3;
+                else if (lc[2] == "fs") system.constants.md_ft = atof(lc[1].c_str());
+                else { // default fs
+                    system.constants.md_ft = atof(lc[1].c_str());
+				}
+                std::cout << "Got MD final step = " << system.constants.md_ft << " fs"; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_rotations")) {
                 if (lc[1] == "on") system.constants.md_rotations = 1;

@@ -107,17 +107,17 @@ void thole_amatrix(System &system) {
 
     int i, j, ii, jj, N, p, q;
     int w, x, y, z;
-    double damp1=0, damp2=0, wdamp1=0, wdamp2=0, v, s; //, distancesp[3], rp;
+    double damp1=0, damp2=0, wdamp1=0, wdamp2=0; // v, s; //, distancesp[3], rp;
     double r, r2, ir3, ir5, ir=0;
-    double rcut, rcut2, rcut3;
-    rcut = system.pbc.cutoff;
-    rcut2 = rcut*rcut; rcut3 = rcut2*rcut;
-    double l, l2, l3;
-    l = system.constants.polar_damp;
-    l2 = l*l; l3 = l2*l;
+    const double rcut = system.pbc.cutoff;
+    const double rcut2=rcut*rcut;
+    const double rcut3=rcut2*rcut;
+    const double l=system.constants.polar_damp;
+    const double l2=l*l;
+    const double l3=l2*l;
     double explr; //exp(-l*r)
-    double explrcut = exp(-l*rcut);
-    double MAXVALUE = 1.0e40;
+    const double explrcut = exp(-l*rcut);
+    const double MAXVALUE = 1.0e40;
     N = (int)system.constants.total_atoms;
 
     system.checkpoint("in thole_amatrix() --> zeroing out");
@@ -215,15 +215,14 @@ void thole_amatrix(System &system) {
 void thole_field(System &system) {
     // wolf thole field
     int i,j,k,l,p;
-    double SMALL_dR = 1e-12;
+    const double SMALL_dR = 1e-12;
     double r, rr; //r and 1/r (reciprocal of r)
-    double R = system.pbc.cutoff;
-    double rR = 1./R;
+    const double R = system.pbc.cutoff;
+    const double rR = 1./R;
     //used for polar_wolf_alpha (aka polar_wolf_damp)
-    double a = system.constants.polar_wolf_alpha; //, distances[3];
-    double erR; //complementary error functions
-        erR=erfc(a*R);
-    double cutoffterm = (erR*rR*rR + 2.0*a*OneOverSqrtPi*exp(-a*a*R*R)*rR);
+    const double a = system.constants.polar_wolf_alpha; //, distances[3];
+    const double erR=erfc(a*R); //complementary error functions
+    const double cutoffterm = (erR*rR*rR + 2.0*a*OneOverSqrtPi*exp(-a*a*R*R)*rR);
     double bigmess=0;
 
 
@@ -308,7 +307,8 @@ void thole_field(System &system) {
 
 void thole_field_nopbc(System &system) {
     int p, i, j, k,l;
-    double r, SMALL_dR = 1e-12; //, distances[3];
+    double r;
+    const double SMALL_dR = 1e-12; //, distances[3];
 
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
