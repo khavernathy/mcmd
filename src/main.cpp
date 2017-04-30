@@ -40,6 +40,19 @@
 using namespace std;
 
 int main(int argc, char **argv) {
+    
+    // try cuda
+    int status=system("/home/khavernathy/mcmd/cuda");
+    if (status < 0)
+        std::cout << "Error: " << strerror(errno) << '\n';
+    else
+    {
+        if (WIFEXITED(status))
+            std::cout << "Program returned normally, exit code " << WEXITSTATUS(status) << '\n';
+        else
+            std::cout << "Program exited abnormaly\n";
+    }
+    //printf("CUDA TEST RESULT = %i\n", status);
 
 	// start timing
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
