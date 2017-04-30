@@ -52,3 +52,10 @@ TODO<br /><br />
 -> MC: add Phast2 model<br />
 -> MD: Make correct(ed) force (most important), pressure, specific heat, temperature calculators<br />
 -> MD: add polarizable force calculator <br />
+-> MC: add more sorbate models from literature<br />
+
+<br />
+OTHER TODO:<br /><br />
+-> MC: replay (frame-by-frame) energy calculations compared to MPMC<br />
+-> MC: benchmarks: LJ, LJ+ES, LJ+ES+POLAR+FH of MOF-5+H2 vs. MPMC<br />
+-> MC: non orthorhombic benchmarks: MPM-1-Br, Mn-Formate<br />
