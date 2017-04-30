@@ -59,3 +59,5 @@ OTHER TODO:<br /><br />
 -> MC: replay (frame-by-frame) energy calculations compared to MPMC<br />
 -> MC: benchmarks: LJ, LJ+ES, LJ+ES+POLAR+FH of MOF-5+H2 vs. MPMC<br />
 -> MC: non orthorhombic benchmarks: MPM-1-Br, Mn-Formate<br />
+-> MC: ensemble tests: NPT, uVT, NVT, NVE<br />
+-> MD: NVT test<br />
