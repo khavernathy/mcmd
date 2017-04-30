@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     setupFugacity(system);
 
     initialize(system); // these are just system name sets,
-    printf("VERSION NUMBER: %i\n", 288); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 336); // i.e. github commit
     system.checkpoint("Done with system setup functions.");
 
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
