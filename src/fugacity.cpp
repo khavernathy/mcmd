@@ -176,7 +176,7 @@ double h2_fugacity(double temperature, double pressure) {
 
 	}
 
-	return(0); /* NOT REACHED */
+	//return(0); /* NOT REACHED */
 
 }
 
@@ -356,7 +356,7 @@ double ch4_fugacity(double temperature, double pressure) {
 
         }
 
-        return(0); /* NOT REACHED */
+        //return(0); /* NOT REACHED */
 
 }
 
@@ -584,7 +584,7 @@ double n2_fugacity(double temperature, double pressure) {
 	
 	}
 	
-	return(0); /* NOT REACHED */
+	//return(0); /* NOT REACHED */
 
 }
 

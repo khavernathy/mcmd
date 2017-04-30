@@ -180,6 +180,8 @@ class Constants {
 
         int_fast8_t all_pbc=1;
 
+        int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS
+
 };
 
 class Pbc {
@@ -376,7 +378,7 @@ class Pbc {
         void calcBoxVertices() {
 			// calculates the 3D points that encompass the crystalline simulation box.
 		    int i,j,k,p,q,count=0;
-		    int box_labels[2][2][2];
+		    //int box_labels[2][2][2];
 		    double box_occupancy[3];
 		    double box_pos[3];
 
@@ -569,13 +571,13 @@ class Atom {
         double polar=0.0; // polarizability in A^3
         double C=0.0; // charge in e
         double V=0.0; // potential energy in K
-        double K=0.0; // kinetic energy in K
-        double E=0.0; // total energy in K
+        //double K=0.0; // kinetic energy in K
+        //double E=0.0; // total energy in K
 		int PDBID; // the atom's PDBID (from input)
         double rank_metric;  // for polarization sorting
 
         double pos[3] = {0,0,0};
-		double prevpos[3] = {0,0,0};
+		//double prevpos[3] = {0,0,0};
         double force[3] = {0,0,0};
         double vel[3] = {0,0,0};
         double acc[3] = {0,0,0};
@@ -640,7 +642,7 @@ class Molecule {
         double ang_acc[3] = {0,0,0};
         double old_ang_acc[3] = {0,0,0};
         double ang_pos[3] = {0,0,0};
-        double d_theta[3] = {0,0,0};
+        //double d_theta[3] = {0,0,0};
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
         double inertia=0.0; //moment of inertia. stored in K fs^2
@@ -663,7 +665,7 @@ class Molecule {
                 ang_acc[n]=0;
                 old_ang_acc[n]=0;
                 ang_pos[n]=0;
-                d_theta[n]=0;
+                //d_theta[n]=0;
             }
             name = "";
             PDBID=0;
@@ -732,14 +734,14 @@ class Molecule {
 
         // angular position // in rad
         void calc_ang_pos(double dt) {
-            double theta[3];
+            //double theta[3];
             //double cap = 0.0005;
             for (int n=0; n<3; n++) {
-                theta[n] = ang_pos[n];
+                //theta[n] = ang_pos[n];
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
                 //if (ang_pos[n] > cap) ang_pos[n] = cap; // SET THE ROTATION CAP -- rad/fs
                 //else if (ang_pos[n] < -cap) ang_pos[n] = -cap;
-                d_theta[n] = ang_pos[n] - theta[n];
+                //d_theta[n] = ang_pos[n] - theta[n];
             }
         }
 

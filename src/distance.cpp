@@ -45,7 +45,8 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         r = sqrt(r2);
         ri = sqrt(ri2);
 
-        if (isnan(ri) != 0 ) {
+        if (ri != ri) {
+        //if (isnan(ri) != 0 ) {
             rimg = r;
             for (p=0; p<3; p++)
                 dimg[p] = d[p];
@@ -63,7 +64,7 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
     else // NO PBC calculation.
     {
         // no PBC r
-        double r, d[3];
+        double d[3];
         for (int n=0; n<3; n++) d[n] = system.molecules[i].atoms[j].pos[n] - system.molecules[k].atoms[l].pos[n];
         static double output[4];
         for (int p=0; p<3; p++) output[p] = d[p];
@@ -112,7 +113,8 @@ double * getR(System &system, double * com1, double * com2) {
         r = sqrt(r2);
         ri = sqrt(ri2);
 
-        if (isnan(ri) != 0 ) {
+        if (ri != ri) {
+        //if (isnan(ri) != 0 ) {
             rimg = r;
             for (p=0; p<3; p++)
                 dimg[p] = d[p];

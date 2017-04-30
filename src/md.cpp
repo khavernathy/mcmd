@@ -161,6 +161,8 @@ void calculateForces(System &system, double dt) {
 	}
 
     // GET FORCES
+
+    if (!system.constants.cuda) {
     // no pbc
     if (!system.constants.md_pbc) {
         if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
@@ -176,6 +178,12 @@ void calculateForces(System &system, double dt) {
             coulombic_real_force(system);
         if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
             polarization_force(system);
+    }
+    } else {
+        #ifdef CUDA
+        // CUDA FORCES
+        CUDA_force(system);
+        #endif
     }
 
     // atomic forces are done, so now calc molecular values
@@ -205,6 +213,7 @@ void integrate(System &system, double dt) {
     // END IF DEBUG
 
     // 1a) CHANGE POSITIONS OF PARTICLES
+    /* NO NEED FOR SAVING OLD POS
     // save old positions
     for (j=0; j<system.molecules.size(); j++) {
         if (!system.molecules[j].frozen) {
@@ -214,6 +223,7 @@ void integrate(System &system, double dt) {
         } // end if movable
     } // end for molecule j
     // done saving old positions
+    */
 
     // if molecular motion
     if (system.constants.md_mode == MD_MOLECULAR) {
@@ -370,3 +380,5 @@ void integrate(System &system, double dt) {
         }
     } // end if NVT (thermostat)
 }// end integrate() function
+
+

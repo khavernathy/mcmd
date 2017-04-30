@@ -112,7 +112,9 @@ void calc_dipole_rrms (System &system) {
                 system.molecules[i].atoms[j].dipole_rrms /= dddotprod(system.molecules[i].atoms[j].newdip, system.molecules[i].atoms[j].newdip);
                 system.molecules[i].atoms[j].dipole_rrms = sqrt(system.molecules[i].atoms[j].dipole_rrms);
 
-                if (!isfinite(system.molecules[i].atoms[j].dipole_rrms)) system.molecules[i].atoms[j].dipole_rrms=0;
+                if (system.molecules[i].atoms[j].dipole_rrms != system.molecules[i].atoms[j].dipole_rrms)
+                //if (!isfinite(system.molecules[i].atoms[j].dipole_rrms)) 
+                    system.molecules[i].atoms[j].dipole_rrms=0;
                 
             
         }
@@ -123,7 +125,7 @@ void calc_dipole_rrms (System &system) {
 }
 
 int are_we_done_yet (System &system, int iteration_counter ) {
-	unsigned int i, j, p, ti, tj;
+	unsigned int i, p, ti, tj;
 	double allowed_sqerr, error;
     int N = system.constants.total_atoms;	
 
@@ -183,8 +185,8 @@ void palmo_contraction (System &system, int * ranked_array ) {
 
 
 void update_ranking (System &system, int * ranked_array ) {
-	unsigned int i, j, k, l, sorted, tmp, trk, trl, trk1, trl1, rankedj, rankedj1;
-	double r; 
+	unsigned int i, j, sorted, tmp, trk, trl, trk1, trl1, rankedj, rankedj1;
+	//double r; 
 
     int N = system.constants.total_atoms;
 

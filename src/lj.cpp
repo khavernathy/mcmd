@@ -87,7 +87,7 @@ double lj(System &system) {
     double total_pot=0, total_lj=0, total_rd_lrc=0, total_rd_self_lrc = 0;
     const double cutoff = system.pbc.cutoff;
     const double volume = system.pbc.volume;
-    int i,j,k,l,index;
+    int i,j,k,l; //index;
     double this_lj;
     double r,sr6;
     
@@ -207,8 +207,8 @@ double lj(System &system) {
 void lj_force(System &system) {
 
     const double cutoff = system.pbc.cutoff;
-    double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
-    int count=0; // for the pair values
+    double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
+    //int count=0; // for the pair values
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -216,7 +216,6 @@ void lj_force(System &system) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
         // do mixing rules
-        double eps,sig;
         eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
         sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
 
@@ -230,13 +229,14 @@ void lj_force(System &system) {
         r6 = rsq*rsq*rsq;
         s2 = sig*sig;
         s6 = s2*s2*s2;
-    
+                /*
                 if (i != k) { // don't do self-interaction for potential.
                     sr = sig/r;
                     sr2 = sr*sr;    
                     sr6 = sr2*sr2*sr2;
                 }
-
+                */
+            
         if ((!system.constants.rd_lrc || r <= cutoff)) {
             for (int n=0; n<3; n++) {
                 f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
@@ -267,7 +267,7 @@ void lj_force(System &system) {
 void lj_force_nopbc(System &system) {
 
     double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
-    int count=0; // for the pair values
+  //  int count=0; // for the pair values
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -275,7 +275,7 @@ void lj_force_nopbc(System &system) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
         // do mixing rules
-        double eps,sig;
+        //double eps,sig;
         eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
         sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
 

@@ -204,7 +204,7 @@ void changeVolumeMove(System &system) {
 
 /* ADD A MOLECULE */
 void addMolecule(System &system) {
-  int_fast8_t model = system.constants.potential_form;
+  //int_fast8_t model = system.constants.potential_form;
     system.checkpoint("starting addMolecule");
 	system.stats.insert_attempts++;
     int protoid;
@@ -242,7 +242,7 @@ void addMolecule(System &system) {
     }
 
 	// for random placement in the unit cell
-    double randn[3]; int p,q,n;
+    double randn[3]; int p,q; //,n;
     double move[3];
     for (p=0; p<3; p++)
         randn[p] = 0.5 - ((double)rand()/(double)RAND_MAX);
@@ -292,7 +292,7 @@ return;
 
 /* REMOVE A MOLECULE */
 void removeMolecule(System &system) {
-    int_fast8_t model = system.constants.potential_form;
+    //int_fast8_t model = system.constants.potential_form;
     system.checkpoint("starting removeMolecule");
 
     if (system.stats.count_movables == 0) return; // skip if no molecules are there to be removed.
@@ -329,7 +329,7 @@ void removeMolecule(System &system) {
 
     // get new energy
     double new_potential = getTotalPotential(system);
-    double energy_delta = (new_potential - old_potential);
+    //double energy_delta = (new_potential - old_potential);
 
     //printf("doing boltzmann -- ");
     // calculate BOLTZMANN FACTOR
@@ -356,8 +356,8 @@ return;
 
 /* DISPLACE (TRANSLATE AND ROTATE) */
 void displaceMolecule(System &system) {
-    int_fast8_t model = system.constants.potential_form;
-    double tmpcom[3], d[3], rsq;
+    //int_fast8_t model = system.constants.potential_form;
+    double tmpcom[3], d[3]; //, rsq;
 
     if (system.stats.count_movables == 0) return; // skip if no sorbate molecules are in the cell.
     system.stats.displace_attempts++;

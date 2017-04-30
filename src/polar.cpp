@@ -3,7 +3,7 @@
 #include <math.h>
 #include <cmath>
 
-#include <thole_iterative.cpp>
+#include "thole_iterative.cpp"
 
 #define OneOverSqrtPi 0.56418958354
 
@@ -58,8 +58,9 @@ double get_dipole_rrms (System &system) {
     int i,j;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            if (isfinite(system.molecules[i].atoms[j].dipole_rrms))
-                dipole_rrms += system.molecules[i].atoms[j].dipole_rrms;
+            //if (isfinite(system.molecules[i].atoms[j].dipole_rrms))
+            if (system.molecules[i].atoms[j].dipole_rrms != system.molecules[i].atoms[j].dipole_rrms) 
+               dipole_rrms += system.molecules[i].atoms[j].dipole_rrms;
             N++;
         }
     }
@@ -108,11 +109,11 @@ void thole_amatrix(System &system) {
 
     int i, j, ii, jj, N, p, q;
     int w, x, y, z;
-    double damp1=0, damp2=0, wdamp1=0, wdamp2=0; // v, s; //, distancesp[3], rp;
+    double damp1=0, damp2=0; //, wdamp1=0, wdamp2=0; // v, s; //, distancesp[3], rp;
     double r, r2, ir3, ir5, ir=0;
     const double rcut = system.pbc.cutoff;
-    const double rcut2=rcut*rcut;
-    const double rcut3=rcut2*rcut;
+    //const double rcut2=rcut*rcut;
+    //const double rcut3=rcut2*rcut;
     const double l=system.constants.polar_damp;
     const double l2=l*l;
     const double l3=l2*l;

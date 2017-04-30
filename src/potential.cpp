@@ -6,12 +6,12 @@
 #include <string>
 #include <stdlib.h>
 
-#include <distance.cpp>
-#include <lj.cpp>
-#include <commy.cpp>
-#include <coulombic.cpp>
-#include <polar.cpp>
-#include <pairs.cpp>
+#include "distance.cpp"
+#include "lj.cpp"
+#include "commy.cpp"
+#include "coulombic.cpp"
+#include "polar.cpp"
+#include "pairs.cpp"
 
 // =================== MAIN FUNCTION ======================
 // ---------------POTENTIAL OF ENTIRE SYSTEM --------------

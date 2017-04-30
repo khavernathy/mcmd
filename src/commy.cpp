@@ -11,14 +11,15 @@ double commy(System &system) {
     // the communist potential from 1961 van der Waals paper
     // http://iopscience.iop.org/article/10.1070/PU1961v004n02ABEH003330/meta;jsessionid=F9941A012802331F1E4FF488A0F004A9.c4.iopscience.cld.iop.org  
     double total_pot=0; 
-    double cutoff = system.pbc.cutoff;
-    double volume = system.pbc.volume;
+    const double cutoff = system.pbc.cutoff;
+    //double volume = system.pbc.volume;
     int i,j,k,l;
     double r,sr6,r7;
-    double numerator= system.constants.HBARC * -23.0;
-    double FourPi = 12.566370614359172;
+    const double numerator= system.constants.HBARC * -23.0;
+    const double FourPi = 12.566370614359172;
     double polar1, polar2;    
     double attractive, repulsive; // energies
+    double eps,sig;
 
     for (i = 0; i < system.molecules.size(); i++) {
     for (j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -28,7 +29,7 @@ double commy(System &system) {
         attractive=0; repulsive=0;
 
         // do mixing rules
-        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
         if (eps != system.molecules[k].atoms[l].eps)
             eps = sqrt(eps * system.molecules[k].atoms[l].eps);
         if (sig != system.molecules[k].atoms[l].sig)

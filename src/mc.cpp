@@ -6,10 +6,10 @@
 #include <map>
 #include <string>
 #include <stdlib.h>
-#include <potential.cpp>
-#include <rotatepoint.cpp>
-#include <boltzmann.cpp>
-#include <moves.cpp>
+#include "potential.cpp"
+#include "rotatepoint.cpp"
+#include "boltzmann.cpp"
+#include "moves.cpp"
 
 // PHAST2 NOT INCLUDED YET
 
@@ -17,7 +17,7 @@
 // ACCORDING TO DIFFERENT ENSEMBLES
 void runMonteCarloStep(System &system) {
     system.checkpoint("Entered runMonteCarloStep().");
-    int_fast8_t model = system.constants.potential_form;
+    //int_fast8_t model = system.constants.potential_form;
     system.stats.MCmoveAccepted = false; // reset acceptance checker
 
 	// VOLUME MOVE (only NPT)

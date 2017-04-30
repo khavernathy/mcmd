@@ -25,7 +25,7 @@ void readInAtomsXYZ(System &system, string filename) {
 	if (myfile.is_open())
 	{
         //int master_index=-1;
-		std::string::size_type sz;     // alias of size_t
+		//std::string::size_type sz;     // alias of size_t
 		// loop through each line
         Molecule whatev;
         system.proto.push_back(whatev); // the first prototype.
@@ -59,8 +59,8 @@ void readInAtomsXYZ(System &system, string filename) {
             current_atom.polar = system.constants.polars[current_atom.name];
             //==============================================================
             current_atom.V = 0.0;
-			current_atom.K = 0.0;
-			current_atom.E = 0.0;
+			//current_atom.K = 0.0;
+			//current_atom.E = 0.0;
 			current_atom.PDBID = line_count - 2; // skipping first 2 lines
 			current_atom.mol_name = "MOF";
 			    current_atom.frozen = 1;
@@ -68,9 +68,9 @@ void readInAtomsXYZ(System &system, string filename) {
 			current_atom.pos[0] = stod(myvector[1]);
 			current_atom.pos[1] = stod(myvector[2]);
 			current_atom.pos[2] = stod(myvector[3]);
-			current_atom.prevpos[0] = current_atom.pos[0];
-			current_atom.prevpos[1] = current_atom.pos[1];
-			current_atom.prevpos[2] = current_atom.pos[2];
+			//current_atom.prevpos[0] = current_atom.pos[0];
+			//current_atom.prevpos[1] = current_atom.pos[1];
+			//current_atom.prevpos[2] = current_atom.pos[2];
             current_atom.C = stod(myvector[4]) * system.constants.E2REDUCED;
 			system.molecules[0].atoms.push_back(current_atom);
             system.molecules[0].mass += current_atom.m;
@@ -102,11 +102,11 @@ void readInAtoms(System &system, string filename) {
 	if (myfile.is_open())
 	{
         //int master_index=-1;
-		std::string::size_type sz;     // alias of size_t
+		//std::string::size_type sz;     // alias of size_t
 		// loop through each line
                 int current_mol_id=-1; // Initializer. Will be changed.
                 int mol_counter=-1;
-		bool prototype_made = false;
+		//bool prototype_made = false;
 		bool first_mover_passed = false;
 		int first_mover_id = -1;
         Molecule whatev;
@@ -146,8 +146,8 @@ void readInAtoms(System &system, string filename) {
             else current_atom.polar = system.constants.polars[current_atom.name];
             //==============================================================
             current_atom.V = 0.0;
-			current_atom.K = 0.0;
-			current_atom.E = 0.0;
+			//current_atom.K = 0.0;
+			//current_atom.E = 0.0;
 			current_atom.PDBID = stoi(myvector[1]); // pulled from input pdb column 2
 			current_atom.mol_name = myvector[3];
             if (myvector[4] == "F")
@@ -169,9 +169,9 @@ void readInAtoms(System &system, string filename) {
 			current_atom.pos[0] = stod(myvector[6]);
 			current_atom.pos[1] = stod(myvector[7]);
 			current_atom.pos[2] = stod(myvector[8]);
-			current_atom.prevpos[0] = current_atom.pos[0];
-			current_atom.prevpos[1] = current_atom.pos[1];
-			current_atom.prevpos[2] = current_atom.pos[2];
+			//current_atom.prevpos[0] = current_atom.pos[0];
+			//current_atom.prevpos[1] = current_atom.pos[1];
+			//current_atom.prevpos[2] = current_atom.pos[2];
             current_atom.C = stod(myvector[10]) * system.constants.E2REDUCED;
 			//system.atoms.push_back(current_atom); // to master atom list
 
@@ -480,7 +480,11 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "mode")) {
 				system.constants.mode = lc[1].c_str();
 				std::cout << "Got mode = " << lc[1].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "cuda")) {
+                if (lc[1] == "on")
+                    system.constants.cuda = 1;
 
+                std::cout << "Got CUDA option = " << lc[1].c_str(); printf("\n");
 			} else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
                 if (lc[1] == "nvt") {
                     system.constants.ensemble = ENSEMBLE_NVT;

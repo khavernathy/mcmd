@@ -6,7 +6,7 @@
 using namespace std;
 
 void make_pairs(System &system) {
-    int i,j,k,l,p,q,r;
+    int i,j,k,l,p; //,q,r;
     int molsize = (int)system.molecules.size();
     int frozenatoms = system.stats.count_frozens;
 

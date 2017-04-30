@@ -38,8 +38,8 @@ void setupRadialDist(System &system) {
 /* THIS FUNCTION WILL BE CALLED EVERY CORRTIME AND WILL ADD TO BINS AS NEEDED */ 
 /* every step is a little excessive and increases step runtime by ~x15        */
 void radialDist(System &system) {
-    double bin_size = system.stats.radial_bin_size;
-    double max_dist = system.stats.radial_max_dist;
+    const double bin_size = system.stats.radial_bin_size;
+    const double max_dist = system.stats.radial_max_dist;
     string centroid = system.stats.radial_centroid;
     string counterpart = system.stats.radial_counterpart;
 
@@ -59,9 +59,9 @@ void radialDist(System &system) {
                         double r = distances[3];     
                         //printf("distance = %f\n",dist);      
                         //system.checkpoint("getting index"); 
-                        if (r < system.stats.radial_max_dist) {
+                        if (r < max_dist) {
                             // determine index of radial_bins
-                            int indexr = floor(r / system.stats.radial_bin_size);  // so 0.02/0.2 -> index 0; 0.25/0.2 -> index 1..
+                            int indexr = floor(r / bin_size);  // so 0.02/0.2 -> index 0; 0.25/0.2 -> index 1..
                             //system.checkpoint("adding to bin");
                             system.stats.radial_bins[indexr]++;
                         } // end dist<max_dist

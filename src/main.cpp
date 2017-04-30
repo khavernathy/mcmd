@@ -6,6 +6,7 @@
 */
 
 // needed c/c++ libraries
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <strings.h>
@@ -25,35 +26,26 @@
 
 // c++ code files of this program
 // ORDER MATTERS HERE
-#include <usefulmath.cpp>
-#include <classes.cpp>
-#include <system.cpp>
-#include <fugacity.cpp>
-#include <system_functions.cpp>
-#include <mc.cpp> // this will include potential.cpp, which includes lj, coulombic, polar
-#include <md.cpp>
-#include <io.cpp>
-#include <radial_dist.cpp>
-#include <averages.cpp>
-#include <histogram.cpp>
+#include "usefulmath.cpp"
+#include "classes.cpp"
+#include "system.cpp"
+#include "fugacity.cpp"
+#include "system_functions.cpp" 
+#ifdef CUDA
+    #include "cudafuncs.cu"  // CUDA STUFF
+#endif
+#include "mc.cpp" // this will include potential.cpp, which includes lj, coulombic, polar
+#include "md.cpp"
+#include "io.cpp"
+#include "radial_dist.cpp"
+#include "averages.cpp"
+#include "histogram.cpp"
+
 
 using namespace std;
 
 int main(int argc, char **argv) {
     
-    // try cuda
-    int status=system("/home/khavernathy/mcmd/cuda");
-    if (status < 0)
-        std::cout << "Error: " << strerror(errno) << '\n';
-    else
-    {
-        if (WIFEXITED(status))
-            std::cout << "Program returned normally, exit code " << WEXITSTATUS(status) << '\n';
-        else
-            std::cout << "Program exited abnormaly\n";
-    }
-    //printf("CUDA TEST RESULT = %i\n", status);
-
 	// start timing
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	double time_elapsed;
@@ -421,7 +413,7 @@ int main(int argc, char **argv) {
 	int total_steps = floor(tf/dt);
 	int count_md_steps = 1;
     double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D=0.0;
-	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Ek=0., Klin=0., Krot=0., pressure=0.;
+	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Klin=0., Krot=0., pressure=0.; //, Ek=0.;
     int i,n;
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
@@ -448,7 +440,7 @@ int main(int argc, char **argv) {
             TE = KE+PE;
             Temp = ETarray[2];
             v_avg = ETarray[3];
-            Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
+            //Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
             Klin = ETarray[5] * system.constants.K2KJMOL;
             Krot = ETarray[6] * system.constants.K2KJMOL;
             pressure = ETarray[7]; // only good for NVT. Frenkel p84
