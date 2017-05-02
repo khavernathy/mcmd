@@ -44,7 +44,7 @@ Quick start:<br />
 <hr />
   
 TODO<br /><br />
--> MC: add "desired N" option to fill a system until a desired N is reached, then do NVT<br />
+-> MC: add "desired N" option to fill a system until a desired N is reached (accelerate uptake), then do NVT<br />
 -> MC: speed up by adjusting energy by the 1 particle that is changed.<br /> 
 -> MC: add multi-sorb Qst calculator<br />
 -> MD: speed up via GPU for MD force calculations<br />
@@ -53,6 +53,8 @@ TODO<br /><br />
 -> MD: Make correct(ed) force (most important), pressure, specific heat, temperature calculators<br />
 -> MD: add polarizable force calculator <br />
 -> MC: add more sorbate models from literature<br />
+-> MC/MD: Flexible materials (bonding potential)<br />
+-> MC: Use openMP for energy tasks<br />
 
 <br />
 OTHER TODO:<br /><br />
