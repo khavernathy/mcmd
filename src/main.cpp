@@ -423,12 +423,12 @@ int main(int argc, char **argv) {
 
 	// begin timing for steps
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();
-	for (double t=dt; t < tf; t=t+dt) {
+	for (double t=dt; t <= tf; t=t+dt) {
         system.stats.MDtime = t;
 		//printf("%f\n",t);
 		integrate(system,dt);
 
-		if (count_md_steps % system.constants.md_corrtime == 0 || t==dt) {  // print every x steps and first.
+		if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
             if (system.constants.histogram_option) {
 							zero_grid(system.grids.histogram->grid,system);
                             population_histogram(system);

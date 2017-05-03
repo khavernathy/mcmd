@@ -4,9 +4,9 @@ mode              md ! mc or md
 !!cuda                on
 checkpoints_option  off       
        
-input_atoms ../pdbs/MPM1.pdb mof5+co2_2.1mmolg.pdb   ! PDB ONLY       
+input_atoms ../../pdbs/MPM1.pdb mof5+co2_2.1mmolg.pdb   ! PDB ONLY       
 
-potential_form        ljes   !ljespolar       
+potential_form        lj   !ljespolar       
 com_option            off     ! center of mass        
  
 
@@ -31,8 +31,8 @@ ensemble nvt
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
 md_dt             2  ! fs       
-md_ft             200000  ! fs        
-md_corrtime       20     ! steps        
+md_ft             10000  ! fs        
+md_corrtime       25     ! steps        
 !md_init_vel         0    ! A / fs^2      
 md_mode             molecular      !atomic        
 md_rotations        on

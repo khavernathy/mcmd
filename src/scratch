@@ -357,3 +357,131 @@ cuda external test
     }
     pclose(in);
     */
+
+
+
+
+cuda garbage
+
+        //cuda_atom anchoratom=atom_list[i]; // make an anchor in register to save time.
+        //printf("potential form = %i\n", potential_form); 
+        //printf("HELLO I AM THREAD %i\n",i);
+        //printf("atom %i contains position vector %f %f %f\n", anchoratom.pos[0], anchoratom.pos[1], anchoratom.pos[2]);
+
+        // distances etc.
+        double rimg,rimg2,r2=0,r,ri,ri2=0,u[3],f[3]; // define variables
+        int p,q; // dimensionality
+        double d[3],di[3],img[3],dimg[3];    
+        double eps,sig;    
+        double s6,r6;
+
+        //accumalated forces (suggestion by Dr. Tu during class presenation)
+        double af[3]={0,0,0};
+
+        // make sure we're synced across the block first.
+        __syncthreads();
+
+        // loop through pairs
+        for (int j=0; j<n; j++) {
+        //circular access of shared memory within tile
+        // NEAREST IMAGE DISTANCE BETWEEN ATOMS
+        // i.e. PBC R
+        for (p=0;p<3;p++) d[p] = atom_list[i].pos[p] - atom_list[j].pos[p];
+        for (p=0;p<3;p++) {
+            img[p]=0;
+            for (q=0; q<3; q++) {
+                img[p] += recip_basis[q][p]*d[q];
+            }
+            img[p]=rint(img[p]);
+        }        
+        for (p=0; p<3; p++) {
+            di[p]=0;
+            for (q=0;q<3;q++) {
+                di[p] += basis[q][p]*img[q];
+            }
+        }
+        for (p=0;p<3;p++)
+            di[p] = d[p] - di[p];
+        
+        for (p=0;p<3;p++) {
+            r2 += d[p]*d[p];
+            ri2 += di[p]*di[p];
+        }
+        r=sqrt(r2);
+        ri=sqrt(ri2);
+        if (ri != ri) { // NAN check
+            rimg=r;
+            for (p=0;p<3;p++)
+                dimg[p]=d[p];
+        } else {
+            rimg=ri;
+            for (p=0;p<3;p++)
+                dimg[p]=di[p];
+        }
+        
+        for (p=0;p<3;p++) u[p] = dimg[p]/rimg;
+
+        printf("rimg = %f\n", rimg);
+
+
+        if (potential_form == 0 || potential_form == 1) {
+            // apply mixing rules for LJ force
+            eps = atom_list[i].eps;
+            if (eps != atom_list[j].eps)
+                eps = sqrt(eps * atom_list[j].eps);
+            sig = atom_list[i].sig;
+            if (sig != atom_list[j].sig)
+                sig = 0.5*(sig + atom_list[j].sig); 
+               
+            s6=sig*sig;
+            s6 *= s6*s6;
+            rimg2=rimg*rimg;
+            r6=rimg2*rimg2*rimg2;
+
+            if (r<=cutoff) {
+                // calculate LJ force
+                for (p=0;p<3;p++)
+                    f[p] = 24*d[p]*eps*(2*(s6*s6)/(r6*r6*rimg2) - s6/(r6*rimg2));
+
+                // add forces to accumulated register variable
+                for (p=0;p<3;p++)
+                    af[p] += f[p]; 
+        
+                //printf("made it to LJ atomicAdd\n");
+                // apply LJ forces to pair atom
+                for (p=0;p<3;p++) {
+                    //printf("before");
+                    atomicAdd(&(atom_list[j].f[p]), -f[p]);           
+                    //printf("after");
+                    //printf("f[%i] = %f\n", p, f[p]);
+                }
+            }
+
+        } // end LJ force contribs   
+        if (potential_form == 1) { 
+            // calculat electrostatic force
+            // this is NOT Ewald. But current errro exists for LJ anways.
+            for (p=0;p<3;p++)
+                f[p] = u[p]*((atom_list[i].charge * atom_list[j].charge)/rimg2);
+
+            // apply electrostatic forces to accumulation   
+            for (p=0;p<3;p++)
+                af[p] += f[p];            
+
+            // apply ES force to pair atom
+            for (p=0;p<3;p++)
+                atomicAdd(&(atom_list[j].f[p]), -f[p]);
+        }        
+
+         __syncthreads();//make sure all forces are updated before loading more atoms
+
+        // finally update the base atom forces
+        for (p=0;p<3;p++) {
+            atomicAdd(&(atom_list[i].f[p]),af[p]);
+            //printf("af[%i] = %f\n", p, af[p]);
+        }
+        } // end pair loop (j)
+        // test
+        atom_list[i].eps=9000;
+        
+    } // end if i<n

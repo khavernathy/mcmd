@@ -47,9 +47,10 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	int i,j,n;
 
     // grab fixed potential energy of system
-        if (system.constants.md_pbc)
+        if (system.constants.md_pbc) {
             V_total += getTotalPotential(system);
-        else {
+            //printf("used getTotalPotential\n");
+        } else {
             for (i=0; i<system.molecules.size(); i++) {
                 for (j=0; j<system.molecules[i].atoms.size(); j++) {
                     V_total += system.molecules[i].atoms[j].V;
@@ -161,24 +162,25 @@ void calculateForces(System &system, double dt) {
 	}
 
     // GET FORCES
-
+    // CPU style
     if (!system.constants.cuda) {
-    // no pbc
-    if (!system.constants.md_pbc) {
+        // no pbc
+        if (!system.constants.md_pbc) {
         if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
             lj_force_nopbc(system);
         if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
             coulombic_force_nopbc(system);
-    } 
-    // pbc
-    else {
+        } 
+        // pbc
+        else {
         if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
             lj_force(system);
         if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
             coulombic_real_force(system);
         if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
             polarization_force(system);
-    }
+        }
+    // GPU style
     } else {
         #ifdef CUDA
         // CUDA FORCES

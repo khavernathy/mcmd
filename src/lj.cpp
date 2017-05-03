@@ -223,6 +223,7 @@ void lj_force(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];    
+        //printf("r = %f\n", r);
         rsq=r*r;
         for (int n=0; n<3; n++) d[n] = distances[n];
 
