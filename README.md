@@ -56,6 +56,7 @@ TODO<br /><br />
 -> MC/MD: Flexible materials (bonding potential)<br />
 -> MC: Use openMP for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
+-> MC: remove MOF from traj files to save io<br />
 
 <br />
 TESTING TODO:<br /><br />
