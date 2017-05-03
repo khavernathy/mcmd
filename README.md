@@ -56,7 +56,6 @@ TODO<br /><br />
 -> MC/MD: Flexible materials (bonding potential)<br />
 -> MC: Use openMP for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
--> MC: modify trajectory output to just sorbates<br />
 
 <br />
 TESTING TODO:<br /><br />
