@@ -43,10 +43,10 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
         register double rimg, rsq;
         double d[3], di[3], img[3], dimg[3],r,r2,ri,ri2;
         int p,q,j,n;
-        double sig,eps,r6,s6,u[3],f[3];
-        register double af[3] = {0,0,0}; // accumulated forces
+        double sig,eps,r6,s6,u[3],f[3]={0,0,0};
+        //register double af[3] = {0,0,0}; // accumulated forces
             //printf("basis[3] = %f\n", basis[3]);
-        //__syncthreads();
+        __syncthreads();
         // order N instead of N^2 bc this runs on all GPU cores at once (basically)
         for (j=i+1;j<N;j++) {
 
@@ -83,7 +83,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                 for (p=0;p<3;p++) dimg[p] = di[p];
             }
             // distance is now rimg
-            //printf("r = %f\n", rimg);
+            //printf("r[%i] = %f\n", i,rimg);
             rsq=rimg*rimg;
 
             // 0 is LJ, 1 is LJ+ES
@@ -103,7 +103,8 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                     for (n=0;n<3;n++) {
                         f[n] = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                         atomicAdd(&(atom_list[j].f[n]), -f[n]);       
-                        af[n] += f[n];
+                        atomicAdd(&(atom_list[i].f[n]), f[n]);
+                        //af[n] += f[n];
                     }
                 }
 
@@ -112,10 +113,10 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                 for (n=0;n<3;n++) u[n] = dimg[n]/r;
             }     
 
+
+            //__syncthreads();
         } // end pair j
 
-        for (n=0;n<3;n++)
-            atomicAdd(&(atom_list[i].f[n]), af[n]);
     } // end if i<n (all threads)
 }
 
@@ -185,9 +186,7 @@ void CUDA_force(System &system) {
     // copy device data back to host
     cudaMemcpy(H, D, atoms_array_size, cudaMemcpyDeviceToHost);
 
-    //for (int i=0;i<N;i++) printf("H[%i] = %f\n", i, H[i].pos[0]);
-
-    cudaFree(D);
+    //for (int i=0;i<N;i++) printf("H[%i] force0 = %f\n", i, H[i].f[0]);
     index=0;
     for (int i=0;i<system.molecules.size();i++) {
         for (int j=0;j<system.molecules[i].atoms.size();j++) {
@@ -197,6 +196,11 @@ void CUDA_force(System &system) {
             index++;       
         }
     }
+
+    printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
+ 
+
+     cudaFree(D);
 
     // we're done. forces have been calc'd on GPU and written to local mem.
 }

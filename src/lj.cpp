@@ -209,7 +209,7 @@ void lj_force(System &system) {
     const double cutoff = system.pbc.cutoff;
     double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
     //int count=0; // for the pair values
-
+    //int index=0;
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i+1; k < system.molecules.size(); k++) {
@@ -223,7 +223,7 @@ void lj_force(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];    
-        //printf("r = %f\n", r);
+        //printf("r[%i] = %f\n",index, r);
         rsq=r*r;
         for (int n=0; n<3; n++) d[n] = distances[n];
 
@@ -258,6 +258,7 @@ void lj_force(System &system) {
 
         //system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
         } // if nonzero sig/eps
+        //index++;
     }  // loop l
     } // loop k 
     } //loop j
