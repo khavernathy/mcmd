@@ -75,13 +75,13 @@ int main(int argc, char **argv) {
         allocate_histogram_grid(system);
     }
     setupFugacity(system);
-
     initialize(system); // these are just system name sets,
     printf("VERSION NUMBER: %i\n", 336); // i.e. github commit
     system.checkpoint("Done with system setup functions.");
 
-    printf("SORBATE COUNT: %i\n", (int)system.proto.size());
 
+
+    printf("SORBATE COUNT: %i\n", (int)system.proto.size());
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses //
     for (int i=0; i<system.molecules.size(); i++) {
@@ -94,7 +94,8 @@ int main(int argc, char **argv) {
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() ); remove( system.constants.output_histogram.c_str() );
-	remove( system.constants.dipole_output.c_str() );
+	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
+    remove( system.constants.restart_mov_pdb.c_str() );
 
     // INITIAL WRITEOUTS
     // Prep thermo output file
@@ -103,12 +104,23 @@ int main(int argc, char **argv) {
     fclose(f);
     // Prep pdb trajectory if needed
     if (system.constants.pdb_traj_option) {
-        FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
-        fclose(f);
+        if (system.constants.pdb_bigtraj_option) {
+            FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
+            fclose(f);
+        } else {
+            // also the movables traj (going to phase-out the old trajectory 
+            // which writes frozen atoms every time
+            FILE *g = fopen(system.constants.restart_mov_pdb.c_str(), "w");
+            fclose(g);
+        }
     }
 		// Prep histogram if needed
 		if (system.constants.histogram_option)
 			system.file_pointers.fp_histogram = fopen(system.constants.output_histogram.c_str(), "w");
+    // frozen .pdb (just the MOF, usually)
+    if (system.stats.count_frozens > 0) {
+        writePDBfrozens(system, system.constants.frozen_pdb.c_str());
+    }
     // END INTIAL WRITEOUTS
 
     system.checkpoint("Initial protocols complete. Starting MC or MD.");
@@ -179,16 +191,16 @@ int main(int argc, char **argv) {
         // CHECK FOR CORRTIME
         if (t==0 || t % corrtime == 0 || t == finalstep) { /// output every x steps
 
-						// get all observable averages
+			// get all observable averages
             computeAverages(system);
 
-						// prep histogram for writing.
-						if (system.constants.histogram_option) {
-							zero_grid(system.grids.histogram->grid,system);
-              population_histogram(system);
-              if (t != 0) update_root_histogram(system);
+			// prep histogram for writing.
+			if (system.constants.histogram_option) {
+			    zero_grid(system.grids.histogram->grid,system);
+                population_histogram(system);
+                if (t != 0) update_root_histogram(system);
             }
-      /* -------------------------------- */
+            /* -------------------------------- */
 			// [[[[ PRINT OUTPUT VALUES ]]]]
 			/* -------------------------------- */
 
@@ -246,7 +258,7 @@ int main(int argc, char **argv) {
                     printf("-> %s wt %%    = %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
                     printf("      wt %% ME = %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
                 }
-                if (system.stats.excess[i].average > 0)
+                if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
                     printf("      Excess adsorption ratio = %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 printf("      N_movables avg = %.3f +- %.3f\n",
@@ -291,11 +303,15 @@ int main(int argc, char **argv) {
             } // end loop i
             // WRITE RESTART FILE AND OTHER OUTPUTS
             if (system.constants.xyz_traj_option)
-                writeXYZ(system,system.constants.output_traj,frame,t,0);
+                writeXYZ(system,system.constants.output_traj,frame,t,0,system.constants.xyz_traj_movers_option);
             frame++;
-            writePDB(system, system.constants.restart_pdb);
-            if (system.constants.pdb_traj_option)
-                writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t);
+            writePDB(system, system.constants.restart_pdb); // all atoms
+            if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers
+            if (system.constants.pdb_traj_option) {
+                if (system.constants.pdb_bigtraj_option)
+                    writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // all atoms
+                else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers
+            }
             // ONLY WRITES DENSITY FOR FIRST SORBATE
             writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density[0].average*1000, system.constants.temp, system.constants.pres, t);
             if (system.stats.radial_dist) {
@@ -348,7 +364,7 @@ int main(int argc, char **argv) {
 
         // write initial XYZ
         if (system.constants.xyz_traj_option)
-            writeXYZ(system,system.constants.output_traj, 1, 0, 0);
+            writeXYZ(system,system.constants.output_traj, 1, 0, 0, system.constants.xyz_traj_movers_option);
         int frame = 2; // weird way to initialize but it works for the output file.
         // and initial PDB
         writePDB(system,system.constants.restart_pdb);
@@ -518,20 +534,22 @@ int main(int argc, char **argv) {
 
             // WRITE OUTPUT FILES
             if (system.constants.xyz_traj_option)
-			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t);
+			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
             frame++;
             writeThermo(system, TE, Klin, Krot, PE, 0.0, system.stats.temperature.average, pressure, count_md_steps);
-            writePDB(system,system.constants.restart_pdb);
-            if (system.constants.pdb_traj_option)
-                writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, count_md_steps);
+            writePDB(system, system.constants.restart_pdb); // all atoms
+            if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers
+            if (system.constants.pdb_traj_option) {
+                if (system.constants.pdb_bigtraj_option)
+                    writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // all atoms
+                else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers
+            }
             if (system.stats.radial_dist) {
                 radialDist(system);
                 writeRadialDist(system);
             }
             if (t != dt && system.constants.histogram_option)
 				write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
-
-
 		}
 		count_md_steps++;
 	} // end MD timestep loop

@@ -232,19 +232,23 @@ void readInAtoms(System &system, string filename) {
 
 
 /* WRITE FRAME COORDINATE FOR TRAJECTORY FILE */
-void writeXYZ(System &system, string filename, int frame, int step, double realtime) {
+void writeXYZ(System &system, string filename, int frame, int step, double realtime, int mover_only_flag) {
 
 	ofstream myfile;
 	myfile.open (filename, ios_base::app);
 	//long unsigned int size = system.atoms.size();
+    int totalatoms;
 
-	if (system.constants.com_option)
- 		myfile << to_string(system.constants.total_atoms + 1) + "\nFrame " + to_string(frame) + "; Step count: " + to_string(step) + "; Realtime (MD) = " + to_string(realtime) + "fs\n";
-	else
-		myfile << to_string(system.constants.total_atoms) + "\nFrame " + to_string(frame) + "; Step count: " + to_string(step) + "; Realtime (MD) = " + to_string(realtime) + " fs\n";
+    if (mover_only_flag) totalatoms = system.constants.total_atoms - system.stats.count_frozens;
+    else totalatoms = system.constants.total_atoms;
+
+    if (system.constants.com_option) totalatoms++;
+        
+        myfile << to_string(totalatoms) + "\nFrame " + to_string(frame) + "; Step count: " + to_string(step) + "; Realtime (MD) = " + to_string(realtime) + "fs\n";
 
 	for (int j = 0; j < system.molecules.size(); j++) {
 		for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
+        if ((mover_only_flag && !system.molecules[j].atoms[i].frozen) || !mover_only_flag) {
 		myfile << system.molecules[j].atoms[i].name;
 		myfile <<  "   ";
 		myfile << system.molecules[j].atoms[i].pos[0];
@@ -254,6 +258,7 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 		myfile << system.molecules[j].atoms[i].pos[2];
 		myfile << "\n";
 		}
+        }
 	}
 
 	if (system.constants.com_option) {
@@ -293,6 +298,199 @@ void writePDBtraj(System &system, string restartfile, string trajfile, int step)
     }
 
     ofile << "ENDMDL\n";
+}
+
+
+/* WRITE PDB RESTART FILE EVERY CORRTIME -- ONLY MOVABLES */
+void writePDBmovables(System &system, string filename) {
+	remove ( filename.c_str() );
+	string frozenstring;
+FILE *f = fopen(filename.c_str(), "w");
+if (f == NULL)
+{
+    printf("Error opening PDB movables restart file! (in movables restart-writing function).\n");
+    exit(1);
+}
+	for (int j=0; j<system.molecules.size(); j++) {
+		for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+        if (system.molecules[j].atoms[i].frozen)
+                continue; // skip frozens!
+        else frozenstring = "M";
+        if (!system.constants.pdb_long) {
+        // this is default. VMD requires the "true" %8.3f
+		fprintf(f, "ATOM  %5i %4s %3s %1s %3i    %8.3f%8.3f%8.3f %3.5f %3.5f %f %f %f\n",
+            system.molecules[j].atoms[i].PDBID, // col 2
+            system.molecules[j].atoms[i].name.c_str(), // 3
+            system.molecules[j].atoms[i].mol_name.c_str(), // 4
+            frozenstring.c_str(), // 5
+            system.molecules[j].atoms[i].mol_PDBID, // 6
+            system.molecules[j].atoms[i].pos[0], // 7
+            system.molecules[j].atoms[i].pos[1],  // 8
+            system.molecules[j].atoms[i].pos[2], //9
+            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
+            system.molecules[j].atoms[i].polar, // 12
+            system.molecules[j].atoms[i].eps,  //13
+            system.molecules[j].atoms[i].sig); //14
+		}
+        else if (system.constants.pdb_long) {
+        fprintf(f, "ATOM  %5i %4s %3s %1s %3i %8.6f %8.6f %8.6f %3.6f %3.6f %f %f %f\n",
+            system.molecules[j].atoms[i].PDBID, // col 2
+            system.molecules[j].atoms[i].name.c_str(), // 3
+            system.molecules[j].atoms[i].mol_name.c_str(), // 4
+            frozenstring.c_str(), // 5
+            system.molecules[j].atoms[i].mol_PDBID, // 6
+            system.molecules[j].atoms[i].pos[0], // 7
+            system.molecules[j].atoms[i].pos[1],  // 8
+            system.molecules[j].atoms[i].pos[2], //9
+            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
+            system.molecules[j].atoms[i].polar, // 12
+            system.molecules[j].atoms[i].eps,  //13
+            system.molecules[j].atoms[i].sig); //14
+        }
+        } // end for atoms
+	} // end for molecules
+
+    // we don't need a box for this file 'cuz it should be in the MOF (frozen) file
+
+fclose(f);
+}
+
+/* WRITE PDB RESTART FILE AT STARTUP -- ONLY FROZENS */
+void writePDBfrozens(System &system, string filename) {
+	remove ( filename.c_str() );
+	string frozenstring;
+FILE *f = fopen(filename.c_str(), "w");
+if (f == NULL)
+{
+    printf("Error opening frozen PDB file.\n");
+    exit(1);
+}
+	for (int j=0; j<system.molecules.size(); j++) {
+		for (int i=0; i<system.molecules[j].atoms.size(); i++) {
+        if (!system.molecules[j].atoms[i].frozen)
+                continue; // skip movables!
+        else frozenstring = "F";
+        if (!system.constants.pdb_long) {
+        // this is default. VMD requires the "true" %8.3f
+		fprintf(f, "ATOM  %5i %4s %3s %1s %3i    %8.3f%8.3f%8.3f %3.5f %3.5f %f %f %f\n",
+            system.molecules[j].atoms[i].PDBID, // col 2
+            system.molecules[j].atoms[i].name.c_str(), // 3
+            system.molecules[j].atoms[i].mol_name.c_str(), // 4
+            frozenstring.c_str(), // 5
+            system.molecules[j].atoms[i].mol_PDBID, // 6
+            system.molecules[j].atoms[i].pos[0], // 7
+            system.molecules[j].atoms[i].pos[1],  // 8
+            system.molecules[j].atoms[i].pos[2], //9
+            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
+            system.molecules[j].atoms[i].polar, // 12
+            system.molecules[j].atoms[i].eps,  //13
+            system.molecules[j].atoms[i].sig); //14
+		}
+        else if (system.constants.pdb_long) {
+        fprintf(f, "ATOM  %5i %4s %3s %1s %3i %8.6f %8.6f %8.6f %3.6f %3.6f %f %f %f\n",
+            system.molecules[j].atoms[i].PDBID, // col 2
+            system.molecules[j].atoms[i].name.c_str(), // 3
+            system.molecules[j].atoms[i].mol_name.c_str(), // 4
+            frozenstring.c_str(), // 5
+            system.molecules[j].atoms[i].mol_PDBID, // 6
+            system.molecules[j].atoms[i].pos[0], // 7
+            system.molecules[j].atoms[i].pos[1],  // 8
+            system.molecules[j].atoms[i].pos[2], //9
+            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
+            system.molecules[j].atoms[i].polar, // 12
+            system.molecules[j].atoms[i].eps,  //13
+            system.molecules[j].atoms[i].sig); //14
+        }
+        } // end for atoms
+	} // end for molecules
+
+    // and draw the box if user desires
+    if (system.constants.draw_box_option) {
+
+        int i,j,k,p,q,diff,l,m,n;
+        int box_labels[2][2][2];
+        double box_occupancy[3];
+        double box_pos[3];
+        int last_mol_index = system.molecules.size() - 1;
+        int last_mol_pdbid = system.molecules[last_mol_index].PDBID;
+        int last_atom_pdbid = system.molecules[last_mol_index].atoms[system.molecules[last_mol_index].atoms.size() - 1].PDBID;
+        int atom_box = last_atom_pdbid + 1;
+        int molecule_box = last_mol_pdbid + 1;
+
+        // draw the box points
+        for(i = 0; i < 2; i++) {
+            for(j = 0; j < 2; j++) {
+                for(k = 0; k < 2; k++) {
+
+                // make this frozen
+                fprintf(f, "ATOM  ");
+                fprintf(f, "%5d", atom_box);
+                fprintf(f, " %-4.45s", "X");
+                fprintf(f, " %-3.3s ", "BOX");
+                fprintf(f, "%-1.1s", "F");
+                fprintf(f, " %4d   ", molecule_box);
+
+                // box coords
+                box_occupancy[0] = ((double)i) - 0.5;
+                box_occupancy[1] = ((double)j) - 0.5;
+                box_occupancy[2] = ((double)k) - 0.5;
+
+
+                for(p = 0; p < 3; p++)
+                    for(q = 0, box_pos[p] = 0; q < 3; q++)
+                        box_pos[p] += system.pbc.basis[q][p]*box_occupancy[q];
+
+                for(p = 0; p < 3; p++)
+                    if(!system.constants.pdb_long)
+                        fprintf(f, "%8.3f", box_pos[p]);
+                    else
+                        fprintf(f, "%11.6f ", box_pos[p]);
+
+                // null interactions
+                fprintf(f, " %8.4f", 0.0);
+                fprintf(f, " %8.4f", 0.0);
+                fprintf(f, " %8.5f", 0.0);
+                fprintf(f, " %8.5f", 0.0);
+                fprintf(f, " %8.5f", 0.0);
+                fprintf(f, "\n");
+
+                box_labels[i][j][k] = atom_box;
+                ++atom_box;
+
+                } // for k
+            } // for j
+        } // for i
+
+        // and draw the connecting lines
+        for(i = 0; i < 2; i++) {
+            for(j = 0; j < 2; j++) {
+                for(k = 0; k < 2; k++) {
+
+                    for(l = 0; l < 2; l++) {
+                        for(m = 0; m < 2; m++) {
+                            for(n = 0; n < 2; n++) {
+
+                                    diff = fabs(i - l) + fabs(j - m) + fabs(k - n);
+                                    if(diff == 1)
+                                        fprintf(f, "CONECT %4d %4d\n", box_labels[i][j][k], box_labels[l][m][n]);
+
+                            } // n
+                        } // m
+                    } // l
+
+
+                } // k
+            } // j
+        } // i
+
+    } // if draw box is on
+    // (end drawing the box)
+
+fclose(f);
 }
 
 
@@ -770,7 +968,7 @@ void readInput(System &system, char* filename) {
                 system.constants.rotate_angle_factor = atof(lc[1].c_str());
 				std::cout << "Got rotate angle factor = " << lc[1].c_str(); printf("\n");
 
-			} else if (!strcasecmp(lc[0].c_str(), "output_traj")) {
+			} else if (!strcasecmp(lc[0].c_str(), "output_traj_xyz")) {
 				system.constants.output_traj = lc[1].c_str();
 				std::cout << "Got output trajectory XYZ filename = " << lc[1].c_str(); printf("\n");
 
@@ -790,7 +988,14 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "displace_factor")) {
 				system.constants.displace_factor = atof(lc[1].c_str());
 				std::cout << "Got displace factor = " << lc[1].c_str(); printf("\n");
-
+            
+            } else if (!strcasecmp(lc[0].c_str(), "big_pdb_traj")) {
+                if (lc[1] == "on") system.constants.pdb_bigtraj_option = 1;
+                std::cout << "Got Big PDB trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "big_xyz_traj")) {
+                if (lc[1] == "on") system.constants.xyz_traj_movers_option=0;
+                std::cout << "Got Big XYZ trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
+    
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
 				if (lc[1] == "lj")
 					system.constants.potential_form = POTENTIAL_LJ;

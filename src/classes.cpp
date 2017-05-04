@@ -79,15 +79,20 @@ class Constants {
         string atom_file; // input atoms .pdb file
         string output_traj="traj.xyz"; // system trajectory in xyz
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb
+        string output_traj_movers_pdb="traj_movers.pdb"; // system traj (only movers) in pdb
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
         string output_histogram="histogram.dx"; // histogram information, viewable in VMD
         string dipole_output="dipoles.dat"; // only used when polarization is on.
+        string restart_mov_pdb="restart_movables.pdb"; // a restart file with only movable molecules to save i/o
+        string frozen_pdb="frozen.pdb"; // a pdb of frozen atoms that is made at startup
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
-        int_fast8_t pdb_traj_option=1; // option to write PDB trajectory (in addition to xyz). default on
+        int_fast8_t pdb_traj_option=1; // option to write PDB trajectory . default on
         int_fast8_t xyz_traj_option=0; // option for xyz trajectory, default off
+        int_fast8_t xyz_traj_movers_option=1; // option for smaller xyz traj (with only movers)
+        int_fast8_t pdb_bigtraj_option=0;// option to write trajectory WITH frozen atoms (though frozen.pdb gets written at startup)
         int_fast8_t dipole_output_option=1; // for dipole output (polar only)
         int_fast8_t com_option=0; // enables computation of center-of-mass and logs in output_traj
         int_fast8_t rotate_option=1; // MC ONLY: can deactivate rotates if wanted.
