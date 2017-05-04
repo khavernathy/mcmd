@@ -54,9 +54,9 @@ TODO<br /><br />
 -> MD: add polarizable force calculator <br />
 -> MC: add more sorbate models from literature<br />
 -> MC/MD: Flexible materials (bonding potential)<br />
--> MC: Use openMP for energy tasks<br />
+-> MC: Use openMP or fork() for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
--> MC: remove MOF from traj files to save io<br />
+-> try out float instead of double optimization<br />
 
 <br />
 TESTING TODO:<br /><br />
@@ -65,3 +65,4 @@ TESTING TODO:<br /><br />
 -> MC: non orthorhombic benchmarks: MPM-1-Br, Mn-Formate<br />
 -> MC: ensemble tests: NPT, uVT, NVT, NVE<br />
 -> MD: NVT test<br />
+-> Mac/Linux tests. HPC platform tests<br />
