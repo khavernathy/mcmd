@@ -7,6 +7,7 @@
 # e.g.
 #
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
+# bash compile.sh cpu errors    (same but with a lot of errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
@@ -37,7 +38,9 @@ if [[ "$option" == "cpu" ]]; then
     elif [[ "$2" == "bridges" ]]; then
         module purge
         module load gcc/6.3.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -0fast;
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
+    elif [[ "$2" == "errors" ]]; then
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
     fi
