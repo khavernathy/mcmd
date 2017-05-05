@@ -634,12 +634,12 @@ fclose(f);
 }
 
 /* WRITE RUNNING ENERGY AVERAGE EVERY CORRTIME */
-void writeThermo(System &system, double TE, double LKE, double RKE, double PE, double density, double temp, double pressure, int step) {
+void writeThermo(System &system, double TE, double LKE, double RKE, double PE, double RD, double ES, double POL, double density, double temp, double pressure, int step, int N) {
     FILE *f = fopen(system.constants.thermo_output.c_str(), "a");
     if (f == NULL) { printf("Error opening thermo data file!\n"); exit(1); }
 
-    fprintf(f, "%i  %f  %f  %f  %f  %f  %f  %f\n",
-        step, TE, LKE, RKE, PE, density, temp, pressure);
+    fprintf(f, "%i  %f  %f  %f  %f  %f  %f  %f %f %f %f %i\n",
+        step, TE, LKE, RKE, PE, RD, ES, POL, density, temp, pressure, N);
 
     fclose(f);
 }

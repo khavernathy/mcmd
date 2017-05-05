@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
     // INITIAL WRITEOUTS
     // Prep thermo output file
     FILE *f = fopen(system.constants.thermo_output.c_str(), "w");
-    fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K)  #density(g/mL) #temp(K) #pres(atm)\n");
+    fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K) #RD(K) #ES(K) #POL(K) #density(g/mL) #temp(K) #pres(atm) #N\n");
     fclose(f);
     // Prep pdb trajectory if needed
     if (system.constants.pdb_traj_option) {
@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
                 else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers
             }
             // ONLY WRITES DENSITY FOR FIRST SORBATE
-            writeThermo(system, system.stats.potential.average, 0.0, 0.0, system.stats.potential.average, system.stats.density[0].average*1000, system.constants.temp, system.constants.pres, t);
+            writeThermo(system, system.stats.potential.value, 0.0, 0.0, system.stats.potential.value, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, system.stats.density[0].value*1000, system.constants.temp, system.constants.pres, t, system.stats.Nmov[0].value);
             if (system.stats.radial_dist) {
                 radialDist(system);
                 writeRadialDist(system);
@@ -536,7 +536,7 @@ int main(int argc, char **argv) {
             if (system.constants.xyz_traj_option)
 			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
             frame++;
-            writeThermo(system, TE, Klin, Krot, PE, 0.0, system.stats.temperature.average, pressure, count_md_steps);
+            writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
             writePDB(system, system.constants.restart_pdb); // all atoms
             if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers
             if (system.constants.pdb_traj_option) {
