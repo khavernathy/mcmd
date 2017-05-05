@@ -1,4 +1,4 @@
-# mcmd
+# MCMD
 This is a Monte Carlo / Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials. 
 
 # Quick start:
@@ -49,6 +49,7 @@ The program outputs several quantities of interest:<br />
 
 # Operating System requirements
 MCMD works out-of-the-box on Linux (tested on Ubuntu 16.04) and Mac (tested on OS X El Capitan v10.11.6).<br />
+We recommend Visual Molecular Dynamics for data visualization, but the output is compatible with most other software<br />
 
 # TODO
 -> MC: add "desired N" option to fill a system until a desired N is reached (accelerate uptake), then do NVT<br />
