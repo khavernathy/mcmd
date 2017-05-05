@@ -28,6 +28,7 @@ MCMD has several features that make simulation easier for the user:<br />
 &emsp;->Easy system basis parametrization via a,b,c,alpha,beta,gamma crystal values<br />
 &emsp;->Quick routines for energy computation<br />
 &emsp;->Faster than most serial MC/MD programs to-date<br />
+&emsp;-> Simulated annealing
 &emsp;-> Any periodic cell is supported for both MC and MD; non-periodic systems also supported.<br />
 &emsp;-> Force-fields available are Lennard-Jones (12-6), Ewald electrostatics, and Thole-Applequist polarization.<br />
 &emsp;-> Sample inputs are included. The program takes just one argument: the input file (which itself usually points to a file containing starting atoms).<br />
