@@ -855,6 +855,14 @@ void readInput(System &system, char* filename) {
 	        } else if (!strcasecmp(lc[0].c_str(), "dist_within_radius")) {
                 system.constants.dist_within_radius = atof(lc[1].c_str());
                 std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
+        
+            } else if (!strcasecmp(lc[0].c_str(), "auto_reject_option")) {    
+                if (lc[1] == "off") system.constants.auto_reject_option=0;
+                std::cout << "Got auto_reject_option = " << lc[1].c_str(); printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "auto_reject_r")) {
+                system.constants.auto_reject_r = atof(lc[1].c_str()); printf("\n");
+                std::cout << "Got auto-reject distance = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
                 if (lc[1] == "on")

@@ -184,6 +184,10 @@ class Constants {
         //int thole_total_atoms = 0;
 
         int_fast8_t all_pbc=1;
+        int_fast8_t auto_reject_option=1; // enables/disables
+        double auto_reject_r=0.76; // Angstroms. If r > this value for any pair, MC will auto-reject a move immediately
+        int_fast8_t auto_reject=0; // on or off (for an individual step!). will go on if auto_reject_r is triggered
+        int rejects=0; // counter
 
         int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS
         int cuda_block_size = 256; // this was the best of a test of 32,64,128,256 on a project from class I took. Can play with this to see how it changes perf.

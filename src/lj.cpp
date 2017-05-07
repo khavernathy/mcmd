@@ -90,7 +90,9 @@ double lj(System &system) {
     int i,j,k,l; //index;
     double this_lj;
     double r,sr6;
-    
+    const double auto_reject_r = system.constants.auto_reject_r;
+    const int auto_reject_option = system.constants.auto_reject_option;
+
     for (i = 0; i < system.molecules.size(); i++) {
     for (j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (k = i+1; k < system.molecules.size(); k++) {
@@ -111,6 +113,13 @@ double lj(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];
+
+        if (auto_reject_option && r <= auto_reject_r) { // auto-reject feature for bad contacts
+            system.constants.auto_reject = 1;
+            system.constants.rejects++;
+            //printf("triggered\n");
+            return 1e40; // a really big energy
+        }
         //r = system.pairs[i][j][k][l].r;    
 
         sr6 = sig/r; //printf("r=%f\n",r);
