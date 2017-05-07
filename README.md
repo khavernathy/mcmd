@@ -65,6 +65,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MC/MD: Flexible materials (bonding potential)<br />
 -> MC: Use openMP or fork() for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
+-> openMPI/MPI for easy isotherm<br />
 
 <br />
 TESTING TODO:<br /><br />
