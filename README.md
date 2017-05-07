@@ -75,3 +75,4 @@ TESTING TODO:<br /><br />
 -> MC: ensemble tests: NPT, uVT, NVT, NVE<br />
 -> MD: NVT test<br />
 -> Mac/Linux tests. HPC platform tests<br />
+-> Compilation flag tests<br />
