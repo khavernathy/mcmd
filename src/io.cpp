@@ -1014,7 +1014,7 @@ void readInput(System &system, char* filename) {
 
 				std::cout << "Got potential form = " << lc[1].c_str(); printf("\n");
 
-			} else if (!strcasecmp(lc[0].c_str(), "polar_iter")) {
+			} else if (!strcasecmp(lc[0].c_str(), "polar_max_iter")) {
 				system.constants.polar_max_iter = atoi(lc[1].c_str());
 				std::cout << "Got polarization iterations = " << lc[1].c_str(); printf("\n");
             
