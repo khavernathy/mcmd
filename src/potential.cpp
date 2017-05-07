@@ -33,7 +33,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     } else if (model == POTENTIAL_COMMY || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
         total_rd = commy(system);
     }
-    if (!system.constants.auto_reject_option || !system.constants.auto_reject) { // these only run if no bad contact was discovered
+    if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
     // ELECTROSTATIC
     if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
         if (system.constants.ewald_es)
