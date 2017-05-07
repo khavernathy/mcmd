@@ -339,7 +339,7 @@ int main(int argc, char **argv) {
 	printf("Remove accepts:        %i\n", system.stats.remove_accepts);
 	printf("Displace accepts:      %i\n", system.stats.displace_accepts);
 	printf("Volume change accepts: %i\n", system.stats.volume_change_accepts);
-    printf("Auto-rejects (r <= %f): %i\n", system.constants.auto_reject_r, system.constants.rejects);
+    printf("Auto-rejects (r <= %.5f A): %i\n", system.constants.auto_reject_r, system.constants.rejects);
 
 	std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
         time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
