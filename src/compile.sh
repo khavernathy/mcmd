@@ -7,6 +7,7 @@
 # e.g.
 #
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
+# bash compile.sh cpu linux     (optimized for linux)
 # bash compile.sh cpu errors    (same but with a lot of errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)
