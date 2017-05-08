@@ -269,9 +269,9 @@ int main(int argc, char **argv) {
             if (system.constants.ensemble == ENSEMBLE_UVT) {
                 if (system.proto.size() == 1) {
                     if (system.stats.qst.average > 0)
-                        printf("Qst avg = %.5f +- %.5f kJ/mol\n", system.stats.qst.average, system.stats.qst.sd);
+                        printf("Qst = %.5f kJ/mol\n", system.stats.qst.value); //, system.stats.qst.sd);
                     if (system.stats.qst_nvt.average > 0)
-                        printf("U/N avg = %.5f +- %.5f kJ/mol\n", system.stats.qst_nvt.average, system.stats.qst_nvt.sd);
+                        printf("U/N avg = %.5f kJ/mol\n", system.stats.qst_nvt.value); //, system.stats.qst_nvt.sd);
                 }
                 printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             }
@@ -528,7 +528,7 @@ int main(int argc, char **argv) {
                 v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
             printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
             if (system.constants.md_pbc) {
-                printf("Diffusion coefficient = %.4e +- %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.average, system.stats.diffusion.sd, system.proto[0].name.c_str());
+                printf("Diffusion coefficient = %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.value, system.proto[0].name.c_str());
 			}
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
             printf("--------------------\n\n");
