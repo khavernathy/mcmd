@@ -8,7 +8,7 @@
 #
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
 # bash compile.sh cpu linux     (optimized for linux)
-# bash compile.sh cpu errors    (same but with a lot of errors/warnings)
+# bash compile.sh cpu errors    (same but with errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
@@ -35,11 +35,11 @@ if [[ "$option" == "cpu" ]]; then
     if [[ "$2" == "circe" ]]; then
         module purge
         module load compilers/gcc/6.2.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
     elif [[ "$2" == "bridges" ]]; then
         module purge
         module load gcc/6.3.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
     elif [[ "$2" == "errors" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
     elif [[ "$2" == "linux" ]]; then
