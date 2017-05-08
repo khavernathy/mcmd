@@ -33,5 +33,5 @@ displace_factor     2.5
 rotate_angle_factor 360.0
 ! =======================================================
 
-auto_reject_option on
+auto_reject_option off
 auto_reject_r 1.78
