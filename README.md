@@ -66,7 +66,8 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MC: Use openMP or fork() for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
 -> openMPI/MPI for easy isotherm<br />
--> investigate NVE and escape-artist molecules in displace MC moves (S.A.) <br />
+-> investigate NVE; and escape-artist molecules in displace MC moves (S.A.) <br />
+-> MC/MD: allow different instances of radial distribution calculator simulateously<br />
 
 <br />
 TESTING TODO:<br /><br />
