@@ -62,7 +62,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MD: speed up via GPU for MD force calculations<br />
 -> MC: speed up via GPU for polarization routine <br />
 -> MC: add Phast2 model<br />
--> MD: Make correct(ed) force (most important), pressure, specific heat, temperature calculators<br />
+-> MD: Make stat-mech pressure, specific heat calculators. Make sure temperature is calculated correctly<br />
 -> MD: add polarizable force calculator <br />
 -> MC: add more sorbate models from literature<br />
 -> MC/MD: Flexible materials (bonding potential)<br />
