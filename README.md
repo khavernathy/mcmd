@@ -19,6 +19,9 @@ On HPC clusters, you may need to load a compiler module first:  <br />
   
 <hr />
 
+# Contact
+Douglas Franz: dfranz@mail.usf.edu
+
 # Features
 MCMD has several features that make simulation easier for the user:<br />
 &emsp;-> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
