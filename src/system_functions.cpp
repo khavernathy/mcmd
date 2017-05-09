@@ -611,7 +611,21 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i,"CH","BNZ","M",0.7,-wp,0,m,0,0,e,s); 
                 system.proto[i].name = "BNZ";
             }
-
+            // TraPPE benzene 9-site
+            else if (sorbmodel == "c6h6_9site" || sorbmodel == "benzene_9site") {
+                double wp = 1.4*sqrt(3)/2.0;
+                double s=3.74, e=48.0, m=13.01833;
+                addAtomToProto(system,i,"CH","BNZ","M", 1.4, 0, 0, m, 0, 0,e,s);
+                addAtomToProto(system,i,"CH", "BNZ", "M", 0.7,wp,0, m, 0,0,e,s);
+                addAtomToProto(system,i,"CH", "BNZ", "M", -0.7, wp, 0, m,0,0,e,s);
+                addAtomToProto(system,i,"CH","BNZ","M",-1.4,0,0,m,0,0,e,s);
+                addAtomToProto(system,i,"CH","BNZ","M",-0.7,-wp,0,m,0,0,e,s);
+                addAtomToProto(system,i,"CH","BNZ","M",0.7,-wp,0,m,0,0,e,s); 
+                addAtomToProto(system,i,"CoM","BNZ", "M", 0,0,0,0,2.42,0,0,0);
+                addAtomToProto(system,i,"PI","BNZ","M",0.785,0,0,0,-1.21,0,0,0);
+                addAtomToProto(system,i,"PI","BNZ","M",-0.785,0,0,0,-1.21,0,0,0);
+                system.proto[i].name = "BNZ";
+            }
             // CYCLOHEXANE: hybrid of TraPPE model and CCCBDB
             // coordinates are from CCD cc-pvDZ geometry CCCBDB, rest is TraPPE params.
             else if (sorbmodel == "cyclohexane" || "c6h12") {
