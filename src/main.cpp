@@ -252,15 +252,16 @@ int main(int argc, char **argv) {
 			for (int i=0; i<system.proto.size(); i++) {
                 double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
+                double mgg = mmolg * (system.proto[i].mass*1000*system.constants.NA);
                 if (system.stats.count_frozens > 0) {
                     printf("-> %s wt %%    = %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
                     printf("      wt %% ME = %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
                 }
+                printf("      N_movables avg = %.3f +- %.3f; %.5f mg/g\n",
+                system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
                 if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
                     printf("      Excess adsorption ratio = %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
-                printf("      N_movables avg = %.3f +- %.3f\n",
-                system.stats.Nmov[i].average, system.stats.Nmov[i].sd);
                 if (system.proto.size() > 1)
                     printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             }
