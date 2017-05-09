@@ -6,8 +6,9 @@
 #
 # e.g.
 #
+# bash compile.sh               Defaults to cpu compilation
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
-# bash compile.sh cpu linux     (optimized for linux)
+# bash compile.sh cpu linux     (optimized for linux (ONLY))
 # bash compile.sh cpu errors    (same but with errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)
@@ -15,8 +16,8 @@
 # bash compile.sh gpu           (for a single computer with GPU functions with NVIDIA CUDA installed).
 # bash compile.sh gpu circe     (GPU on circe, still not working)
 ##########################
-
 echo "This should take like 10 sec."
+
 
 DEFAULT="cpu"
 
@@ -26,6 +27,8 @@ elif [ $1 == "cpu" ]; then
 option="cpu"
 elif [ $1 == "gpu" ]; then
 option="gpu";
+else
+echo "Invalid options detected. Not compiling. Read the header comments for compilation examples."
 fi
 
 
