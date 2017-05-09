@@ -367,7 +367,7 @@ int main(int argc, char **argv) {
         int frame = 2; // weird way to initialize but it works for the output file.
         // and initial PDB
         writePDB(system,system.constants.restart_pdb);
-            if (system.constants.pdb_traj_option)
+            if (system.constants.pdb_traj_option && system.constants.pdb_bigtraj_option)
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
 	// assign initial velocities
@@ -514,14 +514,12 @@ int main(int argc, char **argv) {
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("Input T: %.3f K; Input P: %.3f atm\n",system.constants.temp, system.constants.pres);
+			printf("Input T: %.3f K; Emergent T avg = %.4f +- %.4f K; Current = %.4f K\n",system.constants.temp, system.stats.temperature.average, system.stats.temperature.sd, Temp);
             printf("KE: %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
                   KE, Klin, Krot );
             printf("PE: %.3f kJ/mol; Total E: %.3f kJ/mol; \n",
                   PE, TE
                   );
-            printf("Emergent T avg = %.4f +- %.4f K (inst. T = %.4f K)\n",
-                system.stats.temperature.average, system.stats.temperature.sd, Temp);
             printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure avg: %.3f +- %.3f atm (I.G. approx)\n",
                 v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
             // hiding specific heat until i make sure it's right.
@@ -537,12 +535,15 @@ int main(int argc, char **argv) {
 			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
             frame++;
             writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
-            writePDB(system, system.constants.restart_pdb); // all atoms
-            if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers
+            // restart file.
+            writePDB(system, system.constants.restart_pdb); // containing all atoms
+
+            // trajectory file
+            if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers restart frame
             if (system.constants.pdb_traj_option) {
                 if (system.constants.pdb_bigtraj_option)
-                    writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // all atoms
-                else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers
+                    writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // copy all-atoms-restart-PDB to PDB trajectory
+                else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers to PDB trajectory
             }
             if (system.stats.radial_dist) {
                 radialDist(system);
