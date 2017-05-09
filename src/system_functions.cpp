@@ -598,6 +598,18 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "CoM", "ETH", "M", -0.054141, -0.017774, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 system.proto[i].name = "ETH";
             }
+
+            else if (sorbmodel == "benzene" || sorbmodel == "c6h6") {
+                double wp = 1.4*sqrt(3)/2.0;
+                double s=3.695, e=50.5, m=13.01833;
+                addAtomToProto(system,i,"CH","BNZ","M", 1.4, 0, 0, m, 0, 0,e,s);
+                addAtomToProto(system,i,"CH", "BNZ", "M", 0.7,wp,0, m, 0,0,e,s);
+                addAtomToProto(system,i,"CH", "BNZ", "M", -0.7, wp, 0, m,0,0,e,s);
+                addAtomToProto(system,i,"CH","BNZ","M",-1.4,0,0,m,0,0,e,s);
+                addAtomToProto(system,i,"CH","BNZ","M",-0.7,-wp,0,m,0,0,e,s);
+                addAtomToProto(system,i,"CH","BNZ","M",0.7,-wp,0,m,0,0,e,s); 
+                system.proto[i].name = "BNZ";
+            }
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
