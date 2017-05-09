@@ -295,9 +295,7 @@ void integrate(System &system, double dt) {
     if (system.constants.md_pbc) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
-                checkInTheBox(system,j);
-                // 2) GET NEW C.O.M. FOR MOLECULES
-                system.molecules[j].calc_center_of_mass();
+                checkInTheBox(system,j); // also computes COM 
             } // end if movable
 	    } // end loop j molecules
     } // end if PBC

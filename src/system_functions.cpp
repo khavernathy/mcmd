@@ -114,59 +114,66 @@ void checkInTheBox(System &system, int i) { // i is molecule id passed in functi
 // first the easy systems, alpha=beta=gamma=90
 // saves some time because box limits need not be recomputed
 if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
-    //for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+        
+        system.molecules[i].calc_center_of_mass();
+
         if (system.molecules[i].com[0] > system.pbc.x_max) { // right of box
             system.molecules[i].diffusion_corr[0] += system.pbc.x_length;
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[0] -= system.pbc.x_length;
                 }
+                system.molecules[i].calc_center_of_mass();
         }
         else if (system.molecules[i].com[0] < system.pbc.x_min) {
             system.molecules[i].diffusion_corr[0] -= system.pbc.x_length;
                 for (int k=0; k<system.molecules[i].atoms.size(); k++) {
 	                system.molecules[i].atoms[k].pos[0] += system.pbc.x_length;
                 }
+                system.molecules[i].calc_center_of_mass();
         }
         if (system.molecules[i].com[1] > system.pbc.y_max) {
             system.molecules[i].diffusion_corr[1] += system.pbc.y_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
                 }
+                system.molecules[i].calc_center_of_mass();
         }
         else if (system.molecules[i].com[1] < system.pbc.y_min) {
             system.molecules[i].diffusion_corr[1] -= system.pbc.y_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
                 }
+                system.molecules[i].calc_center_of_mass();
         }
         if (system.molecules[i].com[2]  > system.pbc.z_max) {
             system.molecules[i].diffusion_corr[2] += system.pbc.z_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
                 }
+                system.molecules[i].calc_center_of_mass();
         }
         else if (system.molecules[i].com[2] < system.pbc.z_min) {
             system.molecules[i].diffusion_corr[2] -= system.pbc.z_length;
 	            for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                     system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
                 }
+                system.molecules[i].calc_center_of_mass();
         }
-    //} // end atom loop
 } // end if alpha=beta=gamma=90
 
 // the universal treatment, alpha != beta ?= gamma
 else {
-    double comv[3]; // center of mass of molecules
     double box_limit[6]; //-x, +x, -y, +y, -z, +z limits, which are functions of atom position in other dims.
     double newlimit[6]; // an array to hold temporary new planes for movements.
+    double tmp_com[3]; // temporary COM to track diffusion corrections
 
-    for (int n=0; n<3; n++) comv[n] = system.molecules[i].com[n];
-
+    // first refresh COM
+    system.molecules[i].calc_center_of_mass();
 
     // find appropriate values for box limits based on atom coordinates.
     // check in this order: (-x, +x, -y, +y, -z, +z)
     for (int n=0; n<6; n++)
-        box_limit[n] = getBoxLimit(system, n, comv[0], comv[1], comv[2]);
+        box_limit[n] = getBoxLimit(system, n, system.molecules[i].com[0], system.molecules[i].com[1], system.molecules[i].com[2]);
 
     //printf("box_limit values ::\n");
     //for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
@@ -175,7 +182,7 @@ else {
     // NOTE: the r_c cutoff is not actually used in MD
 
         if (system.molecules[i].com[0] < box_limit[0]) { // left of box
-            system.molecules[i].diffusion_corr[0] -= system.pbc.x_length;
+            for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -190,9 +197,11 @@ else {
                 system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
              }
+                system.molecules[i].calc_center_of_mass();
+                for (int n=0;n<3;n++) system.molecules[i].diffusion_corr[n] -= system.molecules[i].com[n] - tmp_com[n]; 
         }
         else if (system.molecules[i].com[0] > box_limit[1]) { // right of box
-            system.molecules[i].diffusion_corr[0] += system.pbc.x_length;
+            for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -207,9 +216,11 @@ else {
                 system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
             }
+            system.molecules[i].calc_center_of_mass();
+            for (int n=0;n<3;n++) system.molecules[i].diffusion_corr[n] -= system.molecules[i].com[n] - tmp_com[n];
         }
         if (system.molecules[i].com[1] < box_limit[2]) { // below box
-            system.molecules[i].diffusion_corr[1] -= system.pbc.y_length;
+            for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -224,9 +235,11 @@ else {
                 system.molecules[i].atoms[k].pos[1] += system.pbc.y_length;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
             }
+            system.molecules[i].calc_center_of_mass();
+            for (int n=0;n<3;n++) system.molecules[i].diffusion_corr[n] -= system.molecules[i].com[n] - tmp_com[n];
         }
         else if (system.molecules[i].com[1] > box_limit[3]) { // above box
-            system.molecules[i].diffusion_corr[1] += system.pbc.y_length;
+            for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[4] = getBoxLimit(system, 4, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -242,9 +255,12 @@ else {
                 system.molecules[i].atoms[k].pos[1] -= system.pbc.y_length;
                 system.molecules[i].atoms[k].pos[2] = newlimit[4] + zdiff;
             }
+            system.molecules[i].calc_center_of_mass();
+            for (int n=0;n<3;n++) system.molecules[i].diffusion_corr[n] -= system.molecules[i].com[n] - tmp_com[n];
+
         }
         if (system.molecules[i].com[2] < box_limit[4]) { // behind box
-            system.molecules[i].diffusion_corr[2] -= system.pbc.z_length;
+            for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -259,9 +275,11 @@ else {
                 system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] += system.pbc.z_length;
             }
+            system.molecules[i].calc_center_of_mass();
+            for (int n=0;n<3;n++) system.molecules[i].diffusion_corr[n] -= system.molecules[i].com[n] - tmp_com[n];
         }
         else if (system.molecules[i].com[2] > box_limit[5]) { // in front of box
-            system.molecules[i].diffusion_corr[2] += system.pbc.z_length;
+            for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
             for (int k=0; k<system.molecules[i].atoms.size(); k++) {
                 newlimit[0] = getBoxLimit(system, 0, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
                 newlimit[2] = getBoxLimit(system, 2, system.molecules[i].atoms[k].pos[0], system.molecules[i].atoms[k].pos[1], system.molecules[i].atoms[k].pos[2]);
@@ -276,6 +294,8 @@ else {
                 system.molecules[i].atoms[k].pos[1] = newlimit[2] + ydiff;
                 system.molecules[i].atoms[k].pos[2] -= system.pbc.z_length;
             }
+            system.molecules[i].calc_center_of_mass();
+            for (int n=0;n<3;n++) system.molecules[i].diffusion_corr[n] -= system.molecules[i].com[n] - tmp_com[n];
         }
 } // end if non-90/90/90
 } // end pbc function
