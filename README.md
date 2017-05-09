@@ -74,6 +74,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MD: diffusion correction in checkInTheBox needs to be adjusted for non 90/90/90 (do COM calc in that function instead of outside it)<br />
 -> MC/MD: crystal builder (expand the unit cell dynamically by user input)<br />
 -> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
+-> MC/MD: multi-sorbate histograms<br />
 
 <br />
 TESTING TODO:<br /><br />
