@@ -1,0 +1,34 @@
+! This is a comment 
+! Hi
+
+name			    hitherebuddy 
+mode	 		    mc 
+input_atoms    ../../atomfiles/rhtmof9.pdb
+
+free_volume         11595.4
+
+potential_form 		ljespolar
+xyz_traj_option     off
+sorbate_name        c2h2*
+
+carbasis 27.934 27.934 41.081 90 90 90
+!carbasis 47.005 47.005 47.005 90 90 90
+!carbasis 25.669 25.669 25.669 90 90 90
+
+radial_dist         off
+radial_centroid     Cu
+radial_counterpart  H2G
+
+ensemble		    uvt
+mc_corrtime	        10
+finalstep		    100
+temperature         298 	    
+pressure            1.0
+insert_factor		0.667
+displace_factor     2.5
+rotate_angle_factor 360.0
+
+!feynman_hibbs on
+!fh_order 4
+
+
