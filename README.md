@@ -74,3 +74,4 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MC/MD: crystal builder (expand the unit cell dynamically by user input)<br />
 -> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
 -> MC/MD: multi-sorbate histograms<br />
+-> MC: fix multi-sorb<br />
