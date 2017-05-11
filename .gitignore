@@ -42,3 +42,4 @@ uvt_test/mof5
 uvt_test/rhtrestart
 nvt_test/commy
 *.png
+mcmd.dSYM
