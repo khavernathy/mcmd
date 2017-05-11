@@ -13,6 +13,8 @@ com_option		    off   	! center of mass
 sorbate_name        methanol
 sorbate_fugacities  1.0
 
+xyz_traj_option on
+
 carbasis 25.66200 17.49800 25.66200 90 90 90
 
 dist_within on
