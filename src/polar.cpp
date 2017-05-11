@@ -81,6 +81,8 @@ void thole_resize_matrices(System &system) {
 
     //printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
 
+    if (system.proto.size() > 1) makeAtomMap(system); // don't know why, but for LJESPOLAR this is needed for multi-sorbate simulations.
+
     if(!dN) { return; }
 
     // re-make the AtomMap if needed
