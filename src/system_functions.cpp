@@ -653,6 +653,16 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i,"O","O2", "M", 0.605, 0,0,m,-0.113,0,e,s);
                 system.proto[i].name = "O2";
             }
+    
+            // AMMONIA : TraPPE (hybrid: p-table mass, using CCCBDB experimental geometry for NH3: 1966 Herzberg)
+            else if (sorbmodel == "nh3" || sorbmodel == "ammonia") {
+                addAtomToProto(system,i,"M","NH3","M", 0,0,0.08, 0, -1.23, 0,0,0);
+                addAtomToProto(system,i,"N","NH3","M", 0,0,0,14.0067, 0,0,185.0,3.42);
+                addAtomToProto(system,i,"H","NH3","M", 0.0000,  -0.9377, -0.3816, 1.00794, 0.41, 0, 0,0);
+                addAtomToProto(system,i,"H","NH3","M", 0.8121,  0.4689,  -0.3816, 1.00794, 0.41, 0,0,0);
+                addAtomToProto(system,i,"H","NH3","M", -0.8121, 0.4689,  -0.3816, 1.00794, 0.41, 0,0,0);
+                system.proto[i].name = "AMM";
+            }
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
