@@ -683,7 +683,7 @@ void moleculePrintout(System &system) {
 
         // finally, show the current proto molecules
         for (int i=0; i<system.proto.size(); i++) {
-        printf("Prototype molecule %i has PDBID %i ( name %s ) and has %i atoms\n",i, system.proto[i].PDBID, system.proto[i].name.c_str(), (int)system.proto[i].atoms.size());
+        printf("\nPrototype molecule %i has PDBID %i ( name %s ) and has %i atoms\n",i, system.proto[i].PDBID, system.proto[i].name.c_str(), (int)system.proto[i].atoms.size());
             //system.proto.printAll();
             for (int j=0; j<system.proto[i].atoms.size(); j++) {
                 system.proto[i].atoms[j].printAll();

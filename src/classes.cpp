@@ -624,7 +624,9 @@ class Atom {
 
         /* for debugging */
         void printAll() {
-            printf("====================\natom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %e; eps = %f; sig = %f; C = %f\nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C, force[0], force[1], force[2], acc[0], acc[1], acc[2], old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2]);
+            printf("atom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %e kg; eps = %f K; sig = %f A; C = %f sqrt(KA)\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C);
+                   
+                   // force: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C, force[0], force[1], force[2], acc[0], acc[1], acc[2], old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2]);
         }
 };
 
