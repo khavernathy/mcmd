@@ -634,7 +634,7 @@ void moleculePrintout(System &system) {
             }
             // CYCLOHEXANE: hybrid of TraPPE model and CCCBDB
             // coordinates are from CCD cc-pvDZ geometry CCCBDB, rest is TraPPE params.
-            else if (sorbmodel == "cyclohexane" || "c6h12") {
+            else if (sorbmodel == "cyclohexane" || sorbmodel == "c6h12") {
                 double s=3.91, e=52.5, m=84.16/6;
                 addAtomToProto(system,i,"CH2","CHX","M",-1.2221530,  -0.6603440,  0.3930520, m, 0, 0,e,s);
                 addAtomToProto(system,i,"CH2","CHX","M",0.0001370 ,  1.5281720 ,  -0.0001270, m, 0, 0, e,s);
@@ -644,7 +644,15 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i,"CH2","CHX","M", -1.2221530 , 0.6604920 ,  -0.3929090,m,0,0,e,s);
                 system.proto[i].name = "CHX"; 
             }
-
+        
+            // OXYGEN : TraPPE : using p-table mass
+            else if (sorbmodel == "o2" || sorbmodel == "oxygen") {
+                double s=3.02, e=49.0, m=7.9997;
+                addAtomToProto(system,i,"O","O2", "M", -0.605,0,0,m,-0.113,0,e,s);
+                addAtomToProto(system,i,"CoM","O2","M", 0,0,0,0,0.226,0,0,0);
+                addAtomToProto(system,i,"O","O2", "M", 0.605, 0,0,m,-0.113,0,e,s);
+                system.proto[i].name = "O2";
+            }
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
