@@ -3,7 +3,7 @@ name              mcmd_development
 mode              md ! mc or md       
 checkpoints_option  off       
        
-input_atoms ../../atomfiles/MPM1.pdb mof5+co2_2.1mmolg.pdb   ! PDB ONLY       
+input_atoms ../../atomfiles/MPM-1-Br+CO2_PHAST.pdb   ! PDB ONLY       
 
 potential_form        ljes   !ljespolar       
 com_option            off     ! center of mass        

@@ -5,7 +5,7 @@
 name			    mcmd_development
 mode	 		    mc ! mc or md
 checkpoints_option  off
-input_atoms ../../atomfiles/rhtmof9+30h2bssp.pdb      ! PDB ONLY 
+input_atoms ../../atomfiles/rht-MOF-9+30H2_BSSP.pdb      ! PDB ONLY 
 potential_form 		ljespolar 	!phast2    !!lj
 com_option		    off  	! center of mass
 

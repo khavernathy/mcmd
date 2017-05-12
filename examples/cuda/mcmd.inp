@@ -4,13 +4,12 @@ mode              md ! mc or md
 cuda                on
 checkpoints_option  off       
        
-input_atoms ../../../atomfiles/MPM1.pdb mof5+co2_2.1mmolg.pdb   ! PDB ONLY       
+input_atoms ../../atomfiles/MPM-1-Br+CO2_PHAST.pdb   ! PDB ONLY       
 
 potential_form        lj      !ljespolar       
 com_option            off     ! center of mass        
  
 
-!carbasis 25.669 25.669 25.669 90 90 90
 basis1  27.19800  0.00000  0.00000
 basis2  -13.59900 23.55416  0.00000
 basis3   0.00000  0.00000 30.99800
