@@ -73,6 +73,11 @@ void thole_resize_matrices(System &system) {
 
     int i, N, dN, oldN;
 
+    //just make the atom map of indices no matter what.
+    // for whatever reason things get buggy when I try to
+    // minimize calls to this function. It's not expensive anyway.
+    makeAtomMap(system);
+
     /* determine how the number of atoms has changed and realloc matrices */
     oldN = 3*system.last.thole_total_atoms; //will be set to zero if first time called
     system.last.thole_total_atoms = system.constants.total_atoms;
@@ -81,12 +86,7 @@ void thole_resize_matrices(System &system) {
 
     //printf("oldN: %i     N: %i     dN: %i\n",oldN,N,dN);
 
-    if (system.proto.size() > 1) makeAtomMap(system); // don't know why, but for LJESPOLAR this is needed for multi-sorbate simulations.
-
     if(!dN) { return; }
-
-    // re-make the AtomMap if needed
-    makeAtomMap(system); // re-calculates unique indices for atoms
 
     // grow A matricies by free/malloc (to prevent fragmentation)
     //free the A matrix
@@ -367,7 +367,7 @@ double polarization(System &system) {
 */
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
-    if (system.constants.ensemble == ENSEMBLE_UVT) {
+    if (system.constants.ensemble == ENSEMBLE_UVT) { // uVT is the only ensemble that changes N
         thole_resize_matrices(system);
     }
     system.checkpoint("done resizing thole matrix.");

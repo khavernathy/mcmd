@@ -341,16 +341,17 @@ void moleculePrintout(System &system) {
     // CONFIRM ATOMS AND MOLECULES PRINTOUT
 
     // an excessive full list of atoms/molecules.
-/*
+    /*
     for (int b=0; b<system.molecules.size(); b++) {
-        printf("Molecule PDBID = %i: %s has %i atoms and is %s; The first atom has PDBID = %i\n", system.molecules[b].PDBID, system.molecules[b].name.c_str(), (int)system.molecules[b].atoms.size(), system.molecules[b].MF.c_str(), system.molecules[b].atoms[0].PDBID);
+        printf("Molecule PDBID = %i: %s has %i atoms and frozen=%i; The first atom has PDBID = %i\n", system.molecules[b].PDBID, system.molecules[b].name.c_str(), (int)system.molecules[b].atoms.size(), system.molecules[b].frozen, system.molecules[b].atoms[0].PDBID);
         for (int c=0; c<system.molecules[b].atoms.size(); c++) {
             system.molecules[b].atoms[c].printAll();
             printf("\n");
         }
 
     }
-*/
+    */
+
     if (system.constants.mode == "mc") { // prototype is only used for MC.
     // CHANGE THE PROTOTYPE IF USER SUPPLIED A KEYWORD IN INPUT
     // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
