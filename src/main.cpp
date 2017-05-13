@@ -8,6 +8,7 @@
 // needed c/c++ libraries
 #include <cmath>
 #include <iostream>
+#include <ctime>
 #include <string>
 #include <strings.h>
 #include <sstream>
@@ -46,7 +47,17 @@ using namespace std;
 
 int main(int argc, char **argv) {
     
-	// start timing
+    // output current date/time
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(buffer,sizeof(buffer),"%d-%m-%Y %I:%M:%S",timeinfo);
+    std::string str(buffer);
+    std::cout << "MCMD started at " << str << endl;
+
+	// start timing for checkpoints
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	double time_elapsed;
 	double sec_per_step;
@@ -212,17 +223,22 @@ int main(int argc, char **argv) {
             double efficiency = system.stats.MCeffRsq / time_elapsed;
 
 			// PRINT MAIN OUTPUT
-			printf("MONTE CARLO\n");
-            printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
-            if (!system.constants.simulated_annealing)
-			    printf("ENSEMBLE: %s; T = %.3f K\n", system.constants.ensemble_str.c_str(), system.constants.temp);
-			else
-                printf("ENSEMBLE: %s; T = %.3f K (Simulated annealing on)\n",system.constants.ensemble_str.c_str(), system.constants.temp);
-
+			printf("MCMD Monte Carlo: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
+            if (!system.constants.simulated_annealing)
+			    printf("Ensemble: %s; T = %.3f K\n", system.constants.ensemble_str.c_str(), system.constants.temp);
+			else
+                printf("Ensemble: %s; T = %.3f K (Simulated annealing on)\n",system.constants.ensemble_str.c_str(), system.constants.temp);
+            
+            printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep+system.constants.step_offset,finalstep,progress,efficiency);
-			printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-
+			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n",
+				(int)system.stats.total_accepts,
+			    system.stats.ins_perc,
+                system.stats.rem_perc,
+                system.stats.dis_perc,
+                system.stats.vol_perc);
+	
             printf("BF avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol ) \n",
 				system.stats.bf_avg,
 				system.stats.ibf_avg,
@@ -236,12 +252,7 @@ int main(int argc, char **argv) {
 				(system.stats.ar_rem),
 				(system.stats.ar_dis),
 				(system.stats.ar_vol));
-			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n",
-				(int)system.stats.total_accepts,
-			    system.stats.ins_perc,
-                system.stats.rem_perc,
-                system.stats.dis_perc,
-                system.stats.vol_perc);
+		    
             printf("RD avg =              %.5f +- %.5f K\n", // (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",
                 system.stats.rd.average, system.stats.rd.sd); //, system.stats.lj.average, system.stats.lj_lrc.average, system.stats.lj_self_lrc.average);
 			printf("ES avg =              %.5f +- %.5f K\n", //(real = %.4f, recip = %.4f, self = %.4f)\n",
@@ -253,14 +264,17 @@ int main(int argc, char **argv) {
                 double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
                 double mgg = mmolg * (system.proto[i].mass*1000*system.constants.NA);
+                string flspacing = "";
+                if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
+                else flspacing="            "; // stuff like H2, O2 (2 chars)
                 if (system.stats.count_frozens > 0) {
-                    printf("-> %s wt %%    = %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
-                    printf("      wt %% ME = %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
+                    printf("-> %s wt %% =%s   %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(),flspacing.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
+                    printf("      wt %% ME =            %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
                 }
-                printf("      N_movables avg = %.3f +- %.3f; %.5f mg/g\n",
+                printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
                 system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
                 if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
-                    printf("      Excess adsorption ratio = %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
+                    printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 if (system.proto.size() > 1)
                     printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
@@ -461,7 +475,8 @@ int main(int argc, char **argv) {
             //Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
             Klin = ETarray[5] * system.constants.K2KJMOL;
             Krot = ETarray[6] * system.constants.K2KJMOL;
-            pressure = ETarray[7]; // only good for NVT. Frenkel p84
+            pressure = ETarray[7]; // not using this yet. NVT pressure derived from forces/stat mech stuff. Frenkel p84
+            // pretty sure Csp (specific heat) is wrong below. Not printing in output yet.
             system.stats.csp.value = (TE*1000/system.constants.NA);
                 system.stats.csp.value /= -((Temp)*system.proto[0].mass*1000*system.stats.count_movables);
                 system.stats.csp.calcNewStats(); // the minus above i think is needed.
@@ -475,7 +490,7 @@ int main(int argc, char **argv) {
                 for (n=0; n<3; n++)
                     diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
 
-                diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now
+                diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
             }
             D = (diffusion_sum / system.stats.count_movables)/(6.0*t); // 6 because 2*dimensionality = 2*3
             D *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
@@ -508,20 +523,22 @@ int main(int argc, char **argv) {
                 outputTime = t; timeunit="fs";
             }
 
-            printf("MOLECULAR DYNAMICS\n");
-            //printf("testing angular velocity\n");
-            printf("%s %s\n",system.constants.jobname.c_str(),argv[1]);
-            printf("ENSEMBLE: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
+            printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-            printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
+            //printf("testing angular velocity\n");
+            printf("Ensemble: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("Input T: %.3f K; Emergent T avg = %.4f +- %.4f K; Current = %.4f K\n",system.constants.temp, system.stats.temperature.average, system.stats.temperature.sd, Temp);
-            printf("KE: %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
+            printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
+            if (system.constants.ensemble == ENSEMBLE_NVT) printf("        Input T = %.4f K\n", system.constants.temp); 
+            printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
+            printf("Instantaneous T = %.4f K\n", Temp);
+            printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
                   KE, Klin, Krot );
-            printf("PE: %.3f kJ/mol; Total E: %.3f kJ/mol; \n",
-                  PE, TE
+            printf("     PE = %.3f kJ/mol\n",
+                  PE
                   );
-            printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure avg: %.3f +- %.3f atm (I.G. approx)\n",
+            printf("Total E = %.3f kJ/mol\n", TE);
+            printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
                 v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
             // hiding specific heat until i make sure it's right.
             //printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );

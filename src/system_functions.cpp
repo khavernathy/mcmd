@@ -378,8 +378,8 @@ void moleculePrintout(System &system) {
             system.proto[i].PDBID = last_mol_pdbid+1;
             system.proto[i].frozen = 0;
 
-            std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
-            // each call takes 12 arguments
+            //std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
+            // each call takes 12 arguments which correspond to PDB-style input
             // HYDROGEN H2
             if (sorbmodel == "h2_buch") {
                 addAtomToProto(system, i, "H2G", "H2", "M", 0.0, 0.0, 0.0, 2.016, 0.0, 0.0, 34.2, 2.96);
