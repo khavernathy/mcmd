@@ -55,6 +55,7 @@ The program outputs several quantities of interest:<br />
 MCMD works out-of-the-box on Linux (tested on Ubuntu 16.04) and Mac (tested on OS X El Capitan v10.11.6).<br />
 We recommend Visual Molecular Dynamics for data visualization, but the output is compatible with most other software<br />
 
+<!--
 # TODO
 -> MC: add "desired N" option to fill a system until a desired N is reached (accelerate uptake), then do NVT<br />
 -> MC: speed up by adjusting energy by the 1 particle that is changed.<br /> 
@@ -74,3 +75,4 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MC/MD: crystal builder (expand the unit cell dynamically by user input)<br />
 -> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
 -> MC/MD: multi-sorbate histograms<br />
+-->
