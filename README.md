@@ -25,7 +25,7 @@ Douglas Franz: dfranz@mail.usf.edu
 # Features
 MCMD has several features that make simulation easier for the user:<br />
 &emsp;-> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
-&emsp;-> MD supports NVT.  <br />
+&emsp;-> MD supports NVT and NVE.  <br />
 &emsp;->Automatic radial distribution calculator<br />
 &emsp;->Pre-programmed sorbate models for easy input, including multi-sorbate support<br />
 &emsp;->Easy system basis parametrization via a,b,c,alpha,beta,gamma crystal values<br />
