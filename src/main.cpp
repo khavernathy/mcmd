@@ -88,7 +88,8 @@ int main(int argc, char **argv) {
     setupFugacity(system);
     initialize(system); // these are just system name sets,
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 336); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 407); // i.e. github commit
+    inputValidation(system);
     system.checkpoint("Done with system setup functions.");
 
     // compute inital COM for all molecules, and moment of inertia

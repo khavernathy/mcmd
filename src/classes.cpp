@@ -137,7 +137,7 @@ class Constants {
 // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
 		int stepsize=1; // obvi
-        int finalstep; // user defined for MC
+        int finalstep=-1; // user defined for MC. Will error-out if not given in MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
         int currentprotoid=0; // for getting fugacity for the boltzmann factor.
@@ -203,7 +203,7 @@ class Pbc {
         double reciprocal_basis[3][3];
 		double cutoff=0.;
         double volume, inverse_volume, old_volume;
-        double a, b, c, alpha, beta, gamma;
+        double a=0, b=0, c=0, alpha=0, beta=0, gamma=0;
         double box_vertices[8][3];
         double A[6], B[6], C[6], D[6]; // these are coefficients for plane equations for PBC
             /* structure of box_points
