@@ -304,7 +304,9 @@ void integrate(System &system, double dt) {
 	calculateForces(system, dt);
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
-	for (j=0; j<system.molecules.size(); j++) {
+	// Normal CPU routine
+    //if (!system.constants.cuda) {
+    for (j=0; j<system.molecules.size(); j++) {
 		if (!system.molecules[j].frozen) { // only movable atoms should move.
 
             // if atoms allowed to move from molecules
@@ -328,6 +330,13 @@ void integrate(System &system, double dt) {
             }
         } // end if movable
     } // end for j molecules
+    //}
+    // CUDA GPU style
+    //else {
+     //   #ifdef CUDA
+      //  CUDA_verlet(system);
+       // #endif
+    //}
 
     // 5) apply heat bath in NVT
     if (system.constants.ensemble == ENSEMBLE_NVT) {

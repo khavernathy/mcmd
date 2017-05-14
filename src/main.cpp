@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.stats.radial_file.c_str() ); remove( system.constants.output_histogram.c_str() );
 	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
-    remove( system.constants.restart_mov_pdb.c_str() );
+    remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
 
     // INITIAL WRITEOUTS
     // Prep thermo output file
@@ -546,6 +546,9 @@ int main(int argc, char **argv) {
             if (system.constants.md_pbc) {
                 printf("Diffusion coefficient = %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.value, system.proto[0].name.c_str());
 			}
+            printf("Root mean square displacement: %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+                
+
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
             printf("--------------------\n\n");
 
