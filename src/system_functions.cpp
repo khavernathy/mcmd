@@ -394,9 +394,9 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "H2";
             }
             else if (sorbmodel == "h2_dl") {
-                addAtomToProto(system, i,"H2G", "H2", "M", 0.00, 0.0, 0.0, -0.93600, 0.0, 36.7, 2.958, 0.0);
+                addAtomToProto(system, i,"H2G", "H2", "M", 0.00, 0.0, 0.0,   0.0, -0.93600, 0.0, 36.7, 2.958);
                 addAtomToProto(system, i,"H2E", "H2", "M", -0.370, 0.0, 0.0, 1.008, 0.468, 0.0, 0.0, 0.0);
-                addAtomToProto(system, i,"H2E", "H2", "M", 0.370, 0.0, 0.0, 1.008, 0.468, 0.0, 0.0, 0.0);
+                addAtomToProto(system, i,"H2E", "H2", "M", 0.370, 0.0, 0.0,  1.008, 0.468, 0.0, 0.0, 0.0);
                 system.proto[i].name = "H2";
             }
             else if (sorbmodel == "h2_bssp") {
