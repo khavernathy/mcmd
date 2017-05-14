@@ -202,9 +202,11 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                     atomicAdd(&(atom_list[j].f[n]), -holder);                
                 }
             } else if (anchoratom.molid == atom_list[j].molid && i != j) { // intramolecular interaction
-                holder = -((chargeprod*erf(alpha*r))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*r*r)/(sqrtPI*r)))*u[n];
-                af[n] += holder;
-                atomicAdd(&(atom_list[j].f[n]), -holder);
+                for (n=0;n<3;n++) {
+                    holder = -((chargeprod*erf(alpha*r))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*r*r)/(sqrtPI*r)))*u[n];
+                    af[n] += holder;
+                    atomicAdd(&(atom_list[j].f[n]), -holder);
+                }
             }
 
             } // end pair loop j 
