@@ -192,7 +192,7 @@ void coulombic_real_force(System &system) {
         rsq = r*r;
         for (int n=0; n<3; n++) u[n] = distances[n]/r;
 
-        if (r < system.pbc.cutoff && (i < k)) { // only pairs and not beyond cutoff
+        if (r <= system.pbc.cutoff && (i < k)) { // non-duplicated pairs only, not intramolecular and not beyond cutoff
             erfc_term = erfc(alpha*r);
             for (int n=0; n<3; n++) {
                 holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*r*r))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];

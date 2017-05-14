@@ -6,7 +6,7 @@ checkpoints_option  off
        
 input_atoms ../../../atomfiles/MPM-1-Br+57CO2_PHAST.pdb   ! PDB ONLY       
 
-potential_form        lj      !ljespolar       
+potential_form        ljes      !ljespolar       
 com_option            off     ! center of mass        
  
 

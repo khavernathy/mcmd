@@ -47,7 +47,7 @@ typedef struct molecule_t {
 */
 
 __global__
-void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * basis, double * reciprocal_basis, int pform) {
+void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * basis, double * reciprocal_basis, int pform, double ewald_alpha) {
     // define thread id
     int i = threadIdx.x + blockDim.x * blockIdx.x;
     register cuda_atom anchoratom = atom_list[i];
@@ -56,6 +56,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
     if(i<N){   
         //printf("I AM THREAD %i\n", i);
         //atom_list[i].pos[0] += cutoff;
+        const double alpha = ewald_alpha;
         register double rimg, rsq;
         const double sqrtPI=sqrt(M_PI);
         double d[3], di[3], img[3], dimg[3],r,r2,ri,ri2;
@@ -63,7 +64,8 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
         double sig,eps,r6,s6,f[3]={0,0,0},u[3]={0,0,0};
         //int count=0;
         register double af[3] = {0,0,0}; // accumulated forces for anchoratom
-            //printf("basis[3] = %f\n", basis[3]);
+        double holder,erfc_term,chargeprod; // for ES force    
+        //printf("basis[3] = %f\n", basis[3]);
         __syncthreads();
         // order N instead of N^2 bc this runs on all GPU cores at once (basically)
 
@@ -149,9 +151,67 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
         // ==============================================================================
         // Now handle electrostatics
         if (pform == 1) {
+            for (n=0;n<3;n++) af[n]=0; // reset register-stored force for anchoratom.
+           for (j=0;j<N;j++) {
+                if (i==j) continue; // don't do atom with itself
+                if (anchoratom.frozen && atom_list[j].frozen) continue; // don't do frozen pairs
+                if (anchoratom.charge == 0 && atom_list[j].charge == 0) continue; // skip 0-force
+
+                chargeprod = anchoratom.charge * atom_list[j].charge;
+            
+
+               // get R (nearest image)
+            for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
+            for (p=0;p<3;p++) {
+                img[p]=0;
+                for (q=0;q<3;q++) {
+                    img[p] += reciprocal_basis[p*3+q]*d[q];
+                }
+                img[p] = rint(img[p]);
+            }
+            for (p=0;p<3;p++) {
+                di[p] = 0;
+                for (q=0;q<3;q++) {
+                    di[p] += basis[p*3+q]*img[q];
+                }
+            }
+            for (p=0;p<3;p++) di[p] = d[p] - di[p];
+            r2=0;ri2=0;
+            for (p=0;p<3;p++) {
+                r2 += d[p]*d[p];
+                ri2 += di[p]*di[p];
+            }
+            r = sqrt(r2);
+            ri = sqrt(ri2);
+            if (ri != ri) {
+                rimg=r;
+                for (p=0;p<3;p++) dimg[p] = d[p];
+            } else {
+                rimg=ri;
+                for (p=0;p<3;p++) dimg[p] = di[p];
+            }
+
+            rsq=rimg*rimg;
             for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
 
-        }
+            if (r <= cutoff && (anchoratom.molid < atom_list[j].molid)) { // non-duplicated pairs, not intramolecular, not beyond cutoff
+                erfc_term = erfc(alpha*r);
+                for (n=0;n<3;n++) {
+                    holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*r*r))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
+                    af[n] += holder;
+                    atomicAdd(&(atom_list[j].f[n]), -holder);                
+                }
+            } else if (anchoratom.molid == atom_list[j].molid && i != j) { // intramolecular interaction
+                holder = -((chargeprod*erf(alpha*r))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*r*r)/(sqrtPI*r)))*u[n];
+                af[n] += holder;
+                atomicAdd(&(atom_list[j].f[n]), -holder);
+            }
+
+            } // end pair loop j 
+
+            // finally add ES contribution to anchor-atom
+            for (n=0;n<3;n++) atomicAdd(&(atom_list[i].f[n]), af[n]);
+        } // end ES component
 
         //if (i==0) printf("COUNT: %i\n",count);
     } // end if i<n (all threads)
@@ -294,7 +354,7 @@ void CUDA_force(System &system) {
     if (theval == POTENTIAL_LJES || theval == POTENTIAL_LJESPOLAR)
         pform=1;
 
-    calculateForceKernel<<< dimGrid, dimBlock >>>(D,N,system.pbc.cutoff, dbasis, dreciprocal_basis, pform);
+    calculateForceKernel<<< dimGrid, dimBlock >>>(D,N,system.pbc.cutoff, dbasis, dreciprocal_basis, pform, system.constants.ewald_alpha);
     // make sure the threads are synced so we don't overflow
     cudaThreadSynchronize();
     // copy device data back to host
