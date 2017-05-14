@@ -1,10 +1,10 @@
 ! Douglas Franz, Space group, USF      
 name              mcmd_development        
 mode              md ! mc or md       
-cuda                on
+cuda                off
 checkpoints_option  off       
        
-input_atoms ../../atomfiles/MPM-1-Br+46Ne.pdb   ! PDB ONLY       
+input_atoms ../../../atomfiles/MPM-1-Br+46Ne.pdb   ! PDB ONLY       
 
 potential_form        lj      !ljespolar       
 com_option            off     ! center of mass        
@@ -32,6 +32,6 @@ md_pbc              on
 md_dt             2  ! fs       
 md_ft             2000000  ! fs        
 md_corrtime       200     ! steps        
-!md_init_vel         0    ! A / fs^2      
+!md_init_vel         0.00604    ! A / fs^2      
 md_mode             molecular      !atomic        
 md_rotations        off

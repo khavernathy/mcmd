@@ -43,7 +43,8 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
         register double rimg, rsq;
         double d[3], di[3], img[3], dimg[3],r,r2,ri,ri2;
         int p,q,j,n;
-        double sig,eps,r6,s6,u[3],f[3]={0,0,0};
+        double sig,eps,r6,s6,f[3]={0,0,0};//u[3];
+        //int count=0;
         //register double af[3] = {0,0,0}; // accumulated forces
             //printf("basis[3] = %f\n", basis[3]);
         __syncthreads();
@@ -58,6 +59,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                 img[p]=0;
                 for (q=0;q<3;q++) {
                     img[p] += reciprocal_basis[p*3+q]*d[q];
+                    //if (i==0 && j==1188) printf("img[%i] = reciprocal_basis[%i]*d[%i] = %f\n",p,p*3+q,q,reciprocal_basis[p*3+q]*d[q]);
                 }
                 img[p] = rint(img[p]);
             }
@@ -83,11 +85,20 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                 for (p=0;p<3;p++) dimg[p] = di[p];
             }
             // distance is now rimg
-            //printf("r[%i] = %f\n", i,rimg);
+               
+            //if (i==0) {
+              //  printf("r[%i].%i = %f\n", i,j,rimg);
+                //printf("CUTOFF: %f\n", cutoff);
+                //for (int h=0;h<9;h++) {
+                  //  printf("basis[%i] = %f\n", h, basis[h]);
+                //}
+            //}
+            
             rsq=rimg*rimg;
 
             // 0 is LJ, 1 is LJ+ES
             if (pform == 0 || pform == 1) {
+                //if (i==0) printf("hi\n");
                 sig = anchoratom.sig;
                 if (sig != atom_list[j].sig) sig = 0.5*(sig+atom_list[j].sig);
                 eps = anchoratom.eps;
@@ -99,24 +110,27 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                 s6 = sig*sig;
                 s6 *= s6 * s6;
 
-                if (r <= cutoff) {
+                if (rimg <= cutoff) {
                     for (n=0;n<3;n++) {
                         f[n] = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                         atomicAdd(&(atom_list[j].f[n]), -f[n]);       
                         atomicAdd(&(atom_list[i].f[n]), f[n]);
                         //af[n] += f[n];
                     }
+                    //if (i==0) count++;
+
                 }
 
             }
             if (pform == 1) {
-                for (n=0;n<3;n++) u[n] = dimg[n]/r;
+                //for (n=0;n<3;n++) u[n] = dimg[n]/r;
             }     
 
 
             //__syncthreads();
         } // end pair j
 
+        //if (i==0) printf("COUNT: %i\n",count);
     } // end if i<n (all threads)
 }
 
@@ -153,8 +167,8 @@ void CUDA_force(System &system) {
 
     for (int p=0;p<3;p++) {
         for (int q=0;q<3;q++) {
-            basis[3*p+q] = system.pbc.basis[p][q];
-            reciprocal_basis[3*p+q] = system.pbc.reciprocal_basis[p][q];
+            basis[3*q+p] = system.pbc.basis[p][q]; // quite sure correct.
+            reciprocal_basis[3*q+p] = system.pbc.reciprocal_basis[p][q]; // quite sure correct.
         }
     }
     //system.pbc.printBasis();
@@ -197,7 +211,7 @@ void CUDA_force(System &system) {
         }
     }
 
-    printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
+    //printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
  
 
      cudaFree(D);

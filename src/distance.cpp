@@ -20,6 +20,7 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
             img[p] = 0;
             for (q=0; q<3; q++) {
                 img[p] += system.pbc.reciprocal_basis[q][p]*d[q];
+                //if (i==0 && j==0 && k==1 && l==0) printf("img[%i] = reciprocal_basis[%i][%i]*d[%i] = %f\n",p,q,p,q,system.pbc.reciprocal_basis[q][p]*d[q]);
             }
             img[p] = rint(img[p]);
         }

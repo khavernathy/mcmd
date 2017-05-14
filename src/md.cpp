@@ -179,10 +179,10 @@ void calculateForces(System &system, double dt) {
             coulombic_real_force(system);
         if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
             polarization_force(system);
-            int index=0;
+            //int index=0;
             //for (int i=0;i<system.molecules.size();i++)
               //  for (int j=0;j<system.molecules[i].atoms.size();j++){
-                    //printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
+           //         printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
                 //    index++;
                 //}
             

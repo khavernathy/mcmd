@@ -232,7 +232,10 @@ void lj_force(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];    
-        //printf("r[%i] = %f\n",index, r);
+        //if (i==0 && j==0) {
+            //printf("r[%i].%i.%i = %f\n",0,k,l, r);
+            //printf("CUTOFF: %f\n", system.pbc.cutoff);
+        //}
         rsq=r*r;
         for (int n=0; n<3; n++) d[n] = distances[n];
 
@@ -248,11 +251,14 @@ void lj_force(System &system) {
                 */
             
         if ((!system.constants.rd_lrc || r <= cutoff)) {
+        //if (r <= cutoff) {
             for (int n=0; n<3; n++) {
                 f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                 system.molecules[i].atoms[j].force[n] += f[n];
                 system.molecules[k].atoms[l].force[n] -= f[n];
             }
+            //if (i==0 && j==0) count++;
+
 
 /*
             // this dot product is calc'd to get pressure.
@@ -273,6 +279,7 @@ void lj_force(System &system) {
     } //loop j
     } // loop i
     // DONE WITH PAIR INTERACTIONS
+    //printf("COUNT: %i\n", count);
 }
 
 void lj_force_nopbc(System &system) {
