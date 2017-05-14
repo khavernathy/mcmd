@@ -119,7 +119,7 @@ class Constants {
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. (mostly UFF). Defined below
 		map <string,double> eps; // LJ epsions database for defaults. (mostly UFF). Defined lated
-
+        map <string,double>UFF4MOFsigs; // UFF4MOF sigma params. http://pubs.acs.org.ezproxy.lib.usf.edu/doi/pdf/10.1021/acs.jctc.6b00664
 		map <string,double> phast2_c6; map <string,double> phast2_c8; map <string,double> phast2_c10; map <string,double> phast2_sigs; map <string,double> phast2_eps; map <string,double> phast2_polar; // phast2 defaults
 		map <string,double> polars; // polarizability database for defaults. Mostly vanD. Defined below
         int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
@@ -1031,6 +1031,9 @@ sigs["Fm"] = 3.286*uff2mpmc;
 sigs["Md"] = 3.274*uff2mpmc;
 sigs["No"] = 3.248*uff2mpmc;
 sigs["Lr"] = 3.236*uff2mpmc; 
+
+    // UFF4MOF sigs
+    // nevermind, they only give bonding parameters.
 
 
 	// LJ EPSILON VALUES ( /kbk means kcal/mol -> K)
