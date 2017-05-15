@@ -1,4 +1,6 @@
 #md_test
+*.agr
+*.py
 md_test/h2mof5
 md_test/h2mof5/*
 frozen*

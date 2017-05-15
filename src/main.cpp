@@ -544,9 +544,9 @@ int main(int argc, char **argv) {
             // hiding specific heat until i make sure it's right.
             //printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
             if (system.constants.md_pbc) {
-                printf("Diffusion coefficient = %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.value, system.proto[0].name.c_str());
+                printf("Diffusion coefficient =   %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.value, system.proto[0].name.c_str());
 			}
-            printf("Mean square displacement: %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+            printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
                 
 
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);

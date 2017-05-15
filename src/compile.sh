@@ -47,6 +47,8 @@ if [[ "$option" == "cpu" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
     elif [[ "$2" == "linux" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
+    elif [[ "$2" == "old" ]]; then
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
     fi
