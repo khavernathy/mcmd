@@ -546,7 +546,7 @@ int main(int argc, char **argv) {
             if (system.constants.md_pbc) {
                 printf("Diffusion coefficient = %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.value, system.proto[0].name.c_str());
 			}
-            printf("Root mean square displacement: %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+            printf("Mean square displacement: %.5f A^2\n", diffusion_sum/system.stats.count_movables);
                 
 
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
