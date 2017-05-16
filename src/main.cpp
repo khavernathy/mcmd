@@ -53,17 +53,28 @@ int main(int argc, char **argv) {
     // set the default MPI params
     int rank=0, size=1;
     
-    // MPI setup
-    #ifdef MPI
-        MPI_Init(&argc, &argv);
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        MPI_Comm_size(MPI_COMM_WORLD, &size);
-    #endif 
+       // MPI setup
+        #ifdef MPI
+         MPI_Init(&argc, &argv);
+         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+         MPI_Comm_size(MPI_COMM_WORLD, &size);
+         char processor_name[MPI_MAX_PROCESSOR_NAME];
+         int name_len;
+         MPI_Get_processor_name(processor_name, &name_len);
+         // Print off a hello world message
+         printf("Hello world from processor %s, rank %d"
+                " out of %d processors\n",
+                processor_name, rank, size);
+        #endif
+         // suffix for filenames for each core running (if MPI)
+         string rankstring = to_string(rank);
+        // suffix is, e.g. -00004 for 5th core; -01000 for 1001st core
+        std::string corenum = std::string(5 - rankstring.length(), '0') + rankstring;
+        char suffix[7] = "-";
+        std::strcat(suffix,corenum.c_str());
+        printf("suffix: %s\n", suffix); 
     
-    
-    
-
-    // output current date/time
+    //output current date/time
     time_t rawtime;
     struct tm * timeinfo;
     char buffer[80];
