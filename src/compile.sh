@@ -78,5 +78,5 @@ elif [[ "$option" == "icpu" ]]; then
 
 elif [[ "$option" == "mpi" ]]; then
     # MPI compilation
-    mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast
+    mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
 fi
