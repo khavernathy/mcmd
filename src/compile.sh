@@ -58,7 +58,7 @@ elif [[ "$option" == "gpu" ]]; then
     echo "Doing serial GCC (1 processor) compilation including CUDA GPU routines"
     if [[ "$2" == "circe" ]]; then
         module purge
-        module load compilers/gcc/6.2.0
+        module load compilers/gcc/4.9.4 # CUDA 7.5 not compatible with gcc > 5.0
         module load apps/cuda/7.5
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     else
