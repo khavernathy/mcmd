@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
         std::string corenum = std::string(5 - rankstring.length(), '0') + rankstring;
         char suffix[7] = "-";
         std::strcat(suffix,corenum.c_str());
-        printf("suffix: %s\n", suffix); 
+        //printf("suffix: %s\n", suffix); 
     
     //output current date/time
     time_t rawtime;
