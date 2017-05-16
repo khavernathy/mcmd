@@ -774,22 +774,21 @@ class Molecule {
 
         void calc_center_of_mass() {
             // assigns the current center of mass of the molecule based on positions of atoms
-            double x_mass_sum=0.0; double y_mass_sum=0.0; double z_mass_sum=0.0; double mass_sum=0.0;
+            double x_mass_sum=0.0; double y_mass_sum=0.0; double z_mass_sum=0.0;// double mass_sum=0.0;
 
             for (int i=0; i<atoms.size(); i++) {
                 double atom_mass = atoms[i].m;
-                mass_sum += atom_mass;
+                //mass_sum += atom_mass;
 
                 x_mass_sum += atoms[i].pos[0]*atom_mass;
                 y_mass_sum += atoms[i].pos[1]*atom_mass;
                 z_mass_sum += atoms[i].pos[2]*atom_mass;
             }
 
-            double comx = x_mass_sum/mass_sum;
-            double comy = y_mass_sum/mass_sum;
-            double comz = z_mass_sum/mass_sum;
+            com[0] = x_mass_sum/mass;//_sum;
+            com[1] = y_mass_sum/mass;//_sum;
+            com[2] = z_mass_sum/mass;//_sum;
 
-            com[0] = comx; com[1] = comy; com[2] = comz;
         }
 
         void calc_torque() {
