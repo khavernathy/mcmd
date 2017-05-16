@@ -523,8 +523,9 @@ int main(int argc, char **argv) {
             } else {
                 outputTime = t; timeunit="fs";
             }
-
-            printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
+            
+            if (system.constants.cuda) printf("MCMD (CUDA) Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
+            else printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             //printf("testing angular velocity\n");
             printf("Ensemble: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
