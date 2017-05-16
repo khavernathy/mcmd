@@ -27,6 +27,9 @@
 
 // c++ code files of this program
 // ORDER MATTERS HERE
+#ifdef MPI
+    #include <mpi.h>
+#endif
 #include "usefulmath.cpp"
 #include "classes.cpp"
 #include "system.cpp"
@@ -46,7 +49,20 @@
 using namespace std;
 
 int main(int argc, char **argv) {
+   
+    // set the default MPI params
+    int rank=0, size=1;
     
+    // MPI setup
+    #ifdef MPI
+        MPI_Init(&argc, &argv);
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+    #endif 
+    
+    
+    
+
     // output current date/time
     time_t rawtime;
     struct tm * timeinfo;

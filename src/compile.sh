@@ -22,15 +22,16 @@ echo "This should take like 10 sec."
 DEFAULT="cpu"
 
 if [ $# -eq 0 ]; then # IF NO ARGUMENT GIVEN
-option=$DEFAULT   # MANUAL OPTION (only reads if no argument given)
+    option=$DEFAULT   # MANUAL OPTION (only reads if no argument given)
 elif [ $1 == "cpu" ]; then
-option="cpu"
+    option="cpu"
 elif [ $1 == "gpu" ]; then
-option="gpu";
+    option="gpu";
+elif [ $1 == "mpi" ]; then
+    option="mpi"
 else
 echo "Invalid options detected. Not compiling. Read the header comments for compilation examples."
 fi
-
 
 if [[ "$option" == "cpu" ]]; then
     # THIS IS FOR SERIAL COMPILATION (1 CPU ONLY, NO GPU)
@@ -47,7 +48,7 @@ if [[ "$option" == "cpu" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
     elif [[ "$2" == "linux" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
-    elif [[ "$2" == "old" ]]; then
+    elif [[ "$2" == "O3" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
@@ -74,4 +75,8 @@ elif [[ "$option" == "icpu" ]]; then
     else
         icpc --std=c++11 -fast -unroll-aggressive -O3 -o ../mcmd main.cpp
     fi
+
+elif [[ "$option" == "mpi" ]]; then
+    # MPI compilation
+    mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast
 fi
