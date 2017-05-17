@@ -78,8 +78,9 @@ elif [[ "$option" == "icpu" ]]; then
 
 elif [[ "$option" == "mpi" ]]; then
     # MPI compilation
-    echo "Doing MPI compilation (for parallel implementation)"
-    mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
+    echo "MPI is not implemented in MCMD as of now."
+    #echo "Doing MPI compilation (for parallel implementation)"
+    #mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
 fi
 
 echo "...done"
