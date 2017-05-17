@@ -50,6 +50,8 @@ using namespace std;
 
 int main(int argc, char **argv) {
    
+        /*
+        // MPI is on hold for now.
         // set the default MPI params
         int rank=0, size=1;
     
@@ -73,7 +75,8 @@ int main(int argc, char **argv) {
         char suffix[7] = "-";
         std::strcat(suffix,corenum.c_str());
         //printf("suffix: %s\n", suffix); 
-    
+        */    
+
     //output current date/time
     time_t rawtime;
     struct tm * timeinfo;
