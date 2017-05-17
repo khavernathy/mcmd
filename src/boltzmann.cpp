@@ -14,10 +14,20 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     double energy_delta = e_f - e_i;
     double fugacity;
 
+    // determine fugacity
     if (system.proto.size() == 1 && system.constants.sorbate_name.size() == 0 && system.constants.fugacity_single == 0) fugacity = system.constants.pres;
     else if (system.constants.fugacity_single == 1) fugacity = system.proto[0].fugacity;
     else fugacity = system.proto[system.constants.currentprotoid].fugacity;
 
+    // check for N bias (loading bias)
+    if (system.constants.bias_uptake_switcher) {
+        if ((double)system.stats.count_movables < system.constants.bias_uptake)
+            fugacity = 1e4; // big, but not too big, for biased insertions
+        else {
+            system.constants.bias_uptake_switcher=0; // done biasing if we exceed the bias-N
+            printf("Loading bias deactivated! (Desired N reached).\n");
+        }       
+    }
       //printf("fugac: %f\n", fugacity);
 
     if (system.constants.ensemble == ENSEMBLE_UVT) {

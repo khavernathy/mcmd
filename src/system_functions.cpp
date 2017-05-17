@@ -858,10 +858,51 @@ void setupFugacity(System &system) {
     }
     
     for (int i=0; i<system.proto.size(); i++) {
-        printf("INPUT: Calculated fugacity for prototype %i ( %s ) = %f atm\n", i, system.proto[i].name.c_str(), system.proto[i].fugacity);
+        printf("Calculated fugacity for prototype %i ( %s ) = %f atm\n", i, system.proto[i].name.c_str(), system.proto[i].fugacity);
     }
 
     return;
 
 
+}
+
+void setupNBias(System &system) {
+    // lots of messy math here but all I'm doing is converting
+    // various units to N_molecules. Thus IDC it's messy.
+    
+    // frozen atoms total mass
+    // this is the first time the program sets it
+    for (int c=0; c<system.molecules.size();c++) {
+        for (int d=0; d<system.molecules[c].atoms.size(); d++) {
+            double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
+            if (system.molecules[c].frozen) system.stats.frozenmass.value += thismass;
+        }
+    }
+    
+
+    string unit = system.constants.bias_uptake_unit;
+    double x = system.constants.bias_uptake;
+    double thevalue=0; // converted to N for safekeeping
+    if (unit == "N" || unit == "") {
+        thevalue = x;
+    } else if (unit == "wt%") { 
+        thevalue = (-x*system.stats.frozenmass.value/1000.) / system.proto[0].mass / (x/100. -1) / 100.;
+    } else if (unit == "wt%ME") {
+        thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000/10*100;
+    //} else if (unit == "excmg/g") {
+    //    double mm=system.proto[0].mass*1000*system.constants.NA;
+    //    double frozmm=system.stats.frozenmass.value*system.constants.NA;
+    //    thevalue = (((x*frozmm)/1000.) + (mm*system.constants.free_volume*system.proto[0].fugacity*system.constants.ATM2REDUCED)/system.constants.temp)/mm;   
+    } else if (unit == "cm^3/g") {
+        thevalue = x * system.stats.frozenmass.value * system.constants.NA / 1000. / 22.4;
+        //thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000 / (system.proto[0].mass*1000*system.constants.NA) * 22.4;
+    } else if (unit == "mmol/g") {
+        thevalue = x*system.stats.frozenmass.value*system.constants.NA/1000;
+        //thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000 / (system.proto[0].mass * 1000 * system.constants.NA);
+    } else if (unit == "mg/g") {
+        thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000;
+    }
+
+    system.constants.bias_uptake = thevalue;
+    printf("Calculated bias-uptake goal-N = %f molecules (in the box) from %f %s\n", thevalue, x, unit.c_str());
 }

@@ -50,8 +50,8 @@ using namespace std;
 
 int main(int argc, char **argv) {
    
-    // set the default MPI params
-    int rank=0, size=1;
+        // set the default MPI params
+        int rank=0, size=1;
     
        // MPI setup
         #ifdef MPI
@@ -113,6 +113,8 @@ int main(int argc, char **argv) {
         allocate_histogram_grid(system);
     }
     setupFugacity(system);
+    if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
+        setupNBias(system);
     initialize(system); // these are just system name sets,
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
     printf("VERSION NUMBER: %i\n", 407); // i.e. github commit
@@ -251,7 +253,12 @@ int main(int argc, char **argv) {
             double efficiency = system.stats.MCeffRsq / time_elapsed;
 
 			// PRINT MAIN OUTPUT
-			printf("MCMD Monte Carlo: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
+            if (system.constants.ensemble == ENSEMBLE_UVT && system.constants.bias_uptake_switcher)
+                printf("MCMD Monte Carlo: %s (%s): Loading bias (%s)\n", system.constants.jobname.c_str(), argv[1], "on");
+            else if (system.constants.ensemble == ENSEMBLE_UVT && !system.constants.bias_uptake_switcher)
+                printf("MCMD Monte Carlo: %s (%s): Loading bias (%s)\n", system.constants.jobname.c_str(), argv[1], "off");
+            else
+			    printf("MCMD Monte Carlo: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             if (!system.constants.simulated_annealing)
 			    printf("Ensemble: %s; T = %.3f K\n", system.constants.ensemble_str.c_str(), system.constants.temp);
@@ -326,7 +333,6 @@ int main(int argc, char **argv) {
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
             }
-
             printf("--------------------\n\n");
 
             // CONSOLIDATE ATOM AND MOLECULE PDBID's
@@ -579,6 +585,8 @@ int main(int argc, char **argv) {
 
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
             printf("--------------------\n\n");
+
+
 
             // WRITE OUTPUT FILES
             if (system.constants.xyz_traj_option)

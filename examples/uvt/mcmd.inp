@@ -9,7 +9,8 @@ free_volume         11595.4
 
 potential_form 		ljespolar
 xyz_traj_option     off
-sorbate_name        c2h2*
+sorbate_name        h2_bssp
+fugacity_single     h2
 
 carbasis 27.934 27.934 41.081 90 90 90
 !carbasis 47.005 47.005 47.005 90 90 90
@@ -20,15 +21,16 @@ radial_centroid     Cu
 radial_counterpart  H2G
 
 ensemble		    uvt
-mc_corrtime	        10
-finalstep		    100
-temperature         298 	    
+mc_corrtime	        100
+finalstep		    100000
+temperature         77  
 pressure            1.0
 insert_factor		0.667
 displace_factor     2.5
 rotate_angle_factor 360.0
 
-!feynman_hibbs on
-!fh_order 4
+feynman_hibbs on
+fh_order 4
 
-
+bias_uptake 2.6 wt% 
+auto_reject_r 1.5

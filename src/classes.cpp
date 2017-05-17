@@ -135,6 +135,11 @@ class Constants {
         double displace_factor=2.5; // up to +- this number in A
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
 // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
+        
+        double bias_uptake =0; // to accelerate uVT MC. User-defined. This will be converted to N before running MC
+        string bias_uptake_unit="N"; // units for bias. Default N_movables
+        int_fast8_t bias_uptake_switcher=0;
+
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
 		int stepsize=1; // obvi
         int finalstep=-1; // user defined for MC. Will error-out if not given in MC
@@ -189,7 +194,7 @@ class Constants {
         int_fast8_t auto_reject=0; // on or off (for an individual step!). will go on if auto_reject_r is triggered
         int rejects=0; // counter
 
-        int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS
+        int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS (MD only)
         int cuda_block_size = 256; // this was the best of a test of 32,64,128,256 on a project from class I took. Can play with this to see how it changes perf.
 };
 

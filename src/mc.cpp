@@ -42,7 +42,7 @@ void runMonteCarloStep(System &system) {
 			// we're going to do an add/remove now.
 			double ranf2 = (double)rand() / (double)RAND_MAX; // 0->1
 			// ADD A MOLECULE
-			if (ranf2 < 0.5) {
+			if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.
                 system.checkpoint("doing molecule add move.");
 				addMolecule(system);
                 system.checkpoint("done with molecule add move.");

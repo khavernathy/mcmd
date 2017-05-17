@@ -701,6 +701,12 @@ void readInput(System &system, char* filename) {
                     system.constants.ensemble_str = "NPT";
                 }
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "bias_uptake")) {
+                system.constants.bias_uptake = atof(lc[1].c_str());
+                system.constants.bias_uptake_unit = lc[2];
+                system.constants.bias_uptake_switcher=1;
+                std::cout << "Got uptake bias = " << lc[1].c_str() << " " << lc[2].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "sorbate_name")) {
                 system.constants.sorbate_name.push_back(lc[1].c_str());
@@ -1244,16 +1250,14 @@ void inputValidation(System &system) {
         std::cout << "You didn't supply a basis to build the box. Even simulations with no PBC need a box." << endl;
         exit(EXIT_FAILURE);
     }
-
-
-
-
-
-
-
-
-
-
+    if (system.constants.mode != "md" && system.constants.cuda) {
+        std::cout << "CUDA was enabled but simulation mode is not MD. CUDA can only be enabled with MD.";
+        exit(EXIT_FAILURE);
+    }
+    if (system.constants.bias_uptake != 0 && (system.constants.ensemble != ENSEMBLE_UVT || system.constants.mode != "mc" || system.proto.size() > 1)) {
+        std::cout << "Uptake bias option was used but single-sorbate uVT MC is not set.";
+        exit(EXIT_FAILURE);
+    }
 
 }
 // end input validation function

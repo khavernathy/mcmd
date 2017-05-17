@@ -251,7 +251,6 @@ void computeAverages(System &system) {
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
             system.stats.wtp[i].calcNewStats();
             system.stats.wtpME[i].calcNewStats();
-
             
             double mm = system.proto[i].mass * 1000 * system.constants.NA; // molar mass
             double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
