@@ -14,7 +14,7 @@
 # bash compile.sh cpu bridges   (for bridges)
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
 # bash compile.sh gpu           (for a single computer with GPU functions with NVIDIA CUDA installed).
-# bash compile.sh gpu circe     (GPU on circe, still not working)
+# bash compile.sh gpu circe     (CUDA GPU on circe)
 ##########################
 echo "This should take like 10 sec."
 
