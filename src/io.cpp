@@ -681,8 +681,11 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "cuda")) {
                 if (lc[1] == "on")
                     system.constants.cuda = 1;
-
                 std::cout << "Got CUDA option = " << lc[1].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "cuda_block_size")) {
+                system.constants.cuda_block_size = atoi(lc[1].c_str());
+                std::cout << "Got cuda block size (threads per block) = " << lc[1].c_str(); printf("\n");
+
 			} else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
                 if (lc[1] == "nvt") {
                     system.constants.ensemble = ENSEMBLE_NVT;
