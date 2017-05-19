@@ -47,24 +47,26 @@ typedef struct molecule_t {
 */
 
 __global__
-void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * basis, double * reciprocal_basis, int pform, double ewald_alpha) {
+void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double * basis, double * reciprocal_basis, int pformD, double ewald_alpha) {
     // define thread id
     int i = threadIdx.x + blockDim.x * blockIdx.x;
-    register cuda_atom anchoratom = atom_list[i];
 
     // only run for real atoms (no ghost threads)
     if(i<N){   
+        const register cuda_atom anchoratom = atom_list[i];
         //printf("I AM THREAD %i\n", i);
         //atom_list[i].pos[0] += cutoff;
-        const double alpha = ewald_alpha;
+       const int pform = pformD;
+         const double alpha = ewald_alpha;
+        const double cutoff=cutoffD;
         register double rimg, rsq;
         const double sqrtPI=sqrt(M_PI);
         double d[3], di[3], img[3], dimg[3],r,r2,ri,ri2;
-        int p,q,j,n;
-        double sig,eps,r6,s6,f[3]={0,0,0},u[3]={0,0,0};
+        int q,j,n;
+        double sig,eps,r6,s6,u[3]={0,0,0};
         //int count=0;
         register double af[3] = {0,0,0}; // accumulated forces for anchoratom
-        double holder,erfc_term,chargeprod; // for ES force    
+        double holder,chargeprod; // for ES force    
         //printf("basis[3] = %f\n", basis[3]);
         __syncthreads();
         // order N instead of N^2 bc this runs on all GPU cores at once (basically)
@@ -74,36 +76,41 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
         for (j=i+1;j<N;j++) {
 
            if (anchoratom.molid == atom_list[j].molid) continue; // skip same molecule 
+            if (anchoratom.frozen && atom_list[j].frozen) continue; // skip frozens            
+
+           
             // get R (nearest image)
             for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
-            for (p=0;p<3;p++) {
-                img[p]=0;
+            for (n=0;n<3;n++) {
+                img[n]=0;
                 for (q=0;q<3;q++) {
-                    img[p] += reciprocal_basis[p*3+q]*d[q];
+                    img[n] += reciprocal_basis[n*3+q]*d[q];
                     //if (i==0 && j==1188) printf("img[%i] = reciprocal_basis[%i]*d[%i] = %f\n",p,p*3+q,q,reciprocal_basis[p*3+q]*d[q]);
                 }
-                img[p] = rint(img[p]);
+                img[n] = rint(img[n]);
             }
-            for (p=0;p<3;p++) {
-                di[p] = 0;
+            for (n=0;n<3;n++) {
+                di[n] = 0;
                 for (q=0;q<3;q++) {
-                    di[p] += basis[p*3+q]*img[q];
+                    di[n] += basis[n*3+q]*img[q];
                 }
             }
-            for (p=0;p<3;p++) di[p] = d[p] - di[p];
+            for (n=0;n<3;n++) di[n] = d[n] - di[n];
             r2=0;ri2=0;
-            for (p=0;p<3;p++) {
-                r2 += d[p]*d[p];
-                ri2 += di[p]*di[p];
+            for (n=0;n<3;n++) {
+                r2 += d[n]*d[n];
+                ri2 += di[n]*di[n];
             }
             r = sqrt(r2);
             ri = sqrt(ri2);
             if (ri != ri) {
                 rimg=r;
-                for (p=0;p<3;p++) dimg[p] = d[p];
+                rsq=r2;
+                for (n=0;n<3;n++) dimg[n] = d[n];
             } else {
                 rimg=ri;
-                for (p=0;p<3;p++) dimg[p] = di[p];
+                rsq=ri2;
+                for (n=0;n<3;n++) dimg[n] = di[n];
             }
             // distance is now rimg
                
@@ -114,31 +121,27 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
                   //  printf("basis[%i] = %f\n", h, basis[h]);
                 //}
             //}
-            
-            rsq=rimg*rimg;
 
-                //if (i==0) printf("hi\n");
-
-                sig = anchoratom.sig;
+                if (rimg <= cutoff) {
+           
+                 sig = anchoratom.sig;
                 if (sig != atom_list[j].sig) sig = 0.5*(sig+atom_list[j].sig);
                 eps = anchoratom.eps;
-                if (eps != atom_list[j].eps) eps = sqrt(anchoratom.eps * atom_list[j].eps);
+                if (eps != atom_list[j].eps) eps = sqrt(eps * atom_list[j].eps);
 
                 if (sig == 0 || eps == 0) continue;
 
+     
+                
                 r6 = rsq*rsq*rsq;
                 s6 = sig*sig;
                 s6 *= s6 * s6;
-
-                if (rimg <= cutoff) {
+        
                     for (n=0;n<3;n++) {
-                        f[n] = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-                        atomicAdd(&(atom_list[j].f[n]), -f[n]); 
-                        af[n] += f[n];      
-                        
-                        //af[n] += f[n];
+                        holder = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                        atomicAdd(&(atom_list[j].f[n]), -holder); 
+                        af[n] += holder;      
                     }
-                    //if (i==0) count++;
                 }
 
         } // end pair j
@@ -153,57 +156,59 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoff, double * 
         if (pform == 1) {
             for (n=0;n<3;n++) af[n]=0; // reset register-stored force for anchoratom.
            for (j=0;j<N;j++) {
-                if (i==j) continue; // don't do atom with itself
                 if (anchoratom.frozen && atom_list[j].frozen) continue; // don't do frozen pairs
-                if (anchoratom.charge == 0 && atom_list[j].charge == 0) continue; // skip 0-force
-
-                chargeprod = anchoratom.charge * atom_list[j].charge;
-            
+                if (anchoratom.charge == 0 || atom_list[j].charge == 0) continue; // skip 0-force
+                if (i==j) continue; // don't do atom with itself
 
                // get R (nearest image)
             for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
-            for (p=0;p<3;p++) {
-                img[p]=0;
+            for (n=0;n<3;n++) {
+                img[n]=0;
                 for (q=0;q<3;q++) {
-                    img[p] += reciprocal_basis[p*3+q]*d[q];
+                    img[n] += reciprocal_basis[n*3+q]*d[q];
                 }
-                img[p] = rint(img[p]);
+                img[n] = rint(img[n]);
             }
-            for (p=0;p<3;p++) {
-                di[p] = 0;
+            for (n=0;n<3;n++) {
+                di[n] = 0;
                 for (q=0;q<3;q++) {
-                    di[p] += basis[p*3+q]*img[q];
+                    di[n] += basis[n*3+q]*img[q];
                 }
             }
-            for (p=0;p<3;p++) di[p] = d[p] - di[p];
+            for (n=0;n<3;n++) di[n] = d[n] - di[n];
             r2=0;ri2=0;
-            for (p=0;p<3;p++) {
-                r2 += d[p]*d[p];
-                ri2 += di[p]*di[p];
+            for (n=0;n<3;n++) {
+                r2 += d[n]*d[n];
+                ri2 += di[n]*di[n];
             }
             r = sqrt(r2);
             ri = sqrt(ri2);
             if (ri != ri) {
                 rimg=r;
-                for (p=0;p<3;p++) dimg[p] = d[p];
+                rsq=r2;
+                for (n=0;n<3;n++) dimg[n] = d[n];
             } else {
                 rimg=ri;
-                for (p=0;p<3;p++) dimg[p] = di[p];
+                rsq=ri2;
+                for (n=0;n<3;n++) dimg[n] = di[n];
             }
 
-            rsq=rimg*rimg;
-            for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
 
-            if (r <= cutoff && (anchoratom.molid < atom_list[j].molid)) { // non-duplicated pairs, not intramolecular, not beyond cutoff
-                erfc_term = erfc(alpha*r);
+            if (rimg <= cutoff && (anchoratom.molid < atom_list[j].molid)) { // non-duplicated pairs, not intramolecular, not beyond cutoff
+                chargeprod = anchoratom.charge * atom_list[j].charge;
+                for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
                 for (n=0;n<3;n++) {
-                    holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*r*r))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
+                    holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*rsq))/(sqrtPI*rimg) - (chargeprod*erfc(alpha*rimg)/rsq))*u[n];
                     af[n] += holder;
                     atomicAdd(&(atom_list[j].f[n]), -holder);                
                 }
-            } else if (anchoratom.molid == atom_list[j].molid && i != j) { // intramolecular interaction
+            } else if (anchoratom.molid == atom_list[j].molid) { // intramolecular interaction
+                chargeprod = anchoratom.charge * atom_list[j].charge;
+                rsq=rimg*rimg;
+                for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
+
                 for (n=0;n<3;n++) {
-                    holder = -((chargeprod*erf(alpha*r))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*r*r)/(sqrtPI*r)))*u[n];
+                    holder = -((chargeprod*erf(alpha*rimg))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*rsq)/(sqrtPI*rimg)))*u[n];
                     af[n] += holder;
                     atomicAdd(&(atom_list[j].f[n]), -holder);
                 }
