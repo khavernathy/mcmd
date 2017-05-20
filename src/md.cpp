@@ -301,7 +301,9 @@ void integrate(System &system, double dt) {
     } // end if PBC
 
     // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
-	calculateForces(system, dt);
+	system.checkpoint("Starting calculateForces()");
+    calculateForces(system, dt);
+    system.checkpoint("Done with calculateForces()");
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
 	// Normal CPU routine

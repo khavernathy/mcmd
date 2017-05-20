@@ -37,7 +37,8 @@ class System {
             std::time_t thetime = std::chrono::system_clock::to_time_t(now);
             double time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(now - previous_checkpoint).count()) /1000.0; // in ms
 
-            printf("\nCheckpoint: %s ---> %.4f ms from last:  %s \n",std::ctime(&thetime), time_elapsed  , thetext.c_str());
+            //printf("\nCheckpoint: %s std:ctime(&thetime)
+            printf("  ---> %.4f ms from last:  %s \n", time_elapsed  , thetext.c_str());
             previous_checkpoint = std::chrono::system_clock::now();
             }
         }
