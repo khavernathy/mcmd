@@ -208,6 +208,7 @@ void calculateForces(System &system, double dt) {
 // ==================== MOVE ATOMS MD STYLE =========================
 /* THIS IS THE MAIN LOOPING FUNCTION. calculateForces() is called within */
 void integrate(System &system, double dt) {
+    system.checkpoint("started integrate()");
     int i,j,n;
 
     // DEBUG
@@ -235,6 +236,7 @@ void integrate(System &system, double dt) {
     // done saving old positions
     */
 
+    system.checkpoint("moving particles based on forces.");
     // if molecular motion
     if (system.constants.md_mode == MD_MOLECULAR) {
         for (j=0; j<system.molecules.size(); j++) {
@@ -290,6 +292,7 @@ void integrate(System &system, double dt) {
         }
     } // end if atomic motion
     // END POSITION CHANGES
+    system.checkpoint("done moving particles. Checking PBC for all particles");
 
     // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
     if (system.constants.md_pbc) {
@@ -301,9 +304,9 @@ void integrate(System &system, double dt) {
     } // end if PBC
 
     // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
-	system.checkpoint("Starting calculateForces()");
+	system.checkpoint("done checking PBC. Starting calculateForces()");
     calculateForces(system, dt);
-    system.checkpoint("Done with calculateForces()");
+    system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
 	// Normal CPU routine
@@ -339,6 +342,7 @@ void integrate(System &system, double dt) {
       //  CUDA_verlet(system);
        // #endif
     //}
+    system.checkpoint("Done with a,v integration. Starting heat bath (if nvt)");
 
     // 5) apply heat bath in NVT
     if (system.constants.ensemble == ENSEMBLE_NVT) {
@@ -398,6 +402,8 @@ void integrate(System &system, double dt) {
             }
         }
     } // end if NVT (thermostat)
+    system.checkpoint("Done with heatbath if NVT.");
+    system.checkpoint("Done with integrate() function.");
 }// end integrate() function
 
 
