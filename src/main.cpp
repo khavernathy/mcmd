@@ -311,8 +311,13 @@ int main(int argc, char **argv) {
                     printf("-> %s wt %% =%s   %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(),flspacing.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
                     printf("      wt %% ME =            %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
                 }
-                printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
-                system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                if (system.stats.count_frozens > 0) {
+                    printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
+                    system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                } else {
+                    printf("-> %s  N_movables =  %.5f +- %.5f;   %.5f mg/g\n",
+                    system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                }
                 if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
                     printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
