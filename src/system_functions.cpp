@@ -664,6 +664,40 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i,"H","NH3","M", -0.8121, 0.4689,  -0.3816, 1.00794, 0.41, 0,0,0);
                 system.proto[i].name = "AMM";
             }
+
+            // OCTANE
+            else if (sorbmodel == "octane" || sorbmodel == "c8h18") {
+                // only 8 sites with params. H are dummies for viz.
+                // MP2 6-31G* geom from cccbdb
+                double q=0., a=0., se=3.75, sm=3.95, ee=98., em=46., ch3=15.0345, ch2=14.02658;
+                addAtomToProto(system,i,"C1","OCT","M", -2.7969990,  3.5306670,   0.0000000,ch3,q,a,ee,se);
+                addAtomToProto(system,i,"C2","OCT","M", 0.0002360,   0.7653030,   0.0000000,ch2 ,q, a,em,sm);
+                addAtomToProto(system,i,"C3","OCT","M", -0.0002360,  -0.7653030 , 0.0000000,ch2,q,a,em,sm);
+                addAtomToProto(system,i,"C4","OCT","M",-1.3965500,   1.3904300,   0.0000000   ,ch2,q,a,em,sm);
+                addAtomToProto(system,i,"C5","OCT","M",1.3965500,    -1.3904300,  0.0000000   ,ch2,q,a,em,sm);
+                addAtomToProto(system,i,"C6","OCT","M",-1.3965500,   2.9196300,   0.0000000  ,ch2,q,a,em,sm);
+                addAtomToProto(system,i,"C7","OCT","M",1.3965500,    -2.9196300,  0.0000000  ,ch2,q,a,em,sm);
+                addAtomToProto(system,i,"C8","OCT","M",2.7969990 ,   -3.5306670,  0.0000000,ch3,q,a,ee,se);
+                addAtomToProto(system,i,"H","OCT","M",0.5528930,    1.1233910,  0.8793430        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",0.5528930,    1.1233910,  -0.8793430        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-0.5528930,   -1.1233910, 0.8793430        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-0.5528930,   -1.1233910, -0.8793430        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-1.9500370,   1.0332110,  -0.8794270        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-1.9500370,   1.0332110,  0.8794270        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",1.9500370,    -1.0332110, -0.8794270        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",1.9500370,    -1.0332110, 0.8794270        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-0.8416580,   3.2747210,  0.8781290        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-0.8416580,   3.2747210,  -0.8781290        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",0.8416580,    -3.2747210, 0.8781290        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",0.8416580,    -3.2747210, -0.8781290        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-2.7682840,   4.6251440,  0.0000000        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-3.3616990,   3.2150460,  -0.8828340        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",-3.3616990,   3.2150460,  0.8828340        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",2.7682840,    -4.6251440, 0.0000000        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",3.3616990,    -3.2150460, -0.8828340        ,0.,0.,0.,0.,0.);
+                addAtomToProto(system,i,"H","OCT","M",3.3616990,    -3.2150460, 0.8828340        ,0.,0.,0.,0.,0.);
+                system.proto[i].name = "OCT";
+            }
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
