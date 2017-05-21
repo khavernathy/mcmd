@@ -315,7 +315,7 @@ int main(int argc, char **argv) {
                     printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
                     system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
                 } else {
-                    printf("-> %s  N_movables =  %.5f +- %.5f;   %.5f mg/g\n",
+                    printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
                 }
                 if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
