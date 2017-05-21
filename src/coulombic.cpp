@@ -147,6 +147,7 @@ void coulombic_force_nopbc(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system,i,j,k,l);
         r = distances[3];
+        if (r<=10.0) { // 10 A cutoff
 
         rsq = r*r;
         for (int n=0; n<3; n++) u[n] = distances[n]/r;
@@ -158,7 +159,7 @@ void coulombic_force_nopbc(System &system) {
 
             }
         system.molecules[i].atoms[j].V += charge1*charge2/r;
-
+        } // end cutoff
     } // end if not frozen
     } // end l
     } // end k

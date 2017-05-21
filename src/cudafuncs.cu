@@ -225,6 +225,108 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
 }
 
 
+__global__
+void calculateForceNopbcKernel(cuda_atom * atom_list, int N, int pformD) {
+    // define thread id
+    int i = threadIdx.x + blockDim.x * blockIdx.x;
+
+    // only run for real atoms (no ghost threads)
+    if(i<N){   
+        const register cuda_atom anchoratom = atom_list[i];
+        //printf("I AM THREAD %i\n", i);
+        //atom_list[i].pos[0] += cutoff;
+       const int pform = pformD;
+        const double cutoff=10.; // default 10 A for no-pbc cutoff.
+        double d[3], r,r2;
+        int j,n;
+        double sig,eps,r6,s6,u[3]={0,0,0};
+        //int count=0;
+        register double af[3] = {0,0,0}; // accumulated forces for anchoratom
+        double holder,chargeprod; // for ES force    
+        //printf("basis[3] = %f\n", basis[3]);
+        __syncthreads();
+        // order N instead of N^2 bc this runs on all GPU cores at once (basically)
+
+        // if LJ 
+        if (pform == 0 || pform == 1) {
+        for (j=i+1;j<N;j++) {
+
+           if (anchoratom.molid == atom_list[j].molid) continue; // skip same molecule 
+            if (anchoratom.frozen && atom_list[j].frozen) continue; // skip frozens            
+
+           
+            // get R (nearest image)
+            for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
+            r2=0;
+            for (n=0;n<3;n++) {
+                r2 += d[n]*d[n];
+            }
+            r = sqrt(r2);
+               
+                if (r <= cutoff) {
+           
+                 sig = anchoratom.sig;
+                if (sig != atom_list[j].sig) sig = 0.5*(sig+atom_list[j].sig);
+                eps = anchoratom.eps;
+                if (eps != atom_list[j].eps) eps = sqrt(eps * atom_list[j].eps);
+
+                if (sig == 0 || eps == 0) continue;
+                
+                r6 = r2*r2*r2;
+                s6 = sig*sig;
+                s6 *= s6 * s6;
+        
+                    for (n=0;n<3;n++) {
+                        holder = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*r2) - s6/(r6*r2));
+                        atomicAdd(&(atom_list[j].f[n]), -holder); 
+                        af[n] += holder;      
+                    }
+                }
+
+        } // end pair j
+        
+        // finally add the accumulated forces (stored on register) to the anchor atom
+        for (n=0;n<3;n++)
+            atomicAdd(&(atom_list[i].f[n]), af[n]);
+        
+        } // end if LJ
+        // ==============================================================================
+        // Now handle electrostatics
+        if (pform == 1) {
+            for (n=0;n<3;n++) af[n]=0; // reset register-stored force for anchoratom.
+           for (j=i+1;j<N;j++) {
+                if (anchoratom.frozen && atom_list[j].frozen) continue; // don't do frozen pairs
+                if (anchoratom.charge == 0 || atom_list[j].charge == 0) continue; // skip 0-force
+                if (anchoratom.molid == atom_list[j].molid) continue; // don't do molecule with itself
+
+               // get R (nearest image)
+            for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
+            r2=0;
+            for (n=0;n<3;n++) {
+                r2 += d[n]*d[n];
+            }
+            r = sqrt(r2);
+
+            if (r <= cutoff)  { //&& (anchoratom.molid < atom_list[j].molid)) { // non-duplicated pairs, not intramolecular, not beyond cutoff
+                chargeprod = anchoratom.charge * atom_list[j].charge;
+                for (n=0;n<3;n++) u[n] = d[n]/r;
+                for (n=0;n<3;n++) {
+                    holder = chargeprod/r2 * u[n];
+                    af[n] += holder;
+                    atomicAdd(&(atom_list[j].f[n]), -holder);                
+                }
+            }
+
+            } // end pair loop j 
+
+            // finally add ES contribution to anchor-atom
+            for (n=0;n<3;n++) atomicAdd(&(atom_list[i].f[n]), af[n]);
+        } // end ES component
+
+    } // end if i<n (all threads)
+} // end no-pbc force
+
+
 /*
 __global__
 void velocityVerletKernel(cuda_molecule * molecule_list, int N, int md_mode) {
@@ -380,6 +482,67 @@ void CUDA_force(System &system) {
 
     //printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
  
+
+     cudaFree(D);
+
+    // we're done. forces have been calc'd on GPU and written to local mem.
+}
+
+void CUDA_force_nopbc(System &system) {
+
+    const int N = (int)system.constants.total_atoms;
+    const int block_size = system.constants.cuda_block_size; 
+    const int atoms_array_size=sizeof(cuda_atom)*N;
+    int index=0;
+
+    cuda_atom H[N]; // host atoms
+    cuda_atom *D; // device atoms (gpu)
+    for (int i=0;i<system.molecules.size();i++) {
+        for (int j=0;j<system.molecules[i].atoms.size();j++) {
+            H[index].molid = i;
+            H[index].sig = system.molecules[i].atoms[j].sig;
+            H[index].eps = system.molecules[i].atoms[j].eps;
+            H[index].charge = system.molecules[i].atoms[j].C;
+            for (int n=0;n<3;n++) {
+                H[index].pos[n] = system.molecules[i].atoms[j].pos[n];       
+                H[index].f[n] = 0; // initialize to zero
+            }
+            H[index].frozen = system.molecules[i].atoms[j].frozen;     
+            index++;       
+        }
+    }
+
+    // allocate memory on GPU
+    cudaMalloc((void**) &D, atoms_array_size);
+    cudaMemcpy(D, H, atoms_array_size, cudaMemcpyHostToDevice);
+
+    // grid elements
+    int dimGrid = ceil((double)N/block_size);
+    int dimBlock = block_size;   
+
+    // assign potential form for force calculator
+    int pform,theval=system.constants.potential_form;
+    if (theval == POTENTIAL_LJ || theval == POTENTIAL_LJES || theval == POTENTIAL_LJESPOLAR)
+        pform=0;
+    if (theval == POTENTIAL_LJES || theval == POTENTIAL_LJESPOLAR)
+        pform=1;
+
+    calculateForceNopbcKernel<<< dimGrid, dimBlock >>>(D,N, pform);
+    // make sure the threads are synced so we don't overflow
+    cudaThreadSynchronize();
+    // copy device data back to host
+    cudaMemcpy(H, D, atoms_array_size, cudaMemcpyDeviceToHost);
+
+    //for (int i=0;i<N;i++) printf("H[%i] force0 = %f\n", i, H[i].f[0]);
+    index=0;
+    for (int i=0;i<system.molecules.size();i++) {
+        for (int j=0;j<system.molecules[i].atoms.size();j++) {
+            for (int n=0;n<3;n++) {
+                system.molecules[i].atoms[j].force[n] = H[index].f[n];
+            }     
+            index++;       
+        }
+    }
 
      cudaFree(D);
 

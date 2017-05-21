@@ -301,6 +301,8 @@ void lj_force_nopbc(System &system) {
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];    
+
+        if (r <= 10.0) { // 10 A cutoff
         rsq=r*r;
         for (int n=0; n<3; n++) d[n] = distances[n];
 
@@ -321,6 +323,7 @@ void lj_force_nopbc(System &system) {
             }
 
             system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
+        } // end r cutoff
         } // if nonzero sig/eps
     }  // loop l
     } // loop k 

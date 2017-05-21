@@ -191,7 +191,13 @@ void calculateForces(System &system, double dt) {
     } else {
         #ifdef CUDA
         // CUDA FORCES
-        CUDA_force(system);
+        // no pbc    
+        if (!system.constants.md_pbc) {
+            CUDA_force_nopbc(system);
+        // pbc
+        } else {
+            CUDA_force(system);
+        }
         #endif
     }
 
