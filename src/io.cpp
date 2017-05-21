@@ -1227,40 +1227,45 @@ void inputValidation(System &system) {
     // check all the input and atoms and stuff to make sure we don't 
     // get errors because the user is a noob
     
-
     int e = system.constants.ensemble;
     if (system.constants.mode != "mc" && system.constants.mode != "md") {
-        std::cout << "No mode specified. Use   mode mc  --or--  mode md." << endl;
+        std::cout << "ERROR: No mode specified. Use   mode mc  --or--  mode md." << endl;
         exit(EXIT_FAILURE);
     }
     if (e != ENSEMBLE_NPT && e != ENSEMBLE_NVT && e != ENSEMBLE_UVT && e != ENSEMBLE_NVE) {
-        std::cout << "No ensemble specified. Use   ensemble uvt   , for example." << endl;
+        std::cout << "ERROR: No ensemble specified. Use   ensemble uvt   , for example." << endl;
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode == "mc" && !(system.constants.finalstep >= 0)) {
-        std::cout << "Monte carlo was activated but you need to specify finalstep, e.g.  finalstep 100000" << endl;
+        std::cout << "ERROR: Monte carlo was activated but you need to specify finalstep, e.g.  finalstep 100000" << endl;
         exit(EXIT_FAILURE);
     }
     if ((e == ENSEMBLE_UVT || e == ENSEMBLE_NPT || e == ENSEMBLE_NVT ) && system.constants.temp == 0) {
-        std::cout << "You specified an ensemble with constant T but didn't supply T (or you set T=0)." << endl;
+        std::cout << "ERROR: You specified an ensemble with constant T but didn't supply T (or you set T=0)." << endl;
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode == "md" && (e == ENSEMBLE_UVT || e == ENSEMBLE_NPT)) {
-        std::cout << "You specified MD mode but selected an incompatible ensemble. MD supports NVT and NVE only." << endl;
+        std::cout << "ERROR: You specified MD mode but selected an incompatible ensemble. MD supports NVT and NVE only." << endl;
         exit(EXIT_FAILURE);
     }
     if (system.pbc.a == 0 && system.pbc.b == 0 && system.pbc.c == 0 && system.pbc.alpha == 0 && system.pbc.beta ==0 && system.pbc.gamma == 0) {
-        std::cout << "You didn't supply a basis to build the box. Even simulations with no PBC need a box." << endl;
+        std::cout << "ERROR: You didn't supply a basis to build the box. Even simulations with no PBC need a box." << endl;
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode != "md" && system.constants.cuda) {
-        std::cout << "CUDA was enabled but simulation mode is not MD. CUDA can only be enabled with MD.";
+        std::cout << "ERROR: CUDA was enabled but simulation mode is not MD. CUDA can only be enabled with MD.";
         exit(EXIT_FAILURE);
     }
     if (system.constants.bias_uptake != 0 && (system.constants.ensemble != ENSEMBLE_UVT || system.constants.mode != "mc" || system.proto.size() > 1)) {
-        std::cout << "Uptake bias option was used but single-sorbate uVT MC is not set.";
+        std::cout << "ERROR: Uptake bias option was used but single-sorbate uVT MC is not set.";
         exit(EXIT_FAILURE);
     }
+    if (system.constants.mode == "md" && !system.constants.md_pbc) {
+        std::cout << "ERROR: MD mode is on but MD PBC was set off. This feature is not available. (You must have a periodic box for MD). Use a huge box to get the effect of free space.";
+        exit(EXIT_FAILURE);
+    }
+        
+
 
 }
 // end input validation function
