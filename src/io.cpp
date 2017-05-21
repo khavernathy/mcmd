@@ -1264,7 +1264,10 @@ void inputValidation(System &system) {
         std::cout << "ERROR: MD mode is on but MD PBC was set off. This feature is not available. (You must have a periodic box for MD). Use a huge box to get the effect of free space.";
         exit(EXIT_FAILURE);
     }
-        
+    if (system.constants.mode == "md" && system.constants.md_mode == MD_ATOMIC) {
+        std::cout << "ERROR: Atomic mode for MD is no longer supported. You can get the same result by assigning unique molecule IDs to all atoms in your atoms-input file.";
+        exit(EXIT_FAILURE);
+    }        
 
 
 }
