@@ -21,7 +21,7 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
 
     // check for N bias (loading bias)
     if (system.constants.bias_uptake_switcher) {
-        if ((double)system.stats.count_movables >= system.constants.bias_uptake)
+        if ((double)system.stats.count_movables >= system.constants.bias_uptake) {
             //fugacity *= 3; // big, but not too big, for biased insertions
             system.constants.bias_uptake_switcher=0; // done biasing if we exceed the bias-N
             printf("Loading bias deactivated! (Desired N reached).\n");
