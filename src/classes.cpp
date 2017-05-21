@@ -194,6 +194,9 @@ class Constants {
         int_fast8_t auto_reject=0; // on or off (for an individual step!). will go on if auto_reject_r is triggered
         int rejects=0; // counter
 
+        int manual_cutoff=0; // on/off for user-defined pair-interaction cutoff in A.
+        double manual_cutoff_val=0; // in A
+
         int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS (MD only)
         int cuda_block_size = 256; // this was the best of a test of 32,64,128,256 on a project from class I took. Can play with this to see how it changes perf.
 };

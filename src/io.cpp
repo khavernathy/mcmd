@@ -1144,6 +1144,11 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "on") system.constants.pdb_long =1;
                 else system.constants.pdb_long = 0;
                 std::cout << "Got option for PDB long float output = " << lc[1].c_str(); printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "manual_cutoff")) {
+                system.constants.manual_cutoff = 1;
+                system.constants.manual_cutoff_val = atof(lc[1].c_str());
+                std::cout << "Got manual pair-interaction spherical cutoff = " << lc[1].c_str() << " A.";printf("\n");
 
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank

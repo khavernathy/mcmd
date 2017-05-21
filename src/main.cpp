@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
 	if (system.constants.autocenter)
         centerCoordinates(system);
     setupBox(system);
+    if (system.constants.manual_cutoff) system.pbc.cutoff = system.constants.manual_cutoff_val; // override the cutoff if user-defined.
     if (system.stats.radial_dist)
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
