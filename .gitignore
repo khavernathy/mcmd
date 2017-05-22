@@ -15,6 +15,7 @@ radialdist*
 src/scratc*
 a
 b
+*.dat*
 md_test/te
 te
 #cloc-git.sh

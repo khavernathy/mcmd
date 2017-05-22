@@ -134,12 +134,16 @@ int main(int argc, char **argv) {
         for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
 
-	// clobber files
+	// *** clobber files
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
-	remove( system.stats.radial_file.c_str() ); remove( system.constants.output_histogram.c_str() );
+	remove( system.constants.output_histogram.c_str() );
 	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
     remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
+        // system command here will only work with Unix
+        string command = "rm " + system.stats.radial_file + "*";
+        std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
+    // *** done clobbering files.
 
     // INITIAL WRITEOUTS
     // Prep thermo output file

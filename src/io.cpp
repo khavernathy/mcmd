@@ -1110,12 +1110,16 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got radial maximum distance = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_centroid")) {
-                system.stats.radial_centroid = lc[1].c_str();
-                std::cout << "Got radial centroid = " << lc[1].c_str(); printf("\n");
+                for (int i=0; i<((int)lc.size()-1); i++) {
+                    system.stats.radial_centroid.push_back( lc[i+1].c_str() );
+                    std::cout << "Got radial centroid[" << i << "] = " << lc[i+1].c_str(); printf("\n");
+                }
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_counterpart")) {
-                system.stats.radial_counterpart = lc[1].c_str();
-                std::cout << "Got radial counterpart = " << lc[1].c_str(); printf("\n");
+                for (int i=0; i<((int)lc.size()-1); i++) {
+                    system.stats.radial_counterpart.push_back( lc[i+1].c_str() );
+                    std::cout << "Got radial counterpart[" << i << "] = " << lc[i+1].c_str(); printf("\n");
+                }
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_file")) {
                 system.stats.radial_file = lc[1].c_str();
@@ -1279,7 +1283,10 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     #endif
-
+    if (system.stats.radial_dist && (system.stats.radial_centroid.size() != system.stats.radial_counterpart.size())) {
+        std::cout << "ERROR: The number of radial_centroid parameters is not equal to the number of radial_counterpart parameters.";
+        exit(EXIT_FAILURE);
+    }
 
 }
 // end input validation function

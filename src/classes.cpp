@@ -465,8 +465,8 @@ class Stats {
         string radial_file = "radial_distribution.dat"; // default filename for output.
         double radial_bin_size = 0.1; // bin counts will be considered for this range in A
         double radial_max_dist = 10.0; // maximum r to consider in rad. dist.
-        vector<long unsigned int> radial_bins; // holds the counters
-        string radial_centroid, radial_counterpart; // the two atoms to get distance between, user def.
+        vector<vector<long unsigned int>> radial_bins; // holds the counters for each g(r)
+        vector<string> radial_centroid, radial_counterpart; // the two atoms to get distance between, user def.
 
 		double insert_bf_sum = 0; // insert boltzmanns added up in boltzmann.cpp
 		double remove_bf_sum = 0; // ...

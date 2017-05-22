@@ -22,9 +22,17 @@ void setupRadialDist(System &system) {
     
     int num_bins = ceil(system.stats.radial_max_dist / system.stats.radial_bin_size);
     printf("The number of radial bins to create is %i\n", num_bins);
+    printf("The number of different g(r) pair calculations is %i\n", (int)system.stats.radial_centroid.size());
 
-    for (int i=0; i<num_bins; i++) {
-        system.stats.radial_bins.push_back(0);
+    vector<long unsigned int> dummy; // = vector<long unsigned int>(num_bins); // dummy to push into the vector of g(r)'s
+
+    // make vectors to hold each g(r), and fill each with zero in all bins
+    for (int z=0; z<system.stats.radial_centroid.size();z++) {
+        for (int i=0; i<num_bins; i++) {
+            dummy.push_back(0); // fill each g(r) bin with zero
+        }
+        system.stats.radial_bins.push_back(dummy);
+        dummy.clear();
     }
     // so if max = 10 and size = 0.2, 50 bins are created with index 0->49.
     // if dist between 0.0 and 0.2, index 0++, etc.
@@ -40,8 +48,11 @@ void setupRadialDist(System &system) {
 void radialDist(System &system) {
     const double bin_size = system.stats.radial_bin_size;
     const double max_dist = system.stats.radial_max_dist;
-    string centroid = system.stats.radial_centroid;
-    string counterpart = system.stats.radial_counterpart;
+    
+    for (int y=0; y<(int)system.stats.radial_bins.size(); y++) {
+    
+    string centroid = system.stats.radial_centroid[y];
+    string counterpart = system.stats.radial_counterpart[y];
 
     //system.checkpoint("starting loop");
     // loop through all the atom pairs. Doing intramolecular too b/c MD needs it sometimes.
@@ -63,7 +74,7 @@ void radialDist(System &system) {
                             // determine index of radial_bins
                             int indexr = floor(r / bin_size);  // so 0.02/0.2 -> index 0; 0.25/0.2 -> index 1..
                             //system.checkpoint("adding to bin");
-                            system.stats.radial_bins[indexr]++;
+                            system.stats.radial_bins[y][indexr]++;
                         } // end dist<max_dist
 
                     } // end if proper pair.
@@ -72,44 +83,53 @@ void radialDist(System &system) {
         } // end atoms-in-i loop j
     } // end molecules loop i
     //system.checkpoint("ending radialDist");
+    
+    } // end bins loop for different g(r)'s
     return;
 }
 
 /* THIS FUNCTION WILL BE CALLED AFTER EACH CORRTIME AND WRITE THE RADIAL DISTRIBUTION DATA TO FILE */
 void writeRadialDist(System &system) {
-    string radfilename = system.stats.radial_file;
-    remove(radfilename.c_str()); // JIC
+        
+    for (int y=0; y<(int)system.stats.radial_bins.size(); y++) {
+        string suffix = to_string(y);
+        string radfilename = system.stats.radial_file;
+        radfilename = radfilename + suffix;
+        remove(radfilename.c_str()); // JIC
     
+
     ofstream radfile;
     radfile.open (radfilename, ios_base::app);
-    radfile << "#r   #count\n";
-    radfile << "0    0\n";
+    radfile << "#r_(" << system.stats.radial_centroid[y].c_str() << "--" << system.stats.radial_counterpart[y].c_str() << ")   #count(normalized%)\n";
+    radfile << "0       0\n";
 
     double spherev = 0.0;
     double prevspherev = 0.0;
     double sum = 0.0;
 
     //loop to generate sum
-    for (int i=0; i<system.stats.radial_bins.size(); i++) {
+    for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
         spherev = sphere_volume((i+1)*system.stats.radial_bin_size);
-        sum += system.stats.radial_bins[i]/(spherev - prevspherev);
+        sum += system.stats.radial_bins[y][i]/(spherev - prevspherev);
         prevspherev = spherev;
     }
     // reset prevspherev
     prevspherev=0.0;
     
     // loop to write normalized counts
-    for (int i=0; i<system.stats.radial_bins.size(); i++) {
+    for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
         spherev = sphere_volume((i+1)*system.stats.radial_bin_size);
         radfile << ((double)(i+1) * system.stats.radial_bin_size);
-        radfile << "    ";
+        radfile << "        ";
             // normalize as density of sorbates in selected r-region (N/V) as a percent
             // i.e. the integral of g(r) from 0 -> maximum r = 100
-            radfile << system.stats.radial_bins[i]/(spherev - prevspherev)/sum *100;         
+            radfile << system.stats.radial_bins[y][i]/(spherev - prevspherev)/sum *100;         
             radfile << "\n";
         prevspherev = spherev;
     }      
     radfile.close();
+
+    } // end loop y for different g(r)'s
     return;
 }
 
