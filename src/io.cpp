@@ -1273,6 +1273,12 @@ void inputValidation(System &system) {
         std::cout << "ERROR: Atomic mode for MD is no longer supported. You can get the same result by assigning unique molecule IDs to all atoms in your atoms-input file.";
         exit(EXIT_FAILURE);
     }        
+    #ifndef CUDA  // if no cuda compilation, error out if user is asking for CUDA features
+    if (system.constants.cuda) {
+        std::cout << "ERROR: You set CUDA feature on but did not compile with CUDA resources. Use `bash compile.sh gpu`, for example.";
+        exit(EXIT_FAILURE);
+    }
+    #endif
 
 
 }
