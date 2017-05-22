@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
     remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
         // system command here will only work with Unix
         string command = "rm " + system.stats.radial_file + "*";
-        std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
+        int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
     // *** done clobbering files.
 
     // INITIAL WRITEOUTS
