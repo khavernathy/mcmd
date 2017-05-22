@@ -1112,12 +1112,14 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_centroid")) {
                 for (int i=0; i<((int)lc.size()-1); i++) {
+                    if (lc[i+1] == "!") break;
                     system.stats.radial_centroid.push_back( lc[i+1].c_str() );
                     std::cout << "Got radial centroid[" << i << "] = " << lc[i+1].c_str(); printf("\n");
                 }
 
             } else if (!strcasecmp(lc[0].c_str(), "radial_counterpart")) {
                 for (int i=0; i<((int)lc.size()-1); i++) {
+                    if (lc[i+1] == "!") break;
                     system.stats.radial_counterpart.push_back( lc[i+1].c_str() );
                     std::cout << "Got radial counterpart[" << i << "] = " << lc[i+1].c_str(); printf("\n");
                 }
@@ -1296,7 +1298,7 @@ void inputValidation(System &system) {
 
     //printf("System total charge = %f e = %f sqrt(KA).\n", qsum/system.constants.E2REDUCED, qsum);
 
-    if (fabs(qsum/system.constants.E2REDUCED) > 1e-3 && // a little bit of lee-way for charge sum.
+    if (fabs(qsum/system.constants.E2REDUCED) > 0.005 && // a little bit of lee-way for charge sum.
         (system.constants.mode == "md" || system.constants.mc_pbc) &&      
         (system.constants.potential_form != POTENTIAL_LJ && system.constants.potential_form != POTENTIAL_COMMY)
        ) 
@@ -1315,7 +1317,7 @@ void inputValidation(System &system) {
             if (!system.molecules[i].atoms[j].frozen && system.molecules[i].atoms.size() > 1) flag=1;
         }
     }
-    if (system.constants.md_rotations && !flag) {
+    if (system.constants.mode == "md" && system.constants.md_rotations && !flag) {
         std::cout << "ERROR: MD rotations were turned on but there are no movable molecules with >1 atom in input. Turn md_rotations off.";
         exit(EXIT_FAILURE);
     }
