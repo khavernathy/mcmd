@@ -124,7 +124,8 @@ int main(int argc, char **argv) {
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
     printf("VERSION NUMBER: %i\n", 437); // i.e. github commit
     inputValidation(system);
-    system.checkpoint("Done with system setup functions.");
+    printf("...input options validated.\n");
+    system.checkpoint("...input options validated. Done with system setup functions.");
 
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses //

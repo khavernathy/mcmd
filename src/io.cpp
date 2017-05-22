@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <chrono>
+#include <math.h>
 
 /* xyz read-in of atoms */
 void readInAtomsXYZ(System &system, string filename) {
@@ -1285,6 +1286,37 @@ void inputValidation(System &system) {
     #endif
     if (system.stats.radial_dist && (system.stats.radial_centroid.size() != system.stats.radial_counterpart.size())) {
         std::cout << "ERROR: The number of radial_centroid parameters is not equal to the number of radial_counterpart parameters.";
+        exit(EXIT_FAILURE);
+    }
+    // charge sum check
+    double qsum=0;
+    for (int i=0; i<system.molecules.size(); i++)
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) 
+            qsum += system.molecules[i].atoms[j].C;
+
+    //printf("System total charge = %f e = %f sqrt(KA).\n", qsum/system.constants.E2REDUCED, qsum);
+
+    if (fabs(qsum/system.constants.E2REDUCED) > 1e-3 && // a little bit of lee-way for charge sum.
+        (system.constants.mode == "md" || system.constants.mc_pbc) &&      
+        (system.constants.potential_form != POTENTIAL_LJ && system.constants.potential_form != POTENTIAL_COMMY)
+       ) 
+    {
+        std::cout << "ERROR: The sum of charges (" << qsum/system.constants.E2REDUCED << " e) on atoms is not zero. The system must be neutral for ewald summation to be correct.";
+        exit(EXIT_FAILURE);
+    }
+    if (system.constants.mode == "md" && system.stats.count_movables <= 0) {
+        std::cout << "ERROR: MD is turned on but there are no movables molecules in the input. (Use 'M' as opposed to 'F' to distinguish movers from frozens)";
+        exit(EXIT_FAILURE);
+    }
+    // single-atom movers-only check for MD rotation
+    int flag=0;
+    for (int i=0; i<system.molecules.size(); i++) {
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+            if (!system.molecules[i].atoms[j].frozen && system.molecules[i].atoms.size() > 1) flag=1;
+        }
+    }
+    if (system.constants.md_rotations && !flag) {
+        std::cout << "ERROR: MD rotations were turned on but there are no movable molecules with >1 atom in input. Turn md_rotations off.";
         exit(EXIT_FAILURE);
     }
 
