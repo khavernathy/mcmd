@@ -1273,7 +1273,7 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode == "md" && !system.constants.md_pbc) {
-        std::cout << "ERROR: MD mode is on but MD PBC was set off. This feature is not available. (You must have a periodic box for MD). Use a huge box to get the effect of free space.";
+        std::cout << "ERROR: MD mode is on but MD PBC was set off. This feature is not available. (You must have a periodic box for MD). For example, use a huge box with 'manual_cutoff 10`, to get the effect of free space.";
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode == "md" && system.constants.md_mode == MD_ATOMIC) {
