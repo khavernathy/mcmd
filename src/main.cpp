@@ -120,6 +120,9 @@ int main(int argc, char **argv) {
         setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
         setupNBias(system);
+    if (system.constants.crystalbuild)
+        setupCrystalBuild(system);
+
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
     printf("VERSION NUMBER: %i\n", 437); // i.e. github commit

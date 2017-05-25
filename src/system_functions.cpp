@@ -940,3 +940,40 @@ void setupNBias(System &system) {
     system.constants.bias_uptake = thevalue;
     printf("Calculated bias-uptake goal-N = %f molecules (in the box) from %f %s\n", thevalue, x, unit.c_str());
 }
+
+
+void setupCrystalBuild(System &system) {
+    // build out a periodic box according to user's desire
+    int xdim,ydim,zdim; double xlen,ylen,zlen;
+    if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+        xdim = system.constants.crystalbuild_x;
+        ydim = system.constants.crystalbuild_y;
+        zdim = system.constants.crystalbuild_z;
+
+        xlen= system.pbc.x_length;
+        ylen = system.pbc.y_length;
+        zlen = system.pbc.z_length;
+
+        printf("Building out crystal by %ix, %iy, %iz of the original.\n", xdim,ydim,zdim);
+
+        if (xdim > 1) {
+             
+        }
+
+        if (ydim > 1) {
+        
+        }
+
+        if (zdim > 1) {
+
+        } 
+    }
+    else {
+        std::cout << "ERROR: Non-orthorhombic (i.e. non-90/90/90 degree basis) crystals not supported yet for crystal-builder.";
+        exit(EXIT_FAILURE);
+    }
+
+
+
+
+}

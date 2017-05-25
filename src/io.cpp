@@ -1156,6 +1156,21 @@ void readInput(System &system, char* filename) {
                 system.constants.manual_cutoff = 1;
                 system.constants.manual_cutoff_val = atof(lc[1].c_str());
                 std::cout << "Got manual pair-interaction spherical cutoff = " << lc[1].c_str() << " A.";printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "crystalbuild")) {
+                if (lc[1] == "on") system.constants.crystalbuild = 1;
+                std::cout << "Got crystal-builder option = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_x")) {
+                system.constants.crystalbuild_x = atoi(lc[1].c_str());
+                std::cout << "Got crystal-builder in x = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_y")) {
+                system.constants.crystalbuild_y = atoi(lc[1].c_str());
+                std::cout << "Got crystal-builder in y = " << lc[1].c_str(); printf("\n");
+    
+            } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_z")) {
+                system.constants.crystalbuild_z = atoi(lc[1].c_str());
+                std::cout << "Got crystal-builder in z = " << lc[1].c_str(); printf("\n");
 
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
@@ -1319,6 +1334,10 @@ void inputValidation(System &system) {
     }
     if (system.constants.mode == "md" && system.constants.md_rotations && !flag) {
         std::cout << "ERROR: MD rotations were turned on but there are no movable molecules with >1 atom in input. Turn md_rotations off.";
+        exit(EXIT_FAILURE);
+    }
+    if (system.constants.crystalbuild && (system.constants.crystalbuild_x == 0 && system.constants.crystalbuild_y ==0 && system.constants.crystalbuild_z == 0)) {
+        std::cout << "ERROR: You turned the crystal-builder on but did not specify a dimension to duplicate. e.g., `crystalbuild_y 2`";
         exit(EXIT_FAILURE);
     }
 
