@@ -64,18 +64,16 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MD: Make stat-mech pressure, specific heat calculators. Make sure temperature is calculated correctly<br />
 -> MD: add polarizable force calculator <br />
 -> MC: add more sorbate models from literature<br />
--> MC/MD: Flexible materials (bonding potential)<br />
 -> MC: Use openMP or fork() for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
 -> openMPI/MPI for easy isotherm<br />
 -> investigate NVE; and escape-artist molecules in displace MC moves (S.A.) <br />
--> MC/MD: allow different instances of radial distribution calculator simulateously<br />
--> MC/MD: crystal builder (expand the unit cell dynamically by user input)<br />
+-> MC/MD: crystal builder/fragment maker (expand the unit cell dynamically by user input)<br />
 -> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
 -> MC/MD: multi-sorbate histograms<br />
 -> MD: No-PBC GPU algorithm (already did PBC)<br />
 -> MC: show percent energy contributions in output<br />
--> MC: multi-box? (G(T,P))
-
+-> MC: multi-box? (G(T,P)) <br />
+-> MC/MD: non-rigid (vibrating/bending/stretching potentials) for sorbates<br />
 
 -->
