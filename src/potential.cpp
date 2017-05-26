@@ -27,6 +27,7 @@ double getTotalPotential(System &system) {
 
 // =========================================================================
 if (system.molecules.size() > 0) { // don't bother with 0 molecules!
+    system.checkpoint("starting RD energy calculation.");
     // REPULSION DISPERSION.
     if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR) {
         total_rd = lj(system);
@@ -34,6 +35,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
         total_rd = commy(system);
     }
     if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
+    system.checkpoint("starting ES energy calculation");
     // ELECTROSTATIC
     if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
         if (system.constants.ewald_es)
@@ -41,6 +43,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
         else
             total_es = coulombic(system); // plain old coloumb
     }
+    system.checkpoint("starting Polarization energy calculation.");
     // POLARIZATION
     if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR) {
         total_polar = polarization(system); // yikes
