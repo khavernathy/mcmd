@@ -947,7 +947,7 @@ void setupCrystalBuild(System &system) {
     int xdim,ydim,zdim; double xlen,ylen,zlen;
     int i,j;
 
-    if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
+    //if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
         xdim = system.constants.crystalbuild_x;
         ydim = system.constants.crystalbuild_y;
         zdim = system.constants.crystalbuild_z;
@@ -1070,11 +1070,11 @@ void setupCrystalBuild(System &system) {
 
     if (system.constants.autocenter) centerCoordinates(system);
 
-    }
-    else {
-        std::cout << "ERROR: Non-orthorhombic (i.e. non-90/90/90 degree basis) crystals not supported yet for crystal-builder.";
-        exit(EXIT_FAILURE);
-    }
+    //} // end if 90/90/90
+    //else {
+    //    std::cout << "ERROR: Non-orthorhombic (i.e. non-90/90/90 degree basis) crystals not supported yet for crystal-builder.";
+    //    exit(EXIT_FAILURE);
+    //}
 
 
 
