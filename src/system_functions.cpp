@@ -951,6 +951,8 @@ void setupCrystalBuild(System &system) {
         xdim = system.constants.crystalbuild_x;
         ydim = system.constants.crystalbuild_y;
         zdim = system.constants.crystalbuild_z;
+        
+        system.constants.free_volume *= (xdim*ydim*zdim); // adjusts free volume by multiplicity
 
         xlen= system.pbc.x_length;
         ylen = system.pbc.y_length;
