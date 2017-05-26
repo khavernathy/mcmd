@@ -247,7 +247,7 @@ int main(int argc, char **argv) {
         if (t==0 || t % corrtime == 0 || t == finalstep) { /// output every x steps
 
 			// get all observable averages
-            if (t>0 || (t==0 && system.stats.movables>0)) computeAverages(system);
+            if (t>0 || (t==0 && system.stats.count_movables>0)) computeAverages(system);
 
 			// prep histogram for writing.
 			if (system.constants.histogram_option) {
