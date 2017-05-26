@@ -956,26 +956,38 @@ void setupCrystalBuild(System &system) {
         ylen = system.pbc.y_length;
         zlen = system.pbc.z_length;
 
+        double origa = system.pbc.a;
+        double origb = system.pbc.b;
+        double origc = system.pbc.c;
+
+        // assumes ONE frozen molecule!!
+        int size = (int)system.molecules.size();
+        int asize=0;
+        for (int i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].frozen) {
+                asize = system.molecules[i].atoms.size();
+                break;
+            }
+        }
+
         printf("Building out crystal by %ix, %iy, %iz of the original (only frozens).\n", xdim,ydim,zdim);
         printf(" --> using xlen = %f; ylen = %f; zlen = %f;\n", xlen,ylen,zlen);
 
-        if (xdim %2 != 0 || ydim %2 != 0 || zdim % 2 != 0) { std::cout << "ERROR: Crystal-builder only supports multiples of 2 for all dimensions, right now."; exit(EXIT_FAILURE); }
+        //if ((xdim %2 != 0 && xdim>1) || (ydim %2 != 0 && ydim >1) || (zdim % 2 != 0 && zdim > 1)) { std::cout << "ERROR: Crystal-builder only supports multiples of 2 for all dimensions, right now."; exit(EXIT_FAILURE); }
 
         if (xdim > 1) {
-            for (int iter=0; iter < xdim / 2; iter++) {
-            system.pbc.a *= 2;
+            for (int iter=0; iter < xdim-1; iter++) {
+            system.pbc.a += origa;
             system.pbc.calcNormalBasis(); 
             setupBox(system);
-            int size = (int)system.molecules.size();
             //int count = 0;
             for (i =0; i <size; i++) {
                 if (system.molecules[i].frozen) {
-                    int asize = (int)system.molecules[i].atoms.size();
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
                         //std::copy ( system.molecules[i].atoms + j, system.molecules[i].atoms + j +1, newatom);
                         //printf("%i name %s\n",count, newatom.name.c_str());
-                        newatom.pos[0] += xlen;
+                        newatom.pos[0] += xlen*(iter+1);
                         system.molecules[i].mass += newatom.m;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -984,22 +996,30 @@ void setupCrystalBuild(System &system) {
                     }
                 }
             }
-            } // end iterations x 
+            } // end iterations x
+        // reset the atom count 
+        asize=0;
+        for (int i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].frozen) {
+                asize = system.molecules[i].atoms.size();
+                break;
+            }
+        }
+
+
         }
 
         if (ydim > 1) {
-            for (int iter=0; iter < ydim / 2; iter++) {
-            system.pbc.b *= 2;
+            for (int iter=0; iter < ydim-1; iter++) {
+            system.pbc.b += origb;
             system.pbc.calcNormalBasis();
             setupBox(system);
-            int size = (int)system.molecules.size();
 
             for (i=0;i<size; i++) {
                 if (system.molecules[i].frozen) {
-                    int asize = (int)system.molecules[i].atoms.size();
                     for (j=0; j< asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        newatom.pos[1] += ylen;
+                        newatom.pos[1] += ylen*(iter+1);
                         system.molecules[i].mass += newatom.m;                     
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1008,21 +1028,27 @@ void setupCrystalBuild(System &system) {
                 }
             }
             } // end iterations y
+        // reset the atom count.
+        asize=0;
+        for (int i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].frozen) {
+                asize = system.molecules[i].atoms.size();
+                break;
+            }
+        }
         }
 
         if (zdim > 1) {
-            for (int iter=0; iter < zdim / 2; iter++) {
-            system.pbc.c *= 2;
+            for (int iter=0; iter < zdim-1; iter++) {
+            system.pbc.c += origc;
             system.pbc.calcNormalBasis();
             setupBox(system);
-            int size = (int)system.molecules.size();
 
             for (i=0;i<size; i++) {
                 if (system.molecules[i].frozen) {
-                    int asize = (int)system.molecules[i].atoms.size();
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        newatom.pos[2] += zlen;
+                        newatom.pos[2] += zlen*(iter+1);
                         system.molecules[i].mass += newatom.m;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1031,7 +1057,14 @@ void setupCrystalBuild(System &system) {
                 }
             }
             } // end iterations z
-
+        // reset the atom count
+        asize=0;
+        for (int i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].frozen) {
+                asize = system.molecules[i].atoms.size();
+                break;
+            }
+        }
         } 
     
 
