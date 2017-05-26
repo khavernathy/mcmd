@@ -581,6 +581,8 @@ Last::Last() {}
 class Atom {
 	public:
 		Atom();
+        //Atom(const Atom& rhs) { /* for cloning */ }
+        //Atom& operator=(const Atom& rhs) {};
         string name; // element or label, e.g. H or H2G
         string mol_name; // molecule name that the atom belongs to
         int_fast8_t frozen; // movable/frozen (0 or 1)

@@ -945,6 +945,8 @@ void setupNBias(System &system) {
 void setupCrystalBuild(System &system) {
     // build out a periodic box according to user's desire
     int xdim,ydim,zdim; double xlen,ylen,zlen;
+    int i,j;
+
     if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
         xdim = system.constants.crystalbuild_x;
         ydim = system.constants.crystalbuild_y;
@@ -954,19 +956,79 @@ void setupCrystalBuild(System &system) {
         ylen = system.pbc.y_length;
         zlen = system.pbc.z_length;
 
-        printf("Building out crystal by %ix, %iy, %iz of the original.\n", xdim,ydim,zdim);
+        printf("Building out crystal by %ix, %iy, %iz of the original (only frozens).\n", xdim,ydim,zdim);
+        printf(" --> using xlen = %f; ylen = %f; zlen = %f;\n", xlen,ylen,zlen);
 
         if (xdim > 1) {
-             
+            system.pbc.a *= 2;
+            system.pbc.calcNormalBasis(); 
+            setupBox(system);
+            int size = (int)system.molecules.size();
+            //int count = 0;
+            for (i =0; i <size; i++) {
+                if (system.molecules[i].frozen) {
+                    int asize = (int)system.molecules[i].atoms.size();
+                    for (j=0; j<asize; j++) {
+                        Atom newatom = system.molecules[i].atoms[j];
+                        //std::copy ( system.molecules[i].atoms + j, system.molecules[i].atoms + j +1, newatom);
+                        //printf("%i name %s\n",count, newatom.name.c_str());
+                        newatom.pos[0] += xlen;
+                        system.molecules[i].mass += newatom.m;
+                        system.molecules[i].atoms.push_back(newatom);
+                        system.constants.total_atoms++;
+                        system.stats.count_frozens++; 
+                        //count++;
+                    }
+                }
+            }
         }
 
         if (ydim > 1) {
-        
+            system.pbc.b *= 2;
+            system.pbc.calcNormalBasis();
+            setupBox(system);
+            int size = (int)system.molecules.size();
+
+            for (i=0;i<size; i++) {
+                if (system.molecules[i].frozen) {
+                    int asize = (int)system.molecules[i].atoms.size();
+                    for (j=0; j< asize; j++) {
+                        Atom newatom = system.molecules[i].atoms[j];
+                        newatom.pos[1] += ylen;
+                        system.molecules[i].mass += newatom.m;                     
+                        system.molecules[i].atoms.push_back(newatom);
+                        system.constants.total_atoms++;
+                        system.stats.count_frozens++;
+                    }
+                }
+            }
         }
 
         if (zdim > 1) {
+            system.pbc.c *= 2;
+            system.pbc.calcNormalBasis();
+            setupBox(system);
+            int size = (int)system.molecules.size();
+
+            for (i=0;i<size; i++) {
+                if (system.molecules[i].frozen) {
+                    int asize = (int)system.molecules[i].atoms.size();
+                    for (j=0; j<asize; j++) {
+                        Atom newatom = system.molecules[i].atoms[j];
+                        newatom.pos[2] += zlen;
+                        system.molecules[i].mass += newatom.m;
+                        system.molecules[i].atoms.push_back(newatom);
+                        system.constants.total_atoms++;
+                        system.stats.count_frozens++;
+                    }
+                }
+            }
 
         } 
+    
+
+    if (system.constants.autocenter) centerCoordinates(system);
+
     }
     else {
         std::cout << "ERROR: Non-orthorhombic (i.e. non-90/90/90 degree basis) crystals not supported yet for crystal-builder.";
