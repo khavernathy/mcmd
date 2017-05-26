@@ -123,6 +123,7 @@ int main(int argc, char **argv) {
     if (system.constants.crystalbuild)
         setupCrystalBuild(system);
 
+    system.pbc.printBasis();
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
     printf("VERSION NUMBER: %i\n", 437); // i.e. github commit
@@ -177,20 +178,6 @@ int main(int argc, char **argv) {
 
     system.checkpoint("Initial protocols complete. Starting MC or MD.");
 
-    // BEGIN MC OR MD ===========================================================
-	// =========================== MONTE CARLO ===================================
-	if (system.constants.mode == "mc") {
-	printf("\n| ================================== |\n");
-	printf("|  BEGINNING MONTE CARLO SIMULATION  |\n");
-	printf("| ================================== |\n\n");
-
-    //outputCorrtime(system, 0); // do initial output before starting mc
-
-    int frame = 1;
-    int stepsize = system.constants.stepsize;
-    int finalstep = system.constants.finalstep;
-    int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
-
     // RESIZE A MATRIX IF POLAR IS ACTIVE (and initialize the dipole file)
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_COMMYESPOLAR) {
 				FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
@@ -206,7 +193,23 @@ int main(int argc, char **argv) {
         system.last.thole_total_atoms = system.constants.total_atoms;
 
         makeAtomMap(system); // writes the atom indices
+
+        double memreqA = (double)sizeof(double)*9.0*(double)(int)system.constants.total_atoms*system.constants.total_atoms/(double)1e6;
+        printf("The polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqA, memreqA/1000.);
     }
+
+    // BEGIN MC OR MD ===========================================================
+	// =========================== MONTE CARLO ===================================
+	if (system.constants.mode == "mc") {
+	printf("\n| ================================== |\n");
+	printf("|  BEGINNING MONTE CARLO SIMULATION  |\n");
+	printf("| ================================== |\n\n");
+
+    //outputCorrtime(system, 0); // do initial output before starting mc
+    int frame = 1;
+    int stepsize = system.constants.stepsize;
+    int finalstep = system.constants.finalstep;
+    int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
     // begin timing for steps "begin_steps"
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();

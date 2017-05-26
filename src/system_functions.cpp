@@ -763,7 +763,7 @@ void setupBox(System &system) {
     system.constants.ewald_alpha = 3.5/system.pbc.cutoff;
     system.pbc.calcBoxVertices();
     system.pbc.calcPlanes();
-    system.pbc.printBasis();
+    //system.pbc.printBasis();
 }
 
 void setCheckpoint(System &system) {
@@ -959,7 +959,10 @@ void setupCrystalBuild(System &system) {
         printf("Building out crystal by %ix, %iy, %iz of the original (only frozens).\n", xdim,ydim,zdim);
         printf(" --> using xlen = %f; ylen = %f; zlen = %f;\n", xlen,ylen,zlen);
 
+        if (xdim %2 != 0 || ydim %2 != 0 || zdim % 2 != 0) { std::cout << "ERROR: Crystal-builder only supports multiples of 2 for all dimensions, right now."; exit(EXIT_FAILURE); }
+
         if (xdim > 1) {
+            for (int iter=0; iter < xdim / 2; iter++) {
             system.pbc.a *= 2;
             system.pbc.calcNormalBasis(); 
             setupBox(system);
@@ -981,9 +984,11 @@ void setupCrystalBuild(System &system) {
                     }
                 }
             }
+            } // end iterations x 
         }
 
         if (ydim > 1) {
+            for (int iter=0; iter < ydim / 2; iter++) {
             system.pbc.b *= 2;
             system.pbc.calcNormalBasis();
             setupBox(system);
@@ -1002,9 +1007,11 @@ void setupCrystalBuild(System &system) {
                     }
                 }
             }
+            } // end iterations y
         }
 
         if (zdim > 1) {
+            for (int iter=0; iter < zdim / 2; iter++) {
             system.pbc.c *= 2;
             system.pbc.calcNormalBasis();
             setupBox(system);
@@ -1023,6 +1030,7 @@ void setupCrystalBuild(System &system) {
                     }
                 }
             }
+            } // end iterations z
 
         } 
     
