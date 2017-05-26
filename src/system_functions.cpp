@@ -1071,6 +1071,7 @@ void setupCrystalBuild(System &system) {
     
 
     if (system.constants.autocenter) centerCoordinates(system);
+    setupBox(system); // final box setup JIC
 
     //} // end if 90/90/90
     //else {
