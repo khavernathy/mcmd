@@ -1022,6 +1022,8 @@ void setupCrystalBuild(System &system) {
                     for (j=0; j< asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
                         newatom.pos[1] += ylen*(iter+1);
+                        if (system.pbc.gamma != 90.0) newatom.pos[0] -= (iter+1)*origb*sin((system.pbc.gamma-90.0)*M_PI/180.);
+                        //if (system.pbc.gamma != 90.0) newatom.pos[0] -= sqrt(ylen*ylen + origb*origb - 2*ylen*origb*cos((system.pbc.gamma-90.0)*M_PI/180.)); 
                         system.molecules[i].mass += newatom.m;                     
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
