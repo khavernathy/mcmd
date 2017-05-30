@@ -977,6 +977,7 @@ void setupCrystalBuild(System &system) {
 
         //if ((xdim %2 != 0 && xdim>1) || (ydim %2 != 0 && ydim >1) || (zdim % 2 != 0 && zdim > 1)) { std::cout << "ERROR: Crystal-builder only supports multiples of 2 for all dimensions, right now."; exit(EXIT_FAILURE); }
 
+        // DUPLICATE IN X
         if (xdim > 1) {
             for (int iter=0; iter < xdim-1; iter++) {
             system.pbc.a += origa;
@@ -1010,7 +1011,7 @@ void setupCrystalBuild(System &system) {
 
 
         }
-
+        // DUPLICATE IN Y
         if (ydim > 1) {
             for (int iter=0; iter < ydim-1; iter++) {
             system.pbc.b += origb;
@@ -1041,7 +1042,7 @@ void setupCrystalBuild(System &system) {
             }
         }
         }
-
+        // DUPLICATE IN Z
         if (zdim > 1) {
             for (int iter=0; iter < zdim-1; iter++) {
             system.pbc.c += origc;
