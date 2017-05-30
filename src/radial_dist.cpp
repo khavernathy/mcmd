@@ -105,28 +105,27 @@ void writeRadialDist(System &system) {
 
     double spherev = 0.0;
     double prevspherev = 0.0;
-    //double sum = 0.0;
+    double sum = 0.0;
 
     //loop to generate sum
-    /*
+    
     for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
         spherev = sphere_volume((i+1)*system.stats.radial_bin_size);
         sum += system.stats.radial_bins[y][i]/(spherev - prevspherev);
         prevspherev = spherev;
     }
-    */
+    
     // reset prevspherev
-    //prevspherev=0.0;
+    prevspherev=0.0;
     
     // loop to write normalized counts
     for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
         spherev = sphere_volume((i+1)*system.stats.radial_bin_size);
         radfile << ((double)(i+1) * system.stats.radial_bin_size);
         radfile << "        ";
-            // normalize as density of sorbates in selected r-region (N/V) as a percent
-            // i.e. the integral of g(r) from 0 -> maximum r = 100
-            // NEVERMIND. sum is unconventional and I'm turning it off.
-            radfile << system.stats.radial_bins[y][i]/(spherev - prevspherev);// /sum *100;         
+            // normalize as density of sorbates in selected r-region (N/V)
+            // with respect to sum. i.e. the integral of g(r) from 0 -> maximum r = 1
+            radfile << system.stats.radial_bins[y][i]/(spherev - prevspherev)/sum; //*100;         
             radfile << "\n";
         prevspherev = spherev;
     }      
