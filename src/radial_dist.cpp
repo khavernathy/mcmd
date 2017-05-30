@@ -44,7 +44,7 @@ void setupRadialDist(System &system) {
 
 
 /* THIS FUNCTION WILL BE CALLED EVERY CORRTIME AND WILL ADD TO BINS AS NEEDED */ 
-/* every step is a little excessive and increases step runtime by ~x15        */
+/* every step is excessive and increases step runtime by ~x15        */
 void radialDist(System &system) {
     const double bin_size = system.stats.radial_bin_size;
     const double max_dist = system.stats.radial_max_dist;
@@ -105,16 +105,18 @@ void writeRadialDist(System &system) {
 
     double spherev = 0.0;
     double prevspherev = 0.0;
-    double sum = 0.0;
+    //double sum = 0.0;
 
     //loop to generate sum
+    /*
     for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
         spherev = sphere_volume((i+1)*system.stats.radial_bin_size);
         sum += system.stats.radial_bins[y][i]/(spherev - prevspherev);
         prevspherev = spherev;
     }
+    */
     // reset prevspherev
-    prevspherev=0.0;
+    //prevspherev=0.0;
     
     // loop to write normalized counts
     for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
@@ -123,7 +125,8 @@ void writeRadialDist(System &system) {
         radfile << "        ";
             // normalize as density of sorbates in selected r-region (N/V) as a percent
             // i.e. the integral of g(r) from 0 -> maximum r = 100
-            radfile << system.stats.radial_bins[y][i]/(spherev - prevspherev)/sum *100;         
+            // NEVERMIND. sum is unconventional and I'm turning it off.
+            radfile << system.stats.radial_bins[y][i]/(spherev - prevspherev);// /sum *100;         
             radfile << "\n";
         prevspherev = spherev;
     }      
