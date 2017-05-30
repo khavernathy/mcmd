@@ -1172,6 +1172,10 @@ void readInput(System &system, char* filename) {
                 system.constants.crystalbuild_z = atoi(lc[1].c_str());
                 std::cout << "Got crystal-builder in z = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "charge_sum_check")) {
+                if (lc[1] == "off") system.constants.charge_sum_check = 0;
+                std::cout << "Got charge sum check option = " << lc[1].c_str(); printf("\n");
+
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
 		} // end while reading lines
@@ -1306,6 +1310,7 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     // charge sum check
+    if (system.constants.charge_sum_check) {
     double qsum=0;
     for (int i=0; i<system.molecules.size(); i++)
         for (int j=0; j<system.molecules[i].atoms.size(); j++) 
@@ -1321,6 +1326,8 @@ void inputValidation(System &system) {
         std::cout << "ERROR: The sum of charges (" << qsum/system.constants.E2REDUCED << " e) on atoms is not zero. The system must be neutral for ewald summation to be correct.";
         exit(EXIT_FAILURE);
     }
+    } // end q-check
+
     if (system.constants.mode == "md" && system.stats.count_movables <= 0) {
         std::cout << "ERROR: MD is turned on but there are no movables molecules in the input. (Use 'M' as opposed to 'F' to distinguish movers from frozens)";
         exit(EXIT_FAILURE);
