@@ -110,6 +110,9 @@ int main(int argc, char **argv) {
     if (system.stats.radial_dist)
         setupRadialDist(system);
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
+    if (system.constants.crystalbuild)
+        setupCrystalBuild(system);
+
     if (system.constants.histogram_option) {
         system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
         system.grids.avg_histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
@@ -120,8 +123,7 @@ int main(int argc, char **argv) {
         setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
         setupNBias(system);
-    if (system.constants.crystalbuild)
-        setupCrystalBuild(system);
+        
 
     system.pbc.printBasis();
     initialize(system); // these are just system name sets, nothing more
