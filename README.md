@@ -17,6 +17,11 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 3) Run: <br />
 `./mcmd mcmd.inp`<br /><br />  
   
+# Update
+`cd mcmd` <br />
+`git pull` <br />
+`cd src` <br />
+`bash compile.sh` <br />
 <hr />
 
 # Contact
