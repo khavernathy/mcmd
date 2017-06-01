@@ -73,8 +73,9 @@ void readInAtomsXYZ(System &system, string filename) {
 			//current_atom.prevpos[0] = current_atom.pos[0];
 			//current_atom.prevpos[1] = current_atom.pos[1];
 			//current_atom.prevpos[2] = current_atom.pos[2];
-            current_atom.C = stod(myvector[4]) * system.constants.E2REDUCED;
-			system.molecules[0].atoms.push_back(current_atom);
+            if (myvector.size() > 4) current_atom.C = stod(myvector[4]) * system.constants.E2REDUCED;
+            else current_atom.C = 0.; // default to zero charge unless the column is there
+            system.molecules[0].atoms.push_back(current_atom);
             system.molecules[0].mass += current_atom.m;
 			system.constants.total_atoms++;	// add +1 to master atoms count
             system.stats.count_frozens++; // add +1 to frozen atoms count
@@ -752,7 +753,7 @@ void readInput(System &system, char* filename) {
                     system.constants.atom_file = lc[1].c_str();
                 }
 
-                std::cout << "Got XYZ input option = " << lc[1].c_str(); printf("\n");
+                //std::cout << "Got XYZ input option = " << lc[1].c_str(); printf("\n");
                 if (system.constants.readinxyz == 1)
                     std::cout << "Got xyz input file = " << lc[1].c_str(); printf("\n");
                 
