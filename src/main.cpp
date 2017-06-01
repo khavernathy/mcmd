@@ -122,13 +122,15 @@ int main(int argc, char **argv) {
     if (system.constants.mode == "mc")
         setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
-        setupNBias(system);
-        
+        setupNBias(system); 
+    if (system.constants.fragmaker)
+        fragmentMaker(system);
+    
 
     system.pbc.printBasis();
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 437); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 481); // i.e. github commit
     inputValidation(system);
     printf("...input options validated.\n");
     system.checkpoint("...input options validated. Done with system setup functions.");

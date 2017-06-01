@@ -942,6 +942,11 @@ void setupNBias(System &system) {
 }
 
 
+void fragmentMaker(System &system) {
+    int numfrags = system.constants.numfrags; 
+    std::cout << "hi frag making";
+}
+
 void setupCrystalBuild(System &system) {
     // build out a periodic box according to user's desire
     int xdim,ydim,zdim; double xlen,ylen,zlen;
