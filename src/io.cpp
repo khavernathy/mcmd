@@ -15,6 +15,7 @@
 #include <time.h>
 #include <chrono>
 #include <math.h>
+#include <iomanip>
 
 /* xyz read-in of atoms */
 void readInAtomsXYZ(System &system, string filename) {
@@ -252,11 +253,12 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
         if ((mover_only_flag && !system.molecules[j].atoms[i].frozen) || !mover_only_flag) {
 		myfile << system.molecules[j].atoms[i].name;
 		myfile <<  "   ";
-		myfile << system.molecules[j].atoms[i].pos[0];
+        // each coordinate has 9 decimal places, fill with zeros where needed.
+		myfile << std::fixed << std::setprecision(9) << system.molecules[j].atoms[i].pos[0];
 		myfile <<  "   ";
-		myfile << system.molecules[j].atoms[i].pos[1];
+		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[1];
 		myfile <<  "   ";
-		myfile << system.molecules[j].atoms[i].pos[2];
+		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[2];
 		myfile << "\n";
 		}
         }
