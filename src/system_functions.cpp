@@ -1013,7 +1013,10 @@ void fragmentMaker(System &system) {
             double r; // pair distance
             int stepper = 0; // trigger to reset the building_points vector as the frag builds
             int builders_size; // = (int)building_points.size();
+            //int iteration_count = 0; // for debug;
             while (currentatom < fragsize) {   
+                //iteration_count++;
+                //printf("iteration # %i;  bondlength = %f\n", iteration_count, bondlength);
                 // find atoms (pseudo-)bonded to the builder atom, fractal style
                 builders_size = (int)building_points.size();
                 vector<vector<double>> temp_building_points;
@@ -1043,14 +1046,18 @@ void fragmentMaker(System &system) {
                 } // end i (the pair-loop is over now.)
                 } // end loop through builder atoms
                     //printf("made it here\n");
-                    // if no additional bonders were detected, boost the bond-length
-                    if (building_points == temp_building_points) bondlength += 0.1;
+                    // if no additional bonders were detected, boost the bond-length so we can find some atoms
+                    if (building_points == temp_building_points || temp_building_points.size()==0) {
+                        bondlength += 0.1;
+                    } else {
+                        // reset the current (untapped) building points if new connections were found
+                        building_points.clear();
+                        //printf("after clearing: %i \n", (int)building_points.size());
+                        building_points = temp_building_points;    
+                    }
                     //printf("size of building_points  %i\n", (int)building_points.size()); 
                     //printf("size of temp_bp          %i\n", (int)temp_building_points.size());
-                    // reset the current (untapped) building points now.
-                    building_points.clear();
-                    //printf("after clearing: %i \n", (int)building_points.size());
-                    building_points = temp_building_points;    
+                    
             } // end while loop adding atoms to frag
 
             // frag has been made.
