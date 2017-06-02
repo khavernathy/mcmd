@@ -1,11 +1,11 @@
 ! Douglas Franz, Space group, USF      
 ! Molcular dynamics example with a non orthorhombic unit-cell periodic system
 ! Neon atoms in MPM-1-Br  MOF
-name              md_NVE_example        
+name              md_NVT_example        
 mode              md ! mc or md       
 checkpoints_option  off       
        
-input_atoms ../../atomfiles/MPM-1-Br+46Ne.pdb   ! PDB ONLY       
+input_atoms ../../../atomfiles/MPM-1-Br+46Ne.pdb   ! PDB ONLY       
 
 potential_form        lj       
 com_option            off     ! center of mass        
@@ -25,7 +25,7 @@ radial_counterpart  Ne   ! element name to get distance of w/centroid
 radial_file         radialdist.dat        
        
 temperature 295.0   
-ensemble nve      
+ensemble nvt   
        
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
