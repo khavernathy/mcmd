@@ -75,7 +75,8 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
 }
 
 // by giving two r vectors.
-double * getR(System &system, double * com1, double * com2) {
+double * getR(System &system, double * com1, double * com2, int pbcflag) {
+    if (pbcflag) {
         double rimg;
         double d[3],di[3],img[3],dimg[3];
         int p,q;
@@ -130,7 +131,18 @@ double * getR(System &system, double * com1, double * com2) {
         for (p=0; p<3; p++) output[p] = dimg[p];
         output[3] = rimg;
         return output;
-    
+        
+    } else {
+        // no pbc
+        double d[3];
+        for (int n=0; n<3; n++) d[n] = com1[n] - com2[n];
+        static double output[4];
+        for (int p=0; p<3; p++) output[p] = d[p];
+        output[3] = sqrt(dddotprod(d, d));
+        return output;
+    }
+
+
 }
 
 

@@ -34,6 +34,7 @@
 #include "classes.cpp"
 #include "system.cpp"
 #include "fugacity.cpp"
+#include "distance.cpp"
 #include "system_functions.cpp" 
 #ifdef CUDA
     #include "cudafuncs.cu"  // CUDA STUFF
@@ -107,8 +108,11 @@ int main(int argc, char **argv) {
         centerCoordinates(system);
     setupBox(system);
     if (system.constants.manual_cutoff) system.pbc.cutoff = system.constants.manual_cutoff_val; // override the cutoff if user-defined.
-    if (system.stats.radial_dist)
+    if (system.stats.radial_dist) {
+        string command = "rm " + system.stats.radial_file + "*";
+        int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
         setupRadialDist(system);
+    }
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
     if (system.constants.crystalbuild)
         setupCrystalBuild(system);
@@ -123,8 +127,11 @@ int main(int argc, char **argv) {
         setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
         setupNBias(system); 
-    if (system.constants.fragmaker)
+    if (system.constants.fragmaker) {
+        string del = "rm fragment-*.xyz";
+        int whatev = std::system(del.c_str());
         fragmentMaker(system);
+    }
     
 
     system.pbc.printBasis();
@@ -149,11 +156,7 @@ int main(int argc, char **argv) {
 	remove( system.constants.output_histogram.c_str() );
 	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
     remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
-        // system command here will only work with Unix
-        string command = "rm " + system.stats.radial_file + "*";
-        string command2 = "rm fragment-*";
-        int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
-            whatever=std::system(command2.c_str());
+        
     // *** done clobbering files.
 
     // INITIAL WRITEOUTS

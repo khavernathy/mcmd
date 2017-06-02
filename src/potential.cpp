@@ -6,7 +6,7 @@
 #include <string>
 #include <stdlib.h>
 
-#include "distance.cpp"
+//#include "distance.cpp"
 #include "lj.cpp"
 #include "commy.cpp"
 #include "coulombic.cpp"

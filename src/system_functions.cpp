@@ -944,15 +944,15 @@ void setupNBias(System &system) {
 void fragmentMaker(System &system) {
     int numfrags = system.constants.numfrags; // number of total frags to make
     int fragsize = system.constants.fragsize; // # of atoms in each frag
-    double bondlength = 3.2; // Angstroms, max bondlength
-
+    
     int currentfrag = 0; // counter for fragments;
     int currentatom = 0; // counter for atoms in a frag.
+    double bondlength = system.constants.frag_bondlength; // Angstroms
 
     // first, get the unique atom names.
     // because we want fragments which represent 
     // each atom in a buried environment
-    printf("Making unique atoms vector for fragment creation.\n");
+    printf(":: Making unique atoms vector for fragment creation.\n");
     vector<string> atomlabels;    
     for (int i=0; i<system.molecules.size(); i++) {
         if (system.molecules[i].frozen) {
@@ -968,51 +968,90 @@ void fragmentMaker(System &system) {
         }
     }
 
-    // confirm the contents of "atomlabels"
+    // confirm the unique atoms to user
     for (int x=0; x<atomlabels.size(); x++)
-        printf("Unique atom %i = %s\n", x, atomlabels[x].c_str());
+        printf(":: ---> Unique atom %i = %s\n", x+1, atomlabels[x].c_str());
 
     // make fragment for each unique atom
-    // cycles until numfrags is reached.
+    // cycles through uniques until numfrags is reached.
     for (int x=0; x<atomlabels.size(); x++) {
         string theatom = atomlabels[x];
         currentatom=0; // reset
-        vector<Atom> currentFrag; // the fragment being built
-        
-        // build it, son.
-        while (currentatom < fragsize) {   
-            int ifix=0, jfix=0; // the indices for the focus-atom while building 
+        bondlength = system.constants.frag_bondlength; // reset
 
+        vector<Atom> currentFrag; // the fragment being built
+        vector<vector<double>> building_points; // holds the coordinates of the fractal'd focus-atoms
+        vector<int> fragPDBIDs; // holds the PDBIDs of each atom in the frag to avoid duplicates  
             // get the most central occurrence of the atom
             int found=0;
             double probe_radius=0.0;
-            double building_point[3] = {0.,0.,0.}; // holds the coordinates of the current focus-atom
             while (!found) {
                 probe_radius += 3.0; // expand by 3.0 A each time to find the atom
             
                 for (int i=0;i<system.molecules.size();i++) {
                     if (!system.molecules[i].frozen) continue; // skip movers, we want frozens
                     for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-                    
+                        if (system.molecules[i].atoms[j].name != theatom) continue; // only consider atoms of interest
                         // found-it checker
                         if (fabs(system.molecules[i].atoms[j].pos[0]) < probe_radius &&
                             fabs(system.molecules[i].atoms[j].pos[1]) < probe_radius &&
                             fabs(system.molecules[i].atoms[j].pos[2]) < probe_radius) {
                             found=1;
                             probe_radius=0;
-                            for (int n=0;n<3;n++) building_point[n] = system.molecules[i].atoms[j].pos[n];
-                            ifix=i; jfix=j;
+                            vector<double> tempcoords = vector<double>(3);
+                            for (int n=0;n<3;n++) tempcoords[n] = system.molecules[i].atoms[j].pos[n];
+                            building_points.push_back(tempcoords);
                             currentFrag.push_back(system.molecules[i].atoms[j]); // add the atom to frag.
+                            fragPDBIDs.push_back(system.molecules[i].atoms[j].PDBID); // and the PDBID to the vector for housekeeping
+                            currentatom++;
                         } 
                     } // end j
                 } // end i
             } // end while loop to find central atom
-         
-            // now build out the fragment from the starting atom 
-            // HERE lsahgsodhgasighasiogh HERE
-
-            currentatom++;
-        } // end while loop adding atoms to frag
+ 
+            // build it, son.
+            double r; // pair distance
+            int stepper = 0; // trigger to reset the building_points vector as the frag builds
+            int builders_size; // = (int)building_points.size();
+            while (currentatom < fragsize) {   
+                // find atoms (pseudo-)bonded to the builder atom, fractal style
+                builders_size = (int)building_points.size();
+                vector<vector<double>> temp_building_points;
+                for (int bl=0; bl<builders_size; bl++) {
+                for (int i=0;i<system.molecules.size();i++) {
+                    if (!system.molecules[i].frozen) continue;
+                    for (int j=0;j<system.molecules[i].atoms.size();j++) {
+                        if (!system.molecules[i].atoms[j].frozen) continue;
+                        double temp[3];
+                        for (int n=0;n<3;n++) temp[n] = building_points[bl][n];
+                        double * distances = getR(system, temp, system.molecules[i].atoms[j].pos, 0);
+                        r = distances[3];
+                        if (r <= bondlength) { // look for a bonded atom
+                            // make sure it's not a duplicate 
+                            if (std::find(fragPDBIDs.begin(), fragPDBIDs.end(), system.molecules[i].atoms[j].PDBID) != fragPDBIDs.end()) continue; 
+                            vector<double> tempvec = vector<double>(3);
+                            for (int n=0;n<3;n++) tempvec[n] = system.molecules[i].atoms[j].pos[n];
+                            temp_building_points.push_back(tempvec);
+                            currentFrag.push_back(system.molecules[i].atoms[j]);
+                            fragPDBIDs.push_back(system.molecules[i].atoms[j].PDBID);
+                            currentatom++;
+                            //printf("currentatom %i \n",currentatom);
+                        } // end if bonded-atom
+                        //printf("dist %f\n", r);
+                        if (currentatom >= fragsize) break; // make sure we kill the loop as soon as the max # of atoms hits (don't wait until this inner loop finishes)
+                    } // end j
+                } // end i (the pair-loop is over now.)
+                } // end loop through builder atoms
+                    //printf("made it here\n");
+                    // if no additional bonders were detected, boost the bond-length
+                    if (building_points == temp_building_points) bondlength += 0.1;
+                    //printf("size of building_points  %i\n", (int)building_points.size()); 
+                    //printf("size of temp_bp          %i\n", (int)temp_building_points.size());
+                    // reset the current (untapped) building points now.
+                    building_points.clear();
+                    //printf("after clearing: %i \n", (int)building_points.size());
+                    building_points = temp_building_points;    
+            } // end while loop adding atoms to frag
 
             // frag has been made.
             // write the frag and move to next
@@ -1031,19 +1070,21 @@ void fragmentMaker(System &system) {
                 exit(EXIT_FAILURE);
             }
             fprintf(f, "%i\n", (int)currentFrag.size());
-            fprintf(f, "Fragment # %i produced by MCMD\n", currentfrag+1);
+            fprintf(f, "Fragment # %i centered around %s produced by MCMD\n", currentfrag+1, theatom.c_str());
             for (int i=0; i<currentFrag.size(); i++) {
-                fprintf(f, "%s %.9f %.9f %.9f %.9f\n", currentFrag[i].name.c_str(), currentFrag[i].pos[0], currentFrag[i].pos[1], currentFrag[i].pos[2], currentFrag[i].C / system.constants.E2REDUCED);
+                fprintf(f, "%s %.9f %.9f %.9f %.7f\n", currentFrag[i].name.c_str(), currentFrag[i].pos[0], currentFrag[i].pos[1], currentFrag[i].pos[2], currentFrag[i].C / system.constants.E2REDUCED);
             }
             fclose(f);
 
 
-            printf("Built fragment %i with filename %s \n", currentfrag+1, filename);
+            printf("Built fragment %i with filename %s centered on %s\n", currentfrag+1, filename, theatom.c_str());
             currentfrag++;
 
-            if (x == atomlabels.size() && currentfrag < numfrags) {
-                x=0; continue; // keep cycling the unique atoms if numfrags not reached yet
-            } else if (x >= numfrags-1)  {
+            if (x == ((int)atomlabels.size()-1) && currentfrag < numfrags) {
+                x=-1; continue; // keep cycling the unique atoms if numfrags not reached yet
+                // negative one bc it's about to do x++ again
+            }
+            if (currentfrag >= numfrags)  {
                 break; // break out if numfrags reached
             }
         
