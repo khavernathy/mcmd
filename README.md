@@ -77,11 +77,10 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> change timing/string stuff for icpc compatibility<br />
 -> openMPI/MPI for easy isotherm<br />
 -> investigate NVE; and escape-artist molecules in displace MC moves (S.A.) <br />
--> MC/MD: crystal builder/fragment maker (expand the unit cell dynamically by user input)<br />
 -> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
 -> MC/MD: multi-sorbate histograms<br />
 -> MD: No-PBC GPU algorithm (already did PBC)<br />
--> MC: multi-box? (G(T,P)) <br />
+-> MC: multi-box? (GEMC) <br />
 -> MC/MD: non-rigid (vibrating/bending/stretching potentials) for sorbates<br />
 -> MC: use GPU for RD/ES, potential to cut ~8% time<br />
 -->

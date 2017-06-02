@@ -1179,6 +1179,13 @@ void readInput(System &system, char* filename) {
                 system.constants.fragmaker = 1;
                 system.constants.numfrags = atoi(lc[1].c_str());
                 std::cout << "Got fragment-maker = on. Going to make " << lc[1] << " fragments."; printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "atoms_per_frag")) {
+                system.constants.fragsize = atoi(lc[1].c_str());
+                std::cout << "Got atoms-per-fragment = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "frag_bondlength")) {
+                system.constants.frag_bondlength = atof(lc[1].c_str());
+                std::cout << "Got fragment (initial/default) bond-length = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "charge_sum_check")) {
                 if (lc[1] == "off") system.constants.charge_sum_check = 0;
