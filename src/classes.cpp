@@ -238,24 +238,26 @@ class Pbc {
         double lengthx=0, lengthy=0, lengthz=0;
 
         void printBasis() {
-            printf("basis1 %.5f %.5f %.5f\n", basis[0][0], basis[0][1], basis[0][2]);
-            printf("basis2 %.5f %.5f %.5f\n", basis[1][0], basis[1][1], basis[1][2]);
-            printf("basis3 %.5f %.5f %.5f\n", basis[2][0], basis[2][1], basis[2][2]);
-            printf("Basis vectors: { a = %9.5f; b = %9.5f; c = %9.5f }\n", a, b,c);
-            printf("Basis angles:  { α = %9.5f; β = %9.5f; γ = %9.5f }\n", alpha,beta,gamma);
-            printf("Box vertices ::\n");
+            printf("\n:: --- Box (basis) information --- ::\n"); 
+            printf(":: basis1 %.5f %.5f %.5f\n", basis[0][0], basis[0][1], basis[0][2]);
+            printf(":: basis2 %.5f %.5f %.5f\n", basis[1][0], basis[1][1], basis[1][2]);
+            printf(":: basis3 %.5f %.5f %.5f\n", basis[2][0], basis[2][1], basis[2][2]);
+            printf(":: Basis vectors: { a = %9.5f; b = %9.5f; c = %9.5f }\n", a, b,c);
+            printf(":: Basis angles:  { α = %9.5f; β = %9.5f; γ = %9.5f }\n", alpha,beta,gamma);
+            printf(":: Box vertices ::\n");
             for (int n=0; n<8; n++)
                 printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
-            printf("PBC Cutoff = %.5f\n", cutoff);
+            printf(":: PBC Cutoff = %.5f\n", cutoff);
             for (int n=0; n<6; n++) {
-                printf("Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n",
+                printf(":: Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n",
                     n, A[n], B[n], C[n], D[n]);
             }
-            printf("x_length = %.5f; y_length = %.5f; z_length = %.5f\n", x_length, y_length, z_length);
+            printf(":: x_length = %.5f; y_length = %.5f; z_length = %.5f\n", x_length, y_length, z_length);
             if (alpha == 90 && beta == 90 && gamma == 90) { // these don't get calculated or used for weird (non 90-90-90) unit cells
-              printf("x_max = %.5f; y_max = %.5f; z_max = %.5f\n", x_max, y_max, z_max);
-              printf("x_min = %.5f; y_min = %.5f; z_min = %.5f\n", x_min, y_min, z_min);
+              printf(":: x_max = %.5f; y_max = %.5f; z_max = %.5f\n", x_max, y_max, z_max);
+              printf(":: x_min = %.5f; y_min = %.5f; z_min = %.5f\n", x_min, y_min, z_min);
             }
+            printf(":: --- End box information --- ::\n\n");
         }
 
         void calcPlane(int p1index, int p2index, int p3index, int planeIndex) { // 3 points define a plane.
@@ -643,7 +645,7 @@ class Atom {
 
         /* for debugging */
         void printAll() {
-            printf("atom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %e kg; eps = %f K; sig = %f A; C = %f sqrt(KA)\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C);
+            printf("atom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %f amu; eps = %f K; sig = %f A; C = %f e\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m/(1.660578e-27), eps, sig,C/408.7816);
                    
                    // force: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C, force[0], force[1], force[2], acc[0], acc[1], acc[2], old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2]);
         }

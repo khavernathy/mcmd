@@ -1201,6 +1201,7 @@ void readInput(System &system, char* filename) {
 			} // end if line not blank
 		} // end while reading lines
 	} // end if file open
+    printf("Done reading input parameters.\n\n");
 } // end read input function
 
 void paramOverrideCheck(System &system) {

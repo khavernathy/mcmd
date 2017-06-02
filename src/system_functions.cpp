@@ -75,6 +75,7 @@ void centerCoordinates(System &system) {
 		system.molecules[i].atoms[j].pos[2] = system.molecules[i].atoms[j].pos[2] - (zmin + (zmax - zmin)/2.0);
 	}
 	}
+    printf("Done centering coordinates.\n\n");
 }
 
 
@@ -734,13 +735,15 @@ void moleculePrintout(System &system) {
 
 
         // finally, show the current proto molecules
+        printf("\n::: PROTOTYPE (SORBATE) MOLECULES :::\n");
         for (int i=0; i<system.proto.size(); i++) {
-        printf("\nPrototype molecule %i has PDBID %i ( name %s ) and has %i atoms\n",i, system.proto[i].PDBID, system.proto[i].name.c_str(), (int)system.proto[i].atoms.size());
+        printf(":: %i :: Prototype molecule %i has PDBID %i ( name %s ) and has %i atoms\n",i,i, system.proto[i].PDBID, system.proto[i].name.c_str(), (int)system.proto[i].atoms.size());
             //system.proto.printAll();
             for (int j=0; j<system.proto[i].atoms.size(); j++) {
                 system.proto[i].atoms[j].printAll();
             }
         }
+        printf("\n");
 
     } // end if MC
 
@@ -953,11 +956,12 @@ void fragmentMaker(System &system) {
     int currentatom = 0; // counter for atoms in a frag.
     double bondlength = system.constants.frag_bondlength; // Angstroms
     vector<vector<int>> fragment_atom_ids; // to check for duplicate fragments. 
+    int duplicatefrags = 0; // counter for duplicates just to inform user
 
     // first, get the unique atom names.
     // because we want fragments which represent 
     // each atom in a buried environment
-    printf(":: Making unique atoms vector for fragment creation.\n");
+    printf("\n:: Making unique atoms vector for fragment creation.\n");
     vector<string> atomlabels;    
     for (int i=0; i<system.molecules.size(); i++) {
         if (system.molecules[i].frozen) {
@@ -1115,7 +1119,8 @@ void fragmentMaker(System &system) {
             fragment_atom_ids.push_back(fragPDBIDs); // to check duplicates
             } else {
                 // the frag was a duplicate, so we skip it from writing
-                printf("Fragment %i was a duplicate. Not writing.\n", globalfrag+1);
+                duplicatefrags++;
+                //printf("Fragment %i was a duplicate. Not writing.\n", globalfrag+1);
                 currentfrag++;
                 globalfrag++;
                 //continue;
@@ -1133,6 +1138,7 @@ void fragmentMaker(System &system) {
     } // end x loop (unique atoms loop, which makes 1 frag per iter)
     } // end fs loop (frag-size loop, for different size frags)
 
+    printf("%i duplicate fragments were detected and not written.\n", duplicatefrags);
 
 }
 
@@ -1268,6 +1274,7 @@ void setupCrystalBuild(System &system) {
         } 
     
 
+    printf("Done building crystal.\n\n");
     if (system.constants.autocenter) centerCoordinates(system);
     setupBox(system); // final box setup JIC
 
