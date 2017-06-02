@@ -17,12 +17,12 @@ fugacity_single     h2
 carbasis 27.934 27.934 41.081 90 90 90
 
 radial_dist         on
-radial_centroid     CuC  CuL  N1   HN
-radial_counterpart  H2G  H2G  H2G  H2G
+radial_centroid     CuC  CuL  N1   HN   H2G
+radial_counterpart  H2G  H2G  H2G  H2G  H2G
 
 ensemble		    uvt
 mc_corrtime	        100
-finalstep		    100000
+finalstep		    1000000
 temperature         77  
 pressure            1.0
 insert_factor		0.667
