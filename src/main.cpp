@@ -151,7 +151,9 @@ int main(int argc, char **argv) {
     remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
         // system command here will only work with Unix
         string command = "rm " + system.stats.radial_file + "*";
+        string command2 = "rm fragment-*";
         int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
+            whatever=std::system(command2.c_str());
     // *** done clobbering files.
 
     // INITIAL WRITEOUTS

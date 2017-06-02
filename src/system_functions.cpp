@@ -944,7 +944,7 @@ void setupNBias(System &system) {
 void fragmentMaker(System &system) {
     int numfrags = system.constants.numfrags; // number of total frags to make
     int fragsize = system.constants.fragsize; // # of atoms in each frag
-    int bondlength = 3.2; // Angstroms, max bondlength
+    double bondlength = 3.2; // Angstroms, max bondlength
 
     int currentfrag = 0; // counter for fragments;
     int currentatom = 0; // counter for atoms in a frag.
