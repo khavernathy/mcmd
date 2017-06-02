@@ -1026,7 +1026,7 @@ void fragmentMaker(System &system) {
  
             // build it, son.
             double r; // pair distance
-            int stepper = 0; // trigger to reset the building_points vector as the frag builds
+            //int stepper = 0; // trigger to reset the building_points vector as the frag builds
             int builders_size; // = (int)building_points.size();
             //int iteration_count = 0; // for debug;
             while (currentatom < fragsize) {   
