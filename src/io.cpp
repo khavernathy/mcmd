@@ -1182,6 +1182,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "atoms_per_frag")) {
                 system.constants.fragsize.clear(); // empty the default (250)
                 for (int x=0; x<(int)lc.size()-1; x++) {
+                    if (lc[x+1] == "!") break; // avoid tailing comments
                     system.constants.fragsize.push_back(atoi(lc[x+1].c_str()));
                     std::cout << "Got atoms-per-fragment[" << x+1 << "] = " << lc[x+1].c_str(); printf("\n");
                 }
