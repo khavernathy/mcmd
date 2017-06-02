@@ -9,7 +9,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <map>
-#include <string>
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
@@ -943,8 +942,114 @@ void setupNBias(System &system) {
 
 
 void fragmentMaker(System &system) {
-    int numfrags = system.constants.numfrags; 
-    std::cout << "hi frag making";
+    int numfrags = system.constants.numfrags; // number of total frags to make
+    int fragsize = system.constants.fragsize; // # of atoms in each frag
+    int bondlength = 3.2; // Angstroms, max bondlength
+
+    int currentfrag = 0; // counter for fragments;
+    int currentatom = 0; // counter for atoms in a frag.
+
+    // first, get the unique atom names.
+    // because we want fragments which represent 
+    // each atom in a buried environment
+    printf("Making unique atoms vector for fragment creation.\n");
+    vector<string> atomlabels;    
+    for (int i=0; i<system.molecules.size(); i++) {
+        if (system.molecules[i].frozen) {
+            for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                string theatom = system.molecules[i].atoms[j].name;
+                if (std::find(atomlabels.begin(), atomlabels.end(), theatom) != atomlabels.end()) {
+                    // the atom is already in our unique set "atomlabels"
+                    continue;
+                } else {
+                    atomlabels.push_back(theatom);
+                }
+            }
+        }
+    }
+
+    // confirm the contents of "atomlabels"
+    for (int x=0; x<atomlabels.size(); x++)
+        printf("Unique atom %i = %s\n", x, atomlabels[x].c_str());
+
+    // make fragment for each unique atom
+    // cycles until numfrags is reached.
+    for (int x=0; x<atomlabels.size(); x++) {
+        string theatom = atomlabels[x];
+        currentatom=0; // reset
+        vector<Atom> currentFrag; // the fragment being built
+        
+        // build it, son.
+        while (currentatom < fragsize) {   
+            int ifix=0, jfix=0; // the indices for the focus-atom while building 
+
+            // get the most central occurrence of the atom
+            int found=0;
+            double probe_radius=0.0;
+            double building_point[3] = {0.,0.,0.}; // holds the coordinates of the current focus-atom
+            while (!found) {
+                probe_radius += 3.0; // expand by 3.0 A each time to find the atom
+            
+                for (int i=0;i<system.molecules.size();i++) {
+                    if (!system.molecules[i].frozen) continue; // skip movers, we want frozens
+                    for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    
+                        // found-it checker
+                        if (fabs(system.molecules[i].atoms[j].pos[0]) < probe_radius &&
+                            fabs(system.molecules[i].atoms[j].pos[1]) < probe_radius &&
+                            fabs(system.molecules[i].atoms[j].pos[2]) < probe_radius) {
+                            found=1;
+                            probe_radius=0;
+                            for (int n=0;n<3;n++) building_point[n] = system.molecules[i].atoms[j].pos[n];
+                            ifix=i; jfix=j;
+                            currentFrag.push_back(system.molecules[i].atoms[j]); // add the atom to frag.
+                        } 
+                    } // end j
+                } // end i
+            } // end while loop to find central atom
+         
+            // now build out the fragment from the starting atom 
+            // HERE lsahgsodhgasighasiogh HERE
+
+            currentatom++;
+        } // end while loop adding atoms to frag
+
+            // frag has been made.
+            // write the frag and move to next
+            string fragid = to_string(currentfrag);
+            std::string fragtail = std::string(5 - fragid.length(), '0') + fragid;
+            char suffix[7] = "-";
+            strcat(suffix, fragtail.c_str());
+            char filename[20] = "fragment";
+            strcat(filename, suffix);
+            char extension[5] = ".xyz";
+            strcat(filename, extension);
+
+            FILE *f = fopen(filename, "w");
+            if (f == NULL) {
+                printf("Error opening fragment file! Name = %s\n", filename);
+                exit(EXIT_FAILURE);
+            }
+            fprintf(f, "%i\n", (int)currentFrag.size());
+            fprintf(f, "Fragment # %i produced by MCMD\n", currentfrag+1);
+            for (int i=0; i<currentFrag.size(); i++) {
+                fprintf(f, "%s %.9f %.9f %.9f %.9f\n", currentFrag[i].name.c_str(), currentFrag[i].pos[0], currentFrag[i].pos[1], currentFrag[i].pos[2], currentFrag[i].C / system.constants.E2REDUCED);
+            }
+            fclose(f);
+
+
+            printf("Built fragment %i with filename %s \n", currentfrag+1, filename);
+            currentfrag++;
+
+            if (x == atomlabels.size() && currentfrag < numfrags) {
+                x=0; continue; // keep cycling the unique atoms if numfrags not reached yet
+            } else if (x >= numfrags-1)  {
+                break; // break out if numfrags reached
+            }
+        
+    }
+
+
 }
 
 void setupCrystalBuild(System &system) {

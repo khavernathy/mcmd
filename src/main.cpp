@@ -50,7 +50,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
    
-        /*
+        /*        
         // MPI is on hold for now.
         // set the default MPI params
         int rank=0, size=1;
@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
         char suffix[7] = "-";
         std::strcat(suffix,corenum.c_str());
         //printf("suffix: %s\n", suffix); 
-        */    
+         */
 
     //output current date/time
     time_t rawtime;
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
     char buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,sizeof(buffer),"%d-%m-%Y %I:%M:%S",timeinfo);
+    strftime(buffer,sizeof(buffer),"%m-%d-%Y %I:%M:%S",timeinfo);
     std::string str(buffer);
     std::cout << "MCMD started at " << str << endl;
 

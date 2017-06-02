@@ -1,5 +1,6 @@
 #md_test
 *.agr
+frag*
 *.py
 md_test/h2mof5
 md_test/h2mof5/*

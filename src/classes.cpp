@@ -206,6 +206,7 @@ class Constants {
 
         int fragmaker=0; // option to create fragments at startup.
         int numfrags=0; // number of fragments to create in fragmentMaker function
+        int fragsize=50; // 50 atoms as a default
 };
 
 class Pbc {
