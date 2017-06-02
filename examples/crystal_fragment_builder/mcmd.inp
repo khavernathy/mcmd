@@ -1,15 +1,17 @@
-! This is a comment 
-! rht-MOF-9 with hydrogen, to simulate H2 loading
-! Note the use of built-in sorbate via sorbate_name
-! Hi
+! This is idenical to the uvt example, except 
+! we're building out the crystal system at the beginning
+! and also spitting out some sample fragments of the MOF
+! and also excluding polarization
+! You can, of course, use the fragment builder independent of the crystal builder
+! and vice-versa.
 
-name			    mc_uvt_example 
+name			    crystal_and_frag_builder_example 
 mode	 		    mc 
 input_atoms         ../../atomfiles/rht-MOF-9.pdb
 
 free_volume         11595.4
 
-potential_form 		ljespolar
+potential_form 		ljes    ! no polar
 xyz_traj_option     off
 sorbate_name        h2_bssp
 fugacity_single     h2
@@ -34,3 +36,12 @@ fh_order 4
 
 bias_uptake 2.6 wt%    ! based on experiment for quicker equilibration
 auto_reject_r 1.5      ! more speedup
+
+crystalbuild   on
+crystalbuild_x 2
+crystalbuild_y 2
+crystalbuild_z 2
+
+makefrags 17
+atoms_per_frag 75 90 110 150 250
+frag_bondlength 1.9

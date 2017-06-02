@@ -1,5 +1,7 @@
 ! Douglas Franz, Space group, USF      
-name              mcmd_development        
+! Molcular dynamics example with a non orthorhombic unit-cell periodic system
+! Neon atoms in MPM-1-Br  MOF
+name              md_example        
 mode              md ! mc or md       
 checkpoints_option  off       
        
@@ -15,11 +17,11 @@ basis3   0.00000  0.00000 30.99800
 
 
 ! radial distribution option      
-radial_dist         off   ! turns on/off radial distribution function. off for speedup        
+radial_dist         on   ! turns on/off radial distribution function. off for speedup        
 radial_bin_size     0.05  ! in A       
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)        
-radial_centroid     OXY   ! element name      
-radial_counterpart  HYD   ! element name to get distance of w/centroid        
+radial_centroid     Ne   ! element name      
+radial_counterpart  Ne   ! element name to get distance of w/centroid        
 radial_file         radialdist.dat        
        
 temperature 295.0   
@@ -32,5 +34,5 @@ md_dt             2  ! fs
 md_ft             200000  ! fs        
 md_corrtime       1     ! steps        
 !md_init_vel         0    ! A / fs^2      
-md_mode             molecular      !atomic        
-md_rotations        on
+md_mode             molecular          
+md_rotations        off    ! important here, because the movable molecules are monatomic.

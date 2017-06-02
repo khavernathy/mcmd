@@ -1,4 +1,7 @@
 ! Douglas Franz, Space group, USF      
+! This is an example of separation of water and octane via CUDA GPU MD
+! You have to compile the code with cuda enabled
+! e.g. bash compile.sh gpu
 name              mcmd_development        
 mode              md ! mc or md       
 cuda                on
@@ -20,6 +23,6 @@ md_pbc              on
 md_dt             1  ! fs       
 md_ft               10 ns     
 md_corrtime       100     ! steps        
-!md_init_vel         0    ! A / fs^2      
+!md_init_vel         0    ! A / fs     
 md_mode             molecular        
 md_rotations        on

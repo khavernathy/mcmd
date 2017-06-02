@@ -1,8 +1,8 @@
 ! Douglas Franz, Space group, USF
-! all input params are defined only by the second column
+! No-PBC monte carlo example. Ru-tris-bipyridine in a MOF cage with methanol
 ! 2017
 
-name			    mcmd_development
+name			    nopbc_RuBpy_example
 mode	 		    mc ! mc or md
 checkpoints_option  off
 ewald_es            off
@@ -22,11 +22,11 @@ dist_within_target CoM
 dist_within_radius 9.01
 
 ! radial distribution option
-radial_dist         off  ! turns on/off radial distribution function. off for speed-up
+radial_dist         on  ! turns on/off radial distribution function. off for speed-up
 radial_bin_size     0.1  ! in A
 radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
-radial_centroid     Mn1   ! element name
-radial_counterpart  C2G   ! element name to get distance of w/centroid
+radial_centroid     CoM  ! element name
+radial_counterpart  Zn   ! element name to get distance of w/centroid
 radial_file         radialdist.dat 
 
 

@@ -1,11 +1,12 @@
 ! Douglas Franz, Space group, USF
-! all input params are defined only by the second column
+! Example of NPT monte carlo (i.e. the box changes volume)
+! 100 Helium atoms
+! Note the input file He100.pdb takes advantage of the "default" feature
 ! 2017
 
-name			    mcmd_development
+name			    npt_example
 mode	 		    mc ! mc or md
 checkpoints_option  off
-ewald_es            on
 rd_lrc              on
 input_atoms    ../../atomfiles/He100.pdb       ! PDB ONLY 
 potential_form 		lj  

@@ -1,8 +1,8 @@
 ! Douglas Franz, Space group, USF
-! all input params are defined only by the second column
+! NVE monte carlo example.
 ! 2017
 
-name			    mcmd_development
+name			    mc_nve_example
 mode	 		    mc ! mc or md
 checkpoints_option  off
 input_atoms	  ../../atomfiles/He100.pdb        ! PDB ONLY 
