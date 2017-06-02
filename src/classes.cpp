@@ -206,7 +206,7 @@ class Constants {
 
         int fragmaker=0; // option to create fragments at startup.
         int numfrags=0; // number of fragments to create in fragmentMaker function
-        int fragsize=250; // num. atoms as a default
+        vector<int> fragsize = {250}; // num. of atoms in a frag, default
         double frag_bondlength = 2.1; // Angstroms, default.
 };
 

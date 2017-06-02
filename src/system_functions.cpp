@@ -942,12 +942,17 @@ void setupNBias(System &system) {
 
 
 void fragmentMaker(System &system) {
-    int numfrags = system.constants.numfrags; // number of total frags to make
-    int fragsize = system.constants.fragsize; // # of atoms in each frag
+    int numfrags = system.constants.numfrags; // number of base- frags to make
+        // (will be multiplied by the number of atoms_per_frag's chosen
+        // e.g. numfrags=20 and atoms_per_frag 50 100 150 
+        // will result in 20*3 = 60 fragments
+    //int fragsize = system.constants.fragsize; // # of atoms in each frag
     
-    int currentfrag = 0; // counter for fragments;
+    int currentfrag = 0; // counter for fragments (local)
+    int globalfrag = 0; // counter for fragments (global)
     int currentatom = 0; // counter for atoms in a frag.
     double bondlength = system.constants.frag_bondlength; // Angstroms
+    vector<vector<int>> fragment_atom_ids; // to check for duplicate fragments. 
 
     // first, get the unique atom names.
     // because we want fragments which represent 
@@ -972,6 +977,12 @@ void fragmentMaker(System &system) {
     for (int x=0; x<atomlabels.size(); x++)
         printf(":: ---> Unique atom %i = %s\n", x+1, atomlabels[x].c_str());
 
+    // loop through fragsizes (could be multiple depending on user input)
+    for (int fs=0; fs<(int)system.constants.fragsize.size(); fs++) {
+        // the size for this round of frags
+        int fragsize = (int)system.constants.fragsize[fs];
+        currentfrag=0; // reset
+        printf("Making %i-atom fragments...\n", fragsize);
     // make fragment for each unique atom
     // cycles through uniques until numfrags is reached.
     for (int x=0; x<atomlabels.size(); x++) {
@@ -1060,9 +1071,20 @@ void fragmentMaker(System &system) {
                     
             } // end while loop adding atoms to frag
 
+
+
             // frag has been made.
             // write the frag and move to next
-            string fragid = to_string(currentfrag);
+            // check duplicate fragment
+            int dupeFlag=0;
+            sort( fragPDBIDs.begin(), fragPDBIDs.end() ); // sort so that the dupes are correctly found
+            for (int fi=0; fi<fragment_atom_ids.size(); fi++) {
+                if (fragPDBIDs == fragment_atom_ids[fi]) dupeFlag = 1;
+            }
+
+            // write the new fragment now, since it's not a duplicate.
+            if (dupeFlag == 0) {
+            string fragid = to_string(globalfrag);
             std::string fragtail = std::string(5 - fragid.length(), '0') + fragid;
             char suffix[7] = "-";
             strcat(suffix, fragtail.c_str());
@@ -1077,15 +1099,27 @@ void fragmentMaker(System &system) {
                 exit(EXIT_FAILURE);
             }
             fprintf(f, "%i\n", (int)currentFrag.size());
-            fprintf(f, "Fragment # %i centered around %s produced by MCMD\n", currentfrag+1, theatom.c_str());
+            double charge_sum=0.;
+            for (int i=0; i<currentFrag.size(); i++) charge_sum += currentFrag[i].C / system.constants.E2REDUCED;
+    
+            fprintf(f, "Fragment # %i centered around %s with total charge = %.9f e produced by MCMD\n", globalfrag+1, theatom.c_str(), charge_sum);
             for (int i=0; i<currentFrag.size(); i++) {
                 fprintf(f, "%s %.9f %.9f %.9f %.7f\n", currentFrag[i].name.c_str(), currentFrag[i].pos[0], currentFrag[i].pos[1], currentFrag[i].pos[2], currentFrag[i].C / system.constants.E2REDUCED);
             }
             fclose(f);
 
 
-            printf("Built fragment %i with filename %s centered on %s\n", currentfrag+1, filename, theatom.c_str());
+            printf("Built fragment %i with filename %s centered on %s\n", globalfrag+1, filename, theatom.c_str());
             currentfrag++;
+            globalfrag++;
+            fragment_atom_ids.push_back(fragPDBIDs); // to check duplicates
+            } else {
+                // the frag was a duplicate, so we skip it from writing
+                printf("Fragment %i was a duplicate. Not writing.\n", globalfrag+1);
+                currentfrag++;
+                globalfrag++;
+                //continue;
+            }
 
             if (x == ((int)atomlabels.size()-1) && currentfrag < numfrags) {
                 x=-1; continue; // keep cycling the unique atoms if numfrags not reached yet
@@ -1094,8 +1128,10 @@ void fragmentMaker(System &system) {
             if (currentfrag >= numfrags)  {
                 break; // break out if numfrags reached
             }
+            
         
-    }
+    } // end x loop (unique atoms loop, which makes 1 frag per iter)
+    } // end fs loop (frag-size loop, for different size frags)
 
 
 }
