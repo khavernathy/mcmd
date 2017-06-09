@@ -11,7 +11,7 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 2) Compile: <br />
 `cd mcmd` <br />
 `cd src` <br />
-`bash compile.sh` <br />
+`bash compile.sh   [ options ]` <br />
 `cd ..` <br />
 
 3) Run: <br />
