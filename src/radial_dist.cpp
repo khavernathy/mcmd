@@ -121,7 +121,7 @@ void writeRadialDist(System &system) {
     // loop to write normalized counts
     for (int i=0; i<system.stats.radial_bins[y].size(); i++) {
         spherev = sphere_volume((i+1)*system.stats.radial_bin_size);
-        radfile << ((double)(i+1) * system.stats.radial_bin_size);
+        radfile << (((double)(i+1) * system.stats.radial_bin_size) - (system.stats.radial_bin_size/2.0)); // offset to middle of bin-range
         radfile << "        ";
             // normalize as density of sorbates in selected r-region (N/V)
             // with respect to sum. i.e. the integral of g(r) from 0 -> maximum r = 1
