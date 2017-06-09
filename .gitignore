@@ -47,3 +47,5 @@ uvt_test/rhtrestart
 nvt_test/commy
 *.png
 mcmd.dSYM
+test_zone
+test_zone/*
