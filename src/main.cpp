@@ -25,6 +25,11 @@
 #include <chrono>
 //#include <float.h>
 
+// Windows compilation (c11 instead of c++) doesn't auto-define pi.
+#ifdef WINDOWS
+#define M_PI 3.14159265359
+#endif
+
 // c++ code files of this program
 // ORDER MATTERS HERE
 #ifdef MPI
