@@ -9,6 +9,7 @@
 # bash compile.sh               Defaults to cpu compilation
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
 # bash compile.sh cpu linux     (optimized for linux (ONLY))
+# bash compile.sh cpu windows   (for use on Windows ONLY)
 # bash compile.sh cpu errors    (same but with errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)
@@ -50,6 +51,8 @@ if [[ "$option" == "cpu" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
     elif [[ "$2" == "O3" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3
+    elif [[ "$2" == "windows" ]]; then
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -D WINDOWS
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
     fi
