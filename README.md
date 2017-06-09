@@ -24,7 +24,7 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 `bash compile.sh` <br />
 
 # Advanced compilation
-Take a look at mcmd/src/compile.sh for different options in compilation (e.g. CUDA implementation, optimization on different systems, etc.)
+Take a look at mcmd/src/compile.sh for different options in compilation (e.g. OS-specific, CUDA implementation, optimization on different HPC systems, etc.)
 
 <hr />
 
@@ -61,8 +61,8 @@ The program outputs several quantities of interest:<br />
 &emsp;->Induced dipole strengths for polarization simulations<br />
 
 # Operating System requirements
-MCMD works out-of-the-box on Linux (tested on Ubuntu 16.04) and Mac (tested on OS X El Capitan v10.11.6).<br />
-We recommend Visual Molecular Dynamics for data visualization, but the output is compatible with most other software<br />
+MCMD works out-of-the-box on Linux (tested on Ubuntu 16.04), Mac (tested on OS X El Capitan v10.11.6), and Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed.<br />
+We recommend Visual Molecular Dynamics for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, etc.<br />
 
 <!--
 # TODO
