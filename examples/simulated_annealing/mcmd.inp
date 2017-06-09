@@ -1,0 +1,39 @@
+! Douglas Franz, Space group, USF
+! NOTT-112 with 417 H2 molecules (BSS model). Very large volume system.
+! Simulated annealing is on, so the temperature should decrease as the simulation proceeds.
+! 2017
+
+name			    mc_nvt_example 
+mode	 		    mc ! mc or md
+checkpoints_option  off
+
+input_atoms     ../../atomfiles/MPM-1-Br+CO2_PHAST.pdb
+
+potential_form 		ljes  
+com_option		    off  	! center of mass
+
+
+simulated_annealing on
+simulated_annealing_schedule 0.99997 
+simulated_annealing_target   4.0  !K
+
+
+carbasis  27.1979   27.1979   30.9998 90 90 120
+
+! MONTE CARLO ONLY ======================================
+ensemble		    nvt
+
+mc_pbc              on
+mc_corrtime	        500
+finalstep		    500000
+temperature 	    700  ! K
+insert_factor		0.667     ! uVT: prob to insert/delete in uVT
+displace_factor     2.5
+rotate_angle_factor 360.0
+! =======================================================
+
+auto_reject_option on  ! saves time
+auto_reject_r 1.6      ! angstroms
+
+charge_sum_check on
+
