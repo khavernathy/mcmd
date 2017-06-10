@@ -21,7 +21,7 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 `cd mcmd` <br />
 `git pull` <br />
 `cd src` <br />
-`bash compile.sh` <br />
+`bash compile.sh   [ options ]` <br />
 
 # Advanced compilation
 Take a look at mcmd/src/compile.sh for different options in compilation (e.g. OS-specific, CUDA implementation, optimization on different HPC systems, etc.)
