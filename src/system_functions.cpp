@@ -1024,6 +1024,7 @@ void fragmentMaker(System &system) {
                 } // end i
             } // end while loop to find central atom
  
+            //printf("found central atom. building.\n");
             // build it, son.
             double r; // pair distance
             //int stepper = 0; // trigger to reset the building_points vector as the frag builds
@@ -1045,8 +1046,14 @@ void fragmentMaker(System &system) {
                         double * distances = getR(system, temp, system.molecules[i].atoms[j].pos, 0);
                         r = distances[3];
                         if (r <= bondlength) { // look for a bonded atom
-                            // make sure it's not a duplicate 
-                            if (std::find(fragPDBIDs.begin(), fragPDBIDs.end(), system.molecules[i].atoms[j].PDBID) != fragPDBIDs.end()) continue; 
+                            // make sure it's not a duplicate atom
+                            if (std::find(fragPDBIDs.begin(), fragPDBIDs.end(), system.molecules[i].atoms[j].PDBID) != fragPDBIDs.end()) {
+                                //printf("duplicate atom found. skipping \n");
+                                //for (int uip=0; uip<fragPDBIDs.size(); uip++) {
+                                //    printf("fragPDBIDs[%i] = %i\n", uip, fragPDBIDs[uip]);
+                                //}
+                                continue; 
+                            }
                             vector<double> tempvec = vector<double>(3);
                             for (int n=0;n<3;n++) tempvec[n] = system.molecules[i].atoms[j].pos[n];
                             temp_building_points.push_back(tempvec);
@@ -1064,6 +1071,7 @@ void fragmentMaker(System &system) {
                     // if no additional bonders were detected, boost the bond-length so we can find some atoms
                     if (building_points == temp_building_points || temp_building_points.size()==0) {
                         bondlength += 0.1;
+                        //printf("increased bondlength. bondlength = %f \n", bondlength);
                     } else {
                         // reset the current (untapped) building points if new connections were found
                         building_points.clear();
@@ -1277,6 +1285,23 @@ void setupCrystalBuild(System &system) {
     printf("Done building crystal.\n\n");
     if (system.constants.autocenter) centerCoordinates(system);
     setupBox(system); // final box setup JIC
+
+    // this is a just in case measure. If user inputs an xyz file we need to re-write the PDBIDs before proceeding.
+    // CONSOLIDATE ATOM AND MOLECULE PDBID's
+            // quick loop through all atoms to make PDBID's pretty (1->N)
+            if (system.molecules.size() > 0) {
+            int molec_counter=1, atom_counter=1;
+            for (int i=0; i<system.molecules.size(); i++) {
+                system.molecules[i].PDBID = molec_counter;
+                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    system.molecules[i].atoms[j].PDBID = atom_counter;
+                    system.molecules[i].atoms[j].mol_PDBID = system.molecules[i].PDBID;
+                    atom_counter++;
+                } // end loop j
+                molec_counter++;
+            } // end loop i
+            } // end if molecules exist
+
 
     //} // end if 90/90/90
     //else {
