@@ -953,6 +953,7 @@ void fragmentMaker(System &system) {
     
     int currentfrag = 0; // counter for fragments (local)
     int globalfrag = 0; // counter for fragments (global)
+    int successfrags = 0; // counter for successful, non-duplicate, written fragments
     int currentatom = 0; // counter for atoms in a frag.
     double bondlength = system.constants.frag_bondlength; // Angstroms
     vector<vector<int>> fragment_atom_ids; // to check for duplicate fragments. 
@@ -1120,7 +1121,7 @@ void fragmentMaker(System &system) {
             }
             fclose(f);
 
-
+            successfrags++;
             printf("Built fragment %i with filename %s centered on %s\n", globalfrag+1, filename, theatom.c_str());
             currentfrag++;
             globalfrag++;
@@ -1147,6 +1148,7 @@ void fragmentMaker(System &system) {
     } // end fs loop (frag-size loop, for different size frags)
 
     printf("%i duplicate fragments were detected and not written.\n", duplicatefrags);
+    printf("%i fragments were successfully created.\n", successfrags);
 
 }
 
