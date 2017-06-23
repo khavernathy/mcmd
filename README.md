@@ -62,10 +62,10 @@ The program outputs several quantities of interest:<br />
 
 # Operating System requirements
 MCMD works out-of-the-box on 
-&emsp;-> Linux (tested on Ubuntu 16.04)
-&emsp;-> Mac (tested on OS X El Capitan v10.11.6)
-&emsp;-> Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed)
-&emsp;-> Raspberry Pi (3, using Raspian OS).<br />
+&emsp;-> Linux (tested on Ubuntu 16.04)<br />
+&emsp;-> Mac (tested on OS X El Capitan v10.11.6)<br />
+&emsp;-> Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed)<br />
+&emsp;-> Raspberry Pi (3, using Raspian OS).<br /><br />
 We recommend Visual Molecular Dynamics for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, etc.<br />
 
 <!--
