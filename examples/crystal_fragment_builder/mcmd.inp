@@ -14,34 +14,37 @@ free_volume         11595.4
 potential_form 		ljes    ! no polar
 xyz_traj_option     off
 sorbate_name        h2_bssp
-fugacity_single     h2
+!fugacity_single     h2
 
 carbasis 27.934 27.934 41.081 90 90 90
 
-radial_dist         on
-radial_centroid     CuC  CuL  N1   HN
-radial_counterpart  H2G  H2G  H2G  H2G
+!radial_dist         on
+!radial_centroid     CuC  CuL  N1   HN
+!radial_counterpart  H2G  H2G  H2G  H2G
 
 ensemble		    uvt
-mc_corrtime	        100
-finalstep		    100000
+mc_corrtime	        1 
+finalstep		    1
 temperature         77  
 pressure            1.0
 insert_factor		0.667
 displace_factor     2.5
 rotate_angle_factor 360.0
 
-feynman_hibbs on
-fh_order 4
+!feynman_hibbs on
+!fh_order 4
 
-bias_uptake 2.6 wt%    ! based on experiment for quicker equilibration
-auto_reject_r 1.5      ! more speedup
+!bias_uptake 2.6 wt%    ! based on experiment for quicker equilibration
+!auto_reject_r 1.5      ! more speedup
 
+
+! these are commands to build the unit cell to 8 times the original volume (2x2x2)
 crystalbuild   on
 crystalbuild_x 2
 crystalbuild_y 2
 crystalbuild_z 2
 
+! this will make up to 17*5 fragments. The program will exclude duplicates.
 makefrags 17
 atoms_per_frag 75 90 110 150 250
 frag_bondlength 1.9
