@@ -61,7 +61,7 @@ The program outputs several quantities of interest:<br />
 &emsp;->Induced dipole strengths for polarization simulations<br />
 
 # Operating System requirements
-MCMD works out-of-the-box on 
+MCMD works out-of-the-box on <br />
 &emsp;-> Linux (tested on Ubuntu 16.04)<br />
 &emsp;-> Mac (tested on OS X El Capitan v10.11.6)<br />
 &emsp;-> Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed)<br />
