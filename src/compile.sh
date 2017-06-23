@@ -9,7 +9,7 @@
 # bash compile.sh               Defaults to cpu compilation
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
 # bash compile.sh cpu linux     (optimized for linux (ONLY))
-# bash compile.sh cpu windows   (for use on Windows ONLY)
+# bash compile.sh cpu windows   (for use on Windows ONLY -- you must have gcc installed, e.g. through Cygwin)
 # bash compile.sh cpu errors    (same but with errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)

@@ -72,11 +72,16 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             K_total += energy_holder; // linear: kg A^2 / fs^2
             Klin += energy_holder;
 
+            /*
+            // the reason I'm not including rotational energy (here) is because KE_rot = -PE_rot. 
+            // I'm not *entirely* sure about this but what energy is conserved in NVE when excluding 
+            // rotational energies. Reading some papers etc. doesn't suggest that I need to include 
             if (system.constants.md_rotations) {
                 energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
                 K_total += energy_holder; // rotational: kg A^2 / fs^2
                 Krot += energy_holder;
             }
+            */
         }
         else if (system.constants.md_mode == MD_ATOMIC) {
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
