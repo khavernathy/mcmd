@@ -352,7 +352,7 @@ void moleculePrintout(System &system) {
     }
     */
 
-    if (system.constants.mode == "mc") { // prototype is only used for MC.
+    if (system.constants.mode == "mc" || system.constants.mode == "md") { // prototypes will be considered for MC and MD (for multisorb stuff)  
     // CHANGE THE PROTOTYPE IF USER SUPPLIED A KEYWORD IN INPUT
     // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
         if (system.constants.sorbate_name.size() > 0) {
@@ -737,7 +737,7 @@ void moleculePrintout(System &system) {
         // finally, show the current proto molecules
         printf("\n::: PROTOTYPE (SORBATE) MOLECULES :::\n");
         for (int i=0; i<system.proto.size(); i++) {
-        printf(":: %i :: Prototype molecule %i has PDBID %i ( name %s ) and has %i atoms\n",i,i, system.proto[i].PDBID, system.proto[i].name.c_str(), (int)system.proto[i].atoms.size());
+        printf("\n:: %i :: Prototype molecule %i has PDBID %i ( name %s ) and has %i atoms\n",i,i, system.proto[i].PDBID, system.proto[i].name.c_str(), (int)system.proto[i].atoms.size());
             //system.proto.printAll();
             for (int j=0; j<system.proto[i].atoms.size(); j++) {
                 system.proto[i].atoms[j].printAll();

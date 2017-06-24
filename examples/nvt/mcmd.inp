@@ -23,7 +23,7 @@ carbasis 47.005 47.005 47.005 90 90 90
 ensemble		    nvt
 
 mc_pbc              on
-mc_corrtime	        100
+mc_corrtime	        10
 finalstep		    1000
 temperature 	    77.0   !77.0  ! K
 insert_factor		0.667     ! uVT: prob to insert/delete in uVT

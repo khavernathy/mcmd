@@ -514,7 +514,7 @@ int main(int argc, char **argv) {
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
 	int total_steps = floor(tf/dt);
 	int count_md_steps = 1;
-    double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D=0.0;
+    double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D[(int)system.proto.size()];
 	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Klin=0., Krot=0., pressure=0.; //, Ek=0.;
     int i,n;
         printf("\n| ========================================= |\n");
@@ -554,18 +554,27 @@ int main(int argc, char **argv) {
                 system.stats.temperature.calcNewStats();
 
             // calc diffusion
-            // R^2 as a function of time should be linear.
-            diffusion_sum=0.;
-            for (i=0; i<system.molecules.size(); i++) {
-                for (n=0; n<3; n++)
-                    diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
-
-                diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
+            // R^2 as a function of time should be linear according to physical theory.
+            for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
+                // re-initialize these vars for each sorbate
+                for (int n=0;n<3;n++) diffusion_d[n]=0.;
+                diffusion_sum=0.; int localN=0; // localN = num. of sorbates of given type
+                for (i=0; i<system.molecules.size(); i++) {
+                    // only consider molecules of this type (for multi-sorb)
+                    if (system.molecules[i].name == system.proto[sorbid].name) {
+                        localN++;
+                        for (n=0; n<3; n++)
+                            diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
+                    
+                        diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
+                    }
+                    D[sorbid] = (diffusion_sum / localN)/(6.0*t); // 6 because 2*dimensionality = 2*3
+                    D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
+                } // end sorbate-type loop
+                //system.stats.diffusion.value = D;
+                //system.stats.diffusion.calcNewStats();
             }
-            D = (diffusion_sum / system.stats.count_movables)/(6.0*t); // 6 because 2*dimensionality = 2*3
-            D *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
-            system.stats.diffusion.value = D;
-            system.stats.diffusion.calcNewStats();
+            // we've calc'd diffusion coefficients for all sorbates now.
 
             // PRESSURE (my pathetic nRT/V method)
 						// using this until i get a decent NVT frenkel method working.
@@ -614,8 +623,10 @@ int main(int argc, char **argv) {
             // hiding specific heat until i make sure it's right.
             //printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
             if (system.constants.md_pbc) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
-                printf("Diffusion coefficient =    %.4e cm^2 / s (%s homogenous)\n", system.stats.diffusion.value, system.proto[0].name.c_str());
-			    printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+                for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
+                    printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
+			        //printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+                }
             }
                 
                 
