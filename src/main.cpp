@@ -557,7 +557,7 @@ int main(int argc, char **argv) {
             // R^2 as a function of time should be linear according to physical theory.
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                 // re-initialize these vars for each sorbate
-                for (int n=0;n<3;n++) diffusion_d[n]=0.;
+                for (int h=0;h<3;h++) diffusion_d[h]=0.;
                 diffusion_sum=0.; int localN=0; // localN = num. of sorbates of given type
                 for (i=0; i<system.molecules.size(); i++) {
                     // only consider molecules of this type (for multi-sorb)
