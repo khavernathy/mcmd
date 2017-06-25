@@ -74,8 +74,8 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 
             /*
             // the reason I'm not including rotational energy (here) is because KE_rot = -PE_rot. 
-            // I'm not *entirely* sure about this but what energy is conserved in NVE when excluding 
-            // rotational energies. Reading some papers etc. doesn't suggest that I need to include 
+            // I'm not *entirely* sure about this but energy is conserved in NVE for non-rotating particles. 
+            // Reading some papers etc. doesn't suggest that I need to include them but this is still unknown
             if (system.constants.md_rotations) {
                 energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
                 K_total += energy_holder; // rotational: kg A^2 / fs^2
@@ -172,19 +172,19 @@ void calculateForces(System &system, double dt) {
     if (!system.constants.cuda) {
         // no pbc
         if (!system.constants.md_pbc) {
-        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
-            lj_force_nopbc(system);
-        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
-            coulombic_force_nopbc(system);
+            if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+                lj_force_nopbc(system);
+            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+                coulombic_force_nopbc(system);
         } 
         // pbc
         else {
-        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
-            lj_force(system);
-        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
-            coulombic_real_force(system);
-        if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
-            polarization_force(system);
+            if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+                lj_force(system);
+            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+                coulombic_real_force(system);
+            if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+                polarization_force(system);
             //int index=0;
             //for (int i=0;i<system.molecules.size();i++)
               //  for (int j=0;j<system.molecules[i].atoms.size();j++){
@@ -192,7 +192,7 @@ void calculateForces(System &system, double dt) {
                 //    index++;
                 //}
             
-        }
+        } // end if PBC
     // GPU style
     } else {
         #ifdef CUDA
