@@ -260,6 +260,11 @@ void integrate(System &system, double dt) {
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
             system.molecules[j].calc_ang_pos(dt);
 
+            // note,
+            // maybe the angle of rotation here should be ang_pos - previous_ang_pos,
+            // not ang_pos.
+            // this may be why I have to set a rotation cap on theta (ang_pos).
+
             // rotate molecules
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 // ROTATE IN X
