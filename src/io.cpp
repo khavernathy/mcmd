@@ -1087,11 +1087,11 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {
 				system.constants.sig_override[lc[1]] = atof(lc[2].c_str());
-				std::cout << "Got LJ sigma override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");
+				std::cout << "Got LJ sigma override for " << lc[1].c_str() << " = " << lc[2].c_str() << " A."; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "eps_override")) {
 				system.constants.eps_override[lc[1]] = atof(lc[2].c_str());
-				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str(); printf("\n");
+				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str() << " K."; printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "lj_uff")) {
                 if (lc[1] == "on") system.constants.lj_uff = 1;
                 std::cout << "Got LJ UFF option = " << lc[1].c_str(); printf("\n");
