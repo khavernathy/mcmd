@@ -1,0 +1,89 @@
+! Douglas Franz, Space group, USF
+! example of defining RD params for atoms 
+! in this input script 
+! (instead of the input.pdb file)
+! 2017
+
+name			    mc_nvt_example 
+mode	 		    mc ! mc or md
+checkpoints_option  off
+
+input_atoms     input.pdb
+
+potential_form 		lj  
+com_option		    off  	! center of mass
+
+sorbate_name h2_buch
+fugacity_single h2
+
+carbasis 13.2828 13.2828 26.6491 90 90 90
+
+
+! MONTE CARLO ONLY ======================================
+ensemble		    uvt
+
+mc_pbc              on
+mc_corrtime	        100
+finalstep		    10000
+temperature 	    77.0   !77.0  ! K
+insert_factor		0.667     ! uVT: prob to insert/delete in uVT
+displace_factor     2.5
+rotate_angle_factor 360.0
+! =======================================================
+
+auto_reject_option on  ! saves time
+auto_reject_r 1.6      ! angstroms
+
+charge_sum_check on
+
+! manually defining parameters
+
+sig_override Zn 2.46155 ! UFF below
+sig_override N1 3.66
+sig_override N2 3.66
+sig_override N3 3.66
+sig_override N4 3.66
+sig_override N5 3.66
+sig_override C1 3.431
+sig_override C2 3.431
+sig_override H1 2.571
+sig_override H2 2.571
+sig_override H3 2.571
+sig_override H4 2.571
+sig_override O1 3.118
+sig_override O2 3.118
+sig_override C3 3.75    ! this and below are  OPLS
+sig_override C4 3.55
+sig_override C5 3.55
+sig_override C6 3.55
+sig_override C7 3.55
+sig_override H5 2.42
+sig_override H6 2.42
+sig_override H7 2.42
+
+eps_override Zn 62.39923 ! UFF ..
+eps_override N1 34.72215
+eps_override N2 34.72215 
+eps_override N3 34.72215
+eps_override N4 34.72215
+eps_override N5 34.72215
+eps_override C1 52.84
+eps_override C2 52.84
+eps_override H1 22.14
+eps_override H2 22.14
+eps_override H3 22.14
+eps_override H4 22.14
+eps_override O1 30.19
+eps_override O2 30.19
+eps_override C3 52.84   ! OPLS ..
+eps_override C4 35.25
+eps_override C5 35.25
+eps_override C6 35.25
+eps_override C7 35.25
+eps_override H5 15.11
+eps_override H6 15.11 
+eps_override H7 15.11
+
+
+   
+
