@@ -15,6 +15,7 @@
 # bash compile.sh cpu bridges   (for bridges)
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
 # bash compile.sh gpu           (for a single computer with GPU functions with NVIDIA CUDA installed).
+# bash compile.sh gpu errors    (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe)
 ##########################
 echo "This should take like 10 sec."
@@ -65,6 +66,8 @@ elif [[ "$option" == "gpu" ]]; then
         module load compilers/gcc/4.9.4 # CUDA 7.5 not compatible with gcc > 5.0
         module load apps/cuda/7.5
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
+    elif [[ "$2" == "errors" ]]; then
+        nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -g -O3 -o ../mcmd
     else
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     fi
