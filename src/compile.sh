@@ -10,12 +10,12 @@
 # bash compile.sh cpu           (for a single computer on Mac or Linux)
 # bash compile.sh cpu linux     (optimized for linux (ONLY))
 # bash compile.sh cpu windows   (for use on Windows ONLY -- you must have gcc installed, e.g. through Cygwin)
-# bash compile.sh cpu errors    (same but with errors/warnings)
+# bash compile.sh cpu debug     (same but with errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE)
 # bash compile.sh cpu bridges   (for bridges)
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
 # bash compile.sh gpu           (for a single computer with GPU functions with NVIDIA CUDA installed).
-# bash compile.sh gpu errors    (for GPU compilation with errors)
+# bash compile.sh gpu debug     (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe)
 ##########################
 echo "This should take like 10 sec."
@@ -46,7 +46,7 @@ if [[ "$option" == "cpu" ]]; then
         module purge
         module load gcc/6.3.0
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
-    elif [[ "$2" == "errors" ]]; then
+    elif [[ "$2" == "debug" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
     elif [[ "$2" == "linux" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
@@ -66,8 +66,8 @@ elif [[ "$option" == "gpu" ]]; then
         module load compilers/gcc/4.9.4 # CUDA 7.5 not compatible with gcc > 5.0
         module load apps/cuda/7.5
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
-    elif [[ "$2" == "errors" ]]; then
-        nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -g -O3 -o ../mcmd
+    elif [[ "$2" == "debug" ]]; then
+        nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -G -g -O3 -o ../mcmd
     else
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     fi

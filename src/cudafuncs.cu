@@ -483,7 +483,13 @@ void CUDA_force(System &system) {
     //printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
  
 
+    // clean up -- so we don't have a memory leak
      cudaFree(D);
+     cudaFree(dbasis);
+     cudaFree(dreciprocal_basis);
+     free(basis);
+     free(reciprocal_basis);
+
 
     // we're done. forces have been calc'd on GPU and written to local mem.
 }
