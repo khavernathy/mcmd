@@ -168,7 +168,7 @@ void coulombic_force_nopbc(System &system) {
 }
 
 // pbc force via ewald -dU/dx, -dU/dy, -dU/dz
-void coulombic_real_force(System &system) {
+void coulombic_real_force(System &system) {  // units of K/A
     const double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
     double charge1, charge2, chargeprod, r,rsq;

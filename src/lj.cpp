@@ -213,7 +213,7 @@ double lj(System &system) {
 }
 
 
-void lj_force(System &system) {
+void lj_force(System &system) {   // units of K/A
 
     const double cutoff = system.pbc.cutoff;
     double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
