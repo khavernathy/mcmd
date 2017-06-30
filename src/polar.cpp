@@ -420,4 +420,37 @@ void polarization_force(System &system) {
     // gets force on atoms due to dipoles calculated before (via iterative method)
     // TODO
     // adam sent a code snippet that should help on slack
+
+    int i,j,n;
+    double q;
+
+    // using UMS p. 423
+    // see also green notebook.
+    // F_polar = q*(-u/alpha + E)
+    // So, we need to converge on the dipoles first, just like for potential calc.
+    // there is no uVT for MD, so no need to re-size the A matrix.
+    // this is very much a test and not suitable for publishable use.
+
+    thole_amatrix(system); // fill in the A-matrix 
+    thole_field(system); // calculate electric field at each atom (assume PBC)
+    int num_iterations = thole_iterative(system); // iteratively solve the dipoles
+       system.stats.polar_iterations = (double)num_iterations;
+          system.constants.dipole_rrms = get_dipole_rrms(system); 
+    // ready for forces.
+    // it's a many-body potential, not pair-potential, so at this point forces are intrinsic to atoms.
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            if (system.molecules[i].atoms[j].frozen) continue; // skip frozens.
+            if (system.molecules[i].atoms[j].polar == 0.) continue; // skip non-polarizable sites
+            if (system.molecules[i].atoms[j].C == 0) continue; // skip 0-force
+            q = system.molecules[i].atoms[j].C;
+
+            for (n=0;n<3;n++) {
+                //printf("force before[%i] = %e\n", n, system.molecules[i].atoms[j].force[n]);
+                //printf("gamma: %f; dip: %f; q: %f; polar: %f; efield: %f; efield_self: %f\n", system.constants.polar_gamma, system.molecules[i].atoms[j].dip[n], system.molecules[i].atoms[j].C, system.molecules[i].atoms[j].polar, system.molecules[i].atoms[j].efield[n], system.molecules[i].atoms[j].efield_self[n]);
+                system.molecules[i].atoms[j].force[n] += q*((-system.constants.polar_gamma*system.molecules[i].atoms[j].dip[n]  / system.molecules[i].atoms[j].polar)                               + ((system.molecules[i].atoms[j].efield[n] + system.molecules[i].atoms[j].efield_self[n])));
+                //printf("force after[%i] = %e\n", n, system.molecules[i].atoms[j].force[n]);
+            }
+        } // end loop j atoms in i
+    } // end loop i molecules
 }
