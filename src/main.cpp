@@ -96,15 +96,15 @@ int main(int argc, char **argv) {
     // print system info.
     //printf("CPU information (Linux): "); sleep(1);
     string cpucom="cat /proc/cpuinfo  | tail -25 | grep -i 'model name'";
-    std::system(cpucom.c_str());
+    int zzz=std::system(cpucom.c_str());
     //printf("\n");
     //printf("CPU information (Mac): "); sleep(1);
     string cpumac="sysctl -n machdep.cpu.brand_string";
-    std::system(cpumac.c_str());
+    zzz=std::system(cpumac.c_str());
     //printf("\n");
     //printf("Hostname: "); sleep(1);
     string hostcom="hostname";
-    std::system(hostcom.c_str());
+    zzz=std::system(hostcom.c_str());
     //printf("\n");
 
 	// start timing for checkpoints
