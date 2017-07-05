@@ -94,20 +94,22 @@ int main(int argc, char **argv) {
     std::cout << "MCMD started at " << str << endl;
 
     // print system info.
-    //printf("CPU information (Linux): "); sleep(1);
-    string cpucom="cat /proc/cpuinfo  | tail -25 | grep -i 'model name'";
-    int zzz=std::system(cpucom.c_str());
-    //printf("\n");
-    //printf("CPU information (Mac): "); sleep(1);
-    string cpumac="sysctl -n machdep.cpu.brand_string";
-    zzz=std::system(cpumac.c_str());
-    //printf("\n");
-    //printf("Hostname: "); sleep(1);
     string hostcom="hostname";
-    zzz=std::system(hostcom.c_str());
-    //printf("\n");
+    int zzz=std::system(hostcom.c_str());
+    string linuxcheck="/proc/cpuinfo";
+    //linux
+    if (std::ifstream(linuxcheck.c_str())) {
+        string cpucom="cat /proc/cpuinfo  | tail -25 | grep -i 'model name'";
+        zzz=std::system(cpucom.c_str());
+        zzz=std::system("echo $(mem=$(grep MemTotal /proc/meminfo | awk '{print $2}'); echo $mem | awk {'print $1/1024/1024'})' GB memory available on this node (Linux).'");
+    // mac
+    } else {
+        string cpumac="sysctl -n machdep.cpu.brand_string";
+        zzz=std::system(cpumac.c_str());
+        zzz=std::system("echo $(mem=$(sysctl hw.memsize | awk {'print $2'}); echo $mem | awk {'print $1/1024/1024/1024.0'})' GB memory available on this node (Mac).'");
+    }
 
-	// start timing for checkpoints
+   	// start timing for checkpoints
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	double time_elapsed;
 	double sec_per_step;
