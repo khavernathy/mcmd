@@ -93,6 +93,20 @@ int main(int argc, char **argv) {
     std::string str(buffer);
     std::cout << "MCMD started at " << str << endl;
 
+    // print system info.
+    //printf("CPU information (Linux): "); sleep(1);
+    string cpucom="cat /proc/cpuinfo  | tail -25 | grep -i 'model name'";
+    std::system(cpucom.c_str());
+    //printf("\n");
+    //printf("CPU information (Mac): "); sleep(1);
+    string cpumac="sysctl -n machdep.cpu.brand_string";
+    std::system(cpumac.c_str());
+    //printf("\n");
+    //printf("Hostname: "); sleep(1);
+    string hostcom="hostname";
+    std::system(hostcom.c_str());
+    //printf("\n");
+
 	// start timing for checkpoints
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	double time_elapsed;
