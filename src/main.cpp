@@ -134,6 +134,9 @@ int main(int argc, char **argv) {
         int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
         setupRadialDist(system);
     }
+    if (system.constants.scale_charges)
+        scaleCharges(system);
+
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
     if (system.constants.crystalbuild)
         setupCrystalBuild(system);
@@ -153,12 +156,11 @@ int main(int argc, char **argv) {
         int whatev = std::system(del.c_str());
         fragmentMaker(system);
     }
-    
 
     system.pbc.printBasis();
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 481); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 539); // i.e. github commit
     inputValidation(system);
     printf("...input options validated.\n");
     system.checkpoint("...input options validated. Done with system setup functions.");

@@ -1175,6 +1175,11 @@ void readInput(System &system, char* filename) {
                 system.constants.crystalbuild_z = atoi(lc[1].c_str());
                 std::cout << "Got crystal-builder in z = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "scale_charges")) {
+                system.constants.scale_charges = 1;
+                system.constants.scale_charges_factor = atof(lc[1].c_str()); 
+                std::cout << "Got scale-charges option = on; factor = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "makefrags")) {
                 system.constants.fragmaker = 1;
                 system.constants.numfrags = atoi(lc[1].c_str());

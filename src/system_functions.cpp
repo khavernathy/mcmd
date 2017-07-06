@@ -1313,6 +1313,13 @@ void setupCrystalBuild(System &system) {
     //}
 
 
+}
 
-
+void scaleCharges(System &system) {
+    for (int i=0; i < system.molecules.size(); i++) {
+        for (int j=0; j < system.molecules[i].atoms.size(); j++) {
+            system.molecules[i].atoms[j].C *= system.constants.scale_charges_factor;    
+        }
+    }
+    printf("Finished scaling all atomic charges by %f.\n", system.constants.scale_charges_factor);
 }

@@ -49,3 +49,5 @@ nvt_test/commy
 mcmd.dSYM
 test_zone
 test_zone/*
+testzone
+testzone/*

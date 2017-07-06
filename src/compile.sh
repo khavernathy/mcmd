@@ -18,7 +18,7 @@
 # bash compile.sh gpu debug     (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe)
 ##########################
-echo "This should take like 10 sec."
+###echo "This should take like 10 sec."
 
 
 DEFAULT="cpu"
@@ -39,20 +39,26 @@ if [[ "$option" == "cpu" ]]; then
     # THIS IS FOR SERIAL COMPILATION (1 CPU ONLY, NO GPU)
     echo "Doing serial GCC (1 processor) compilation for CPU"
     if [[ "$2" == "circe" ]]; then
+        echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/6.2.0
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
     elif [[ "$2" == "bridges" ]]; then
+        echo "... for Bridges cluster environment.";
         module purge
         module load gcc/6.3.0
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
     elif [[ "$2" == "debug" ]]; then
+        echo "... in debug mode (with errors/warnings";
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
     elif [[ "$2" == "linux" ]]; then
+        echo "... optimized for linux."
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
     elif [[ "$2" == "O3" ]]; then
+        echo "... optimized at -O3 (not fully)."
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3
     elif [[ "$2" == "windows" ]]; then
+        echo "... for Windows OS.";
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -D WINDOWS
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
@@ -62,11 +68,13 @@ elif [[ "$option" == "gpu" ]]; then
     # GPU compilation enabled
     echo "Doing serial GCC (1 processor) compilation including CUDA GPU routines"
     if [[ "$2" == "circe" ]]; then
+        echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/4.9.4 # CUDA 7.5 not compatible with gcc > 5.0
         module load apps/cuda/7.5
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     elif [[ "$2" == "debug" ]]; then
+        echo "... in debug mode (with errors/warnings)";
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -G -g -O3 -o ../mcmd
     else
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
@@ -75,6 +83,7 @@ elif [[ "$option" == "icpu" ]]; then
     # CPU compilation using Intel
     echo "Doing serial Intel (1 proc.) compilation for CPU"
     if [[ "$2" == "bridges" ]]; then
+        echo "... for Bridges cluster environment";
         module purge
         module load icc/16.0.3
         icpc --std=c++11 -fast -unroll-aggressive -O3 -o ../mcmd main.cpp
@@ -89,4 +98,4 @@ elif [[ "$option" == "mpi" ]]; then
     #mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
 fi
 
-echo "...done"
+echo "...done. Have a nice day."
