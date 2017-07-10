@@ -70,6 +70,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 
 <!--
 # TODO
+-> MD: fix the MD rotations via quaternion..<br />
 -> MC: Tang-Toennies potential, or other ones<br />
 -> MC: maybe, speed up by adjusting energy by the 1 particle that is changed.<br /> 
 -> MC: add multi-sorb Qst calculator<br />
