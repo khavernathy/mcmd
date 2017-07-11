@@ -211,8 +211,10 @@ void calculateForces(System &system, double dt) {
     for (int i=0; i<system.molecules.size(); i++) {
         if (system.molecules[i].frozen) continue;
         system.molecules[i].calc_force();
-        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1)
+        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1) {
+            system.molecules[i].calc_inertia();
             system.molecules[i].calc_torque();
+        }
     }
 
 }
