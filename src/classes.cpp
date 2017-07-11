@@ -680,7 +680,7 @@ class Molecule {
         //double d_theta[3] = {0,0,0};
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
-        double inertia[3]={0.,0.,0.}; // moments of inertia. Ixx, Iyy, Izz: stored in K fs^2
+        double inertia=0.0; //moment of inertia. stored in K fs^2
         double fugacity=0.0;
 
         void reInitialize() {
@@ -688,8 +688,8 @@ class Molecule {
             if (atoms.size() > 0) {
             while (!atoms.empty()) atoms.pop_back();
             mass=0;
+            inertia=0;
             for (int n=0; n<3; n++) {
-                inertia[n]=0;
                 com[n] = 0;
                 force[n]=0;
                 torque[n]=0;
@@ -715,22 +715,17 @@ class Molecule {
 
         void calc_inertia() {
             for (int i=0; i<atoms.size(); i++) {
-                double x2 = (atoms[i].pos[0]-com[0])*(atoms[i].pos[0]-com[0]);
-                double y2 = (atoms[i].pos[1]-com[1])*(atoms[i].pos[1]-com[1]);
-                double z2 = (atoms[i].pos[2]-com[2])*(atoms[i].pos[2]-com[2]);
-                inertia[0] += atoms[i].m * (y2 + z2);
-                inertia[1] += atoms[i].m * (x2 + z2);
-                inertia[2] += atoms[i].m * (x2 + y2);
+                double rsq = (atoms[i].pos[0] - com[0])*(atoms[i].pos[0] - com[0]) + (atoms[i].pos[1] - com[1])*(atoms[i].pos[1] - com[1]) + (atoms[i].pos[2] - com[2])*(atoms[i].pos[2] - com[2]);
+                inertia += atoms[i].m * rsq; // kg * A^2
             }
-            for (int n=0;n<3;n++)
-                inertia[n] = inertia[n]/1.3806488e-23/1e20*1e30; // to K fs^2
+            inertia = inertia/1.3806488e-23/1e20*1e30; // to K fs^2
         }
 
         // angular acceleration
         void calc_ang_acc() {
             for (int n=0; n<3; n++) {
                 old_ang_acc[n] = ang_acc[n];
-                ang_acc[n] = torque[n] / inertia[n]; // in rad / fs^2
+                ang_acc[n] = torque[n] / inertia; // in rad / fs^2
             }
         }
 
@@ -834,8 +829,8 @@ class Molecule {
 
         // for debugging
         void printAll() {
-            printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e %e %e; frozen = %i; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
-            PDBID,mass,inertia[0],inertia[1],inertia[2],frozen,
+            printf("====================\nmolecule PDBID=%i :: mass: %e; inertia: %e; frozen = %i; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
+            PDBID,mass,inertia,frozen,
             force[0], force[1], force[2], acc[0], acc[1], acc[2],
             old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2], com[0], com[1], com[2],
             torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2],
