@@ -71,6 +71,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 <!--
 # TODO
 -> MD: fix the MD rotations via quaternion..<br />
+-> MD: add uVT hybrid MD via insert/delete every x timesteps.<br />
 -> MC: Tang-Toennies potential, or other ones<br />
 -> MC: maybe, speed up by adjusting energy by the 1 particle that is changed.<br /> 
 -> MC: add multi-sorb Qst calculator<br />
@@ -82,7 +83,6 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 -> MC: Use openMP or fork() for energy tasks<br />
 -> change timing/string stuff for icpc compatibility<br />
 -> openMPI/MPI for easy isotherm<br />
--> investigate NVE; and escape-artist molecules in displace MC moves (S.A.) <br />
 -> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
 -> MC/MD: multi-sorbate histograms<br />
 -> MD: No-PBC GPU algorithm (already did PBC)<br />
