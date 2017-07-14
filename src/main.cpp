@@ -543,16 +543,36 @@ int main(int argc, char **argv) {
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();
 	for (double t=dt; t <= tf; t=t+dt) {
         system.stats.MDtime = t;
-		//printf("%f\n",t);
+		//printf("time %f\n",t);
 		integrate(system,dt);
 
-		if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
+        if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
+            // try a MC uVT insert/delete
+            getTotalPotential(system); // this is needed on-the-spot because of 
+                                       // time-evolution of the system. Otherwise, 
+                                       // potential is only re-calculated at corrtime.
+            double ranf2 = (double)rand() / (double)RAND_MAX; // 0->1
+            // ADD A MOLECULE
+            if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.
+                system.checkpoint("doing molecule add move.");
+                addMolecule(system);
+                system.checkpoint("done with molecule add move.");
+            } // end add
+            else { // REMOVE MOLECULE
+                system.checkpoint("doing molecule delete move.");
+                removeMolecule(system);
+                system.checkpoint("done with molecule delete move.");
+            } // end add vs. remove
+        }		
+
+        if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
             if (system.constants.histogram_option) {
-							zero_grid(system.grids.histogram->grid,system);
-                            population_histogram(system);
-                            if (t != dt) update_root_histogram(system);
+				zero_grid(system.grids.histogram->grid,system);
+                population_histogram(system);
+                if (t != dt) update_root_histogram(system);
             }
 
+            if (system.stats.count_movables > 0) {
             // get KE and PE and T at this step.
             double* ETarray = calculateEnergyAndTemp(system, t);
             KE = ETarray[0] * system.constants.K2KJMOL;
@@ -601,6 +621,7 @@ int main(int argc, char **argv) {
 						system.stats.pressure.value = nmol*system.constants.R*system.stats.temperature.value/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
 						system.stats.pressure.calcNewStats();
 						//pressure = -PE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
+            } // end if N>0 (stats calculation) 
 
 			// PRINT OUTPUT
 			std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
@@ -627,7 +648,7 @@ int main(int argc, char **argv) {
             printf("Ensemble: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
-            if (system.constants.ensemble == ENSEMBLE_NVT) printf("        Input T = %.4f K\n", system.constants.temp); 
+            if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp); 
             printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", Temp);
             printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
@@ -640,13 +661,12 @@ int main(int argc, char **argv) {
                 v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
             // hiding specific heat until i make sure it's right.
             //printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
-            if (system.constants.md_pbc) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
+            if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
 			        //printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
                 }
             }
-                
                 
 
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
@@ -655,20 +675,24 @@ int main(int argc, char **argv) {
 
 
             // WRITE OUTPUT FILES
-            if (system.constants.xyz_traj_option)
-			    writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
-            frame++;
+            
             writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
             // restart file.
             writePDB(system, system.constants.restart_pdb); // containing all atoms
 
             // trajectory file
-            if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers restart frame
-            if (system.constants.pdb_traj_option) {
-                if (system.constants.pdb_bigtraj_option)
-                    writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // copy all-atoms-restart-PDB to PDB trajectory
-                else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers to PDB trajectory
-            }
+            if (system.stats.count_movables > 0) {
+                if (system.constants.xyz_traj_option)
+			        writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
+                    
+                if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers restart frame
+                if (system.constants.pdb_traj_option) {
+                    if (system.constants.pdb_bigtraj_option)
+                        writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // copy all-atoms-restart-PDB to PDB trajectory
+                    else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers to PDB trajectory
+                }
+            } // end if N > 0 
+            frame++;
             if (system.stats.radial_dist) {
                 radialDist(system);
                 writeRadialDist(system);

@@ -1,0 +1,36 @@
+! Douglas Franz, Space group, USF      
+! Molcular dynamics example with a non orthorhombic unit-cell periodic system
+! CO2+C2H2 in a SIFSIX MOF
+
+name              md_uVT_example        
+mode              md ! mc or md       
+checkpoints_option  off      
+       
+input_atoms ../../../atomfiles/SIFSIX14Cui.pdb         
+
+potential_form        ljes       
+com_option            off     ! center of mass        
+xyz_traj_option       on 
+
+basis1    25.77960000000000     0.00000000000000     0.00000000000000
+basis2     0.00000000000000    18.50600000000000     0.00000000000000
+basis3    -0.01483000000000     0.00000000000000    18.47629000000000
+
+       
+temperature 298.0   
+ensemble uvt
+
+sorbate_name     co2_phast   c2h2   
+user_fugacities  0.5         0.5
+       
+ ! MOLECULAR DYNAMICS ONLY ===============================     
+md_pbc              on
+md_dt             0.2  ! fs       
+md_ft             2 ns        
+md_corrtime       10     ! steps 
+md_insert_frequency 20   ! every x steps, try insert/delete MC style       
+!md_init_vel         0    ! A / fs^2      
+md_mode             molecular          
+md_rotations        on    
+
+

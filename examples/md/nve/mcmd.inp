@@ -6,7 +6,7 @@ name              md_NVE_example
 mode              md ! mc or md       
 checkpoints_option  off       
        
-input_atoms ../../atomfiles/MPM-1-Br+46Ne.pdb   ! PDB ONLY       
+input_atoms ../../../atomfiles/MPM-1-Br+46Ne.pdb   ! PDB ONLY       
 
 potential_form        lj       
 com_option            off     ! center of mass        
@@ -25,7 +25,6 @@ radial_centroid     Ne   ! element name
 radial_counterpart  Ne   ! element name to get distance of w/centroid        
 radial_file         radialdist.dat        
        
-temperature 295.0   
 ensemble nve      
        
  ! MOLECULAR DYNAMICS ONLY ===============================     

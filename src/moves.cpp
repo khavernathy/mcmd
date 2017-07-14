@@ -276,6 +276,9 @@ void addMolecule(System &system) {
 	if (ranf < boltz_factor && system.constants.iter_success ==0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
 	    system.stats.MCmoveAccepted = true;
+        if (system.constants.mode == "md") {
+            system.molecules[last_molecule_id].calc_inertia(); // need this for MD
+        }
         printEnergies(system);
     } else {
         system.constants.iter_success = 0;

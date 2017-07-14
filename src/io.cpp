@@ -726,7 +726,7 @@ void readInput(System &system, char* filename) {
                     }
                 }
 
-            } else if (!strcasecmp(lc[0].c_str(), "sorbate_fugacities")) {
+            } else if (!strcasecmp(lc[0].c_str(), "sorbate_fugacities") || (!strcasecmp(lc[0].c_str(), "user_fugacities")) ) {
                 system.constants.sorbate_fugacity.push_back(atof(lc[1].c_str()));
                 std::cout << "Got fugacity for sorbate 1 = " << lc[1].c_str(); printf("\n");
 
@@ -938,6 +938,10 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing_schedule")) {
                 system.constants.sa_schedule = atof(lc[1].c_str());
                 std::cout << "Got simulated annealing schedule = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "md_insert_frequency")) {
+                system.constants.md_insert_attempt = atoi(lc[1].c_str());
+                std::cout << "Got MD uVT insert/delete attempt frequency = every " << lc[1].c_str() << " timesteps."; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "step_offset")) {
                 system.constants.step_offset = atoi(lc[1].c_str());
@@ -1302,8 +1306,8 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You specified an ensemble with constant T but didn't supply T (or you set T=0)." << endl;
         exit(EXIT_FAILURE);
     }
-    if (system.constants.mode == "md" && (e == ENSEMBLE_UVT || e == ENSEMBLE_NPT)) {
-        std::cout << "ERROR: You specified MD mode but selected an incompatible ensemble. MD supports NVT and NVE only." << endl;
+    if (system.constants.mode == "md" && (e == ENSEMBLE_NPT)) {
+        std::cout << "ERROR: You specified MD mode but selected an incompatible ensemble. MD supports uVT, NVT and NVE only." << endl;
         exit(EXIT_FAILURE);
     }
     if (system.pbc.a == 0 && system.pbc.b == 0 && system.pbc.c == 0 && system.pbc.alpha == 0 && system.pbc.beta ==0 && system.pbc.gamma == 0) {
@@ -1355,8 +1359,8 @@ void inputValidation(System &system) {
     }
     } // end q-check
 
-    if (system.constants.mode == "md" && system.stats.count_movables <= 0) {
-        std::cout << "ERROR: MD is turned on but there are no movables molecules in the input. (Use 'M' as opposed to 'F' to distinguish movers from frozens)";
+    if (system.constants.mode == "md" && system.constants.ensemble != ENSEMBLE_UVT && system.stats.count_movables <= 0) {
+        std::cout << "ERROR: MD is turned on but there are no movables molecules in the input (and ensemble is not uVT). (Use 'M' as opposed to 'F' to distinguish movers from frozens)";
         exit(EXIT_FAILURE);
     }
     // single-atom movers-only check for MD rotation
@@ -1366,7 +1370,7 @@ void inputValidation(System &system) {
             if (!system.molecules[i].atoms[j].frozen && system.molecules[i].atoms.size() > 1) flag=1;
         }
     }
-    if (system.constants.mode == "md" && system.constants.md_rotations && !flag) {
+    if (system.constants.mode == "md" && system.constants.md_rotations && !flag && e != ENSEMBLE_UVT) {
         std::cout << "ERROR: MD rotations were turned on but there are no movable molecules with >1 atom in input. Turn md_rotations off.";
         exit(EXIT_FAILURE);
     }
