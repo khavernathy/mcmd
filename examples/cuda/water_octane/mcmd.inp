@@ -22,7 +22,7 @@ ensemble nvt
 md_pbc              on
 md_dt             1  ! fs       
 md_ft               10 ns     
-md_corrtime       100     ! steps        
+md_corrtime       10     ! steps        
 !md_init_vel         0    ! A / fs     
 md_mode             molecular        
 md_rotations        on
