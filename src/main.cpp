@@ -671,7 +671,20 @@ int main(int argc, char **argv) {
 
             //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
             printf("--------------------\n\n");
-
+            // CONSOLIDATE ATOM AND MOLECULE PDBID's if uVT
+            // quick loop through all atoms to make PDBID's pretty (1->N)
+            if (system.constants.ensemble == ENSEMBLE_UVT && system.molecules.size() > 0) {
+            int molec_counter=1, atom_counter=1;
+            for (int i=0; i<system.molecules.size(); i++) {
+                system.molecules[i].PDBID = molec_counter;
+                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    system.molecules[i].atoms[j].PDBID = atom_counter;
+                    system.molecules[i].atoms[j].mol_PDBID = system.molecules[i].PDBID;
+                    atom_counter++;
+                } // end loop j
+                molec_counter++;
+            } // end loop i
+            } // end if N>0
 
 
             // WRITE OUTPUT FILES
