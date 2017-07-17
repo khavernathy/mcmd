@@ -664,7 +664,8 @@ int main(int argc, char **argv) {
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
-			        //printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+			        if (system.proto.size() == 1)
+                        printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
                 }
             }
                 

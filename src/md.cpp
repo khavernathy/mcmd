@@ -359,10 +359,10 @@ void integrate(System &system, double dt) {
       //  CUDA_verlet(system);
        // #endif
     //}
-    system.checkpoint("Done with a,v integration. Starting heat bath (if nvt)");
+    system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
 
     // 5) apply heat bath in NVT
-    if (system.constants.ensemble == ENSEMBLE_NVT) {
+    if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like, which is good for equilibration results.
         // the thermostat probability must be recalc'd every new step.
@@ -419,7 +419,7 @@ void integrate(System &system, double dt) {
             }
         }
     } // end if NVT (thermostat)
-    system.checkpoint("Done with heatbath if NVT.");
+    system.checkpoint("Done with heatbath if NVT/uVT.");
     system.checkpoint("Done with integrate() function.");
 }// end integrate() function
 
