@@ -1167,6 +1167,10 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "on") system.constants.crystalbuild = 1;
                 std::cout << "Got crystal-builder option = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_includemovers")) {
+                if (lc[1] == "on") system.constants.crystalbuild_includemovers = 1;
+                std::cout << "Got crystal-builder include movable molecules option = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_x")) {
                 system.constants.crystalbuild_x = atoi(lc[1].c_str());
                 std::cout << "Got crystal-builder in x = " << lc[1].c_str(); printf("\n");

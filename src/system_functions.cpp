@@ -1189,7 +1189,7 @@ void setupCrystalBuild(System &system) {
             }
         }
 
-        printf("Building out crystal by %ix, %iy, %iz of the original (only frozens).\n", xdim,ydim,zdim);
+        printf("Building out crystal by %ix, %iy, %iz of the original.\n", xdim,ydim,zdim);
         printf(" --> using xlen = %f; ylen = %f; zlen = %f;\n", xlen,ylen,zlen);
 
         //if ((xdim %2 != 0 && xdim>1) || (ydim %2 != 0 && ydim >1) || (zdim % 2 != 0 && zdim > 1)) { std::cout << "ERROR: Crystal-builder only supports multiples of 2 for all dimensions, right now."; exit(EXIT_FAILURE); }
@@ -1202,7 +1202,7 @@ void setupCrystalBuild(System &system) {
             setupBox(system);
             //int count = 0;
             for (i =0; i <size; i++) {
-                if (system.molecules[i].frozen) {
+                if (system.molecules[i].frozen ) {
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
                         //std::copy ( system.molecules[i].atoms + j, system.molecules[i].atoms + j +1, newatom);
@@ -1214,10 +1214,19 @@ void setupCrystalBuild(System &system) {
                         system.stats.count_frozens++; 
                         //count++;
                     }
+                } else if (system.constants.crystalbuild_includemovers) {
+                    Molecule newmolecule = system.molecules[i];
+                    for (j=0; j<newmolecule.atoms.size(); j++) {
+                        system.constants.total_atoms++;
+                        newmolecule.atoms[j].pos[0] += xlen*(iter+1);
+                    }
+                    system.stats.count_movables++;
+                    system.molecules.push_back(newmolecule);
                 }
             }
             } // end iterations x
-        // reset the atom count 
+        // reset the atom count
+        size=(int)system.molecules.size(); 
         asize=0;
         for (int i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) {
@@ -1247,10 +1256,21 @@ void setupCrystalBuild(System &system) {
                         system.constants.total_atoms++;
                         system.stats.count_frozens++;
                     }
+                } else if (system.constants.crystalbuild_includemovers) {
+                    Molecule newmolecule = system.molecules[i];
+                    for (j=0; j<newmolecule.atoms.size(); j++) {
+                        system.constants.total_atoms++;
+                        newmolecule.atoms[j].pos[1] += ylen*(iter+1);
+                        if (system.pbc.gamma != 90.0) newmolecule.atoms[j].pos[0] -= (iter+1)*origb*sin((system.pbc.gamma-90.0)*M_PI/180.);
+                    }
+                    system.stats.count_movables++;
+                    system.molecules.push_back(newmolecule);
                 }
+
             }
             } // end iterations y
         // reset the atom count.
+        size=(int)system.molecules.size();
         asize=0;
         for (int i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) {
@@ -1277,10 +1297,20 @@ void setupCrystalBuild(System &system) {
                         system.constants.total_atoms++;
                         system.stats.count_frozens++;
                     }
+                } else if (system.constants.crystalbuild_includemovers) {
+                    Molecule newmolecule = system.molecules[i];
+                    for (j=0; j<newmolecule.atoms.size(); j++) {
+                        system.constants.total_atoms++;
+                        newmolecule.atoms[j].pos[2] += zlen*(iter+1);
+                        if (system.pbc.beta != 90.0) newmolecule.atoms[j].pos[0] -= (iter+1)*origc*sin((system.pbc.beta-90.0)*M_PI/180.0);
+                    }
+                    system.stats.count_movables++;
+                    system.molecules.push_back(newmolecule);
                 }
             }
             } // end iterations z
         // reset the atom count
+        size=(int)system.molecules.size();
         asize=0;
         for (int i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) {

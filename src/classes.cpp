@@ -207,6 +207,7 @@ class Constants {
 
         int crystalbuild=0; // option to dynamically build a crystal box to a supercell
         int crystalbuild_x=1, crystalbuild_y=1, crystalbuild_z = 1; // duplication # in each dim. 
+        int crystalbuild_includemovers=0; // option to include movable molecules in the crystal builder. default off.
         int charge_sum_check = 1; // option to check the total system charge before simulation. Default on.
 
         int fragmaker=0; // option to create fragments at startup.
