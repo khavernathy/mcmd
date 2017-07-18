@@ -47,9 +47,11 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	int i,j,n;
 
     // grab fixed potential energy of system
+        // from PBC (same as Monte Carlo potential)
         if (system.constants.md_pbc) {
             V_total += getTotalPotential(system);
             //printf("used getTotalPotential\n");
+        // from individual atomic contributions (no PBC)
         } else {
             for (i=0; i<system.molecules.size(); i++) {
                 for (j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -72,16 +74,13 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             K_total += energy_holder; // linear: kg A^2 / fs^2
             Klin += energy_holder;
 
-            /*
-            // the reason I'm not including rotational energy (here) is because KE_rot = -PE_rot. 
-            // I'm not *entirely* sure about this but energy is conserved in NVE for non-rotating particles. 
-            // Reading some papers etc. doesn't suggest that I need to include them but this is still unknown
+            // energy is conserved in NVE for non-rotating particles. 
+            // for rotating particles, I don't seem to conserve energy in NVE.
             if (system.constants.md_rotations) {
                 energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
-                K_total += energy_holder; // rotational: kg A^2 / fs^2
+                K_total += energy_holder; // rotational: (rad)*kg A^2 / fs^2
                 Krot += energy_holder;
             }
-            */
         }
         else if (system.constants.md_mode == MD_ATOMIC) {
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
