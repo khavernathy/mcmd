@@ -667,8 +667,8 @@ int main(int argc, char **argv) {
                   PE
                   );
             printf("Total E = %.3f kJ/mol\n", TE);
-            printf("Average v = %.5f A/fs; v_init = %.5f A/fs\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
-                v_avg, system.constants.md_init_vel, system.stats.pressure.average, system.stats.pressure.sd );
+            printf("Average v = %.2f m/s; v_init = %.2f m/s\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
+                v_avg*1e5, system.constants.md_init_vel*1e5, system.stats.pressure.average, system.stats.pressure.sd );
             // hiding specific heat until i make sure it's right.
             //printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
