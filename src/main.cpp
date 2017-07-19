@@ -364,7 +364,7 @@ int main(int argc, char **argv) {
                 }
                 if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
                     printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
-                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
+                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L = kg/m^3\n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 if (system.proto.size() > 1)
                     printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             } // end prototype molecules loop for uptake data
@@ -571,11 +571,9 @@ int main(int argc, char **argv) {
             } // end add vs. remove
         }		
 
-        
-
         if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
         
-            if (system.constants.ensemble == ENSEMBLE_UVT && system.stats.count_movables > 0) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
+            if (system.constants.ensemble == ENSEMBLE_UVT) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
             if (system.constants.histogram_option) {
 				zero_grid(system.grids.histogram->grid,system);
                 population_histogram(system);
@@ -700,7 +698,7 @@ int main(int argc, char **argv) {
                 }
                 if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
                     printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
-                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
+                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L = kg/m^3\n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 if (system.proto.size() > 1)
                     printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             } // end prototype molecules loop for uptake data
@@ -727,16 +725,15 @@ int main(int argc, char **argv) {
                 } // end loop j
                 molec_counter++;
             } // end loop i
-            } // end if N>0
-
+            } // end if uVT && N>0
 
             // WRITE OUTPUT FILES
+            if (system.molecules.size() > 0) { 
             writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
             // restart file.
             writePDB(system, system.constants.restart_pdb); // containing all atoms
 
             // trajectory file
-            if (system.stats.count_movables > 0) {
                 if (system.constants.xyz_traj_option)
 			        writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
                     
@@ -746,7 +743,6 @@ int main(int argc, char **argv) {
                         writePDBtraj(system, system.constants.restart_pdb, system.constants.output_traj_pdb, t); // copy all-atoms-restart-PDB to PDB trajectory
                     else writePDBtraj(system, system.constants.restart_mov_pdb, system.constants.output_traj_movers_pdb,t); // just movers to PDB trajectory
                 }
-            } // end if N > 0 
             frame++;
             if (system.stats.radial_dist) {
                 radialDist(system);
@@ -754,8 +750,10 @@ int main(int argc, char **argv) {
             }
             if (t != dt && system.constants.histogram_option)
 				write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
-		}
+		    
+            } // end if N>0, write output files.
+        } // end if corrtime (quite sure.)
 		count_md_steps++;
 	} // end MD timestep loop
-	}
-}
+	} // end if MD i.e. not MC (quite sure.)
+} // end main()
