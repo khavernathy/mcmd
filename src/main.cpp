@@ -367,7 +367,8 @@ int main(int argc, char **argv) {
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 if (system.proto.size() > 1)
                     printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
-            }
+            } // end prototype molecules loop for uptake data
+
             if (system.constants.ensemble == ENSEMBLE_UVT) {
                 if (system.proto.size() == 1) {
                     if (system.stats.qst.average > 0)
@@ -541,10 +542,15 @@ int main(int argc, char **argv) {
 
 	// begin timing for steps
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();
+    
+
+    computeInitialValues(system);
+    // Main MD time loop
 	for (double t=dt; t <= tf; t=t+dt) {
         system.stats.MDtime = t;
-		//printf("time %f\n",t);
-		integrate(system,dt);
+		
+        // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
+        integrate(system,dt);
 
         if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
             // try a MC uVT insert/delete
@@ -565,7 +571,11 @@ int main(int argc, char **argv) {
             } // end add vs. remove
         }		
 
+        
+
         if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
+        
+            if (system.constants.ensemble == ENSEMBLE_UVT && system.stats.count_movables > 0) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
             if (system.constants.histogram_option) {
 				zero_grid(system.grids.histogram->grid,system);
                 population_histogram(system);
@@ -645,7 +655,7 @@ int main(int argc, char **argv) {
             else printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             //printf("testing angular velocity\n");
-            printf("Ensemble: %s; N_molecules = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
+            printf("Ensemble: %s; N_movables = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
             if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp); 
@@ -668,9 +678,41 @@ int main(int argc, char **argv) {
                         printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
                 }
             }
-                
+            // uptake data if uVT
+            if (system.constants.ensemble == ENSEMBLE_UVT) { 
+			for (int i=0; i<system.proto.size(); i++) {
+                double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
+                double cm3gSTP = mmolg*22.4;
+                double mgg = mmolg * (system.proto[i].mass*1000*system.constants.NA);
+                string flspacing = "";
+                if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
+                else flspacing="            "; // stuff like H2, O2 (2 chars)
+                if (system.stats.count_frozens > 0) {
+                    printf("-> %s wt %% =%s   %.5f +- %.5f %%; %.5f cm^3/g (STP)\n", system.proto[i].name.c_str(),flspacing.c_str(), system.stats.wtp[i].average, system.stats.wtp[i].sd, cm3gSTP);
+                    printf("      wt %% ME =            %.5f +- %.5f %%; %.5f mmol/g\n",system.stats.wtpME[i].average, system.stats.wtpME[i].sd, mmolg);
+                }
+                if (system.stats.count_frozens > 0) {
+                    printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
+                    system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                } else {
+                    printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
+                    system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                }
+                if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
+                    printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
+                printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L \n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
+                if (system.proto.size() > 1)
+                    printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
+            } // end prototype molecules loop for uptake data
+            
+                if (system.proto.size() == 1) {
+                    if (system.stats.qst.average > 0)
+                        printf("Qst = %.5f kJ/mol\n", system.stats.qst.value); //, system.stats.qst.sd);
+                    if (system.stats.qst_nvt.average > 0)
+                        printf("U/N avg = %.5f kJ/mol\n", system.stats.qst_nvt.value); //, system.stats.qst_nvt.sd);
+                }
+            } // end if uVT
 
-            //printf("   --> instantaneous D = %.4e cm^2 / s\n", system.stats.diffusion.value);
             printf("--------------------\n\n");
             // CONSOLIDATE ATOM AND MOLECULE PDBID's if uVT
             // quick loop through all atoms to make PDBID's pretty (1->N)
@@ -689,7 +731,6 @@ int main(int argc, char **argv) {
 
 
             // WRITE OUTPUT FILES
-            
             writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
             // restart file.
             writePDB(system, system.constants.restart_pdb); // containing all atoms
