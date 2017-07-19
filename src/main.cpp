@@ -147,8 +147,7 @@ int main(int argc, char **argv) {
         setup_histogram(system);
         allocate_histogram_grid(system);
     }
-    if (system.constants.mode == "mc")
-        setupFugacity(system);
+    setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
         setupNBias(system); 
     if (system.constants.fragmaker) {
