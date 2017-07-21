@@ -709,7 +709,7 @@ void readInput(System &system, char* filename) {
                 }
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
             
-            } else if (!strcasecmp(lc[0].c_str(), "bias_uptake")) {
+            } else if (!strcasecmp(lc[0].c_str(), "bias_uptake") || !strcasecmp(lc[0].c_str(), "uptake_bias")) {
                 system.constants.bias_uptake = atof(lc[1].c_str());
                 system.constants.bias_uptake_unit = lc[2];
                 system.constants.bias_uptake_switcher=1;
