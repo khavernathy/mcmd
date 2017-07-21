@@ -214,7 +214,30 @@ void calculateForces(System &system, double dt) {
             system.molecules[i].calc_torque();
     }
 
-}
+    // apply a constant external force if requested
+    if (system.constants.md_external_force) {
+        // molecular motion
+        if (system.constants.md_mode == MD_MOLECULAR) {
+            for (int i=0; i<system.molecules.size(); i++) {
+                if (!system.molecules[i].frozen) {
+                for (int n=0;n<3;n++) {
+                    system.molecules[i].force[n] += system.constants.external_force_vector[n];
+                }
+                }
+            }
+        } else if (system.constants.md_mode == MD_ATOMIC) {
+            for (int i=0; i<system.molecules.size(); i++) {
+                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    if (!system.molecules[i].atoms[j].frozen) {
+                    for (int n=0;n<3;n++) 
+                        system.molecules[i].atoms[j].force[n] += system.constants.external_force_vector[n];
+                    }
+                }
+            }
+        } // end if molecular else atomic
+    } // end if EXTERNAL force
+
+} // end force function.
 
 // ==================== MOVE ATOMS MD STYLE =========================
 /* THIS IS THE MAIN LOOPING FUNCTION. calculateForces() is called within */

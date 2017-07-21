@@ -163,6 +163,8 @@ class Constants {
 		double md_thermostat_freq = 0.01; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
         int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
+        int md_external_force = 0; // option for constant external force in MD
+        double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
 
 
         map <string,double> sig_override;

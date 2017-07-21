@@ -925,6 +925,15 @@ void readInput(System &system, char* filename) {
                     system.constants.polar_pbc = 0;
                     system.constants.all_pbc = 0;
                 }
+            } else if (!strcasecmp(lc[0].c_str(), "external_force")) { 
+                system.constants.md_external_force = 1;
+                for (int n=0;n<3;n++)
+                    system.constants.external_force_vector[n] = atof(lc[n+1].c_str())/system.constants.kb/1e10/1e9; // convert from nN (semi-intuitive force)   to   K/A (MCMD force)
+                std::cout << "Got external force vector = [ " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str() << " ] nanoNewtons."; printf("\n");
+                printf("So the ext. force in K/A is [ %.3f %.3f %.3f ].\n",
+                system.constants.external_force_vector[0],
+                system.constants.external_force_vector[1],
+                system.constants.external_force_vector[2]);
 
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing")) {
                 if (lc[1] == "on") system.constants.simulated_annealing = 1;
