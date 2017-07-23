@@ -586,6 +586,7 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "HYD", "H2O","M",  0.58588, 0.75695, 0.0, 1.008, 0.52, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "HYD", "H2O","M",  0.58588, -0.75695, 0.0, 1.008, 0.52, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "M", "H2O", "M", 0.15, 0.0, 0.0, 0.0, -1.04, 0.0, 0.0, 0.0);
+                system.proto[i].name = "H2O";
             }
             // METHANOL CH3OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz on CCSDT=FULL aug-cc-pvtz geometry (CCCBDB); van Deuynen polariz's
             else if (sorbmodel == "methanol" || sorbmodel == "ch3oh" || sorbmodel == "ch4o") {
