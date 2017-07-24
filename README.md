@@ -70,6 +70,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 
 <!--
 # TODO
+-> MC/MD: half the polarization A matrix<br />
 -> MC: add option to force no-zero-sorbate<br />
 -> MD: fix the MD rotations via quaternion..<br />
 -> MC: Tang-Toennies potential, or other ones<br />
