@@ -1,0 +1,40 @@
+! Douglas Franz, Space group, USF
+! Molcular dynamics using external force
+
+
+name              sifsix14cui_co2_md_nvt
+mode              md ! mc or md
+checkpoints_option  off
+
+
+input_atoms input.pdb   ! PDB ONLY
+
+potential_form        ljes
+com_option            off     ! center of mass
+
+basis1    25.77960000000000     0.00000000000000     0.00000000000000
+basis2     0.00000000000000    18.50600000000000     0.00000000000000
+basis3    -0.01483000000000     0.00000000000000    18.47629000000000
+
+
+
+! radial distribution option
+radial_dist         on   ! turns on/off radial distribution function. off for speedup
+radial_bin_size     0.05  ! in A
+radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)
+radial_centroid     C2G C2G C2G O2E O2E  ! element name
+radial_counterpart  C2G CU  SI  CU  SI   ! element name to get distance of w/centroid
+radial_file         radialdist.dat
+
+temperature 298.0
+ensemble nvt
+external_force  0.5 0 0   ! vector in nN
+
+ ! MOLECULAR DYNAMICS ONLY ===============================
+md_pbc            on
+md_dt             0.2  ! fs
+md_ft             20 ns
+md_corrtime       1000     ! steps
+md_mode           molecular
+md_rotations      on    ! asdf
+
