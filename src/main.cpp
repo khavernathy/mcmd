@@ -361,7 +361,7 @@ int main(int argc, char **argv) {
                     printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
                 }
-                if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
+                if (system.stats.excess[i].average > 0 && system.constants.free_volume > 0)
                     printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L = kg/m^3\n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 if (system.proto.size() > 1)
@@ -695,7 +695,7 @@ int main(int argc, char **argv) {
                     printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
                 }
-                if (system.stats.excess[i].average > 0 || system.constants.free_volume >0)
+                if (system.stats.excess[i].average > 0 && system.constants.free_volume > 0)
                     printf("      Excess ads. ratio =  %.5f +- %.5f mg/g\n", system.stats.excess[i].average, system.stats.excess[i].sd);
                 printf("      Density avg = %.6f +- %.3f g/mL = %6f g/L = kg/m^3\n",system.stats.density[i].average, system.stats.density[i].sd, system.stats.density[i].average*1000.0);
                 if (system.proto.size() > 1)
