@@ -70,6 +70,7 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 
 <!--
 # TODO
+-> MC: polar energy differs from MPMC by 0.0015% for Zn-datzbdc test case.<br />
 -> MC: add compressibility, bulk modulus, heat capacity calculators<br />
 -> MC/MD: half the polarization A matrix<br />
 -> MC: add option to force no-zero-sorbate<br />
