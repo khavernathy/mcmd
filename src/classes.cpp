@@ -686,6 +686,7 @@ class Molecule {
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
         double inertia=0.0; //moment of inertia. stored in K fs^2
+        double inertia_tensor[6] = {0,0,0,0,0,0}; // xx,yy,zz,xy,yz,xz
         double fugacity=0.0;
 
         void reInitialize() {
@@ -724,6 +725,26 @@ class Molecule {
                 inertia += atoms[i].m * rsq; // kg * A^2
             }
             inertia = inertia/1.3806488e-23/1e20*1e30; // to K fs^2
+        }
+
+        void calc_inertia_tensor() {
+            // xx,yy,zz,xy,yz,xz
+            for (int n=0;n<6;n++) inertia_tensor[n]=0; // reset to 0
+            for (int i=0; i<atoms.size(); i++) {
+                double x = atoms[i].pos[0]-com[0];
+                double y = atoms[i].pos[1]-com[1];
+                double z = atoms[i].pos[2]-com[2];
+                double x2 = x*x, y2=y*y, z2=z*z;
+                double m = atoms[i].m;
+
+                inertia_tensor[0] += m*(y2+z2);
+                inertia_tensor[1] += m*(x2+z2);
+                inertia_tensor[2] += m*(x2+y2);
+                inertia_tensor[3] -= m*x*y;
+                inertia_tensor[4] -= m*y*z;
+                inertia_tensor[5] -= m*x*z; // all in kg*A^2
+            }
+            for (int n=0;n<6;n++) inertia_tensor[n] = inertia_tensor[n]/1.3806488e-23/1e20*1e30; // to K fs^2
         }
 
         // angular acceleration

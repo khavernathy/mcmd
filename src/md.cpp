@@ -77,7 +77,24 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             // energy is conserved in NVE for non-rotating particles. 
             // for rotating particles, I don't seem to conserve energy in NVE.
             if (system.constants.md_rotations) {
-                energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
+                // old scalar method
+                //energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
+                
+                // new tensor method.
+                system.molecules[j].calc_inertia_tensor();
+                double wx = system.molecules[j].ang_vel[0];
+                double wy = system.molecules[j].ang_vel[1];
+                double wz = system.molecules[j].ang_vel[2];
+
+                energy_holder = 0.5 * (system.molecules[j].inertia_tensor[0]*wx*wx +
+                    system.molecules[j].inertia_tensor[1]*wy*wy +
+                    system.molecules[j].inertia_tensor[2]*wz*wz +
+                    2*system.molecules[j].inertia_tensor[3]*wx*wy +
+                    2*system.molecules[j].inertia_tensor[4]*wy*wz + 
+                    2*system.molecules[j].inertia_tensor[5]*wx*wz);
+
+                energy_holder *= system.constants.kb/1e10;
+
                 K_total += energy_holder; // rotational: (rad)*kg A^2 / fs^2
                 Krot += energy_holder;
             }
