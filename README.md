@@ -70,26 +70,4 @@ We recommend Visual Molecular Dynamics for data visualization, but the output is
 
 <!--
 # TODO
--> MC: polar energy differs from MPMC by 0.0015% for Zn-datzbdc test case.<br />
--> MC: add compressibility, bulk modulus, heat capacity calculators<br />
--> MC/MD: half the polarization A matrix<br />
--> MC: add option to force no-zero-sorbate<br />
--> MD: fix the MD rotations via quaternion..<br />
--> MC: Tang-Toennies potential, or other ones<br />
--> MC: maybe, speed up by adjusting energy by the 1 particle that is changed.<br /> 
--> MC: add multi-sorb Qst calculator<br />
--> MC: speed up via GPU for polarization routine <br />
--> MC: add Phast2 model<br />
--> MD: Make stat-mech pressure, specific heat calculators. Make sure temperature is calculated correctly<br />
--> MD: add polarizable force calculator <br />
--> MC: add more sorbate models from literature<br />
--> MC: Use openMP or fork() for energy tasks<br />
--> change timing/string stuff for icpc compatibility<br />
--> openMPI/MPI for easy isotherm<br />
--> MC: change fugacity dynamically in S.A. if threshold is crossed<br />
--> MC/MD: multi-sorbate histograms<br />
--> MD: No-PBC GPU algorithm (already did PBC)<br />
--> MC: multi-box? (GEMC) <br />
--> MC/MD: non-rigid (vibrating/bending/stretching potentials) for sorbates<br />
--> MC: use GPU for RD/ES, potential to cut ~8% time<br />
 -->
