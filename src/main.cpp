@@ -141,6 +141,8 @@ int main(int argc, char **argv) {
     if (system.constants.crystalbuild) {
         setupCrystalBuild(system);
         // write an XYZ of the built system by default
+        string delit = "rm crystalbuild.xyz";
+        int whatever = std::system(delit.c_str());
         writeXYZ(system, "crystalbuild.xyz", 0, 0, 0, 0);
     }
 
