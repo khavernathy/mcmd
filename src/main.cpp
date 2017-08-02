@@ -138,8 +138,11 @@ int main(int argc, char **argv) {
         scaleCharges(system);
 
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
-    if (system.constants.crystalbuild)
+    if (system.constants.crystalbuild) {
         setupCrystalBuild(system);
+        // write an XYZ of the built system by default
+        writeXYZ(system, "crystalbuild.xyz", 0, 0, 0, 0);
+    }
 
     if (system.constants.histogram_option) {
         system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
