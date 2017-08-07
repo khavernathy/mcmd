@@ -34,7 +34,7 @@ Douglas Franz: dfranz@mail.usf.edu
 # Features
 MCMD has several features that make simulation easier for the user:<br />
 &emsp;-> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
-&emsp;-> MD supports NVT and NVE.  <br />
+&emsp;-> MD supports NVT, NVE, and uVT ensembles.  <br />
 &emsp;->Automatic radial distribution calculator<br />
 &emsp;->Pre-programmed sorbate models for easy input, including multi-sorbate support<br />
 &emsp;->Easy system basis parametrization via a,b,c,alpha,beta,gamma crystal values<br />
@@ -66,7 +66,7 @@ MCMD works out-of-the-box on <br />
 &emsp;-> Mac (tested on OS X El Capitan v10.11.6)<br />
 &emsp;-> Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed)<br />
 &emsp;-> Raspberry Pi (3, using Raspian OS).<br /><br />
-We recommend Visual Molecular Dynamics for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, etc.<br />
+We recommend Visual Molecular Dynamics (VMD) for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, Ovito, etc.<br />
 
 <!--
 # TODO
