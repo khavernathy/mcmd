@@ -185,6 +185,7 @@ class Constants {
         double polar_gamma = 1.03;
         int polar_max_iter = 4;
         double **A_matrix, **B_matrix, C_matrix[3][3];
+        double *Ahalf_matrix, *Adiag;
         int polar_precision=0;
         int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
         int_fast8_t polar_rrms =0;
@@ -216,6 +217,8 @@ class Constants {
         int numfrags=0; // number of fragments to create in fragmentMaker function
         vector<int> fragsize = {250}; // num. of atoms in a frag, default
         double frag_bondlength = 2.1; // Angstroms, default.
+
+        int write_lammps = 0; // option to write out LAMMPS input files 
 };
 
 class Pbc {

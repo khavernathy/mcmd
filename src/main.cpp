@@ -89,9 +89,9 @@ int main(int argc, char **argv) {
     char buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,sizeof(buffer),"%m-%d-%Y %I:%M:%S",timeinfo);
+    strftime(buffer,sizeof(buffer),"%m-%d-%Y at %H:%M:%S",timeinfo);
     std::string str(buffer);
-    std::cout << "MCMD started at " << str << endl;
+    std::cout << "MCMD started on " << str << endl;
 
     // print system info.
     string hostcom="hostname";
@@ -138,6 +138,10 @@ int main(int argc, char **argv) {
         scaleCharges(system);
 
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
+    if (system.constants.write_lammps) 
+        writeLAMMPSfiles(system);
+
+    
     if (system.constants.crystalbuild) {
         setupCrystalBuild(system);
         // write an XYZ of the built system by default
