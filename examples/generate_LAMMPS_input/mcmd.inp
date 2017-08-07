@@ -1,0 +1,37 @@
+! This is a comment 
+! Hi
+
+
+name			    generate_lammps_ex 
+mode	 		    mc 
+input_atoms     input.pdb      
+
+free_volume         11595.4
+
+potential_form 		ljes
+xyz_traj_option     on
+sorbate_name        h2_bss
+fugacity_single     h2
+
+carbasis 25.669 25.669 25.669 90 90 90
+
+radial_dist         off
+
+ensemble		    uvt
+mc_corrtime	        100
+finalstep		    1000000
+temperature         77  
+pressure            1.0
+insert_factor		0.667
+displace_factor     2.5
+rotate_angle_factor 360.0
+
+feynman_hibbs on
+fh_order 4
+
+
+# THIS
+write_lammps on
+
+
+auto_reject_r 1.5      ! more speedup
