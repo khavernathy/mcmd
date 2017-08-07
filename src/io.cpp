@@ -649,6 +649,9 @@ void writeThermo(System &system, double TE, double LKE, double RKE, double PE, d
 }
 
 void writeLAMMPSfiles(System &system) {
+    
+    printf("\n\nWriting LAMMPS input files...\n");
+
     // first write the input file
     FILE *f = fopen("lammps.in", "w");
     time_t rawtime;
@@ -687,6 +690,8 @@ void writeLAMMPSfiles(System &system) {
             for (int j=0; j<system.molecules[i].atoms.size(); j++) {
                 if (system.molecules[i].atoms[j].name == atomlabels[x]) {
                     mass = system.molecules[i].atoms[j].m / system.constants.cM; // in amu
+                    // LAMMPS doesn't accept 0-mass atoms so we need to contrive this
+                    if (mass == 0) mass = 0.00001;
                     break;
                 }
             }
@@ -779,8 +784,48 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f2, "%s\n\n", system.constants.jobname.c_str());
     fprintf(f2, "%i atoms\n", system.constants.total_atoms);
     fprintf(f2, "%i atom types\n\n", (int)atomlabels.size());
+    // we'll use the box vertices calculed in MCMD to get hi and lo params for the LAMMPS box.
+    double xlo=1e40, xhi=-1e40, ylo=1e40, yhi=-1e40, zlo=1e40, zhi=-1e40; // big numbers to start
+    for (int v=0; v<8; v++) {
+        if (system.pbc.box_vertices[v][0] < xlo) xlo = system.pbc.box_vertices[v][0];
+        if (system.pbc.box_vertices[v][0] > xhi) xhi = system.pbc.box_vertices[v][0];
+        if (system.pbc.box_vertices[v][1] < ylo) ylo = system.pbc.box_vertices[v][1];
+        if (system.pbc.box_vertices[v][1] > yhi) yhi = system.pbc.box_vertices[v][1];
+        if (system.pbc.box_vertices[v][2] < zlo) zlo = system.pbc.box_vertices[v][2];
+        if (system.pbc.box_vertices[v][2] > zhi) zhi = system.pbc.box_vertices[v][2];
+    }
+    fprintf(f2, "%.6f %.6f xlo xhi\n",xlo,xhi);
+    fprintf(f2, "%.6f %.6f ylo yhi\n",ylo,yhi);
+    fprintf(f2, "%.6f %.6f zlo zhi\n\n",zlo,zhi);
+
+    fprintf(f2, "Atoms\n\n");
+    // now the atom list in LAMMPS style input
+    int counter=1;
+    int atomtype;
+    for (int i=0;i<system.molecules.size();i++) {
+        for (int j=0;j<system.molecules[i].atoms.size();j++) {
+            for (int x=0;x<atomlabels.size();x++) {
+                if (atomlabels[x] == system.molecules[i].atoms[j].name) {
+                    atomtype = x+1;
+                    fprintf(f2, "%i %i %i %.5f %.5f %.5f %.5f #%s\n",
+                           counter, system.molecules[i].PDBID, atomtype,
+                           system.molecules[i].atoms[j].C / system.constants.E2REDUCED,
+                           system.molecules[i].atoms[j].pos[0],
+                           system.molecules[i].atoms[j].pos[1],
+                           system.molecules[i].atoms[j].pos[2],
+                           atomlabels[x].c_str());
+                    counter++;
+                    break;
+                }
+            } // end atom labels
+        } // end j atoms in mol
+    } // end i molecules loop
+
 
     fclose(f2);
+
+    printf("Done generating LAMMPS inputs from loaded data in MCMD.\n");
+    printf(" --> Written to [[ lammps.in ]] and [[ lammps.data ]]\n\n");
 }
 
 /* READ INPUT FILE PARAMETERS AND OPTIONS */
