@@ -1249,7 +1249,7 @@ void readInput(System &system, char* filename) {
                 system.constants.free_volume = atof(lc[1].c_str());
                 std::cout << "Got free volume = " << lc[1].c_str() << " A^3."; printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "write_lammps")) {
+            } else if (!strcasecmp(lc[0].c_str(), "write_lammps") || !strcasecmp(lc[0].c_str(), "lammps_write")) {
                 if (lc[1] == "on") {
                     system.constants.write_lammps = 1;
                 }
