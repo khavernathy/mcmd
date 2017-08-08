@@ -764,6 +764,7 @@ void writeLAMMPSfiles(System &system) {
 
     fprintf(f, "\n# more variables etc. useful for MD");
     fprintf(f, "\nvariable step equal step\nvariable time equal step*2\nvariable timeNS equal time/1000000\nvariable diffusion_coeff equal c_themsd[4]/(6*time)*0.1 # cm^2/s\n");
+    fprintf(f, "variable te equal c_pe+c+ke\n");
     fprintf(f, "compute pe all pe\ncompute ke all ke\ncompute themsd moving msd com yes average yes\ncompute movingtemp moving temp\nthermo_style custom step etotal ke pe evdwl ecoul\nthermo ${freq}\n\n");
     string idSort = "";
     for (int x=0;x<atomlabels.size();x++) {
