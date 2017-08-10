@@ -1,9 +1,19 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>Page1.qml</file>
-        <file>Page1Form.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>main_old_copy.qml</file>
+        <file>Inputpage.qml</file>
+        <file>InputpageForm.ui.qml</file>
+        <file>images/badbenzene.png</file>
+        <file>backend.cpp</file>
+        <file>backend.h</file>
+        <file>fileio.cpp</file>
+        <file>fileio.h</file>
+        <file>main.cpp</file>
+        <file>whatever.cpp</file>
+        <file>images/mof5-hexagonal-angle.png</file>
+        <file>images/lineedit.png</file>
+        <file>InputLine.qml</file>
     </qresource>
 </RCC>

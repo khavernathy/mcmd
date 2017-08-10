@@ -31,5 +31,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    backend.h \
-    fileio.h
+    fileio.h \
+    backend.h
+
+FORMS += \
+    dialog.ui
+
+DISTFILES +=

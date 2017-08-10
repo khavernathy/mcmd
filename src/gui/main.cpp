@@ -18,8 +18,11 @@ int main(int argc, char *argv[])
 {
 
     system("pwd");
+    string homeDir="/home/dfranz";
+    //string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log &";
     // dev/null is important to supress MCMD output in Qt Application Output
-    system("$HOME/mcmd/mcmd $HOME/mcmd/testzone/mcmd.inp | tee $HOME/mcmd/testzone/runlog.log  >/dev/null & ");
+    string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log >/dev/null &";
+    system(commandString.c_str());
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);

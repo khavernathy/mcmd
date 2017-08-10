@@ -22,8 +22,8 @@ ApplicationWindow {
     }
     FileIO {
         id: runlogFile
-        source: "/home/khavernathy/mcmd/testzone/runlog.log"
-        //linecount: 0 // this will change.
+        homeDir: "/home/dfranz/"
+        source: homeDir+"/mcmd/testzone/runlog.log"
         onError: console.log(msg);
     }
     SwipeView {
@@ -32,14 +32,13 @@ ApplicationWindow {
         currentIndex: tabBar.currentIndex
         onCurrentIndexChanged: {
             //myText.text = myFile.read();
+        }
+        Inputpage {
 
         }
-
-
         Page {
-
             ScrollView {
-                id: view
+                id: runlogOut
                 anchors.fill: parent
                     TextArea {
                         id: outputText
@@ -54,9 +53,6 @@ ApplicationWindow {
                             //positionAt: bottom
                         }
                     }
-
-
-
             }
 
             Component.onCompleted: {
@@ -81,7 +77,7 @@ ApplicationWindow {
 
         Page {
             Label {
-                text: qsTr("Second page")
+                text: qsTr("3rd page")
                 anchors.centerIn: parent
             }
             TextField {
@@ -90,13 +86,14 @@ ApplicationWindow {
         }
         Page {
             Label {
-                text: qsTr("Stuff on the 3rd page")
+                text: qsTr("Stuff on the 4 page")
             }
         }
 
-        Page1 {
-
-
+        Page {
+            Label {
+                text: qsTr("more stuff, 5th")
+            }
         }
     }
 
@@ -104,16 +101,19 @@ ApplicationWindow {
         id: tabBar
         currentIndex: swipeView.currentIndex
         TabButton {
-            text: qsTr("First")
+            text: qsTr("Input setup")
         }
         TabButton {
-            text: qsTr("Second")
+            text: qsTr("Runlog (output)")
         }
         TabButton {
             text: qsTr("3rd")
         }
         TabButton {
-            text: qsTr("testing ui")
+            text: qsTr("4th")
+        }
+        TabButton {
+            text: qsTr("5th")
         }
     }
 
