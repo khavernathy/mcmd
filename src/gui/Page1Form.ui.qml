@@ -7,8 +7,11 @@ Item {
     property alias button1: button1
 
     RowLayout {
+        width: 305
+        height: 44
+        anchors.horizontalCenterOffset: -52
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: 20
+        anchors.topMargin: 15
         anchors.top: parent.top
 
         TextField {
@@ -20,5 +23,26 @@ Item {
             id: button1
             text: qsTr("Press Me")
         }
+    }
+
+    MouseArea {
+        id: mouseArea
+        x: 0
+        y: 2
+        width: 100
+        height: 100
+    }
+
+    ProgressBar {
+        id: progressBar
+        x: 220
+        y: 91
+        value: 0.5
+    }
+
+    Dial {
+        id: dial
+        x: 456
+        y: 2
     }
 }

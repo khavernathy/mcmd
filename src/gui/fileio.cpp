@@ -26,13 +26,40 @@ QString FileIO::read()
     if ( file.open(QIODevice::ReadOnly) ) {
         QString line;
         QTextStream t( &file );
-        int count=0;
+        int recounter=0;
+        int limit=mLinecount;
+        bool write = false;
+        bool firstCheck = false;
+        if (recounter == 0 && limit == 0) firstCheck = true;
+        printf("firstCheck is %i and mLinecount is currently %i\n",firstCheck,mLinecount);
         do {
             line = t.readLine();
-            fileContent += "\n"+line;
-            count++;
+
+            if (firstCheck) {
+                write = true;
+            } else {
+                if (limit < recounter) {
+                    write = true;
+
+                }
+            }
+            if (write) {
+                QString spacer="";
+                if (recounter<9) spacer =      "      | ";
+                else if (recounter<99) spacer = "     | ";
+                else if (recounter<999) spacer = "    | ";
+                else if (recounter<9999) spacer = "   | ";
+                else if (recounter<99999) spacer = "  | ";
+                else if (recounter<999999) spacer = " | ";
+                else if (recounter<9999999) spacer = "| ";
+                fileContent += "\n"+QString::number(recounter+1)+spacer+line;
+            }
+            recounter++;
+
         } while (!line.isNull());
-        printf("%i",count);
+        //printf("HEYYY %i",count);
+
+        mLinecount = recounter;
 
         file.close();
     } else {

@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QDebug>
 
 #include "backend.h"
 #include "fileio.h"
@@ -17,7 +18,8 @@ int main(int argc, char *argv[])
 {
 
     system("pwd");
-    system("$HOME/mcmd/mcmd $HOME/mcmd/testzone/mcmd.inp | tee $HOME/mcmd/testzone/runlog.log &");
+    // dev/null is important to supress MCMD output in Qt Application Output
+    system("$HOME/mcmd/mcmd $HOME/mcmd/testzone/mcmd.inp | tee $HOME/mcmd/testzone/runlog.log  >/dev/null & ");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
