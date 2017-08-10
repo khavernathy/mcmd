@@ -62,8 +62,7 @@ ApplicationWindow {
             Component.onCompleted: {
                 //console.log( "WRITE"+ myFile.write("TEST"))
                 outputText.text += runlogFile.read();
-                flickableItem.contentY = flickableItem.contentHeight / 2 - height / 2
-                flickableItem.contentX = flickableItem.contentWidth / 2 - width / 2
+
 
             }
 
