@@ -262,6 +262,13 @@ ApplicationWindow {
                     //scroller.setPosition(outputText.contentHeight)
                     //scroller.position = 0.95; // not quite right, when output gets large it doesn't catch the end
                     scroller.position = (outputText.contentHeight - 500)/outputText.contentHeight;
+
+                    var N = outputText.text.indexOf()
+
+                    var stuff = outputText.text.split(/[ ]+/); // by whitespace
+                    console.log(stuff);
+
+
                     console.log("contentHeight:"+outputText.contentHeight)
                     console.log("scroller pos:"+scroller.position)
                     //runlogOut.availableHeight

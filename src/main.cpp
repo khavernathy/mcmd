@@ -384,7 +384,7 @@ int main(int argc, char **argv) {
                     if (system.stats.qst_nvt.average > 0)
                         printf("U/N avg = %.5f kJ/mol\n", system.stats.qst_nvt.value); //, system.stats.qst_nvt.sd);
                 }
-                printf("N_molecules = %i; N_movables = %i; N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
+                printf("N_molecules = %i N_movables = %i N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             }
             /*
             if (system.constants.ensemble != "npt") {
@@ -661,7 +661,7 @@ int main(int argc, char **argv) {
             else printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             //printf("testing angular velocity\n");
-            printf("Ensemble: %s; N_movables = %i; N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
+            printf("Ensemble: %s; N_movables = %i N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
             if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp); 
