@@ -44,6 +44,7 @@ QString FileIO::read()
                 }
             }
             if (write) {
+                /*
                 QString spacer="";
                 if (recounter<9) spacer =      "      | ";
                 else if (recounter<99) spacer = "     | ";
@@ -53,6 +54,8 @@ QString FileIO::read()
                 else if (recounter<999999) spacer = " | ";
                 else if (recounter<9999999) spacer = "| ";
                 fileContent += "\n"+QString::number(recounter+1)+spacer+line;
+                */
+                fileContent += "\n"+line;
             }
             recounter++;
 

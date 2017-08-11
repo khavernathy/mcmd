@@ -216,7 +216,7 @@ ApplicationWindow {
                 height: parent.height
                 width: parent.width
                 anchors.fill: parent
-                    ScrollBar.vertical: ScrollBar { id: scroller; height: 30; width: parent.width; visible: no;}
+                    ScrollBar.vertical: ScrollBar { id: scroller; height: 30; width: parent.width; visible: false;}
                     TextArea {
                         id: outputText
                         color: "white"
@@ -263,10 +263,19 @@ ApplicationWindow {
                     //scroller.position = 0.95; // not quite right, when output gets large it doesn't catch the end
                     scroller.position = (outputText.contentHeight - 500)/outputText.contentHeight;
 
-                    var N = outputText.text.indexOf()
+                    // loop each line...
+                    var allLines = outputText.text.split("\n");
+                    var i=0;
+                    while (allLines.length > i) {
+                        var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
+                        if (allLines[i].indexOf("Qst") !== -1) {
+                            //console.log(allLines[i]);
+                            var qst = thisLine[2];
+                        }
+                        i++;
+                    }
 
-                    var stuff = outputText.text.split(/[ ]+/); // by whitespace
-                    console.log(stuff);
+                    //console.log("allLines: "+allLines.length+" ... runlogFile.linecount:"+runlogFile.linecount);
 
 
                     console.log("contentHeight:"+outputText.contentHeight)
