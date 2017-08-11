@@ -22,7 +22,7 @@ ApplicationWindow {
     }
     FileIO {
         id: runlogFile
-        homeDir: "/home/dfranz/"
+        homeDir: "/Users/douglasfranz"
         source: homeDir+"/mcmd/testzone/runlog.log"
         onError: console.log(msg);
     }
@@ -33,10 +33,181 @@ ApplicationWindow {
         onCurrentIndexChanged: {
             //myText.text = myFile.read();
         }
-        Inputpage {
+
+        Page { // 1 :: Input stuff
+            Rectangle {
+                id: leftcol
+                color: "red"
+                border.color: "black"
+                border.width: 3
+                height: parent.height
+                width: parent.width/2
+                anchors.margins: 5
+
+               Rectangle {
+                    width: parent.width
+                    height: 50
+                    color: "#cdcdcd"
+                    Text {
+                        font.pixelSize: 30
+                        text: "MCMD input parameters"
+                    }
+                }
+/*
+                    InputLine {
+                        id: firstInpLine
+                        y: 50
+                        name: "Job name"
+                        defaultIn: "test job"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + firstInpLine.height
+                        name: "Mode"
+                        defaultIn: "mc"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 2*firstInpLine.height
+                        name: "Input atoms"
+                        defaultIn: "/Users/douglasfranz/mcmd/testzone/input.pdb"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 3*firstInpLine.height
+                        name: "Potential"
+                        defaultIn: "ljes"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 4*firstInpLine.height
+                        name: "Sorbates"
+                        defaultIn: "h2_bss"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 5*firstInpLine.height
+                        name: "Fugacity"
+                        defaultIn: "h2"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 6*firstInpLine.height
+                        name: "Basis a"
+                        defaultIn: "25.669"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 7*firstInpLine.height
+                        name: "Basis b"
+                        defaultIn: "25.669"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 8*firstInpLine.height
+                        name: "Basis c"
+                        defaultIn: "25.669"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 9*firstInpLine.height
+                        name: "Basis α"
+                        defaultIn: "90.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 10*firstInpLine.height
+                        name: "Basis β"
+                        defaultIn: "90.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 11*firstInpLine.height
+                        name: "Basis γ"
+                        defaultIn: "90.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 12*firstInpLine.height
+                        name: "Ensemble"
+                        defaultIn: "uvt"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 13*firstInpLine.height
+                        name: "Corrtime"
+                        defaultIn: "1000"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 14*firstInpLine.height
+                        name: "Final step"
+                        defaultIn: "10000000"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 15*firstInpLine.height
+                        name: "Temperature"
+                        defaultIn: "77.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 16*firstInpLine.height
+                        name: "Pressure"
+                        defaultIn: "1.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 17*firstInpLine.height
+                        name: "Insert factor"
+                        defaultIn: "0.667"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 18*firstInpLine.height
+                        name: "Displace factor"
+                        defaultIn: "2.5"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 19*firstInpLine.height
+                        name: "Angle rotation factor"
+                        defaultIn: "360.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 20*firstInpLine.height
+                        name: "Basis γ"
+                        defaultIn: "90.0"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 21*firstInpLine.height
+                        name: "Feynman-Hibbs corrections"
+                        defaultIn: "on"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 22*firstInpLine.height
+                        name: "F-H order"
+                        defaultIn: "4"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 23*firstInpLine.height
+                        name: "write_lammps"
+                        defaultIn: "on"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 24*firstInpLine.height
+                        name: "Auto-reject option"
+                        defaultIn: "on"
+                    }
+                    InputLine {
+                        y: firstInpLine.y + 25*firstInpLine.height
+                        name: "Auto-reject r"
+                        defaultIn: "1.78"
+                    }
+*/
+            }
+            Rectangle {
+                id: midcol
+                anchors.left: leftcol.right
+                border.color: "black"
+                border.width: 3
+                color: "blue"
+                height: parent.height
+                width: parent.width/4
+            }
+            Rectangle {
+                id: rightcol
+                anchors.left: midcol.right
+                color: "orange"
+                border.color: "black"
+                border.width: 3
+                height: parent.height
+                width: parent.width/4
+            }
 
         }
-        Page {
+        Page { // 2 :: Runlog output
             ScrollView {
                 id: runlogOut
                 anchors.fill: parent
@@ -58,8 +229,6 @@ ApplicationWindow {
             Component.onCompleted: {
                 //console.log( "WRITE"+ myFile.write("TEST"))
                 outputText.text += runlogFile.read();
-
-
             }
 
             Button {
@@ -71,11 +240,10 @@ ApplicationWindow {
                 }
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-
             }
         }
 
-        Page {
+        Page { // 3 :: graph stuff...
             Label {
                 text: qsTr("3rd page")
                 anchors.centerIn: parent

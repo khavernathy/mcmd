@@ -51,6 +51,7 @@ private:
 public:
     int mLinecount=0;
     QString mHomedir;
+
 };
 
 #endif // FILEIO_H

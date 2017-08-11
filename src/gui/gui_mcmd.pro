@@ -4,7 +4,7 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     backend.cpp \
-    fileio.cpp
+    fileio.cpp \
 
 RESOURCES += qml.qrc
 

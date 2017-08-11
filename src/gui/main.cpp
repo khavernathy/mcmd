@@ -10,15 +10,33 @@
 #include <string>
 #include <fstream>
 
+
+
 using namespace std;
 
 
 
 int main(int argc, char *argv[])
 {
-
     system("pwd");
-    string homeDir="/home/dfranz";
+
+    string homeDir;
+    string linuxcheck="/proc/cpuinfo";
+        //linux
+        if (std::ifstream(linuxcheck.c_str())) {
+            string usfspace = "/home/dfranz";
+            string homebox = "/home/khavernathy";
+            if (std::ifstream(usfspace.c_str())) {
+                homeDir = usfspace;
+            } else {
+                homeDir = homebox;
+            }
+        } else {
+            // mac
+            homeDir = "/Users/douglasfranz";
+        }
+
+
     //string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log &";
     // dev/null is important to supress MCMD output in Qt Application Output
     string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log >/dev/null &";
