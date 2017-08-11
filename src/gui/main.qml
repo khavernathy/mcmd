@@ -211,6 +211,7 @@ ApplicationWindow {
         }
         Page { // 2 :: Runlog output
             id: outputPage
+
             ScrollView {
                 id: runlogOut
                 height: parent.height
@@ -252,6 +253,7 @@ ApplicationWindow {
 
             Timer {
                 id: timer
+                //property BackEnd backend: BackEnd {}
                 interval: 50 // ms
                 repeat: true
                 running: root.visible
@@ -261,7 +263,7 @@ ApplicationWindow {
                     //outputText.y = outputText.contentHeight;
                     //scroller.setPosition(outputText.contentHeight)
                     //scroller.position = 0.95; // not quite right, when output gets large it doesn't catch the end
-                    scroller.position = (outputText.contentHeight - 500)/outputText.contentHeight;
+                    scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
 
                     // loop each line...
                     var allLines = outputText.text.split("\n");
@@ -271,6 +273,8 @@ ApplicationWindow {
                         if (allLines[i].indexOf("Qst") !== -1) {
                             //console.log(allLines[i]);
                             var qst = thisLine[2];
+                            backend.Qst.append(qst);
+                            console.log(backend.Qst);
                         }
                         i++;
                     }

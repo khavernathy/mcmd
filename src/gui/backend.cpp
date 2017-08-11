@@ -32,3 +32,17 @@ void BackEnd::setOutputLineNumber(const int &outputLineNumber)
     m_outputLineNumber = outputLineNumber;
     emit outputLineNumberChanged();
 }
+
+QList<qreal> BackEnd::Qst()
+{
+    return m_Qst;
+}
+
+void BackEnd::setQst(QList<qreal> &Qst)
+{
+    if (Qst == m_Qst)
+        return;
+
+    m_Qst = Qst;
+    emit QstChanged();
+}
