@@ -8,15 +8,15 @@ import QtQuick.Window 2.2
 import QtCharts 2.2
 
 import FileIO 1.0
-import Graphs 1.0
+
 
 
 
 ApplicationWindow {
     id: root
     visible: true
-    width: 1000
-    height: 800
+    width: 1200
+    height: 900
     title: qsTr("MCMD :: Monte Carlo & Molecular Dynamics")
 
     // custom c++ classes
@@ -278,8 +278,11 @@ ApplicationWindow {
                     var KEs = new Array();
                     var PEs = new Array();
                     var TEs = new Array();
+                    var Ds = new Array();
+                    var ETemps = new Array();
+                    var ITemps = new Array();
 
-                    // loop each line...
+                    // loop each NEW line...
                     var allLines = newText.split("\n"); //outputText.text.split("\n");
                     var i=0;
                     while (allLines.length > i) {
@@ -289,7 +292,6 @@ ApplicationWindow {
                             var step = thisLine[1+runlogFile.colOffset];
                             //console.log(step);
                             steps.push(step);
-
                         }
                         else if (allLines[i].indexOf("KE") !== -1) {
                             var KE = thisLine[2+runlogFile.colOffset];
@@ -302,6 +304,15 @@ ApplicationWindow {
                         else if (allLines[i].indexOf("Total E") !== -1) {
                             var TE = thisLine[3+runlogFile.colOffset];
                             TEs.push(TE);
+                        } else if (allLines[i].indexOf("Diffusion c") !== -1) {
+                            var Diff = thisLine[5+runlogFile.colOffset];
+                            Ds.push(Diff);
+                        } else if (allLines[i].indexOf("Emergent T") !== -1) {
+                            var ETemp = thisLine[3+runlogFile.colOffset];
+                            ETemps.push(ETemp);
+                        } else if (allLines[i].indexOf("Instantaneous T") !== -1) {
+                            var ITemp = thisLine[3+runlogFile.colOffset];
+                            ITemps.push(ITemp);
                         }
 
                         i++;
@@ -313,6 +324,9 @@ ApplicationWindow {
                     energychart.updateKE(laststep, KEs[KEs.length -1]);
                     energychart.updatePE(laststep, PEs[PEs.length -1]);
                     energychart.updateTE(laststep, TEs[TEs.length -1]);
+                    diffusionchart.updateDiff(laststep, Ds[Ds.length -1]);
+                    temperaturechart.updateETemp(laststep, ETemps[ETemps.length -1]);
+                    temperaturechart.updateITemp(laststep, ITemps[ITemps.length -1]);
 
                 }
 
@@ -322,10 +336,11 @@ ApplicationWindow {
 
         Page { // 3 :: graph stuff...
             id: graphspage
+
             Text {
                 id: toptitle
-                text: "blah"
-                height: 100
+                text: "Live data"
+                height: 25
                 width: parent.width
             }
 
@@ -334,11 +349,11 @@ ApplicationWindow {
                 theme: ChartView.ChartThemeDark
                 title: "Energies"
 
-                anchors.fill: parent
-                //anchors.left: parent.left
-                //anchors.top: toptitle.top
-                //height: (parent.height - toptitle.height)/3
-                //width: parent.height/3
+                //anchors.fill: parent
+                anchors.left: parent.left
+                anchors.top: toptitle.bottom
+                height: (root.height - toptitle.height)/2
+                width: root.width/3
                 antialiasing: true
                 function updateKE(x, y) {
                     ke_line.append(x,y);
@@ -392,11 +407,14 @@ ApplicationWindow {
                         min: 0
                         max: 10
                         tickCount: 5
+                        titleText: "Step"
+
                     }
 
                     axisY: ValueAxis {
                         min: -0.5
                         max: 1.5
+                        titleText: "Energy (kJ/mol)"
                     }
                     name: "Kinetic Energy"
                 }
@@ -410,6 +428,114 @@ ApplicationWindow {
                 }
             }
 
+            ChartView {
+                id: diffusionchart
+                theme: ChartView.ChartThemeBlueCerulean
+                title: "Diffusion Coefficient"
+
+                //anchors.fill: parent
+                anchors.left: energychart.right
+                anchors.top: toptitle.bottom
+                height: (root.height - toptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateDiff(x, y) {
+                    diff_line.append(x,y);
+                    if (x > diff_line.axisX.max) {
+                        diff_line.axisX.max = x;
+                    }
+                    else if (x < diff_line.axisX.min) {
+                        diff_line.axisX.min = x;
+                    }
+                    if (y > diff_line.axisY.max) {
+                        diff_line.axisY.max = y;
+                    }
+                    else if (y < diff_line.axisY.min) {
+                        diff_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: diff_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "D (cm^2 / s)"
+                    }
+                    name: "D"
+                }
+            }
+
+            ChartView {
+                id: temperaturechart
+                theme: ChartView.ChartThemeQt
+                title: "Diffusion Coefficient"
+
+                //anchors.fill: parent
+                anchors.left: diffusionchart.right
+                anchors.top: toptitle.bottom
+                height: (root.height - toptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateETemp(x, y) {
+                    temp_line.append(x,y);
+                    if (x > temp_line.axisX.max) {
+                        temp_line.axisX.max = x;
+                    }
+                    else if (x < temp_line.axisX.min) {
+                        temp_line.axisX.min = x;
+                    }
+                    if (y > temp_line.axisY.max) {
+                        temp_line.axisY.max = y;
+                    }
+                    else if (y < temp_line.axisY.min) {
+                        temp_line.axisY.min = y;
+                    }
+                }
+                function updateITemp(x, y) {
+                    itemp_line.append(x,y);
+                    if (x > itemp_line.axisX.max) {
+                        itemp_line.axisX.max = x;
+                    }
+                    else if (x < itemp_line.axisX.min) {
+                        itemp_line.axisX.min = x;
+                    }
+                    if (y > itemp_line.axisY.max) {
+                        itemp_line.axisY.max = y;
+                    }
+                    else if (y < itemp_line.axisY.min) {
+                        itemp_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: temp_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "Temperature (K)"
+                    }
+                    name: "Emergent T"
+                }
+                LineSeries {
+                    id: itemp_line
+                    name: "Instantaneous T"
+                }
+            }
         }
         Page {
             Label {
@@ -431,10 +557,10 @@ ApplicationWindow {
             text: qsTr("Input setup")
         }
         TabButton {
-            text: qsTr("Runlog (output)")
+            text: qsTr("Runlog")
         }
         TabButton {
-            text: qsTr("3rd")
+            text: qsTr("Live graphs")
         }
         TabButton {
             text: qsTr("4th")

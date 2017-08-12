@@ -4,9 +4,7 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     backend.cpp \
-    fileio.cpp \
-    qcustomplot.cpp \
-    graphs.cpp
+    fileio.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,9 +32,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     fileio.h \
-    backend.h \
-    qcustomplot.h \
-    graphs.h
+    backend.h
 
 FORMS += \
     graphs.ui

@@ -6,7 +6,6 @@
 
 #include "backend.h"
 #include "fileio.h"
-#include "graphs.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -51,7 +50,7 @@ int main(int argc, char *argv[])
     // c++ classes and corresponding headers for C++ <--> QML comm.
     qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
     qmlRegisterType<FileIO, 1>("FileIO", 1, 0, "FileIO");
-    qmlRegisterType<Graphs, 1>("Graphs", 1, 0, "Graphs" );
+    //qmlRegisterType<Graphs, 1>("Graphs", 1, 0, "Graphs" );
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
