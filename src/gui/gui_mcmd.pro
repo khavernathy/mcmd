@@ -1,10 +1,12 @@
-QT += qml quick
+QT += qml quick printsupport
 
 CONFIG += c++11
 
 SOURCES += main.cpp \
     backend.cpp \
     fileio.cpp \
+    qcustomplot.cpp \
+    graphs.cpp
 
 RESOURCES += qml.qrc
 
@@ -32,9 +34,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     fileio.h \
-    backend.h
+    backend.h \
+    qcustomplot.h \
+    graphs.h
 
 FORMS += \
-    dialog.ui
+    graphs.ui
 
 DISTFILES +=

@@ -8,6 +8,7 @@ import QtQuick.Window 2.2
 import QtCharts 2.2
 
 import FileIO 1.0
+import Graphs 1.0
 
 
 
@@ -18,16 +19,24 @@ ApplicationWindow {
     height: 800
     title: qsTr("MCMD :: Monte Carlo & Molecular Dynamics")
 
+    // custom c++ classes
     BackEnd {
         id: backend
         outputLineNumber: 0
     }
     FileIO {
         id: runlogFile
-        homeDir: "/Users/douglasfranz"
-        source: homeDir+"/mcmd/testzone/runlog.log"
+        property int colOffset: 2; // to read data excluding the line # output
+        //homeDir: "/Users/douglasfranz" // determined dynamically now
+        //source: homeDir+"/mcmd/testzone/runlog.log" // determined dynamically now
         onError: console.log(msg);
     }
+    Graphs {
+        id: graphsholder
+        //visible: true
+    }
+
+    // main visual stuff begins
     SwipeView {
         id: swipeView
         anchors.fill: parent
@@ -228,7 +237,7 @@ ApplicationWindow {
                         font.family: "Monospace"
                         //text: "Heloo world."
                         onTextChanged: {
-                            console.log("the text changed yo")
+                            //console.log("the text changed yo")
                             //positionAt: bottom
                         }
                     }
@@ -254,10 +263,11 @@ ApplicationWindow {
             Timer {
                 id: timer
                 //property BackEnd backend: BackEnd {}
-                interval: 50 // ms
+                interval: 300 // ms
                 repeat: true
                 running: root.visible
                 onTriggered: {
+                    //console.time("start data collection");
                     outputText.text += runlogFile.read();
                     // outputText.contentHeight contains the real height, which grows.
                     //outputText.y = outputText.contentHeight;
@@ -265,25 +275,29 @@ ApplicationWindow {
                     //scroller.position = 0.95; // not quite right, when output gets large it doesn't catch the end
                     scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
 
+                    var steps = new Array();
+
                     // loop each line...
                     var allLines = outputText.text.split("\n");
                     var i=0;
                     while (allLines.length > i) {
                         var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
-                        if (allLines[i].indexOf("Qst") !== -1) {
+                        if (allLines[i].indexOf("Step") !== -1) {
                             //console.log(allLines[i]);
-                            var qst = thisLine[2];
-                            backend.Qst.append(qst);
-                            console.log(backend.Qst);
+                            var step = thisLine[1+runlogFile.colOffset];
+                            //console.log(step);
+                            steps.push(step);
+
                         }
                         i++;
                     }
+                    console.log(steps);
 
                     //console.log("allLines: "+allLines.length+" ... runlogFile.linecount:"+runlogFile.linecount);
+                    //console.time("start data collection");
 
-
-                    console.log("contentHeight:"+outputText.contentHeight)
-                    console.log("scroller pos:"+scroller.position)
+                    //console.log("contentHeight:"+outputText.contentHeight)
+                    //console.log("scroller pos:"+scroller.position)
                     //runlogOut.availableHeight
 
                 }
@@ -293,6 +307,9 @@ ApplicationWindow {
         }
 
         Page { // 3 :: graph stuff...
+            id: graphspage
+
+
 /*
             ChartView {
                 title: "Line"

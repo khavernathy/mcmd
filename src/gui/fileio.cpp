@@ -16,6 +16,25 @@ FileIO::FileIO(QObject *parent) :
 
 QString FileIO::read()
 {
+    // dynamically find the home directory (based on Linux or Mac)
+    QString homeDir;
+    string linuxcheck="/proc/cpuinfo";
+        //linux
+        if (std::ifstream(linuxcheck.c_str())) {
+            string usfspace = "/home/dfranz";
+            string homebox = "/home/khavernathy";
+            if (std::ifstream(usfspace.c_str())) {
+                homeDir = "/home/dfranz";
+            } else {
+                homeDir = "/home/khavernathy";
+            }
+        } else {
+            // mac
+            homeDir = "/Users/douglasfranz";
+        }
+
+        mSource = homeDir + "/mcmd/testzone/runlog.log";
+
     if (mSource.isEmpty()){
         emit error("source is empty");
         return QString();
@@ -31,20 +50,19 @@ QString FileIO::read()
         bool write = false;
         bool firstCheck = false;
         if (recounter == 0 && limit == 0) firstCheck = true;
-        printf("firstCheck is %i and mLinecount is currently %i\n",firstCheck,mLinecount);
+        //printf("firstCheck is %i and mLinecount is currently %i\n",firstCheck,mLinecount);
         do {
             line = t.readLine();
-
+            //if (line.indexOf("MCMD") != -1) printf("recounter %i; lim %i; %s\n", recounter, limit, line.toLatin1().data());
             if (firstCheck) {
                 write = true;
             } else {
-                if (limit < recounter) {
+                if (limit < recounter+1) {
                     write = true;
-
                 }
             }
             if (write) {
-                /*
+
                 QString spacer="";
                 if (recounter<9) spacer =      "      | ";
                 else if (recounter<99) spacer = "     | ";
@@ -53,16 +71,19 @@ QString FileIO::read()
                 else if (recounter<99999) spacer = "  | ";
                 else if (recounter<999999) spacer = " | ";
                 else if (recounter<9999999) spacer = "| ";
-                fileContent += "\n"+QString::number(recounter+1)+spacer+line;
-                */
-                fileContent += "\n"+line;
+
+                // make sure it's a real line.
+                if (!line.isNull())
+                    fileContent += "\n"+QString::number(recounter+1)+spacer+line;
+
+                //fileContent += "\n"+line;
             }
             recounter++;
 
         } while (!line.isNull());
-        //printf("HEYYY %i",count);
+        //printf(" ---> TOTAL LINES at %i\n",recounter);
 
-        mLinecount = recounter;
+        mLinecount = recounter-1;
 
         file.close();
     } else {

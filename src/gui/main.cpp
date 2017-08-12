@@ -1,35 +1,15 @@
-#include <QGuiApplication>
-//#include <QApplication>
+#include <QApplication>
+//#include <QGuiApplication>
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QDebug>
-#include <QtCharts/QChartView>
-#include <QtCharts/QPieSeries>
-#include <QtCharts/QPieSlice>
-#include <QtCharts/QAbstractBarSeries>
-#include <QtCharts/QPercentBarSeries>
-#include <QtCharts/QStackedBarSeries>
-#include <QtCharts/QBarSeries>
-#include <QtCharts/QBarSet>
-#include <QtCharts/QLineSeries>
-#include <QtCharts/QSplineSeries>
-#include <QtCharts/QScatterSeries>
-#include <QtCharts/QAreaSeries>
-#include <QtCharts/QLegend>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QLabel>
-#include <QtCore/QTime>
-#include <QtCharts/QBarCategoryAxis>
+
 
 
 
 #include "backend.h"
 #include "fileio.h"
+#include "graphs.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -69,12 +49,13 @@ int main(int argc, char *argv[])
     system(commandString.c_str());
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    QGuiApplication app(argc, argv);
-    //QApplication app(argc, argv);
+    //QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     // c++ classes and corresponding headers for C++ <--> QML comm.
     qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
     qmlRegisterType<FileIO, 1>("FileIO", 1, 0, "FileIO");
+    qmlRegisterType<Graphs, 1>("Graphs", 1, 0, "Graphs" );
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
