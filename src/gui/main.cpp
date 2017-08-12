@@ -4,9 +4,6 @@
 #include <QQmlApplicationEngine>
 #include <QDebug>
 
-
-
-
 #include "backend.h"
 #include "fileio.h"
 #include "graphs.h"
@@ -41,7 +38,6 @@ int main(int argc, char *argv[])
             // mac
             homeDir = "/Users/douglasfranz";
         }
-
 
     //string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log &";
     // dev/null is important to supress MCMD output in Qt Application Output

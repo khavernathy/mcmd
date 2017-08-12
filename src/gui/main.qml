@@ -31,10 +31,7 @@ ApplicationWindow {
         //source: homeDir+"/mcmd/testzone/runlog.log" // determined dynamically now
         onError: console.log(msg);
     }
-    Graphs {
-        id: graphsholder
-        //visible: true
-    }
+
 
     // main visual stuff begins
     SwipeView {
@@ -245,6 +242,7 @@ ApplicationWindow {
             }
 
             Component.onCompleted: {
+                console.log("scrollview complete");
                 //console.log( "WRITE"+ myFile.write("TEST"))
                 outputText.text += runlogFile.read();
             }
@@ -268,17 +266,21 @@ ApplicationWindow {
                 running: root.visible
                 onTriggered: {
                     //console.time("start data collection");
-                    outputText.text += runlogFile.read();
+                    var newText = runlogFile.read();
+                    outputText.text += newText;
                     // outputText.contentHeight contains the real height, which grows.
                     //outputText.y = outputText.contentHeight;
                     //scroller.setPosition(outputText.contentHeight)
                     //scroller.position = 0.95; // not quite right, when output gets large it doesn't catch the end
                     scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
-
+                    //console.log("moved scroller, making array");
                     var steps = new Array();
+                    var KEs = new Array();
+                    var PEs = new Array();
+                    var TEs = new Array();
 
                     // loop each line...
-                    var allLines = outputText.text.split("\n");
+                    var allLines = newText.split("\n"); //outputText.text.split("\n");
                     var i=0;
                     while (allLines.length > i) {
                         var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
@@ -289,45 +291,125 @@ ApplicationWindow {
                             steps.push(step);
 
                         }
+                        else if (allLines[i].indexOf("KE") !== -1) {
+                            var KE = thisLine[2+runlogFile.colOffset];
+                            KEs.push(KE);
+                        }
+                        else if (allLines[i].indexOf("PE") !== -1) {
+                            var PE = thisLine[2+runlogFile.colOffset];
+                            PEs.push(PE);
+                        }
+                        else if (allLines[i].indexOf("Total E") !== -1) {
+                            var TE = thisLine[3+runlogFile.colOffset];
+                            TEs.push(TE);
+                        }
+
                         i++;
                     }
-                    console.log(steps);
+                    //console.log(steps);
+                    //console.log(KEs);
+                    var laststep = steps[steps.length-1];
 
-                    //console.log("allLines: "+allLines.length+" ... runlogFile.linecount:"+runlogFile.linecount);
-                    //console.time("start data collection");
-
-                    //console.log("contentHeight:"+outputText.contentHeight)
-                    //console.log("scroller pos:"+scroller.position)
-                    //runlogOut.availableHeight
+                    energychart.updateKE(laststep, KEs[KEs.length -1]);
+                    energychart.updatePE(laststep, PEs[PEs.length -1]);
+                    energychart.updateTE(laststep, TEs[TEs.length -1]);
 
                 }
-                //onTriggered: outputText.text = runlogFile.read() + outputText.text
+
 
             }
         }
 
         Page { // 3 :: graph stuff...
             id: graphspage
+            Text {
+                id: toptitle
+                text: "blah"
+                height: 100
+                width: parent.width
+            }
 
-
-/*
             ChartView {
-                title: "Line"
+                id: energychart
+                theme: ChartView.ChartThemeDark
+                title: "Energies"
+
                 anchors.fill: parent
+                //anchors.left: parent.left
+                //anchors.top: toptitle.top
+                //height: (parent.height - toptitle.height)/3
+                //width: parent.height/3
                 antialiasing: true
+                function updateKE(x, y) {
+                    ke_line.append(x,y);
+                    if (x > ke_line.axisX.max) {
+                        ke_line.axisX.max = x;
+                    }
+                    else if (x < ke_line.axisX.min) {
+                        ke_line.axisX.min = x;
+                    }
+                    if (y > ke_line.axisY.max) {
+                        ke_line.axisY.max = y;
+                    }
+                    else if (y < ke_line.axisY.min) {
+                        ke_line.axisY.min = y;
+                    }
+                }
+                function updatePE(x, y) {
+                    pe_line.append(x,y);
+                    if (x > ke_line.axisX.max) {
+                        ke_line.axisX.max = x;
+                    }
+                    else if (x < ke_line.axisX.min) {
+                        ke_line.axisX.min = x;
+                    }
+                    if (y > ke_line.axisY.max) {
+                        ke_line.axisY.max = y;
+                    }
+                    else if (y < ke_line.axisY.min) {
+                        ke_line.axisY.min = y;
+                    }
+                }
+                function updateTE(x, y) {
+                    te_line.append(x,y);
+                    if (x > ke_line.axisX.max) {
+                        ke_line.axisX.max = x;
+                    }
+                    else if (x < ke_line.axisX.min) {
+                        ke_line.axisX.min = x;
+                    }
+                    if (y > ke_line.axisY.max) {
+                        ke_line.axisY.max = y;
+                    }
+                    else if (y < ke_line.axisY.min) {
+                        ke_line.axisY.min = y;
+                    }
+                }
 
                 LineSeries {
-                    name: "LineSeries"
-                    XYPoint { x: 0; y: 0 }
-                    XYPoint { x: 1.1; y: 2.1 }
-                    XYPoint { x: 1.9; y: 3.3 }
-                    XYPoint { x: 2.1; y: 2.1 }
-                    XYPoint { x: 2.9; y: 4.9 }
-                    XYPoint { x: 3.4; y: 3.0 }
-                    XYPoint { x: 4.1; y: 3.3 }
+                    id: ke_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 10
+                        tickCount: 5
+                    }
+
+                    axisY: ValueAxis {
+                        min: -0.5
+                        max: 1.5
+                    }
+                    name: "Kinetic Energy"
+                }
+                LineSeries {
+                    id: pe_line
+                    name: "Potential Energy"
+                }
+                LineSeries {
+                    id: te_line
+                    name: "Total Energy"
                 }
             }
-*/
+
         }
         Page {
             Label {
