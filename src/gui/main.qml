@@ -220,78 +220,124 @@ ApplicationWindow {
                     console.time("entire");
                     console.time("read");
                     var newText = runlogFile.read();
+                    //console.log("NEW TEXT: "+newText);
                     console.timeEnd("read");
+
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
 
-                    var steps = new Array();
-                    var KEs = new Array();
-                    var PEs = new Array();
-                    var TEs = new Array();
-                    var Ds = new Array();
-                    var ETemps = new Array();
-                    var ITemps = new Array();
-                    var Press = new Array();
-                    var Vels = new Array();
+                    if (newText !== "") { // make sure we have new data to work with.
+                        var steps = new Array();
+                        // MC...
+                        var PolEns = new Array();
+                        var ESEns = new Array();
+                        var RDEns = new Array();
+                        var UEns = new Array();
+                        var Qsts = new Array();
+                        var Ns = new Array();
+                        var Navgs = new Array();
 
-                    // loop each NEW line...
-                    console.time("loop");
-                    var allLines = newText.split("\n"); //outputText.text.split("\n");
-                    var i=0;
-                    while (allLines.length > i) {
-                        var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
-                        if (allLines[i].indexOf("Step") !== -1) {
-                            //console.log(allLines[i]);
-                            var step = thisLine[1+runlogFile.colOffset];
-                            //console.log(step);
-                            steps.push(step);
-                        }
-                        else if (allLines[i].indexOf("KE") !== -1) {
-                            var KE = thisLine[2+runlogFile.colOffset];
-                            KEs.push(KE);
-                        }
-                        else if (allLines[i].indexOf("PE") !== -1) {
-                            var PE = thisLine[2+runlogFile.colOffset];
-                            PEs.push(PE);
-                        }
-                        else if (allLines[i].indexOf("Total E") !== -1) {
-                            var TE = thisLine[3+runlogFile.colOffset];
-                            TEs.push(TE);
-                        } else if (allLines[i].indexOf("Diffusion c") !== -1) {
-                            var Diff = thisLine[5+runlogFile.colOffset];
-                            Ds.push(Diff);
-                        } else if (allLines[i].indexOf("Emergent T") !== -1) {
-                            var ETemp = thisLine[3+runlogFile.colOffset];
-                            ETemps.push(ETemp);
-                        } else if (allLines[i].indexOf("Instantaneous T") !== -1) {
-                            var ITemp = thisLine[3+runlogFile.colOffset];
-                            ITemps.push(ITemp);
-                        } else if (allLines[i].indexOf("Pressure") !== -1) {
-                            var Pres = thisLine[3+runlogFile.colOffset];
-                            Press.push(Pres);
-                        } else if (allLines[i].indexOf("Average v =") !== -1) {
-                            var Vel = thisLine[3+runlogFile.colOffset];
-                            Vels.push(Vel);
-                        }
+                        // MD...
+                        var KEs = new Array();
+                        var PEs = new Array();
+                        var TEs = new Array();
+                        var Ds = new Array();
+                        var ETemps = new Array();
+                        var ITemps = new Array();
+                        var Press = new Array();
+                        var Vels = new Array();
 
-                        i++;
-                    }
-                    //console.log(steps);
-                    //console.log(KEs);
-                    var laststep = steps[steps.length-1];
-                    console.log(laststep);
-                    console.timeEnd("loop");
-                    console.time("graph");
-                    energychart.updateKE(laststep, KEs[KEs.length -1]);
-                    energychart.updatePE(laststep, PEs[PEs.length -1]);
-                    energychart.updateTE(laststep, TEs[TEs.length -1]);
-                    diffusionchart.updateDiff(laststep, Ds[Ds.length -1]);
-                    temperaturechart.updateETemp(laststep, ETemps[ETemps.length -1]);
-                    temperaturechart.updateITemp(laststep, ITemps[ITemps.length -1]);
-                    pressurechart.updatePres(laststep, Press[Press.length -1]);
-                    velocitychart.updateVel(laststep, Vels[Vels.length -1]);
-                    console.timeEnd("graph");
-                    console.timeEnd("entire");
+
+                        // loop each NEW line...
+                        console.time("loop");
+                        var allLines = newText.split("\n"); //outputText.text.split("\n");
+                        var i=0;
+                        while (allLines.length > i) {
+                            var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
+                            if (allLines[i].indexOf("Step") !== -1) {
+                                //console.log(allLines[i]);
+                                var step = thisLine[1+runlogFile.colOffset];
+                                console.log(step);
+                                steps.push(step);
+                            }
+                            // MD...
+                            else if (allLines[i].indexOf("KE") !== -1) {
+                                var KE = thisLine[2+runlogFile.colOffset];
+                                KEs.push(KE);
+                            }
+                            else if (allLines[i].indexOf("PE") !== -1) {
+                                var PE = thisLine[2+runlogFile.colOffset];
+                                PEs.push(PE);
+                            }
+                            else if (allLines[i].indexOf("Total E") !== -1) {
+                                var TE = thisLine[3+runlogFile.colOffset];
+                                TEs.push(TE);
+                            } else if (allLines[i].indexOf("Diffusion c") !== -1) {
+                                var Diff = thisLine[5+runlogFile.colOffset];
+                                Ds.push(Diff);
+                            } else if (allLines[i].indexOf("Emergent T") !== -1) {
+                                var ETemp = thisLine[3+runlogFile.colOffset];
+                                ETemps.push(ETemp);
+                            } else if (allLines[i].indexOf("Instantaneous T") !== -1) {
+                                var ITemp = thisLine[3+runlogFile.colOffset];
+                                ITemps.push(ITemp);
+                            } else if (allLines[i].indexOf("Pressure") !== -1) {
+                                var Pres = thisLine[3+runlogFile.colOffset];
+                                Press.push(Pres);
+                            } else if (allLines[i].indexOf("Average v =") !== -1) {
+                                var Vel = thisLine[3+runlogFile.colOffset];
+                                Vels.push(Vel);
+                            // MC ...
+                            } else if (allLines[i].indexOf("Polar avg") !== -1) {
+                                var PolEn = thisLine[3+runlogFile.colOffset];
+                                PolEns.push(PolEn);
+                                console.log(PolEn);
+                            } else if (allLines[i].indexOf("ES avg =") !== -1) {
+                                var ESEn = thisLine[3+runlogFile.colOffset];
+                                ESEns.push(ESEn);
+                            } else if (allLines[i].indexOf("RD avg =") !== -1) {
+                                var RDEn = thisLine[3+runlogFile.colOffset];
+                                RDEns.push(RDEn);
+                            } else if (allLines[i].indexOf("Total potential avg") !== -1) {
+                                var UEn = thisLine[4+runlogFile.colOffset];
+                                UEns.push(UEn);
+                            } else if (allLines[i].indexOf("Qst = ") !== -1) {
+                                var Qst = thisLine[2+runlogFile.colOffset];
+                                Qsts.push(Qst);
+                            } else if (allLines[i].indexOf("N_movables =") !== -1 && allLines[i].indexOf("mg/g") !== -1) {
+                                var Navg = thisLine[2+runlogFile.colOffset];
+                                Navgs.push(Navg);
+                            } else if (allLines[i].indexOf("N_movables =") !== -1 && allLines[i].indexOf("mg/g") === -1) {
+                                var N = thisLine[5+runlogFile.colOffset];
+                                Ns.push(N);
+                            }
+
+                            i++;
+                        }
+                        //console.log(steps);
+                        //console.log(KEs);
+                        var laststep = steps[steps.length-1];
+                        console.log(laststep);
+                        console.timeEnd("loop");
+                        console.time("graph");
+                        energychart.updateKE(laststep, KEs[KEs.length -1]);
+                        energychart.updatePE(laststep, PEs[PEs.length -1]);
+                        energychart.updateTE(laststep, TEs[TEs.length -1]);
+                        diffusionchart.updateDiff(laststep, Ds[Ds.length -1]);
+                        temperaturechart.updateETemp(laststep, ETemps[ETemps.length -1]);
+                        temperaturechart.updateITemp(laststep, ITemps[ITemps.length -1]);
+                        pressurechart.updatePres(laststep, Press[Press.length -1]);
+                        velocitychart.updateVel(laststep, Vels[Vels.length -1]);
+                        mcenergychart.updatePolEn(laststep, PolEns[PolEns.length -1]);
+                        mcenergychart.updateESEn(laststep, ESEns[ESEns.length -1]);
+                        mcenergychart.updateRDEn(laststep, RDEns[RDEns.length -1]);
+                        mcenergychart.updateTotalU(laststep, UEns[UEns.length -1]);
+                        qstchart.updateQst(laststep, Qsts[Qsts.length -1]);
+                        nchart.updateNAvg(laststep, Navgs[Navgs.length -1]);
+                        nchart.updateN(laststep, Ns[Ns.length -1]);
+                        console.timeEnd("graph");
+                        console.timeEnd("entire");
+                    } // end if new data is detected
                 }
             } // end timer
 
@@ -306,7 +352,212 @@ ApplicationWindow {
             }
 
             ChartView {
+                id: mcenergychart
+                theme: ChartView.ChartThemeDark
+                title: "Potential Energy"
 
+                //anchors.fill: parent
+                anchors.left: parent.left
+                anchors.top: mctoptitle.bottom
+                height: (root.height - mctoptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updatePolEn(x, y) {
+                    pol_line.append(x,y);
+                    if (x > pol_line.axisX.max) {
+                        pol_line.axisX.max = x;
+                    }
+                    else if (x < pol_line.axisX.min) {
+                        pol_line.axisX.min = x;
+                    }
+                    if (y > pol_line.axisY.max) {
+                        pol_line.axisY.max = y;
+                    }
+                    else if (y < pol_line.axisY.min) {
+                        pol_line.axisY.min = y;
+                    }
+                }
+                function updateESEn(x, y) {
+                    es_line.append(x,y);
+                    if (x > es_line.axisX.max) {
+                        es_line.axisX.max = x;
+                    }
+                    else if (x < es_line.axisX.min) {
+                        es_line.axisX.min = x;
+                    }
+                    if (y > es_line.axisY.max) {
+                        es_line.axisY.max = y;
+                    }
+                    else if (y < es_line.axisY.min) {
+                        es_line.axisY.min = y;
+                    }
+                }
+                function updateRDEn(x, y) {
+                    rd_line.append(x,y);
+                    if (x > rd_line.axisX.max) {
+                        rd_line.axisX.max = x;
+                    }
+                    else if (x < rd_line.axisX.min) {
+                        rd_line.axisX.min = x;
+                    }
+                    if (y > rd_line.axisY.max) {
+                        rd_line.axisY.max = y;
+                    }
+                    else if (y < rd_line.axisY.min) {
+                        rd_line.axisY.min = y;
+                    }
+                }
+                function updateTotalU(x, y) {
+                    totalu_line.append(x,y);
+                    if (x > totalu_line.axisX.max) {
+                        totalu_line.axisX.max = x;
+                    }
+                    else if (x < totalu_line.axisX.min) {
+                        totalu_line.axisX.min = x;
+                    }
+                    if (y > totalu_line.axisY.max) {
+                        totalu_line.axisY.max = y;
+                    }
+                    else if (y < totalu_line.axisY.min) {
+                        totalu_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: pol_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "Energy (K)"
+                    }
+                    name: "Polarization"
+                }
+                LineSeries {
+                    id: es_line
+                    name: "Electrostatics"
+                }
+                LineSeries {
+                    id: rd_line
+                    name: "Repulsion/dispersion"
+                }
+                LineSeries {
+                    id: totalu_line
+                    name: "Total U"
+                }
+            }
+            ChartView {
+                id: qstchart
+                theme: ChartView.ChartThemeDark
+                title: "Isosteric Heat"
+
+                //anchors.fill: parent
+                anchors.left: mcenergychart.right
+                anchors.top: mctoptitle.bottom
+                height: (root.height - mctoptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateQst(x, y) {
+                    qst_line.append(x,y);
+                    if (x > qst_line.axisX.max) {
+                        qst_line.axisX.max = x;
+                    }
+                    else if (x < qst_line.axisX.min) {
+                        qst_line.axisX.min = x;
+                    }
+                    if (y > qst_line.axisY.max) {
+                        qst_line.axisY.max = y;
+                    }
+                    else if (y < qst_line.axisY.min) {
+                        qst_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: qst_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "Energy (kJ/mol)"
+                    }
+                    name: "Qst"
+                }
+            }
+            ChartView {
+                id: nchart
+                theme: ChartView.ChartThemeDark
+                title: "Uptake (N)"
+
+                //anchors.fill: parent
+                anchors.left: qstchart.right
+                anchors.top: mctoptitle.bottom
+                height: (root.height - mctoptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateN(x, y) {
+                    n_line.append(x,y);
+                    if (x > n_line.axisX.max) {
+                        n_line.axisX.max = x;
+                    }
+                    else if (x < n_line.axisX.min) {
+                        n_line.axisX.min = x;
+                    }
+                    if (y > n_line.axisY.max) {
+                        n_line.axisY.max = y;
+                    }
+                    else if (y < n_line.axisY.min) {
+                        n_line.axisY.min = y;
+                    }
+                }
+                function updateNAvg(x, y) {
+                    navg_line.append(x,y);
+                    if (x > navg_line.axisX.max) {
+                        navg_line.axisX.max = x;
+                    }
+                    else if (x < navg_line.axisX.min) {
+                        navg_line.axisX.min = x;
+                    }
+                    if (y > navg_line.axisY.max) {
+                        navg_line.axisY.max = y;
+                    }
+                    else if (y < navg_line.axisY.min) {
+                        navg_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: n_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "No. molecules"
+                    }
+                    name: "N"
+                }
+                LineSeries {
+                    id: navg_line
+                    name: "N average"
+                }
             }
         }
 
