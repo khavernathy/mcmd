@@ -9,13 +9,10 @@ import QtCharts 2.2
 
 import FileIO 1.0
 
-
-
-
 ApplicationWindow {
     id: root
     visible: true
-    width: 1200
+    width: 1440
     height: 900
     title: qsTr("MCMD :: Monte Carlo & Molecular Dynamics")
 
@@ -213,51 +210,6 @@ ApplicationWindow {
                 height: parent.height
                 width: parent.width/4
             }
-
-        }
-        Page { // 2 :: Runlog output
-            id: outputPage
-
-            ScrollView {
-                id: runlogOut
-                height: parent.height
-                width: parent.width
-                anchors.fill: parent
-                    ScrollBar.vertical: ScrollBar { id: scroller; height: 30; width: parent.width; visible: false;}
-                    TextArea {
-                        id: outputText
-                        color: "white"
-                        background: Rectangle { color: "black" }
-                        width: 1000
-                        height: 780
-                        anchors.topMargin: 10
-                        font.family: "Monospace"
-                        //text: "Heloo world."
-                        onTextChanged: {
-                            //console.log("the text changed yo")
-                            //positionAt: bottom
-                        }
-                    }
-
-            }
-
-            Component.onCompleted: {
-                console.log("scrollview complete");
-                //console.log( "WRITE"+ myFile.write("TEST"))
-                outputText.text += runlogFile.read();
-            }
-
-            Button {
-                id: reloadButton
-                text: "reload"
-                onClicked: {
-                    outputText.text += runlogFile.read();
-                    //outputText.text += "THE LINE COUNT IS: "+runlogFile.linecount;
-                }
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-            }
-
             Timer {
                 id: timer
                 //property BackEnd backend: BackEnd {}
@@ -265,15 +217,13 @@ ApplicationWindow {
                 repeat: true
                 running: root.visible
                 onTriggered: {
-                    //console.time("start data collection");
+                    console.time("entire");
+                    console.time("read");
                     var newText = runlogFile.read();
-                    outputText.text += newText;
-                    // outputText.contentHeight contains the real height, which grows.
-                    //outputText.y = outputText.contentHeight;
-                    //scroller.setPosition(outputText.contentHeight)
-                    //scroller.position = 0.95; // not quite right, when output gets large it doesn't catch the end
-                    scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
-                    //console.log("moved scroller, making array");
+                    console.timeEnd("read");
+
+                    //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
+
                     var steps = new Array();
                     var KEs = new Array();
                     var PEs = new Array();
@@ -281,8 +231,11 @@ ApplicationWindow {
                     var Ds = new Array();
                     var ETemps = new Array();
                     var ITemps = new Array();
+                    var Press = new Array();
+                    var Vels = new Array();
 
                     // loop each NEW line...
+                    console.time("loop");
                     var allLines = newText.split("\n"); //outputText.text.split("\n");
                     var i=0;
                     while (allLines.length > i) {
@@ -313,6 +266,12 @@ ApplicationWindow {
                         } else if (allLines[i].indexOf("Instantaneous T") !== -1) {
                             var ITemp = thisLine[3+runlogFile.colOffset];
                             ITemps.push(ITemp);
+                        } else if (allLines[i].indexOf("Pressure") !== -1) {
+                            var Pres = thisLine[3+runlogFile.colOffset];
+                            Press.push(Pres);
+                        } else if (allLines[i].indexOf("Average v =") !== -1) {
+                            var Vel = thisLine[3+runlogFile.colOffset];
+                            Vels.push(Vel);
                         }
 
                         i++;
@@ -320,22 +279,39 @@ ApplicationWindow {
                     //console.log(steps);
                     //console.log(KEs);
                     var laststep = steps[steps.length-1];
-
+                    console.log(laststep);
+                    console.timeEnd("loop");
+                    console.time("graph");
                     energychart.updateKE(laststep, KEs[KEs.length -1]);
                     energychart.updatePE(laststep, PEs[PEs.length -1]);
                     energychart.updateTE(laststep, TEs[TEs.length -1]);
                     diffusionchart.updateDiff(laststep, Ds[Ds.length -1]);
                     temperaturechart.updateETemp(laststep, ETemps[ETemps.length -1]);
                     temperaturechart.updateITemp(laststep, ITemps[ITemps.length -1]);
-
+                    pressurechart.updatePres(laststep, Press[Press.length -1]);
+                    velocitychart.updateVel(laststep, Vels[Vels.length -1]);
+                    console.timeEnd("graph");
+                    console.timeEnd("entire");
                 }
+            } // end timer
 
+        }
+        Page { // 2 :: MC graphs
+            id: mcgraphspage
+            Text {
+                id: mctoptitle
+                text: "Live data"
+                height: 25
+                width: parent.width
+            }
+
+            ChartView {
 
             }
         }
 
-        Page { // 3 :: graph stuff...
-            id: graphspage
+        Page { // 3 :: MD graphs
+            id: mdgraphspage
 
             Text {
                 id: toptitle
@@ -427,10 +403,9 @@ ApplicationWindow {
                     name: "Total Energy"
                 }
             }
-
             ChartView {
                 id: diffusionchart
-                theme: ChartView.ChartThemeBlueCerulean
+                theme: ChartView.ChartThemeDark
                 title: "Diffusion Coefficient"
 
                 //anchors.fill: parent
@@ -472,11 +447,10 @@ ApplicationWindow {
                     name: "D"
                 }
             }
-
             ChartView {
                 id: temperaturechart
-                theme: ChartView.ChartThemeQt
-                title: "Diffusion Coefficient"
+                theme: ChartView.ChartThemeDark
+                title: "Temperature"
 
                 //anchors.fill: parent
                 anchors.left: diffusionchart.right
@@ -536,6 +510,97 @@ ApplicationWindow {
                     name: "Instantaneous T"
                 }
             }
+            ChartView {
+                id: pressurechart
+                theme: ChartView.ChartThemeDark
+                title: "Pressure"
+
+                //anchors.fill: parent
+                anchors.left: parent.left
+                anchors.top: energychart.bottom
+                height: (root.height - toptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updatePres(x, y) {
+                    pres_line.append(x,y);
+                    if (x > pres_line.axisX.max) {
+                        pres_line.axisX.max = x;
+                    }
+                    else if (x < pres_line.axisX.min) {
+                        pres_line.axisX.min = x;
+                    }
+                    if (y > pres_line.axisY.max) {
+                        pres_line.axisY.max = y;
+                    }
+                    else if (y < pres_line.axisY.min) {
+                        pres_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: pres_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "I.G. pressure (atm)"
+                    }
+                    name: "Emergent Pressure"
+                }
+
+            }
+            ChartView {
+                id: velocitychart
+                theme: ChartView.ChartThemeDark
+                title: "Velocity"
+
+                //anchors.fill: parent
+                anchors.left: pressurechart.right
+                anchors.top: diffusionchart.bottom
+                height: (root.height - toptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateVel(x, y) {
+                    vel_line.append(x,y);
+                    if (x > vel_line.axisX.max) {
+                        vel_line.axisX.max = x;
+                    }
+                    else if (x < vel_line.axisX.min) {
+                        vel_line.axisX.min = x;
+                    }
+                    if (y > vel_line.axisY.max) {
+                        vel_line.axisY.max = y;
+                    }
+                    else if (y < vel_line.axisY.min) {
+                        vel_line.axisY.min = y;
+                    }
+                }
+
+                LineSeries {
+                    id: vel_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "Velocity (m/s)"
+                    }
+                    name: "Average Velocity"
+                }
+            }
+
+
         }
         Page {
             Label {
@@ -557,16 +622,13 @@ ApplicationWindow {
             text: qsTr("Input setup")
         }
         TabButton {
-            text: qsTr("Runlog")
+            text: qsTr("MC")
         }
         TabButton {
-            text: qsTr("Live graphs")
+            text: qsTr("MD")
         }
         TabButton {
-            text: qsTr("4th")
-        }
-        TabButton {
-            text: qsTr("5th")
+            text: qsTr("hi")
         }
     }
 

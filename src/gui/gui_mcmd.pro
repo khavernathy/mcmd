@@ -37,4 +37,5 @@ HEADERS += \
 FORMS += \
     graphs.ui
 
-DISTFILES +=
+DISTFILES += \
+    garbage
