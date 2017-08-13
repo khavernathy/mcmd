@@ -29,7 +29,6 @@ ApplicationWindow {
         onError: console.log(msg);
     }
 
-
     // main visual stuff begins
     SwipeView {
         id: swipeView
@@ -217,17 +216,14 @@ ApplicationWindow {
                 repeat: true
                 running: root.visible
                 onTriggered: {
-                    console.time("entire");
-                    console.time("read");
-                    var newText = runlogFile.read();
-                    //console.log("NEW TEXT: "+newText);
-                    console.timeEnd("read");
 
+                    var newText = runlogFile.read();
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
 
                     if (newText !== "") { // make sure we have new data to work with.
                         var steps = new Array();
+                        var progresss = new Array();
                         // MC...
                         var PolEns = new Array();
                         var ESEns = new Array();
@@ -236,6 +232,10 @@ ApplicationWindow {
                         var Qsts = new Array();
                         var Ns = new Array();
                         var Navgs = new Array();
+                        var Inserts = new Array();
+                        var Removes = new Array();
+                        var Displaces = new Array();
+                        var VolumeChanges = new Array();
 
                         // MD...
                         var KEs = new Array();
@@ -249,16 +249,15 @@ ApplicationWindow {
 
 
                         // loop each NEW line...
-                        console.time("loop");
                         var allLines = newText.split("\n"); //outputText.text.split("\n");
                         var i=0;
                         while (allLines.length > i) {
                             var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
                             if (allLines[i].indexOf("Step") !== -1) {
-                                //console.log(allLines[i]);
                                 var step = thisLine[1+runlogFile.colOffset];
-                                console.log(step);
                                 steps.push(step);
+                                var prg = thisLine[6+runlogFile.colOffset].replace("%","");
+                                progresss.push(parseFloat(prg));
                             }
                             // MD...
                             else if (allLines[i].indexOf("KE") !== -1) {
@@ -291,7 +290,6 @@ ApplicationWindow {
                             } else if (allLines[i].indexOf("Polar avg") !== -1) {
                                 var PolEn = thisLine[3+runlogFile.colOffset];
                                 PolEns.push(PolEn);
-                                console.log(PolEn);
                             } else if (allLines[i].indexOf("ES avg =") !== -1) {
                                 var ESEn = thisLine[3+runlogFile.colOffset];
                                 ESEns.push(ESEn);
@@ -310,16 +308,22 @@ ApplicationWindow {
                             } else if (allLines[i].indexOf("N_movables =") !== -1 && allLines[i].indexOf("mg/g") === -1) {
                                 var N = thisLine[5+runlogFile.colOffset];
                                 Ns.push(N);
+                            } else if (allLines[i].indexOf("Total accepts:") !== -1) {
+                                var ins = thisLine[4+runlogFile.colOffset].replace("%","");
+                                Inserts.push(ins);
+                                var rem = thisLine[7+runlogFile.colOffset].replace("%","");
+                                Removes.push(rem);
+                                var dis = thisLine[10+runlogFile.colOffset].replace("%","");
+                                Displaces.push(dis);
+                                var vc = thisLine[13+runlogFile.colOffset].replace("%","");
+                                VolumeChanges.push(vc);
                             }
-
                             i++;
                         }
-                        //console.log(steps);
-                        //console.log(KEs);
+
                         var laststep = steps[steps.length-1];
-                        console.log(laststep);
-                        console.timeEnd("loop");
-                        console.time("graph");
+                        progressdisplayer.update(progresss[progresss.length-1]);
+                        mdprogressdisplayer.update(progresss[progresss.length-1]);
                         energychart.updateKE(laststep, KEs[KEs.length -1]);
                         energychart.updatePE(laststep, PEs[PEs.length -1]);
                         energychart.updateTE(laststep, TEs[TEs.length -1]);
@@ -335,8 +339,9 @@ ApplicationWindow {
                         qstchart.updateQst(laststep, Qsts[Qsts.length -1]);
                         nchart.updateNAvg(laststep, Navgs[Navgs.length -1]);
                         nchart.updateN(laststep, Ns[Ns.length -1]);
-                        console.timeEnd("graph");
-                        console.timeEnd("entire");
+                        mcstatschart.updateMCStats(Inserts[Inserts.length-1],
+                            Removes[Removes.length-1], Displaces[Displaces.length-1],
+                            VolumeChanges[VolumeChanges.length-1]);
                     } // end if new data is detected
                 }
             } // end timer
@@ -346,9 +351,19 @@ ApplicationWindow {
             id: mcgraphspage
             Text {
                 id: mctoptitle
-                text: "Live data"
+                text: "Live data :: progress: "
                 height: 25
-                width: parent.width
+                width: 150
+
+            }
+            ProgressBar {
+                id: progressdisplayer
+                height: 25
+                anchors.left: mctoptitle.right
+                value: 0
+                function update(newprog) {
+                    this.value = newprog;
+                }
             }
 
             ChartView {
@@ -559,6 +574,32 @@ ApplicationWindow {
                     name: "N average"
                 }
             }
+
+            ChartView {
+                id: mcstatschart
+                theme: ChartView.ChartThemeDark
+                title: "MC stats"
+                anchors.left: parent.left
+                anchors.top: mcenergychart.bottom
+                height: (root.height - mctoptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateMCStats(ins, rem, dis, vol) {
+                    mcs1.value = ins;
+                    mcs2.value = rem;
+                    mcs3.value = dis;
+                    mcs4.value = vol;
+
+                }
+
+                PieSeries {
+                    id: mcstats_pie
+                    PieSlice { id: mcs1; color: "green"; label: "Inserts"; value: 94.7 }
+                    PieSlice { id: mcs2; color: "red"; label: "Removes"; value: 5.1 }
+                    PieSlice { id: mcs3; color: "grey"; label: "Displaces"; value: 0.1 }
+                    PieSlice { id: mcs4; color: "blue"; label: "Volume changes"; value: 0.1 }
+                }
+            }
         }
 
         Page { // 3 :: MD graphs
@@ -566,9 +607,19 @@ ApplicationWindow {
 
             Text {
                 id: toptitle
-                text: "Live data"
+                text: "Live data :: progress: "
                 height: 25
-                width: parent.width
+                width: 150
+            }
+            ProgressBar {
+                id: mdprogressdisplayer
+                value: 0
+                height: 25
+
+                anchors.left: toptitle.right
+                function update(newprog) {
+                    this.value = newprog;
+                }
             }
 
             ChartView {
