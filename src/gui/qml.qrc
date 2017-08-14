@@ -11,5 +11,6 @@
         <file>main.cpp</file>
         <file>images/mof5-hexagonal-angle.png</file>
         <file>images/lineedit.png</file>
+        <file>InputLine.qml</file>
     </qresource>
 </RCC>
