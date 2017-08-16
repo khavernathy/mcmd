@@ -16,7 +16,11 @@ public:
     Q_PROPERTY(QString grSource
                READ grSource
                WRITE setgrSource
-               NOTIFY grSourceChanged);
+               NOTIFY grSourceChanged)
+    Q_PROPERTY(QString otherSource
+               READ otherSource
+               WRITE setOtherSource
+               NOTIFY otherSourceChanged)
     Q_PROPERTY(int linecount
                READ linecount
                WRITE setLinecount
@@ -30,11 +34,13 @@ public:
     // functions
     Q_INVOKABLE QString read();
     Q_INVOKABLE QString read_gr();
+    Q_INVOKABLE QString read_other(const QString& data);
     Q_INVOKABLE bool write(const QString& data);
 
     // local objects
     QString source() { return mSource; };
     QString grSource() { return mgrSource; };
+    QString otherSource() { return motherSource; };
     int linecount() { return mLinecount; };
     QString homeDir() { return mHomedir; };
 
@@ -44,11 +50,13 @@ public slots:
     void setLinecount(int& linecount) { mLinecount = linecount; };
     void setHomeDir(const QString& homeDir) { mHomedir = homeDir; };
     void setgrSource(const QString& grSource) { mgrSource = grSource; };
+    void setOtherSource(const QString& otherSource) { motherSource = otherSource; };
 
     // change signals
 signals:
     void sourceChanged(const QString& source);
     void grSourceChanged(const QString& grSource);
+    void otherSourceChanged(const QString& otherSource);
     void linecountChanged(int& linecount);
     void homeDirChanged(const QString& homeDir);
     void error(const QString& msg);
@@ -56,6 +64,7 @@ signals:
 private:
     QString mSource;
     QString mgrSource;
+    QString motherSource;
 
 public:
     int mLinecount=0;

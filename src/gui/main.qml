@@ -6,6 +6,7 @@ import io.qt.examples.backend 1.0
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.2
 import QtCharts 2.2
+import Qt.labs.platform 1.0
 
 
 
@@ -24,7 +25,7 @@ ApplicationWindow {
         outputLineNumber: 0
     }
     FileIO {
-        id: runlogFile
+        id: fileIO
         property int colOffset: 2; // to read data excluding the line # output
         //homeDir: "/Users/douglasfranz" // determined dynamically now
         //source: homeDir+"/mcmd/testzone/runlog.log" // determined dynamically now
@@ -42,18 +43,79 @@ ApplicationWindow {
 
 
         Page { // 1 :: Input stuff
+            id: pg1
+            Rectangle {
+                id: column1
+                color: "red"
+                width: parent.width/2
+                height: parent.height
+                Button {
+                    id: fileButton
+                    text: "File"
+                    onClicked: menu.open()
+
+                    Menu {
+                        id: menu
+
+                        MenuItem {
+                            text: "New..."
+                            onTriggered: document.reset()
+                        }
+                        MenuItem {
+                            text: "Open..."
+                            onTriggered: openDialog.open()
+                        }
+                        MenuItem {
+                            text: "Save ..."
+                            onTriggered: {
+                                if (fileIO.motherSource != "")
+                                    fileIO.write(inputFileText.text); // auto-writes to "motherSource", the file that was opened.
+                                else
+                                    console.log("ERROR: motherSource not defined, so the file was not saved.");
+                            }
+                        }
+
+                        FileDialog {
+                            id: openDialog
+                            title: "open a document..."
+                            folder: "/home/"
+                            onAccepted: {
+                                console.log("you chose: "+openDialog.currentFile);
+                                inputFileText.text = fileIO.read_other(openDialog.currentFile);
+                            }
+                            onRejected: {
+                                console.log("Canceled.");
+                                Qt.quit();
+                            }
+                            Component.onCompleted: visible = false
+                        }
+                    }
+                } // end button
+            } // end column1 rectangle
+            Rectangle {
+                id: column2
+                color: "black"
+                width: parent.width/2
+                height: parent.height
+                anchors.left: column1.right
+                TextArea {
+                    id: inputFileText
+                    color: "white"
+                }
+            }
+
 
             Timer {
                 id: timer
                 //property BackEnd backend: BackEnd {}
                 interval: 300 // ms
                 repeat: true
-                running: root.visible
+                running: false //root.visible
 
 
                 onTriggered: {
                     console.time("entire");
-                    var newText = runlogFile.read();
+                    var newText = fileIO.read();
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
 
@@ -90,68 +152,68 @@ ApplicationWindow {
                         while (allLines.length > i) {
                             var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
                             if (allLines[i].indexOf("Step") !== -1) {
-                                var step = thisLine[1+runlogFile.colOffset];
+                                var step = thisLine[1+fileIO.colOffset];
                                 steps.push(step);
-                                var prg = thisLine[6+runlogFile.colOffset].replace("%","");
+                                var prg = thisLine[6+fileIO.colOffset].replace("%","");
                                 progresss.push(parseFloat(prg)/100);
                             }
                             // MD...
                             else if (allLines[i].indexOf("KE") !== -1) {
-                                var KE = thisLine[2+runlogFile.colOffset];
+                                var KE = thisLine[2+fileIO.colOffset];
                                 KEs.push(KE);
                             }
                             else if (allLines[i].indexOf("PE") !== -1) {
-                                var PE = thisLine[2+runlogFile.colOffset];
+                                var PE = thisLine[2+fileIO.colOffset];
                                 PEs.push(PE);
                             }
                             else if (allLines[i].indexOf("Total E") !== -1) {
-                                var TE = thisLine[3+runlogFile.colOffset];
+                                var TE = thisLine[3+fileIO.colOffset];
                                 TEs.push(TE);
                             } else if (allLines[i].indexOf("Diffusion c") !== -1) {
-                                var Diff = thisLine[5+runlogFile.colOffset];
+                                var Diff = thisLine[5+fileIO.colOffset];
                                 Ds.push(Diff);
                             } else if (allLines[i].indexOf("Emergent T") !== -1) {
-                                var ETemp = thisLine[3+runlogFile.colOffset];
+                                var ETemp = thisLine[3+fileIO.colOffset];
                                 ETemps.push(ETemp);
                             } else if (allLines[i].indexOf("Instantaneous T") !== -1) {
-                                var ITemp = thisLine[3+runlogFile.colOffset];
+                                var ITemp = thisLine[3+fileIO.colOffset];
                                 ITemps.push(ITemp);
                             } else if (allLines[i].indexOf("Pressure") !== -1) {
-                                var Pres = thisLine[3+runlogFile.colOffset];
+                                var Pres = thisLine[3+fileIO.colOffset];
                                 Press.push(Pres);
                             } else if (allLines[i].indexOf("Average v =") !== -1) {
-                                var Vel = thisLine[3+runlogFile.colOffset];
+                                var Vel = thisLine[3+fileIO.colOffset];
                                 Vels.push(Vel);
                             // MC ...
                             } else if (allLines[i].indexOf("Polar avg") !== -1) {
-                                var PolEn = thisLine[3+runlogFile.colOffset];
+                                var PolEn = thisLine[3+fileIO.colOffset];
                                 PolEns.push(PolEn);
                             } else if (allLines[i].indexOf("ES avg =") !== -1) {
-                                var ESEn = thisLine[3+runlogFile.colOffset];
+                                var ESEn = thisLine[3+fileIO.colOffset];
                                 ESEns.push(ESEn);
                             } else if (allLines[i].indexOf("RD avg =") !== -1) {
-                                var RDEn = thisLine[3+runlogFile.colOffset];
+                                var RDEn = thisLine[3+fileIO.colOffset];
                                 RDEns.push(RDEn);
                             } else if (allLines[i].indexOf("Total potential avg") !== -1) {
-                                var UEn = thisLine[4+runlogFile.colOffset];
+                                var UEn = thisLine[4+fileIO.colOffset];
                                 UEns.push(UEn);
                             } else if (allLines[i].indexOf("Qst = ") !== -1) {
-                                var Qst = thisLine[2+runlogFile.colOffset];
+                                var Qst = thisLine[2+fileIO.colOffset];
                                 Qsts.push(Qst);
                             } else if (allLines[i].indexOf("N_movables =") !== -1 && allLines[i].indexOf("mg/g") !== -1) {
-                                var Navg = thisLine[2+runlogFile.colOffset];
+                                var Navg = thisLine[2+fileIO.colOffset];
                                 Navgs.push(Navg);
                             } else if (allLines[i].indexOf("N_movables =") !== -1 && allLines[i].indexOf("mg/g") === -1) {
-                                var N = thisLine[5+runlogFile.colOffset];
+                                var N = thisLine[5+fileIO.colOffset];
                                 Ns.push(N);
                             } else if (allLines[i].indexOf("Total accepts:") !== -1) {
-                                var ins = thisLine[4+runlogFile.colOffset].replace("%","");
+                                var ins = thisLine[4+fileIO.colOffset].replace("%","");
                                 Inserts.push(ins);
-                                var rem = thisLine[7+runlogFile.colOffset].replace("%","");
+                                var rem = thisLine[7+fileIO.colOffset].replace("%","");
                                 Removes.push(rem);
-                                var dis = thisLine[10+runlogFile.colOffset].replace("%","");
+                                var dis = thisLine[10+fileIO.colOffset].replace("%","");
                                 Displaces.push(dis);
-                                var vc = thisLine[13+runlogFile.colOffset].replace("%","");
+                                var vc = thisLine[13+fileIO.colOffset].replace("%","");
                                 VolumeChanges.push(vc);
                             }
                             i++;
@@ -182,7 +244,7 @@ ApplicationWindow {
 
                         // radial distribution stuff
                         gr_line.clear();
-                        var grdata = runlogFile.read_gr();
+                        var grdata = fileIO.read_gr();
                         var gr_lines = grdata.split("\n");
                         for (var i=1; i<gr_lines.length; i++) { // skipping i=0 first line
                             var splitarr = gr_lines[i].split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );

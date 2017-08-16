@@ -1,4 +1,4 @@
-QT += qml quick printsupport
+QT += qml quick printsupport widgets
 
 CONFIG += c++11
 

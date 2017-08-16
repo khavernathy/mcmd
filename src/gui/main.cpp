@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QDebug>
+#include <QStandardPaths>
+//#include <QFileDialog>
 
 #include "backend.h"
 #include "fileio.h"
@@ -41,7 +43,8 @@ int main(int argc, char *argv[])
     //string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log &";
     // dev/null is important to supress MCMD output in Qt Application Output
     string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log >/dev/null &";
-    system(commandString.c_str());
+    // RUN MCMD
+    //system(commandString.c_str());
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     //QGuiApplication app(argc, argv);
@@ -53,9 +56,12 @@ int main(int argc, char *argv[])
     //qmlRegisterType<Graphs, 1>("Graphs", 1, 0, "Graphs" );
 
     QQmlApplicationEngine engine;
+
+
+
+    // go
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
-
     return app.exec();
 }

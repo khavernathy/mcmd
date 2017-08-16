@@ -118,13 +118,39 @@ QString FileIO::read_gr() {
     return fileContent;
 }
 
+QString FileIO::read_other(const QString& data) {
+    motherSource = data;
+    motherSource.remove(0,6); // truncate "file://"
+
+    if (motherSource.isEmpty()){
+        emit error("source is empty");
+        return QString();
+    }
+
+    QFile file(motherSource);
+    QString fileContent;
+    if ( file.open(QIODevice::ReadOnly) ) {
+        QString line;
+        QTextStream t( &file );
+        do {
+            line = t.readLine();
+            fileContent += line+"\n";
+        } while (!line.isNull());
+        file.close();
+    } else {
+        emit error("Unable to open the file"+motherSource);
+        return QString();
+    }
+    return fileContent;
+}
+
 
 bool FileIO::write(const QString& data)
 {
-    if (mSource.isEmpty())
+    if (motherSource.isEmpty())
         return false;
 
-    QFile file(mSource);
+    QFile file(motherSource);
     if (!file.open(QFile::WriteOnly | QFile::Truncate))
         return false;
 
