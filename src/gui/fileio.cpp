@@ -93,6 +93,32 @@ QString FileIO::read()
     return fileContent;
 }
 
+QString FileIO::read_gr() {
+
+    mgrSource = "radialdist.dat0";
+    if (mgrSource.isEmpty()){
+        emit error("source is empty");
+        return QString();
+    }
+
+    QFile file(mgrSource);
+    QString fileContent;
+    if ( file.open(QIODevice::ReadOnly) ) {
+        QString line;
+        QTextStream t( &file );
+        do {
+            line = t.readLine();
+            fileContent += line+"\n";
+        } while (!line.isNull());
+        file.close();
+    } else {
+        emit error("Unable to open the file");
+        return QString();
+    }
+    return fileContent;
+}
+
+
 bool FileIO::write(const QString& data)
 {
     if (mSource.isEmpty())

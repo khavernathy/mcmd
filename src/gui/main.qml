@@ -7,6 +7,8 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.2
 import QtCharts 2.2
 
+
+
 import FileIO 1.0
 
 ApplicationWindow {
@@ -38,198 +40,19 @@ ApplicationWindow {
             //myText.text = myFile.read();
         }
 
+
         Page { // 1 :: Input stuff
-            Column {
-                id: leftcol
 
-                height: parent.height
-                width: parent.width/2
-                anchors.margins: 5
-
-               Rectangle {
-                    id: mcmdtitle
-                    width: parent.width
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    height: 50
-                    color: "#cdcdcd"
-                    Text {
-                        font.pixelSize: 30
-                        text: "MCMD input parameters"
-                    }
-                }
-               Rectangle {
-                   color: "red";
-                   anchors.top: mcmdtitle.bottom
-                   Text {
-                       text: "input stuff goes here";
-                   }
-                   InputLine {
-                       id: firstInpLine
-                       y: 50
-                       name: "Job name"
-                       defaultIn: "test job"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + firstInpLine.height
-                       name: "Mode"
-                       defaultIn: "mc"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 2*firstInpLine.height
-                       name: "Input atoms"
-                       defaultIn: "/Users/douglasfranz/mcmd/testzone/input.pdb"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 3*firstInpLine.height
-                       name: "Potential"
-                       defaultIn: "ljes"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 4*firstInpLine.height
-                       name: "Sorbates"
-                       defaultIn: "h2_bss"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 5*firstInpLine.height
-                       name: "Fugacity"
-                       defaultIn: "h2"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 6*firstInpLine.height
-                       name: "Basis a"
-                       defaultIn: "25.669"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 7*firstInpLine.height
-                       name: "Basis b"
-                       defaultIn: "25.669"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 8*firstInpLine.height
-                       name: "Basis c"
-                       defaultIn: "25.669"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 9*firstInpLine.height
-                       name: "Basis α"
-                       defaultIn: "90.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 10*firstInpLine.height
-                       name: "Basis β"
-                       defaultIn: "90.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 11*firstInpLine.height
-                       name: "Basis γ"
-                       defaultIn: "90.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 12*firstInpLine.height
-                       name: "Ensemble"
-                       defaultIn: "uvt"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 13*firstInpLine.height
-                       name: "Corrtime"
-                       defaultIn: "1000"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 14*firstInpLine.height
-                       name: "Final step"
-                       defaultIn: "10000000"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 15*firstInpLine.height
-                       name: "Temperature"
-                       defaultIn: "77.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 16*firstInpLine.height
-                       name: "Pressure"
-                       defaultIn: "1.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 17*firstInpLine.height
-                       name: "Insert factor"
-                       defaultIn: "0.667"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 18*firstInpLine.height
-                       name: "Displace factor"
-                       defaultIn: "2.5"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 19*firstInpLine.height
-                       name: "Angle rotation factor"
-                       defaultIn: "360.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 20*firstInpLine.height
-                       name: "Basis γ"
-                       defaultIn: "90.0"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 21*firstInpLine.height
-                       name: "Feynman-Hibbs corrections"
-                       defaultIn: "on"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 22*firstInpLine.height
-                       name: "F-H order"
-                       defaultIn: "4"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 23*firstInpLine.height
-                       name: "write_lammps"
-                       defaultIn: "on"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 24*firstInpLine.height
-                       name: "Auto-reject option"
-                       defaultIn: "on"
-                   }
-                   InputLine {
-                       y: firstInpLine.y + 25*firstInpLine.height
-                       name: "Auto-reject r"
-                       defaultIn: "1.78"
-                   }
-               }
-            }
-            Column {
-                id: midcol
-                anchors.left: leftcol.right
-
-                height: parent.height
-                width: parent.width/4
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: "red"
-                }
-            }
-            Column {
-                id: rightcol
-
-                anchors.left: midcol.right
-
-                height: parent.height
-                width: parent.width/4
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: "green"
-                }
-            }
             Timer {
                 id: timer
                 //property BackEnd backend: BackEnd {}
                 interval: 300 // ms
                 repeat: true
                 running: root.visible
-                onTriggered: {
 
+
+                onTriggered: {
+                    console.time("entire");
                     var newText = runlogFile.read();
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
@@ -337,6 +160,7 @@ ApplicationWindow {
                         var laststep = steps[steps.length-1];
                         progressdisplayer.update(progresss[progresss.length-1]);
                         mdprogressdisplayer.update(progresss[progresss.length-1]);
+                        grprogressbar.update(progresss[progresss.length-1]);
                         energychart.updateKE(laststep, KEs[KEs.length -1]);
                         energychart.updatePE(laststep, PEs[PEs.length -1]);
                         energychart.updateTE(laststep, TEs[TEs.length -1]);
@@ -355,11 +179,27 @@ ApplicationWindow {
                         mcstatschart.updateMCStats(Inserts[Inserts.length-1],
                             Removes[Removes.length-1], Displaces[Displaces.length-1],
                             VolumeChanges[VolumeChanges.length-1]);
+
+                        // radial distribution stuff
+                        gr_line.clear();
+                        var grdata = runlogFile.read_gr();
+                        var gr_lines = grdata.split("\n");
+                        for (var i=1; i<gr_lines.length; i++) { // skipping i=0 first line
+                            var splitarr = gr_lines[i].split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
+                            var x = splitarr[0]; var y = splitarr[1];
+                            console.log("x: "+x+";  y: "+y);
+                            if (typeof x != 'undefined' && typeof y != 'undefined')
+                                grchart.updategr(x,y);
+                        }
+
+
+
                     } // end if new data is detected
-                }
+
+                } // end onTriggered
             } // end timer
 
-        }
+        } // end p1
         Page { // 2 :: MC graphs
             id: mcgraphspage
             Text {
@@ -613,7 +453,7 @@ ApplicationWindow {
                     PieSlice { id: mcs4; color: "blue"; label: "Volume changes"; value: 0.1 }
                 }
             }
-        }
+        } // end p2
 
         Page { // 3 :: MD graphs
             id: mdgraphspage
@@ -916,18 +756,72 @@ ApplicationWindow {
             }
 
 
-        }
-        Page {
-            Label {
-                text: qsTr("Stuff on the 4 page")
+        } // end p3
+        Page { // 4 :: g(r) graphs
+            id: grgraphspage
+            Text {
+                id: grtoptitle
+                text: "Live data :: progress: "
+                height: 25
+                width: 150
             }
-        }
+            ProgressBar {
+                id: grprogressbar
+                value: 0
+                height: 25
+                anchors.left: grtoptitle.right
+                function update(newprog) {
+                    this.value = newprog;
+                }
+            }
+            ChartView {
+                id: grchart
+                theme: ChartView.ChartThemeDark
+                title: "g(r)"
+                anchors.left: parent.left
+                anchors.top: grtoptitle.bottom
+                height: (root.height - grtoptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updategr(x,y) {
+                    gr_line.append(x,y);
+                    if (x > gr_line.axisX.max) {
+                        gr_line.axisX.max = x;
+                    }
+                    else if (x < gr_line.axisX.min) {
+                        gr_line.axisX.min = x;
+                    }
+                    if (y > gr_line.axisY.max) {
+                        gr_line.axisY.max = y;
+                    }
+                    else if (y < gr_line.axisY.min) {
+                        gr_line.axisY.min = y;
+                    }
+                }
+                LineSeries {
+                    id: gr_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "Distance (A)"
+                    }
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "g(r), normalized"
+                    }
+                    //XYPoint { x: 31.0; y: 45.8 }
+                    //XYPoint { x: 13.3; y: 14.4 }
+                    name: "g(r)"
+                }
+            }
+        } // end p4
 
         Page {
             Label {
                 text: qsTr("more stuff, 5th")
             }
-        }
+        } // end p5
     }
 
     footer: TabBar {
@@ -937,13 +831,16 @@ ApplicationWindow {
             text: qsTr("Input setup")
         }
         TabButton {
-            text: qsTr("MC")
+            text: qsTr("MC plots")
         }
         TabButton {
-            text: qsTr("MD")
+            text: qsTr("MD plots")
         }
         TabButton {
-            text: qsTr("hi")
+            text: qsTr("g(r) plots")
+        }
+        TabButton {
+            text: qsTr("blashdd")
         }
     }
 

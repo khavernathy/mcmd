@@ -52,3 +52,4 @@ test_zone/*
 testzone
 testzone/*
 lammps.*
+src/gui/*app

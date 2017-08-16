@@ -34,8 +34,7 @@ HEADERS += \
     fileio.h \
     backend.h
 
-FORMS += \
-    graphs.ui
+FORMS +=
 
 DISTFILES += \
     garbage
