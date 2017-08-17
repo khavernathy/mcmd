@@ -167,7 +167,7 @@ void coulombic_force_nopbc(System &system) {
     } // end i 
 }
 
-// pbc force via ewald -dU/dx, -dU/dy, -dU/dz
+/*
 void coulombic_real_force(System &system) {  // units of K/A
     const double alpha=system.constants.ewald_alpha;
     double erfc_term; // = erfc(alpha*r);
@@ -219,7 +219,95 @@ void coulombic_real_force(System &system) {  // units of K/A
     } // end i    
 
  
+}*/
+
+
+// pbc force via ewald -dU/dx, -dU/dy, -dU/dz
+void coulombic_real_force(System &system) {  // units of K/A
+    const double alpha=system.constants.ewald_alpha;
+    double erfc_term; // = erfc(alpha*r);
+    double charge1, charge2, chargeprod, r,rsq;
+    double u[3]; double holder;
+    const double sqrtPI = sqrt(M_PI);
+    const double fourPI = M_PI*4;
+    int l[3]; double k[3]; int p,q; double k_sq;
+    double invV = 1./system.pbc.volume;
+    int kmax = system.constants.ewald_kmax;
+
+   if (system.constants.ensemble == ENSEMBLE_NPT) {
+        system.pbc.calcVolume();
+        system.pbc.calcRecip();
+        invV = 1./system.pbc.volume;
+   }
+    
+    // define k-space
+    for (l[0] = 0; l[0] <= kmax; l[0]++) {
+        for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
+            for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
+
+                // skip if norm is out of sphere
+                if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
+
+                // get reciprocal lattice vectors
+                for (p=0; p<3; p++) {
+                    for (q=0, k[p] = 0; q < 3; q++) {
+                        k[p] += 2.0*M_PI*system.pbc.reciprocal_basis[p][q] * l[q];
+                    }
+                }
+                k_sq = k[0]*k[0] + k[1]*k[1] + k[2]*k[2];
+            } // end for l[2], n
+        } // end for l[1], m
+    } // end for l[0], l
+
+
+
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+    for (int ka = 0; ka < system.molecules.size(); ka++) {
+    for (int la = 0; la < system.molecules[ka].atoms.size(); la++) {
+    if (!(system.molecules[i].frozen && system.molecules[ka].frozen) &&
+        !(system.molecules[i].atoms[j].C == 0 || system.molecules[ka].atoms[la].C == 0) ) { // don't do frozen-frozen or zero charge
+
+        charge1 = system.molecules[i].atoms[j].C;
+        charge2 = system.molecules[ka].atoms[la].C;
+        chargeprod=charge1*charge2;
+
+        // calculate distance between atoms
+        double* distances = getDistanceXYZ(system,i,j,ka,la);
+        r = distances[3];
+
+        rsq = r*r;
+        for (int n=0; n<3; n++) u[n] = distances[n]/r;
+
+        if (r <= system.pbc.cutoff && (i < ka)) { // non-duplicated pairs only, not intramolecular and not beyond cutoff
+            // real space. units are K/A. alpha is 1/A, charge is sqrt(KA)
+            erfc_term = erfc(alpha*r);
+            for (int n=0; n<3; n++) {
+                holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*r*r))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[ka].atoms[la].force[n] -= holder;
+
+            }
+            
+            // k-space. units are K/A, quite sure... charge still sqrt(KA) 
+            for (int n=0;n<3;n++) {
+                holder = chargeprod*invV*fourPI*k[n]*exp(-k_sq/(4*alpha))*sin(k[0]*distances[0]+k[1]*distances[1]+k[2]*distances[2])/k_sq;  
+                system.molecules[i].atoms[j].force[n] += holder;
+                system.molecules[ka].atoms[la].force[n] -= holder;
+            } // end 3D 
+        } 
+    } // end if not frozen
+    } // end l
+    } // end k
+    } // end j
+    } // end i    
+
+ 
 }
+
+
+
+
 
 // old MD pseudo-periodic coulombic force. probably wrong.
 // not being used
