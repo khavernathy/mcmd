@@ -33,6 +33,10 @@ public:
                READ workingDir
                WRITE setWorkingDir
                NOTIFY workingDirChanged)
+    Q_PROPERTY(QString mode
+               READ mode
+               WRITE setMode
+               NOTIFY modeChanged)
     explicit FileIO(QObject *parent = 0);
 
     // functions
@@ -50,6 +54,7 @@ public:
     int linecount() { return mLinecount; };
     QString homeDir() { return mHomedir; };
     QString workingDir() { return mworkingDir; };
+    QString mode() { return mmode; };
 
     // setting functions
 public slots:
@@ -59,6 +64,7 @@ public slots:
     void setgrSource(const QString& grSource) { mgrSource = grSource; };
     void setOtherSource(const QString& otherSource) { motherSource = otherSource; };
     void setWorkingDir(const QString& workingDir) { mworkingDir = workingDir; };
+    void setMode(const QString& mode) { mmode = mode; };
 
     // change signals
 signals:
@@ -68,6 +74,7 @@ signals:
     void linecountChanged(int& linecount);
     void homeDirChanged(const QString& homeDir);
     void workingDirChanged(const QString& workingDir);
+    void modeChanged(const QString& mode);
     void error(const QString& msg);
 
 private:
@@ -75,6 +82,7 @@ private:
     QString mgrSource;
     QString motherSource;
     QString mworkingDir;
+    QString mmode; // "mc" or "md"
 
 public:
     int mLinecount=0;

@@ -106,6 +106,7 @@ ApplicationWindow {
                                 mcs1.value = 0; mcs2.value = 0; mcs3.value = 0; mcs4.value = 0;
                                 ke_line.clear(); pe_line.clear(); te_line.clear(); diff_line.clear();
                                 temp_line.clear(); itemp_line.clear(); pres_line.clear(); vel_line.clear();
+                                msd_line.clear();
                                 gr_line.clear();
 
                                 // go go go
@@ -132,6 +133,23 @@ ApplicationWindow {
                     property string statusvar: "Waiting for input..."
                     anchors.top: button1.bottom
                     text: "Status: "+statusvar
+                }
+                Rectangle {
+                    id: runlogScrollerHolder
+                    anchors.top: statustext.bottom
+                    width: parent.width
+                    height: parent.height - button1.height - statustext.height
+                    color: "black"
+                    ScrollView {
+                        id: runlogCurrentScroller
+                        anchors.fill: parent
+                        TextArea {
+                            id: runlogCurrent
+                            font.family: "monospace"
+                            color: "green"
+                            text: "Runlog will go here..."
+                        }
+                    }
                 }
             } // end column1 rectangle
             Rectangle {
@@ -163,8 +181,10 @@ ApplicationWindow {
                 onTriggered: {
                     console.time("entire");
                     var newText = fileIO.read();
+                    runlogCurrent.text = newText;
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
+                    //runlogCurrentScroller.position = runlogCurrent.contentHeight - runlogScrollerHolder.height;
 
                     if (newText !== "") { // make sure we have new data to work with.
                         var steps = new Array();
@@ -191,18 +211,25 @@ ApplicationWindow {
                         var ITemps = new Array();
                         var Press = new Array();
                         var Vels = new Array();
+                        var Msds = new Array();
 
 
                         // loop each NEW line...
                         var allLines = newText.split("\n"); //outputText.text.split("\n");
                         var i=0;
                         while (allLines.length > i) {
-                            var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );;
-                            if (allLines[i].indexOf("Step") !== -1) {
+                            var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );
+                            if (allLines[i].indexOf("Got mode =") !== -1) {
+                                var mode = thisLine[3+fileIO.colOffset];
+                                fileIO.mode = mode; // determines MD or MC at beginning of output.
+                            }
+                            else if (allLines[i].indexOf("Step") !== -1) {
                                 var step = thisLine[1+fileIO.colOffset];
                                 steps.push(step);
                                 var prg = thisLine[6+fileIO.colOffset].replace("%","");
                                 progresss.push(parseFloat(prg)/100);
+                                var finalstep = thisLine[3+fileIO.colOffset].replace(";","");
+                                statustext.statusvar = "Running... ( Step "+ step+" / "+finalstep + " ); " + prg.replace(";","") + "%";
                             }
                             // MD...
                             else if (allLines[i].indexOf("KE") !== -1) {
@@ -231,6 +258,9 @@ ApplicationWindow {
                             } else if (allLines[i].indexOf("Average v =") !== -1) {
                                 var Vel = thisLine[3+fileIO.colOffset];
                                 Vels.push(Vel);
+                            } else if (allLines[i].indexOf("Mean square displacement") !== -1) {
+                                var msd = thisLine[4+fileIO.colOffset];
+                                Msds.push(msd);
                             // MC ...
                             } else if (allLines[i].indexOf("Polar avg") !== -1) {
                                 var PolEn = thisLine[3+fileIO.colOffset];
@@ -270,25 +300,28 @@ ApplicationWindow {
                         progressdisplayer.update(progresss[progresss.length-1]);
                         mdprogressdisplayer.update(progresss[progresss.length-1]);
                         grprogressbar.update(progresss[progresss.length-1]);
-                        energychart.updateKE(laststep, KEs[KEs.length -1]);
-                        energychart.updatePE(laststep, PEs[PEs.length -1]);
-                        energychart.updateTE(laststep, TEs[TEs.length -1]);
-                        diffusionchart.updateDiff(laststep, Ds[Ds.length -1]);
-                        temperaturechart.updateETemp(laststep, ETemps[ETemps.length -1]);
-                        temperaturechart.updateITemp(laststep, ITemps[ITemps.length -1]);
-                        pressurechart.updatePres(laststep, Press[Press.length -1]);
-                        velocitychart.updateVel(laststep, Vels[Vels.length -1]);
-                        mcenergychart.updatePolEn(laststep, PolEns[PolEns.length -1]);
-                        mcenergychart.updateESEn(laststep, ESEns[ESEns.length -1]);
-                        mcenergychart.updateRDEn(laststep, RDEns[RDEns.length -1]);
-                        mcenergychart.updateTotalU(laststep, UEns[UEns.length -1]);
-                        qstchart.updateQst(laststep, Qsts[Qsts.length -1]);
-                        nchart.updateNAvg(laststep, Navgs[Navgs.length -1]);
-                        nchart.updateN(laststep, Ns[Ns.length -1]);
-                        mcstatschart.updateMCStats(Inserts[Inserts.length-1],
-                            Removes[Removes.length-1], Displaces[Displaces.length-1],
-                            VolumeChanges[VolumeChanges.length-1]);
-
+                        if (fileIO.mode == "md") {
+                            energychart.updateKE(laststep, KEs[KEs.length -1]);
+                            energychart.updatePE(laststep, PEs[PEs.length -1]);
+                            energychart.updateTE(laststep, TEs[TEs.length -1]);
+                            diffusionchart.updateDiff(laststep, Ds[Ds.length -1]);
+                            temperaturechart.updateETemp(laststep, ETemps[ETemps.length -1]);
+                            temperaturechart.updateITemp(laststep, ITemps[ITemps.length -1]);
+                            pressurechart.updatePres(laststep, Press[Press.length -1]);
+                            velocitychart.updateVel(laststep, Vels[Vels.length -1]);
+                            msdchart.updateMsd(laststep, Msds[Msds.length-1]);
+                        } else if (fileIO.mode == "mc") {
+                            mcenergychart.updatePolEn(laststep, PolEns[PolEns.length -1]);
+                            mcenergychart.updateESEn(laststep, ESEns[ESEns.length -1]);
+                            mcenergychart.updateRDEn(laststep, RDEns[RDEns.length -1]);
+                            mcenergychart.updateTotalU(laststep, UEns[UEns.length -1]);
+                            qstchart.updateQst(laststep, Qsts[Qsts.length -1]);
+                            nchart.updateNAvg(laststep, Navgs[Navgs.length -1]);
+                            nchart.updateN(laststep, Ns[Ns.length -1]);
+                            mcstatschart.updateMCStats(Inserts[Inserts.length-1],
+                                Removes[Removes.length-1], Displaces[Displaces.length-1],
+                                VolumeChanges[VolumeChanges.length-1]);
+                        }
                         // radial distribution stuff
                         gr_line.clear();
                         var grdata = fileIO.read_gr();
@@ -304,7 +337,7 @@ ApplicationWindow {
 
 
                     } // end if new data is detected
-
+                console.timeEnd("entire");
                 } // end onTriggered
             } // end timer
 
@@ -315,7 +348,7 @@ ApplicationWindow {
                 id: mctoptitle
                 text: statustext.statusvar+" :: progress: "
                 height: 25
-                width: 150
+                width: 500
 
             }
             ProgressBar {
@@ -564,7 +597,6 @@ ApplicationWindow {
                 }
             }
         } // end p2
-
         Page { // 3 :: MD graphs
             id: mdgraphspage
 
@@ -572,7 +604,7 @@ ApplicationWindow {
                 id: toptitle
                 text: statustext.statusvar+" :: progress: "
                 height: 25
-                width: 150
+                width: 500
             }
             ProgressBar {
                 id: mdprogressdisplayer
@@ -864,6 +896,47 @@ ApplicationWindow {
                     name: "Average Velocity"
                 }
             }
+            ChartView {
+                id: msdchart
+                theme: ChartView.ChartThemeDark
+                title: "Mean square displacement"
+                anchors.left: velocitychart.right
+                anchors.top: temperaturechart.bottom
+                height: (root.height - toptitle.height)/2
+                width: root.width/3
+                antialiasing: true
+                function updateMsd(x,y) {
+                    msd_line.append(x,y);
+                    if (x > msd_line.axisX.max) {
+                        msd_line.axisX.max = x;
+                    }
+                    else if (x < msd_line.axisX.min) {
+                        msd_line.axisX.min = x;
+                    }
+                    if (y > msd_line.axisY.max) {
+                        msd_line.axisY.max = y;
+                    }
+                    else if (y < msd_line.axisY.min) {
+                        msd_line.axisY.min = y;
+                    }
+                }
+                LineSeries {
+                    id: msd_line
+                    axisX: ValueAxis {
+                        min: 0
+                        max: 0
+                        tickCount: 5
+                        titleText: "Step"
+                    }
+
+                    axisY: ValueAxis {
+                        min: 0
+                        max: 1e-7
+                        titleText: "MSD (r^2)"
+                    }
+                    name: "MSD"
+                }
+            }
 
 
         } // end p3
@@ -873,7 +946,7 @@ ApplicationWindow {
                 id: grtoptitle
                 text: statustext.statusvar+" :: progress: "
                 height: 25
-                width: 150
+                width: 500
             }
             ProgressBar {
                 id: grprogressbar
