@@ -50,7 +50,7 @@ ApplicationWindow {
                 width: parent.width/2
                 height: parent.height
                 Button {
-                    id: fileButton
+                    id: button1
                     text: "File"
                     onClicked: menu.open()
 
@@ -68,10 +68,10 @@ ApplicationWindow {
                         MenuItem {
                             text: "Save ..."
                             onTriggered: {
-                                if (fileIO.motherSource != "")
+                                if (fileIO.otherSource !== "")
                                     fileIO.write(inputFileText.text); // auto-writes to "motherSource", the file that was opened.
                                 else
-                                    console.log("ERROR: motherSource not defined, so the file was not saved.");
+                                    console.log("ERROR: otherSource not defined, so the file was not saved.");
                             }
                         }
 
@@ -90,7 +90,49 @@ ApplicationWindow {
                             Component.onCompleted: visible = false
                         }
                     }
-                } // end button
+                } // end button1
+                Button {
+                    id: button2
+                    anchors.left: button1.right
+                    property string switcher: "off"
+                    text: "Start"
+                    onClicked: {
+                        if (switcher == "off") {
+                            if (fileIO.otherSource !== "") {
+                                console.log("starting MCMD using input file: "+fileIO.otherSource);
+                                // clear all graphs before (re-)starting
+                                pol_line.clear(); es_line.clear(); rd_line.clear(); totalu_line.clear();
+                                qst_line.clear(); n_line.clear(); navg_line.clear();
+                                mcs1.value = 0; mcs2.value = 0; mcs3.value = 0; mcs4.value = 0;
+                                ke_line.clear(); pe_line.clear(); te_line.clear(); diff_line.clear();
+                                temp_line.clear(); itemp_line.clear(); pres_line.clear(); vel_line.clear();
+                                gr_line.clear();
+
+                                // go go go
+                                fileIO.startSimulation(fileIO.otherSource);
+                                timer.timerCondition = 1;
+                                switcher = "on";
+                                statustext.statusvar = "Running...";
+                                this.text = "Stop";
+                            } else {
+                                console.log("ERROR: No input file selected for simulation...");
+                            }
+                        } else {
+                            fileIO.killSimulation(fileIO.otherSource);
+                            timer.timerCondition = 0;
+                            switcher = "off";
+                            statustext.statusvar = "Stopped.";
+
+                            this.text = "Start";
+                        }
+                    }
+                } // end button2
+                Text {
+                    id: statustext
+                    property string statusvar: "Waiting for input..."
+                    anchors.top: button1.bottom
+                    text: "Status: "+statusvar
+                }
             } // end column1 rectangle
             Rectangle {
                 id: column2
@@ -98,19 +140,24 @@ ApplicationWindow {
                 width: parent.width/2
                 height: parent.height
                 anchors.left: column1.right
-                TextArea {
-                    id: inputFileText
-                    color: "white"
+                ScrollView {
+                    id: inputFileScroller
+                    anchors.fill: parent
+                    TextArea {
+                        id: inputFileText
+                        color: "white"
+                        cursorVisible: activeFocus
+                    }
                 }
             }
 
 
             Timer {
                 id: timer
-                //property BackEnd backend: BackEnd {}
+                property int timerCondition: 0
                 interval: 300 // ms
                 repeat: true
-                running: false //root.visible
+                running: timerCondition //root.visible
 
 
                 onTriggered: {
@@ -249,7 +296,7 @@ ApplicationWindow {
                         for (var i=1; i<gr_lines.length; i++) { // skipping i=0 first line
                             var splitarr = gr_lines[i].split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
                             var x = splitarr[0]; var y = splitarr[1];
-                            console.log("x: "+x+";  y: "+y);
+                            //console.log("x: "+x+";  y: "+y);
                             if (typeof x != 'undefined' && typeof y != 'undefined')
                                 grchart.updategr(x,y);
                         }
@@ -266,7 +313,7 @@ ApplicationWindow {
             id: mcgraphspage
             Text {
                 id: mctoptitle
-                text: "Live data :: progress: "
+                text: statustext.statusvar+" :: progress: "
                 height: 25
                 width: 150
 
@@ -509,10 +556,10 @@ ApplicationWindow {
 
                 PieSeries {
                     id: mcstats_pie
-                    PieSlice { id: mcs1; color: "green"; label: "Inserts"; value: 94.7 }
-                    PieSlice { id: mcs2; color: "red"; label: "Removes"; value: 5.1 }
-                    PieSlice { id: mcs3; color: "grey"; label: "Displaces"; value: 0.1 }
-                    PieSlice { id: mcs4; color: "blue"; label: "Volume changes"; value: 0.1 }
+                    PieSlice { id: mcs1; color: "green"; label: "Inserts"; value: 0.0 }
+                    PieSlice { id: mcs2; color: "red"; label: "Removes"; value: 0.0 }
+                    PieSlice { id: mcs3; color: "grey"; label: "Displaces"; value: 0.0 }
+                    PieSlice { id: mcs4; color: "blue"; label: "Volume changes"; value: 0.0 }
                 }
             }
         } // end p2
@@ -522,7 +569,7 @@ ApplicationWindow {
 
             Text {
                 id: toptitle
-                text: "Live data :: progress: "
+                text: statustext.statusvar+" :: progress: "
                 height: 25
                 width: 150
             }
@@ -823,7 +870,7 @@ ApplicationWindow {
             id: grgraphspage
             Text {
                 id: grtoptitle
-                text: "Live data :: progress: "
+                text: statustext.statusvar+" :: progress: "
                 height: 25
                 width: 150
             }

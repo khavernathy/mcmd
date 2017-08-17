@@ -1,6 +1,7 @@
 #include "fileio.h"
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 #include "unistd.h"
 
 #include <iostream>
@@ -95,7 +96,9 @@ QString FileIO::read()
 
 QString FileIO::read_gr() {
 
-    mgrSource = "radialdist.dat0";
+    mgrSource = "/home/khavernathy/mcmd/src/build-gui_mcmd-Desktop_Qt_5_9_1_GCC_64bit-Debug/radial_distribution.dat0";
+    //mgrSource = mworkingDir + "/radial_distribution.dat0";
+    //mgrSource = qApp->applicationDirPath() + "/radial_distribution.dat0";
     if (mgrSource.isEmpty()){
         emit error("source is empty");
         return QString();
@@ -120,7 +123,7 @@ QString FileIO::read_gr() {
 
 QString FileIO::read_other(const QString& data) {
     motherSource = data;
-    motherSource.remove(0,6); // truncate "file://"
+    motherSource.remove(0,7); // truncate "file://"
 
     if (motherSource.isEmpty()){
         emit error("source is empty");
@@ -160,4 +163,60 @@ bool FileIO::write(const QString& data)
     file.close();
 
     return true;
+}
+
+int FileIO::startSimulation(const QString& data)
+{
+    string homeDir;
+    string linuxcheck="/proc/cpuinfo";
+        //linux
+        if (std::ifstream(linuxcheck.c_str())) {
+            string usfspace = "/home/dfranz";
+            string homebox = "/home/khavernathy";
+            if (std::ifstream(usfspace.c_str())) {
+                homeDir = usfspace;
+            } else {
+                homeDir = homebox;
+            }
+        } else {
+            // mac
+            homeDir = "/Users/douglasfranz";
+        }
+
+    //string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log &";
+    // dev/null is important to supress MCMD output in Qt Application Output
+    string filename = data.toStdString();
+    string placeholder = filename;
+
+    // determine working directory at location of input file.
+    string delimeter = "/";
+    string token;
+    string workingDir; // = delimeter; // start at root
+    size_t pos = 0;
+    while ((pos = placeholder.find(delimeter)) != std::string::npos) {
+        token = placeholder.substr(0, pos);
+        //std::cout << token << endl;
+        workingDir = workingDir + token + delimeter; // build the working dir piece by piece
+        placeholder.erase(0, pos + delimeter.length());
+    }
+    //std::cout << "final token: " << token << endl;
+    std::cout << "working dir is " << workingDir << endl;
+    mworkingDir = QString::fromStdString(workingDir);
+
+    // write it to a runlog in working dir.
+    string cdString = "cd "+workingDir;
+    system(cdString.c_str());
+    string commandString = homeDir+"/mcmd/mcmd "+filename+" | tee "+workingDir+"runlog.log >/dev/null &";
+    // RUN MCMD
+    system(commandString.c_str());
+    return 0;
+}
+
+int FileIO::killSimulation(const QString& data)
+{
+    string filename = data.toStdString();
+    string commandString = "kill -9 $(ps aux | grep '"+filename+"' | awk {'print $2'})";
+    system(commandString.c_str());
+    qDebug() << "Tried to kill simulation via: " << QString::fromStdString(commandString);
+    return 0;
 }

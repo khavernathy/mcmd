@@ -29,12 +29,18 @@ public:
                READ homeDir
                WRITE setHomeDir
                NOTIFY homeDirChanged)
+    Q_PROPERTY(QString workingDir
+               READ workingDir
+               WRITE setWorkingDir
+               NOTIFY workingDirChanged)
     explicit FileIO(QObject *parent = 0);
 
     // functions
     Q_INVOKABLE QString read();
     Q_INVOKABLE QString read_gr();
     Q_INVOKABLE QString read_other(const QString& data);
+    Q_INVOKABLE int startSimulation(const QString& data);
+    Q_INVOKABLE int killSimulation(const QString& data);
     Q_INVOKABLE bool write(const QString& data);
 
     // local objects
@@ -43,6 +49,7 @@ public:
     QString otherSource() { return motherSource; };
     int linecount() { return mLinecount; };
     QString homeDir() { return mHomedir; };
+    QString workingDir() { return mworkingDir; };
 
     // setting functions
 public slots:
@@ -51,6 +58,7 @@ public slots:
     void setHomeDir(const QString& homeDir) { mHomedir = homeDir; };
     void setgrSource(const QString& grSource) { mgrSource = grSource; };
     void setOtherSource(const QString& otherSource) { motherSource = otherSource; };
+    void setWorkingDir(const QString& workingDir) { mworkingDir = workingDir; };
 
     // change signals
 signals:
@@ -59,12 +67,14 @@ signals:
     void otherSourceChanged(const QString& otherSource);
     void linecountChanged(int& linecount);
     void homeDirChanged(const QString& homeDir);
+    void workingDirChanged(const QString& workingDir);
     void error(const QString& msg);
 
 private:
     QString mSource;
     QString mgrSource;
     QString motherSource;
+    QString mworkingDir;
 
 public:
     int mLinecount=0;
