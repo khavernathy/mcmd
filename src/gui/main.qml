@@ -400,6 +400,7 @@ ApplicationWindow {
                     }
                 }
 
+
                 LineSeries {
                     id: pol_line
                     axisX: ValueAxis {
