@@ -462,6 +462,8 @@ ApplicationWindow {
                     id: totalu_line
                     name: "Total U"
                 }
+
+
             }
             ChartView {
                 id: qstchart
@@ -621,7 +623,6 @@ ApplicationWindow {
                 id: energychart
                 theme: ChartView.ChartThemeDark
                 title: "Energies"
-
                 //anchors.fill: parent
                 anchors.left: parent.left
                 anchors.top: toptitle.bottom
