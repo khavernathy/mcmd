@@ -181,12 +181,12 @@ ApplicationWindow {
                 onTriggered: {
                     console.time("entire");
                     var newText = fileIO.read();
-                    runlogCurrent.text = newText;
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
                     //runlogCurrentScroller.position = runlogCurrent.contentHeight - runlogScrollerHolder.height;
 
                     if (newText !== "") { // make sure we have new data to work with.
+                        runlogCurrent.text = newText;
                         var steps = new Array();
                         var progresss = new Array();
                         // MC...
