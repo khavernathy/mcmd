@@ -297,7 +297,10 @@ void removeMolecule(System &system) {
     //int_fast8_t model = system.constants.potential_form;
     system.checkpoint("starting removeMolecule");
 
-    if (system.stats.count_movables == 0) return; // skip if no molecules are there to be removed.
+    if (system.stats.count_movables == 0 || 
+    (system.constants.no_zero_option && system.stats.count_movables == 1)) {
+        return; // skip if no molecules are there to be removed, or if 1 left and no-zero option on.
+    }
     system.stats.remove_attempts++;
 
     //if ((int)system.stats.count_movables == 1) // IMPORTANT: CANCEL THE DELETE IF ONLY 1 MOVABLE MOLECULE LEFT
