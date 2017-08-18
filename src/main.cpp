@@ -150,12 +150,6 @@ int main(int argc, char **argv) {
         writeXYZ(system, "crystalbuild.xyz", 0, 0, 0, 0);
     }
 
-    if (system.constants.histogram_option) {
-        system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
-        system.grids.avg_histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
-        setup_histogram(system);
-        allocate_histogram_grid(system);
-    }
     setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
         setupNBias(system); 
@@ -163,6 +157,12 @@ int main(int argc, char **argv) {
         string del = "rm fragment-*.xyz";
         int whatev = std::system(del.c_str());
         fragmentMaker(system);
+    }
+    if (system.constants.histogram_option) {
+        system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
+        system.grids.avg_histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
+        setup_histogram(system);
+        allocate_histogram_grid(system);
     }
 
     system.pbc.printBasis();
