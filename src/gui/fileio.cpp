@@ -115,7 +115,7 @@ QString FileIO::read_gr() {
         } while (!line.isNull());
         file.close();
     } else {
-        emit error("Unable to open the file");
+        emit error("Unable to open the g(r) file");
         return QString();
     }
     return fileContent;
