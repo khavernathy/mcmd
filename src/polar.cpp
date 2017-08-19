@@ -123,6 +123,7 @@ void thole_amatrix(System &system) {
     const double explrcut = exp(-l*rcut);
     const double MAXVALUE = 1.0e40;
     N = (int)system.constants.total_atoms;
+    double rmin = 1.0e40;
 
     system.checkpoint("in thole_amatrix() --> zeroing out");
     zero_out_amatrix(system,N);
@@ -158,6 +159,11 @@ void thole_amatrix(System &system) {
 
             double* distances = getDistanceXYZ(system, w,x,y,z);
             r = distances[3];
+        
+            if (r<rmin && (system.molecules[w].atoms[x].polar!=0 && system.molecules[y].atoms[z].polar!=0))
+                rmin=r; // for ranking, later
+
+
             // this on-the-spot distance calculator works, but the new method
             // below does not work, even though everywhere else, it does...
             //rp = system.pairs[w][x][y][z].r;
@@ -211,8 +217,11 @@ void thole_amatrix(System &system) {
             } // end p
         } /* end j */
     } /* end i */
+    //printf("\n===================================================\n\n");
     //print_matrix(system, N*3, system.constants.A_matrix);
     //printf("\n===================================================\n\n");
+    
+    system.constants.polar_rmin = rmin;
     return;
 }
 
@@ -395,6 +404,7 @@ double polarization(System &system) {
 
     // 3) CALCULATE POLARIZATION ENERGY 1/2 mu*E
     potential=0;
+    //int atom=0;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             potential += 
@@ -403,8 +413,18 @@ double polarization(System &system) {
             if (system.constants.polar_palmo) {
                 potential += dddotprod(system.molecules[i].atoms[j].dip, system.molecules[i].atoms[j].efield_induced_change);
             }
+        // DEBUG
+        /*
+            printf("atom %i \ndip %f %f %f \nefield %f %f %f \nindchang %f %f %f \nef_self %f %f %f \nef_ind %f %f %f\n", atom, 
+                system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2],
+                system.molecules[i].atoms[j].efield[0], system.molecules[i].atoms[j].efield[1], system.molecules[i].atoms[j].efield[2],
+                 system.molecules[i].atoms[j].efield_induced_change[0], system.molecules[i].atoms[j].efield_induced_change[1], system.molecules[i].atoms[j].efield_induced_change[2],
+                system.molecules[i].atoms[j].efield_self[0], system.molecules[i].atoms[j].efield_self[1], system.molecules[i].atoms[j].efield_self[2],
+                system.molecules[i].atoms[j].efield_induced[0], system.molecules[i].atoms[j].efield_induced[1], system.molecules[i].atoms[j].efield_induced[2]);
+       */ 
+          //  atom++;
         }
-//        printf("molecule %i dip %f efield %f indchang %f\n", i, system.molecules[i].atoms[0].dip[0], system.molecules[i].atoms[0].efield[0], system.molecules[i].atoms[0].efield_induced_change[0]);
+        
     }
     system.checkpoint("POLARIZATION POTENTIAL CALCULATED.");
     

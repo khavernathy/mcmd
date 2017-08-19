@@ -8,6 +8,7 @@
 //set them to alpha*E_static
 void init_dipoles (System &system) {
 	unsigned int i, j, p;
+    //int atom =0;
     //printf("polar gamma: %f\n", system.constants.polar_gamma);
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -18,6 +19,9 @@ void init_dipoles (System &system) {
                 // improve convergence
                 system.molecules[i].atoms[j].dip[p] *= system.constants.polar_gamma;
             }
+    
+            //printf("atom %i dip %f %f %f\n", atom, system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2]);
+            //atom++;    
             //printf("mol %i atom %i dip = %f %f %f\n", i, j, system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2]);
 
         }
@@ -53,6 +57,7 @@ void contract_dipoles (System &system, int * ranked_array ) {
                     ((system.constants.A_matrix[ii+p]+jj)[0] * system.molecules[tk].atoms[tl].dip[0]) +
                     ((system.constants.A_matrix[ii+p]+jj)[1] * system.molecules[tk].atoms[tl].dip[1]) +
                     ((system.constants.A_matrix[ii+p]+jj)[2] * system.molecules[tk].atoms[tl].dip[2]);
+            
             }
         } /* end j */
 
@@ -68,6 +73,7 @@ void contract_dipoles (System &system, int * ranked_array ) {
             }
         }
 
+    //printf("atom %i mu %f %f %f\n", index, system.molecules[ti].atoms[tj].dip[0], system.molecules[ti].atoms[tj].dip[1], system.molecules[ti].atoms[tj].dip[2]);
     } /* end matrix multiply */
 
     return;
@@ -99,7 +105,7 @@ void calc_dipole_rrms (System &system) {
         if ( !isfinite(system.molecules[ti].atoms[tj].dipole_rrms) ) system.molecules[ti].atoms[tj].dipole_rrms = 0;
     }
     */
-
+//int atom=0;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             // mean square distance
@@ -116,11 +122,12 @@ void calc_dipole_rrms (System &system) {
                 //if (!isfinite(system.molecules[i].atoms[j].dipole_rrms)) 
                     system.molecules[i].atoms[j].dipole_rrms=0;
                 
-            
+        //printf("atom %i rrms %f\n", atom, system.molecules[i].atoms[j].dipole_rrms);    
+        //atom++;
         }
     }
 
-
+    
     return;
 }
 
@@ -178,20 +185,67 @@ void palmo_contraction (System &system, int * ranked_array ) {
                 }// end p
             } 
         }
+    
+
+    //printf("atom %i efindc %f %f %f\n", i, system.molecules[ti].atoms[tj].efield_induced_change[0],
+    //system.molecules[ti].atoms[tj].efield_induced_change[1],
+    //system.molecules[ti].atoms[tj].efield_induced_change[2]);
     }
+
 
     return;
 }
 
 
 void update_ranking (System &system, int * ranked_array ) {
-	unsigned int i, j, sorted, tmp, trk, trl, trk1, trl1, rankedj, rankedj1;
-	//double r; 
+	unsigned int i, j, k,l,sorted, tmp, trk, trl, trk1, trl1, rankedj, rankedj1;
+	const double rmin = system.constants.polar_rmin*1.5; 
+    //printf("rmin = %f\n", rmin/1.5);
+    double r;
 
     int N = system.constants.total_atoms;
 
+    // initialize rank metrics
+    for (i=0; i<system.molecules.size(); i++) 
+        for (j=0; j<system.molecules[i].atoms.size(); j++)
+            system.molecules[i].atoms[j].rank_metric = 0;
+    
+
+    // set rank metrics
+    system.constants.all_pbc = 0; // temporary for r ranking
+    int hits=0;
+    int paircount=0;
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            if (system.molecules[i].atoms[j].polar == 0) continue;
+            for (k=i;k<system.molecules.size(); k++) {
+                for (l=0; l<system.molecules[k].atoms.size(); l++) {
+                    if (system.molecules[k].atoms[l].polar ==0) continue;
+                    if ((i==k && j>=l)) continue; // don't do self, or double count.
+                    double* distances = getDistanceXYZ(system, i,j,k,l);
+                    r = distances[3];
+                    if (r <= rmin) {
+                        system.molecules[i].atoms[j].rank_metric += 1.0;
+                        system.molecules[k].atoms[l].rank_metric += 1.0;
+                        hits++;
+                    }
+                    paircount++;   
+                } // l
+            } // k
+        } // j
+    } // i end rank metric determination
+    system.constants.all_pbc = 1; // reset PBC.
+    
+//    int atom=0;
+  //  for (i=0; i<system.molecules.size(); i++) {
+    //    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+      //      printf("atom %i rank_metric %f hits %i pc %i\n",atom, system.molecules[i].atoms[j].rank_metric,hits,paircount);
+        //    atom++;
+        //} // j
+   // } // i 
+
+
     /* rank the dipoles by bubble sort */
-    if (system.constants.polar_gs_ranked) {
         for(i = 0; i < N; i++) {
             for(j = 0, sorted = 1; j < (N-1); j++) {
 
@@ -210,7 +264,12 @@ void update_ranking (System &system, int * ranked_array ) {
             }
             if(sorted) break;
         }
-    }
+
+
+    //for (int n=0; n<N; n++) {
+     //   int ni=system.atommap[n][0]; int nj=system.atommap[n][1];
+       // printf("ranked_array[%i] = %i rm %f\n", n, ranked_array[n], system.molecules[ni].atoms[nj].rank_metric);
+    //}
 
 	return;
 }
