@@ -99,7 +99,12 @@ elif [[ "$option" == "mpi" ]]; then
     #mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
 elif [[ "$option" == "omp" ]]; then 
     echo "Doing OpenMP compilation"
-    /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
+    if [[ "$2" == "linux" ]]; then
+        echo "... for linux."
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp
+    else 
+        /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
+    fi
 fi
 
 echo "...done. Have a nice day."
