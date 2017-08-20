@@ -31,6 +31,8 @@ elif [ $1 == "gpu" ]; then
     option="gpu";
 elif [ $1 == "mpi" ]; then
     option="mpi"
+elif [ $1 == "omp" ]; then
+    option="omp"
 else
 echo "Invalid options detected. Not compiling. Read the header comments for compilation examples."
 fi
@@ -90,12 +92,14 @@ elif [[ "$option" == "icpu" ]]; then
     else
         icpc --std=c++11 -fast -unroll-aggressive -O3 -o ../mcmd main.cpp
     fi
-
 elif [[ "$option" == "mpi" ]]; then
     # MPI compilation
     echo "MPI is not implemented in MCMD as of now."
     #echo "Doing MPI compilation (for parallel implementation)"
     #mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
+elif [[ "$option" == "omp" ]]; then 
+    echo "Doing OpenMP compilation"
+    /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
 fi
 
 echo "...done. Have a nice day."
