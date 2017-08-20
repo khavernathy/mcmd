@@ -15,8 +15,10 @@ FileIO::FileIO(QObject *parent) :
 
 }
 
-QString FileIO::read()
+QString FileIO::read(const QString& data)
 {
+    mSource = data+"/runlog.log";
+    /*
     // dynamically find the home directory (based on Linux or Mac)
     QString homeDir;
     string linuxcheck="/proc/cpuinfo";
@@ -35,6 +37,7 @@ QString FileIO::read()
         }
 
         mSource = homeDir + "/mcmd/testzone/runlog.log";
+    */
 
     if (mSource.isEmpty()){
         emit error("source is empty");
@@ -88,15 +91,16 @@ QString FileIO::read()
 
         file.close();
     } else {
-        emit error("Unable to open the file");
+        emit error("Unable to open the runlog file "+mSource);
         return QString();
     }
     return fileContent;
 }
 
-QString FileIO::read_gr() {
+QString FileIO::read_gr(const QString& data) {
 
-    mgrSource = "/home/khavernathy/mcmd/src/build-gui_mcmd-Desktop_Qt_5_9_1_GCC_64bit-Debug/radial_distribution.dat0";
+    mgrSource = data + "/radial_distribution.dat0";
+    //mgrSource = "/home/khavernathy/mcmd/src/build-gui_mcmd-Desktop_Qt_5_9_1_GCC_64bit-Debug/radial_distribution.dat0";
     //mgrSource = mworkingDir + "/radial_distribution.dat0";
     //mgrSource = qApp->applicationDirPath() + "/radial_distribution.dat0";
     if (mgrSource.isEmpty()){
@@ -115,22 +119,22 @@ QString FileIO::read_gr() {
         } while (!line.isNull());
         file.close();
     } else {
-        emit error("Unable to open the g(r) file");
+        emit error("Unable to open the g(r) file "+mgrSource);
         return QString();
     }
     return fileContent;
 }
 
-QString FileIO::read_other(const QString& data) {
-    motherSource = data;
-    motherSource.remove(0,7); // truncate "file://"
+QString FileIO::read_input(const QString& data) {
+    minputSource = data;
+    minputSource.remove(0,7); // truncate "file://"
 
-    if (motherSource.isEmpty()){
+    if (minputSource.isEmpty()){
         emit error("source is empty");
         return QString();
     }
 
-    QFile file(motherSource);
+    QFile file(minputSource);
     QString fileContent;
     if ( file.open(QIODevice::ReadOnly) ) {
         QString line;
@@ -141,7 +145,7 @@ QString FileIO::read_other(const QString& data) {
         } while (!line.isNull());
         file.close();
     } else {
-        emit error("Unable to open the file"+motherSource);
+        emit error("Unable to open the file"+minputSource);
         return QString();
     }
     return fileContent;
@@ -150,10 +154,10 @@ QString FileIO::read_other(const QString& data) {
 
 bool FileIO::write(const QString& data)
 {
-    if (motherSource.isEmpty())
+    if (minputSource.isEmpty())
         return false;
 
-    QFile file(motherSource);
+    QFile file(minputSource);
     if (!file.open(QFile::WriteOnly | QFile::Truncate))
         return false;
 
@@ -165,7 +169,7 @@ bool FileIO::write(const QString& data)
     return true;
 }
 
-int FileIO::startSimulation(const QString& data)
+int FileIO::startSimulation(const QString& data, const QString& data2)
 {
     string homeDir;
     string linuxcheck="/proc/cpuinfo";
@@ -186,6 +190,7 @@ int FileIO::startSimulation(const QString& data)
     //string commandString = homeDir+"/mcmd/mcmd "+homeDir+"/mcmd/testzone/mcmd.inp | tee "+homeDir+"/mcmd/testzone/runlog.log &";
     // dev/null is important to supress MCMD output in Qt Application Output
     string filename = data.toStdString();
+    string runlogFile = data2.toStdString() + "/runlog.log";
     string placeholder = filename;
 
     // determine working directory at location of input file.
@@ -206,7 +211,7 @@ int FileIO::startSimulation(const QString& data)
     // write it to a runlog in working dir.
     string cdString = "cd "+workingDir;
     system(cdString.c_str());
-    string commandString = homeDir+"/mcmd/mcmd "+filename+" | tee "+workingDir+"runlog.log >/dev/null &";
+    string commandString = homeDir+"/mcmd/mcmd "+filename+" | tee "+runlogFile+" >/dev/null &";
     // RUN MCMD
     system(commandString.c_str());
     return 0;

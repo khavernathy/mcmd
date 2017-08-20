@@ -17,10 +17,10 @@ public:
                READ grSource
                WRITE setgrSource
                NOTIFY grSourceChanged)
-    Q_PROPERTY(QString otherSource
-               READ otherSource
-               WRITE setOtherSource
-               NOTIFY otherSourceChanged)
+    Q_PROPERTY(QString inputSource
+               READ inputSource
+               WRITE setinputSource
+               NOTIFY inputSourceChanged)
     Q_PROPERTY(int linecount
                READ linecount
                WRITE setLinecount
@@ -40,17 +40,17 @@ public:
     explicit FileIO(QObject *parent = 0);
 
     // functions
-    Q_INVOKABLE QString read();
-    Q_INVOKABLE QString read_gr();
-    Q_INVOKABLE QString read_other(const QString& data);
-    Q_INVOKABLE int startSimulation(const QString& data);
+    Q_INVOKABLE QString read(const QString& data);
+    Q_INVOKABLE QString read_gr(const QString& data);
+    Q_INVOKABLE QString read_input(const QString& data);
+    Q_INVOKABLE int startSimulation(const QString& data, const QString& data2);
     Q_INVOKABLE int killSimulation(const QString& data);
     Q_INVOKABLE bool write(const QString& data);
 
     // local objects
     QString source() { return mSource; };
     QString grSource() { return mgrSource; };
-    QString otherSource() { return motherSource; };
+    QString inputSource() { return minputSource; };
     int linecount() { return mLinecount; };
     QString homeDir() { return mHomedir; };
     QString workingDir() { return mworkingDir; };
@@ -62,7 +62,7 @@ public slots:
     void setLinecount(int& linecount) { mLinecount = linecount; };
     void setHomeDir(const QString& homeDir) { mHomedir = homeDir; };
     void setgrSource(const QString& grSource) { mgrSource = grSource; };
-    void setOtherSource(const QString& otherSource) { motherSource = otherSource; };
+    void setinputSource(const QString& inputSource) { minputSource = inputSource; };
     void setWorkingDir(const QString& workingDir) { mworkingDir = workingDir; };
     void setMode(const QString& mode) { mmode = mode; };
 
@@ -70,7 +70,7 @@ public slots:
 signals:
     void sourceChanged(const QString& source);
     void grSourceChanged(const QString& grSource);
-    void otherSourceChanged(const QString& otherSource);
+    void inputSourceChanged(const QString& inputSource);
     void linecountChanged(int& linecount);
     void homeDirChanged(const QString& homeDir);
     void workingDirChanged(const QString& workingDir);
@@ -80,7 +80,7 @@ signals:
 private:
     QString mSource;
     QString mgrSource;
-    QString motherSource;
+    QString minputSource;
     QString mworkingDir;
     QString mmode; // "mc" or "md"
 

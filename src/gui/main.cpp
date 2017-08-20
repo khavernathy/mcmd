@@ -4,6 +4,7 @@
 #include <QQmlApplicationEngine>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QWindow>
 //#include <QFileDialog>
 
 #include "backend.h"
@@ -43,6 +44,10 @@ int main(int argc, char *argv[])
 
     // go
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
+
+    QWindow *window = qobject_cast<QWindow*>(engine.rootObjects()[0]);
+    window->setProperty("exePath", qApp->applicationDirPath());
+
     if (engine.rootObjects().isEmpty())
         return -1;
     return app.exec();

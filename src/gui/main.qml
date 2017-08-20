@@ -14,6 +14,7 @@ import FileIO 1.0
 
 ApplicationWindow {
     id: root
+    property string exePath
     visible: true
     width: 1440
     height: 900
@@ -68,10 +69,10 @@ ApplicationWindow {
                         MenuItem {
                             text: "Save ..."
                             onTriggered: {
-                                if (fileIO.otherSource !== "")
-                                    fileIO.write(inputFileText.text); // auto-writes to "motherSource", the file that was opened.
+                                if (fileIO.inputSource !== "")
+                                    fileIO.write(inputFileText.text); // auto-writes to "minputSource", the file that was opened.
                                 else
-                                    console.log("ERROR: otherSource not defined, so the file was not saved.");
+                                    console.log("ERROR: inputSource not defined, so the file was not saved.");
                             }
                         }
 
@@ -81,7 +82,7 @@ ApplicationWindow {
                             folder: "/home/"
                             onAccepted: {
                                 console.log("you chose: "+openDialog.currentFile);
-                                inputFileText.text = fileIO.read_other(openDialog.currentFile);
+                                inputFileText.text = fileIO.read_input(openDialog.currentFile);
                             }
                             onRejected: {
                                 console.log("Canceled.");
@@ -98,8 +99,8 @@ ApplicationWindow {
                     text: "Start"
                     onClicked: {
                         if (switcher == "off") {
-                            if (fileIO.otherSource !== "") {
-                                console.log("starting MCMD using input file: "+fileIO.otherSource);
+                            if (fileIO.inputSource !== "") {
+                                console.log("starting MCMD using input file: "+fileIO.inputSource);
                                 // clear all graphs before (re-)starting
                                 pol_line.clear(); es_line.clear(); rd_line.clear(); totalu_line.clear();
                                 qst_line.clear(); n_line.clear(); navg_line.clear();
@@ -110,7 +111,7 @@ ApplicationWindow {
                                 gr_line.clear();
 
                                 // go go go
-                                fileIO.startSimulation(fileIO.otherSource);
+                                fileIO.startSimulation(fileIO.inputSource, exePath);
                                 timer.timerCondition = 1;
                                 switcher = "on";
                                 statustext.statusvar = "Running...";
@@ -119,7 +120,7 @@ ApplicationWindow {
                                 console.log("ERROR: No input file selected for simulation...");
                             }
                         } else {
-                            fileIO.killSimulation(fileIO.otherSource);
+                            fileIO.killSimulation(fileIO.inputSource);
                             timer.timerCondition = 0;
                             switcher = "off";
                             statustext.statusvar = "Stopped.";
@@ -129,42 +130,52 @@ ApplicationWindow {
                     }
                 } // end button2
                 Text {
+                    id: dataLocationText
+                    width: root.width - button1.width - button2.width - runlogScrollerHolder.width
+                    text: "Data will be written to: \n"+exePath
+                    anchors.left: button2.right
+                }
+
+                Text {
                     id: statustext
                     property string statusvar: "Waiting for input..."
                     anchors.top: button1.bottom
                     text: "Status: "+statusvar
                 }
                 Rectangle {
-                    id: runlogScrollerHolder
+                    id: inputFileHolder
                     anchors.top: statustext.bottom
                     width: parent.width
                     height: parent.height - button1.height - statustext.height
-                    color: "black"
+                    color: "grey"
                     ScrollView {
-                        id: runlogCurrentScroller
+                        id: inputFileScroller
                         anchors.fill: parent
                         TextArea {
-                            id: runlogCurrent
+                            id: inputFileText
                             font.family: "monospace"
                             color: "green"
-                            text: "Runlog will go here..."
+
                         }
                     }
                 }
             } // end column1 rectangle
             Rectangle {
-                id: column2
+                id: runlogScrollerHolder
                 color: "black"
                 width: parent.width/2
                 height: parent.height
                 anchors.left: column1.right
+                border.color: "green"
+                border.width: 5
                 ScrollView {
-                    id: inputFileScroller
+                    id: runlogCurrentScroller
                     anchors.fill: parent
                     TextArea {
-                        id: inputFileText
+                        id: runlogCurrent
                         color: "white"
                         cursorVisible: activeFocus
+                        text: "Runlog will go here..."
                     }
                 }
             }
@@ -180,7 +191,7 @@ ApplicationWindow {
 
                 onTriggered: {
                     console.time("entire");
-                    var newText = fileIO.read();
+                    var newText = fileIO.read(exePath);
 
                     //scroller.position = (outputText.contentHeight - outputPage.height)/outputText.contentHeight;
                     //runlogCurrentScroller.position = runlogCurrent.contentHeight - runlogScrollerHolder.height;
@@ -324,7 +335,7 @@ ApplicationWindow {
                         }
                         // radial distribution stuff
                         gr_line.clear();
-                        var grdata = fileIO.read_gr();
+                        var grdata = fileIO.read_gr(exePath);
                         var gr_lines = grdata.split("\n");
                         for (var i=1; i<gr_lines.length; i++) { // skipping i=0 first line
                             var splitarr = gr_lines[i].split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
