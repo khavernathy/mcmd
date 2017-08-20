@@ -57,3 +57,5 @@ src/build-*
 src/gui/build-*
 src/gui/*.o
 src/gui/gui_mcmd.pro.user.*
+src/buildgui
+
