@@ -32,14 +32,12 @@ Take a look at mcmd/src/compile.sh for different options in compilation (OS-spec
 Douglas Franz: dfranz@mail.usf.edu
 
 # Features
-MCMD has several features that make simulation easier for the user:<br />
-&emsp;-> MC supports NPT, NVT, NVE, uVT ensembles.  <br />
-&emsp;-> MD supports NVT, NVE, and uVT ensembles.  <br />
-&emsp;->Automatic radial distribution calculator<br />
-&emsp;->Pre-programmed sorbate models for easy input, including multi-sorbate support<br />
-&emsp;->Easy system basis parametrization via a,b,c,alpha,beta,gamma crystal values<br />
-&emsp;->Quick routines for energy computation<br />
-&emsp;->Faster than most serial MC/MD programs to-date<br />
+&emsp;-> Monte Carlo simulation in NPT, NVT, NVE, and uVT ensembles.  <br />
+&emsp;-> Molecular Dynamics simulation in NVT, NVE, and uVT ensembles.  <br />
+&emsp;-> Automatic radial distribution calculator<br />
+&emsp;-> Hard-coded molecular models for easy input, including multi-sorbate support<br />
+&emsp;-> Easy system basis parametrization via a, b, c, alpha, beta, gamma crystal values, or basis vectors<br />
+&emsp;-> Quick routines for energy/force computation<br />
 &emsp;-> Simulated annealing<br />
 &emsp;-> Any periodic cell is supported for both MC and MD; non-periodic systems also supported.<br />
 &emsp;-> Force-fields available are Lennard-Jones (12-6), Ewald electrostatics, and Thole-Applequist polarization.<br />
@@ -47,15 +45,12 @@ MCMD has several features that make simulation easier for the user:<br />
 
 # What can be obtained from this software
 The program outputs several quantities of interest:<br />
-&emsp;->Uptake of sorbates in wt%, reduced wt%, cm^3/g and mmol/g (MC)<br />
+&emsp;->Uptake of sorbates in wt%, reduced wt%, cm^3/g, mmol/g and mg/g (MC)<br />
 &emsp;->Excess adsorption ratio in mg/g (MC)<br />
 &emsp;->Selectivities for multi-sorbate simulation (MC)<br />
 &emsp;->Qst (heat of sorption) for sorbate (MC)<br />
 &emsp;->Sorbate occupation about some site/atom (g(r)) (MC)<br />
-&emsp;->Compressibility factor Z for homogenous gases as indicator of ideality (MC)<br />
-&emsp;->Monte Carlo statistics (accepted moves, Boltzmann Factor and Acceptance Ratios) (MC)<br />
 &emsp;->Diffusion coefficient and specific heat (MD)<br />
-&emsp;->Emergent pressure approximation (MD)<br />
 &emsp;->Trajectory and restart files to easily pickup a halted job and visualize simulation<br />
 &emsp;->3D histogram data for visualization of sorbate occupation in a material (density visualization).<br />
 &emsp;->Induced dipole strengths for polarization simulations<br />
