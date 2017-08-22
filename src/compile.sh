@@ -7,16 +7,21 @@
 # e.g.
 #
 # bash compile.sh               Defaults to cpu compilation
-# bash compile.sh cpu           (for a single computer on Mac or Linux)
+# bash compile.sh cpu           (same result; for a single computer on Mac or Linux)
 # bash compile.sh cpu linux     (optimized for linux (ONLY))
 # bash compile.sh cpu windows   (for use on Windows ONLY -- you must have gcc installed, e.g. through Cygwin)
 # bash compile.sh cpu debug     (same but with errors/warnings)
-# bash compile.sh cpu circe     (for CIRCE)
-# bash compile.sh cpu bridges   (for bridges)
+# bash compile.sh cpu circe     (for CIRCE (HPC at USF))
+# bash compile.sh cpu bridges   (for bridges (HPC at UPitt)
+
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
-# bash compile.sh gpu           (for a single computer with GPU functions with NVIDIA CUDA installed).
+
+# bash compile.sh gpu           (for a single computer with CUDA compatible GPU installed).
 # bash compile.sh gpu debug     (for GPU compilation with errors)
-# bash compile.sh gpu circe     (CUDA GPU on circe)
+# bash compile.sh gpu circe     (CUDA GPU on circe HPC)
+
+# bash compile.sh omp           (including OpenMP support)
+# bash compile.sh omp linux     (same, optimized for Linux)
 ##########################
 ###echo "This should take like 10 sec."
 
