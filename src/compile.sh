@@ -20,8 +20,6 @@
 # bash compile.sh gpu debug     (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe HPC)
 
-# bash compile.sh omp           (including OpenMP support)
-# bash compile.sh omp linux     (same, optimized for Linux)
 ##########################
 ###echo "This should take like 10 sec."
 
@@ -106,13 +104,15 @@ elif [[ "$option" == "mpi" ]]; then
     #mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
 #######################################################################
 elif [[ "$option" == "omp" ]]; then 
-    echo "Doing OpenMP compilation"
-    if [[ "$2" == "linux" ]]; then
-        echo "... for linux."
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
-    else 
-        /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
-    fi
+    # OpenMP compilation
+    echo "OpenMP is not implemented in MCMD as of now."
+    #echo "Doing OpenMP compilation"
+    #if [[ "$2" == "linux" ]]; then
+    #    echo "... for linux."
+    #    g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
+    #else 
+    #    /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
+    #fi
 fi
 
 echo "...done. Have a nice day."

@@ -40,10 +40,10 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     //system.checkpoint("end RD");
 
     //system.checkpoint("starting ES energy calculation");
-    #pragma omp parallel //num_threads(4)
-    {
-    #pragma omp sections
-    {
+    //#pragma omp parallel //num_threads(4)
+    //{
+    //#pragma omp sections
+    //{
     // ELECTROSTATIC
     if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
 
@@ -57,7 +57,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     //system.checkpoint("end ES");
 
     //system.checkpoint("starting Polarization energy calculation.");
-    #pragma omp section
+    //#pragma omp section
     // POLARIZATION
     if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR) {
 
@@ -68,8 +68,8 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
 
     }
     //system.checkpoint("end Polar");
-  } // omp sections
-  } // omp parallel
+  //} // omp sections
+  //} // omp parallel
 
 }
 // ==========================================================================
