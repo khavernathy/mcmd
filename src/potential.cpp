@@ -15,7 +15,9 @@
 
 // =================== MAIN FUNCTION ======================
 // ---------------POTENTIAL OF ENTIRE SYSTEM --------------
+
 double getTotalPotential(System &system) {
+    system.checkpoint("started getTotalPotential()");
     int_fast8_t model = system.constants.potential_form;
     // compute all interaction distances
     //make_pairs(system);
@@ -27,28 +29,48 @@ double getTotalPotential(System &system) {
 
 // =========================================================================
 if (system.molecules.size() > 0) { // don't bother with 0 molecules!
-    system.checkpoint("starting RD energy calculation.");
+    //system.checkpoint("starting RD energy calculation.");
+
     // REPULSION DISPERSION.
     if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR) {
         total_rd = lj(system);
     } else if (model == POTENTIAL_COMMY || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
         total_rd = commy(system);
     }
-    if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
-    system.checkpoint("starting ES energy calculation");
+    //system.checkpoint("end RD");
+
+    //system.checkpoint("starting ES energy calculation");
+    #pragma omp parallel
+    {
+    #pragma omp sections
+    {
     // ELECTROSTATIC
     if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
-        if (system.constants.ewald_es)
-            total_es = coulombic_ewald(system); // using ewald method for es
-        else
-            total_es = coulombic(system); // plain old coloumb
+
+        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
+            if (system.constants.ewald_es)
+                total_es = coulombic_ewald(system); // using ewald method for es
+            else
+                total_es = coulombic(system); // plain old coloumb
+        }
     }
-    system.checkpoint("starting Polarization energy calculation.");
+    //system.checkpoint("end ES");
+
+    //system.checkpoint("starting Polarization energy calculation.");
+    #pragma omp section
     // POLARIZATION
     if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR) {
-        total_polar = polarization(system); // yikes
+
+        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
+
+                total_polar = polarization(system); // yikes
+        }
+
     }
-    }
+    //system.checkpoint("end Polar");
+  } // omp sections
+  } // omp parallel
+
 }
 // ==========================================================================
 
@@ -61,5 +83,6 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     system.stats.potential.value = total_potential;
 
 //    printf("MC STEP %i ::: rd %f es %f pol %f tot %f\n", system.stats.MCstep, total_rd, total_es, total_polar, total_potential);
+  system.checkpoint("ended getTotalPotential()");
 	return total_potential;
 }
