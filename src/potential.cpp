@@ -40,7 +40,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     //system.checkpoint("end RD");
 
     //system.checkpoint("starting ES energy calculation");
-    #pragma omp parallel
+    #pragma omp parallel //num_threads(4)
     {
     #pragma omp sections
     {

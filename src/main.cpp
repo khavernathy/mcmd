@@ -35,6 +35,9 @@
 #ifdef MPI
     #include <mpi.h>
 #endif
+#ifdef OMP
+    #include "omp.h"
+#endif
 #include "usefulmath.cpp"
 #include "classes.cpp"
 #include "system.cpp"

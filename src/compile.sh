@@ -65,7 +65,7 @@ if [[ "$option" == "cpu" ]]; then
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
     fi
-
+######################################################################
 elif [[ "$option" == "gpu" ]]; then
     # GPU compilation enabled
     echo "Doing serial GCC (1 processor) compilation including CUDA GPU routines"
@@ -81,6 +81,7 @@ elif [[ "$option" == "gpu" ]]; then
     else
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     fi
+########################################################################
 elif [[ "$option" == "icpu" ]]; then
     # CPU compilation using Intel
     echo "Doing serial Intel (1 proc.) compilation for CPU"
@@ -92,16 +93,18 @@ elif [[ "$option" == "icpu" ]]; then
     else
         icpc --std=c++11 -fast -unroll-aggressive -O3 -o ../mcmd main.cpp
     fi
+#######################################################################
 elif [[ "$option" == "mpi" ]]; then
     # MPI compilation
     echo "MPI is not implemented in MCMD as of now."
     #echo "Doing MPI compilation (for parallel implementation)"
     #mpic++ main.cpp -lm -o ../mcmd -I. -std=c++11 -D MPI -Ofast
+#######################################################################
 elif [[ "$option" == "omp" ]]; then 
     echo "Doing OpenMP compilation"
     if [[ "$2" == "linux" ]]; then
         echo "... for linux."
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
     else 
         /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
     fi

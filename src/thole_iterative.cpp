@@ -212,7 +212,6 @@ void update_ranking (System &system, int * ranked_array ) {
     
 
     // set rank metrics
-    system.constants.all_pbc = 0; // temporary for r ranking
     int hits=0;
     int paircount=0;
     for (i=0; i<system.molecules.size(); i++) {
@@ -234,7 +233,6 @@ void update_ranking (System &system, int * ranked_array ) {
             } // k
         } // j
     } // i end rank metric determination
-    system.constants.all_pbc = 1; // reset PBC.
     
 //    int atom=0;
   //  for (i=0; i<system.molecules.size(); i++) {
