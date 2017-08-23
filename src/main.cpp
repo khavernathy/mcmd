@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <chrono>
+#include <sys/stat.h>
 //#include <float.h>
 
 // Windows compilation (c11 instead of c++) doesn't auto-define pi.
@@ -126,7 +127,20 @@ int main(int argc, char **argv) {
     System system;
 	system.checkpoint("setting up system with main functions...");
     readInput(system, argv[1]); // executable takes the input file as only argument.
-	readInAtoms(system, system.constants.atom_file);
+	if (system.constants.restart_mode) {
+        // restarting an old job. Make a new saved_data folder e.g. "saved_data4" then overwrite the input file.
+        int save_folder_number=1;
+        struct stat sb;
+        string folder_name = "saved_data"+to_string(save_folder_number);
+        while (stat(folder_name.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            save_folder_number++;
+            folder_name = "saved_data"+to_string(save_folder_number);
+        }
+        string command = "mkdir "+folder_name+"; cp * "+folder_name+"; cp restart.pdb "+system.constants.atom_file.c_str();
+        int whatever=std::system(command.c_str());
+        printf("RESTARTING previous job from input atoms contained in %s/restart.pdb\n",folder_name.c_str());
+    }
+    readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);
 	if (system.constants.autocenter)
         centerCoordinates(system);

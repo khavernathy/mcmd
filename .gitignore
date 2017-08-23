@@ -58,4 +58,5 @@ src/gui/build-*
 src/gui/*.o
 src/gui/gui_mcmd.pro.user.*
 src/buildgui
-
+saved_data
+saved_data/*

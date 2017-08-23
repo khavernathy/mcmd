@@ -858,6 +858,10 @@ void readInput(System &system, char* filename) {
 				system.constants.jobname = lc[1].c_str();
 				std::cout << "Got job name = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(),"restart")) {
+                system.constants.restart_mode = 1;
+                std::cout << "Got restart option = " << lc[1].c_str(); printf("\n");
+
 			} else if (!strcasecmp(lc[0].c_str(), "mode")) {
 				system.constants.mode = lc[1].c_str();
 				std::cout << "Got mode = " << lc[1].c_str(); printf("\n");
@@ -1578,6 +1582,10 @@ void inputValidation(System &system) {
     }
     if (system.constants.crystalbuild && ((system.constants.crystalbuild_x == 1 && system.constants.crystalbuild_y ==1 && system.constants.crystalbuild_z == 1) || (system.constants.crystalbuild_x < 1 || system.constants.crystalbuild_y < 1 || system.constants.crystalbuild_z < 1) )) {
         std::cout << "ERROR: You turned the crystal-builder on but did not specify a (correct) dimension to duplicate. e.g., `crystalbuild_y 2` is acceptable but `crystalbuild_y 0` is not. Leave the option off if you don't want to use it. (i.e. x y z are set to 1 by default).";
+        exit(EXIT_FAILURE);
+    }
+    if (e == ENSEMBLE_UVT && system.stats.count_movables <= 0 && system.constants.sorbate_name.size() ==0) {
+        std::cout << "ERROR: You specified uVT with a system containing no movable molecules and did not specify a desired sorbate. Try `sorbate_name h2_bssp`, for example.";
         exit(EXIT_FAILURE);
     }
 
