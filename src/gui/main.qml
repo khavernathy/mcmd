@@ -83,6 +83,7 @@ ApplicationWindow {
                             onAccepted: {
                                 console.log("you chose: "+openDialog.currentFile);
                                 inputFileText.text = fileIO.read_input(openDialog.currentFile);
+
                             }
                             onRejected: {
                                 console.log("Canceled.");
@@ -110,6 +111,26 @@ ApplicationWindow {
                                 msd_line.clear();
                                 gr_line.clear();
 
+                                // save simulation input parameters
+                                var allLines = inputFileText.text.split("\n"); //var allLines = newText.split("\n")
+                                //console.log(allLines);
+                                for (var i=0; i<allLines.length; i++) {
+                                    if (allLines[i] === "") continue;
+                                    var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );
+                                    console.log(thisLine);
+                                    if (thisLine.indexOf("mode") !== -1) {
+                                        var mode=thisLine[1];
+                                        if (mode === "mc") {
+                                            mdgraphspage.visible = false;
+                                            mdtab.visible = false;
+                                        } else if (mode === "md") {
+                                            mcgraphspage.visible = false;
+                                            mctab.visible = false;
+                                        }
+                                    }
+
+                                }
+
                                 // go go go
                                 fileIO.startSimulation(fileIO.inputSource, exePath);
                                 timer.timerCondition = 1;
@@ -124,6 +145,8 @@ ApplicationWindow {
                             timer.timerCondition = 0;
                             switcher = "off";
                             statustext.statusvar = "Stopped.";
+                            mdtab.visible=true; mdgraphspage.visible=true;
+                            mctab.visible=true; mcgraphspage.visible=true;
 
                             this.text = "Start";
                         }
@@ -147,7 +170,7 @@ ApplicationWindow {
                     anchors.top: statustext.bottom
                     width: parent.width
                     height: parent.height - button1.height - statustext.height
-                    color: "grey"
+                    color: "#efefef"
                     ScrollView {
                         id: inputFileScroller
                         anchors.fill: parent
@@ -1011,7 +1034,6 @@ ApplicationWindow {
                 }
             }
         } // end p4
-
         Page {
             Label {
                 text: qsTr("more stuff, 5th")
@@ -1026,12 +1048,15 @@ ApplicationWindow {
             text: qsTr("Input setup")
         }
         TabButton {
+            id: mctab
             text: qsTr("MC plots")
         }
         TabButton {
+            id: mdtab
             text: qsTr("MD plots")
         }
         TabButton {
+            id: grtab
             text: qsTr("g(r) plots")
         }
         TabButton {
