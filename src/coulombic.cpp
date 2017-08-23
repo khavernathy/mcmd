@@ -68,11 +68,11 @@ double coulombic_self(System &system) {
             if (!system.molecules[i].atoms[j].frozen &&
                 system.molecules[i].atoms[j].C != 0) {
                 charge = system.molecules[i].atoms[j].C; 
-                potential -= alpha* charge * charge / sqrtPI; 
+                potential += charge * charge ; 
             }        
         } // end for atom i in molecule j
     } // end for molecule j
-
+        potential *= -alpha/sqrtPI;
     } // end if re-calculate
     else {
         potential = system.stats.es_self.value;
