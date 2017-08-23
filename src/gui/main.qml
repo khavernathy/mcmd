@@ -41,8 +41,6 @@ ApplicationWindow {
         onCurrentIndexChanged: {
             //myText.text = myFile.read();
         }
-
-
         Page { // 1 :: Input stuff
             id: pg1
             Rectangle {
@@ -111,13 +109,13 @@ ApplicationWindow {
                                 msd_line.clear();
                                 gr_line.clear();
 
-                                // save simulation input parameters
+                                // save simulation INPUT parameters
                                 var allLines = inputFileText.text.split("\n"); //var allLines = newText.split("\n")
                                 //console.log(allLines);
                                 for (var i=0; i<allLines.length; i++) {
                                     if (allLines[i] === "") continue;
                                     var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );
-                                    console.log(thisLine);
+                                    //console.log(thisLine);
                                     if (thisLine.indexOf("mode") !== -1) {
                                         var mode=thisLine[1];
                                         if (mode === "mc") {
@@ -127,7 +125,19 @@ ApplicationWindow {
                                             mcgraphspage.visible = false;
                                             mctab.visible = false;
                                         }
+                                    } else if (thisLine.indexOf("sorbate_name") !== -1) {
+                                        if (mode==="mc") {
+                                            for (var x=1; x<thisLine.length; x++) {
+                                                nchart.createSeries(ChartView.SeriesTypeLine, thisLine[x], nchart.axisX(n_line));
+                                                nchart.createSeries(ChartView.SeriesTypeLine, thisLine[x]+" avg.", nchart.axisX(navg_line));
+                                            }
+                                        } else if (mode==="md") {
+                                            for (var x=1; x<thisLine.length; x++) {
+                                                diffusionchart.createSeries(ChartView.SeriesTypeLine, thisLine[x], diffusionchart.axisX(diff_line));
+                                            }
+                                        }
                                     }
+
 
                                 }
 
@@ -197,6 +207,8 @@ ApplicationWindow {
                     TextArea {
                         id: runlogCurrent
                         color: "white"
+                        font.family: "monospace"
+                        font.pointSize: 10
                         cursorVisible: activeFocus
                         text: "Runlog will go here..."
                     }
