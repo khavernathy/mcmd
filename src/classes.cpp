@@ -177,7 +177,7 @@ class Constants {
         double initial_energy=0.0; // "" ""
 
         // Ewald (for ES)
-        double ewald_alpha; // =3.5/cutoff;
+        double ewald_alpha; // =3.5/cutoff; Really, sqrt(alpha), by Ewald formula.
         double ewald_kmax = 7;
 
         // Wolf (for polarization)
