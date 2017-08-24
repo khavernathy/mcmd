@@ -688,6 +688,7 @@ class Molecule {
         double ang_acc[3] = {0,0,0};
         double old_ang_acc[3] = {0,0,0};
         double ang_pos[3] = {0,0,0};
+        
         //double d_theta[3] = {0,0,0};
         //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
@@ -714,6 +715,7 @@ class Molecule {
                 ang_pos[n]=0;
                 //d_theta[n]=0;
             }
+            for (int n=0;n<4;n++) q[n]=qv[n]=qa[n]=0;
             name = "";
             PDBID=0;
             frozen = 0; // movable
@@ -753,6 +755,92 @@ class Molecule {
             for (int n=0;n<6;n++) inertia_tensor[n] = inertia_tensor[n]/1.3806488e-23/1e20*1e30; // to K fs^2
         }
 
+
+        // quaternion rotational md
+        // Rapaport p194
+        // quaternions for rotational MD of rigid bodies.
+        double qa[4] = {0,0,0,0};
+        double q[4] = {0,0,0,0};
+        double qv[4] = {0,0,0,0};
+        double rMat[9] = {0,0,0,0,0,0,0,0,0};
+
+        void calc_q_acc() {
+            // checked
+            double s1,s2,s3,s4;
+            double w[3]; for (int n=0;n<3;n++) w[n] = ang_vel[n];
+
+            s1 = (torque[0] + (inertia_tensor[1] - inertia_tensor[2])*w[1]*w[2]) / inertia_tensor[0];
+            s2 = (torque[1] + (inertia_tensor[2] - inertia_tensor[0])*w[2]*w[0]) / inertia_tensor[1];
+            s3 = (torque[2] + (inertia_tensor[0] - inertia_tensor[1])*w[0]*w[1]) / inertia_tensor[2];
+            s4 = -2. * (qv[0]*qv[0] + qv[1]*qv[1] + qv[2]*qv[2] + qv[3]*qv[3]);
+
+            qa[0] = 0.5 * ( q[3] * s1 - q[2] * s2 + q[1] * s3 + q[0] * s4);
+            qa[1] = 0.5 * ( q[2] * s1 + q[3] * s2 - q[0] * s3 + q[1] * s4);
+            qa[2] = 0.5 * (-q[1] * s1 + q[0] * s2 + q[3] * s3 + q[2] * s4);
+            qa[3] = 0.5 * (-q[0] * s1 - q[1] * s2 - q[2] * s3 + q[3] * s4);            
+
+        }
+
+        void calc_ang_vel_q() {
+            // w = 2 times qv times q*. checked
+            ang_vel[0] = 2. * ( q[3] * qv[0] + q[2] * qv[1] - q[1] * qv[2] - q[0] * qv[3]);
+            ang_vel[1] = 2. * (-q[2] * qv[0] + q[3] * qv[1] + q[0] * qv[2] - q[1] * qv[3]);
+            ang_vel[2] = 2. * ( q[1] * qv[0] - q[0] * qv[1] + q[3] * qv[2] - q[2] * qv[3]);
+        }
+
+        void calc_torque() {
+            for (int n=0; n<3; n++) torque[n] = 0.0;
+            // torque is the cross product rxF NOT Fxr, the sum of all atoms relative to molecule's com.
+            for (int i=0; i<atoms.size(); i++) {
+                atoms[i].torque[0] = (atoms[i].pos[1]-com[1]) * atoms[i].force[2] - (atoms[i].pos[2]-com[2]) * atoms[i].force[1];
+                atoms[i].torque[1] = (atoms[i].pos[2]-com[2]) * atoms[i].force[0] - (atoms[i].pos[0]-com[0]) * atoms[i].force[2];
+                atoms[i].torque[2] = (atoms[i].pos[0]-com[0]) * atoms[i].force[1] - (atoms[i].pos[1]-com[1]) * atoms[i].force[0];
+                // molecular torque = sum of atomic torques
+                for (int n=0; n<3; n++) torque[n] += atoms[i].torque[n]; // in K
+            } // end atomic loop
+            build_rot_matrix(0);
+
+        
+        } // end calc_torque()
+
+        void build_rot_matrix(int transpose) {
+            double p[10];
+            int k,k1,k2; k=0;
+            for (k2=1; k2<=4; k2++) {
+                for (k1=k2; k1<=4; k1++) {
+                    k=k+1; p[k] = 2. * q[k1-1] * q[k2-1];
+                }
+            }
+
+            rMat[0] = p[0] + p[9] - 1.; rMat[1] = p[1] + p[8];
+            rMat[2] = p[2] - p[6];      rMat[3] = p[1] - p[8];
+            rMat[4] = p[4] + p[9] - 1.; rMat[5] = p[5] + p[3];
+            rMat[6] = p[2] + p[6];      rMat[7] = p[5] - p[3];
+            rMat[8] = p[7] + p[9] - 1.;
+            
+            if (transpose) {
+                double tmp;
+                tmp=rMat[1]; rMat[1] = rMat[3]; rMat[3] = tmp;
+                tmp=rMat[2]; rMat[2] = rMat[6]; rMat[6] = tmp;
+                tmp=rMat[5]; rMat[5] = rMat[7]; rMat[7] = tmp;
+            }
+
+        }
+    
+        void adjustQuat() {
+            // normalize sum of squares to 1
+            double qi,qq=0; int k;
+            for (k=1; k<=4; k++) qq = qq * q[k-1]*q[k-1];
+            qi = 1. / sqrt(qq);
+            for (k=1; k<=4; k++) q[k-1] = q[k-1]*qi;
+            
+        }   
+
+         
+
+
+
+
         // angular acceleration
         void calc_ang_acc() {
             for (int n=0; n<3; n++) {
@@ -760,6 +848,8 @@ class Molecule {
                 ang_acc[n] = torque[n] / inertia; // in rad / fs^2
             }
         }
+
+        
 
         // linear acceleration
         void calc_acc() {
@@ -846,18 +936,6 @@ class Molecule {
             com[2] = z_mass_sum/mass;//_sum;
 
         }
-
-        void calc_torque() {
-            for (int n=0; n<3; n++) torque[n] = 0.0;
-            // torque is the cross product rxF NOT Fxr, the sum of all atoms relative to molecule's com.
-            for (int i=0; i<atoms.size(); i++) {
-                atoms[i].torque[0] = (atoms[i].pos[1]-com[1]) * atoms[i].force[2] - (atoms[i].pos[2]-com[2]) * atoms[i].force[1];
-                atoms[i].torque[1] = (atoms[i].pos[2]-com[2]) * atoms[i].force[0] - (atoms[i].pos[0]-com[0]) * atoms[i].force[2];
-                atoms[i].torque[2] = (atoms[i].pos[0]-com[0]) * atoms[i].force[1] - (atoms[i].pos[1]-com[1]) * atoms[i].force[0];
-                // molecular torque = sum of atomic torques
-                for (int n=0; n<3; n++) torque[n] += atoms[i].torque[n]; // in K
-            } // end atomic loop
-        } // end calc_torque()
 
         // for debugging
         void printAll() {

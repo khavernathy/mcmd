@@ -227,8 +227,10 @@ void calculateForces(System &system, double dt) {
     for (int i=0; i<system.molecules.size(); i++) {
         if (system.molecules[i].frozen) continue;
         system.molecules[i].calc_force();
-        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1)
+        if (system.constants.md_rotations && system.molecules[i].atoms.size() > 1) {
             system.molecules[i].calc_torque();
+            system.molecules[i].calc_inertia_tensor();
+        }
     }
 
     // apply a constant external force if requested
@@ -297,15 +299,21 @@ void integrate(System &system, double dt) {
 
               // ROTATION
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
-            system.molecules[j].calc_ang_pos(dt);
+            //system.molecules[j].calc_ang_pos(dt);
+            system.molecules[j].build_rot_matrix(1); // transposed Rotation matrix
 
-            // note,
-            // maybe the angle of rotation here should be ang_pos - previous_ang_pos,
-            // not ang_pos.
-            // this may be why I have to set a rotation cap on theta (ang_pos).
-
+            int kk;
             // rotate molecules
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
+                kk=0;
+                for (int k=0;k<3;k++) {
+                    system.molecules[j].atoms[i].pos[k] = system.molecules[j].atoms[i].pos[k] + 
+                    system.molecules[j].rMat[kk] * system.molecules[j].com[0] +
+                    system.molecules[j].rMat[kk+1] * system.molecules[j].com[1] + 
+                    system.molecules[j].rMat[kk+2] * system.molecules[j].com[2];
+                    kk=kk+3;
+                }
+                /*
                 // ROTATE IN X
                 double* rotatedx = rotatePointRadians(system,
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
@@ -332,6 +340,8 @@ void integrate(System &system, double dt) {
                 2, system.molecules[j].ang_pos[2] );
                 for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
+                */
+                 
             } // end loop over atoms i
             } // end if rotations allowed and >1 atom
             } // end if movable molecule
@@ -385,8 +395,13 @@ void integrate(System &system, double dt) {
 
                 // rotational
                 if (system.constants.md_rotations) {
+                    /*
                     system.molecules[j].calc_ang_acc();
                     system.molecules[j].calc_ang_vel(dt);
+                    */
+                    system.molecules[j].calc_ang_vel_q(); // get w
+                    system.molecules[j].calc_q_acc(); // get qa
+
                 }
             }
         } // end if movable
