@@ -52,7 +52,6 @@ test_zone/*
 testzone
 testzone/*
 lammps.*
-src/gui/*app
 src/build-*
 src/gui/build-*
 src/gui/*.o
@@ -60,3 +59,6 @@ src/gui/gui_mcmd.pro.user.*
 src/buildgui
 saved_data
 saved_data/*
+saved_data*
+src/gui/*app
+
