@@ -3,3 +3,8 @@ git branch -D blah           <-- delete branch "blah"
 git checkout otherb          <-- switch to branch "otherb"
 git checkout -b newb         <-- create and switch to new branch "newb"
 
+To catch-up with current live-version of a git repo (overwrite your own):
+git remote add upstream https://github.com/whoever/whatever.git
+git fetch upstream
+git checkout master          (git checkout dev) for atomify
+git rebase upstream/master   ( git rebase upstream/dev) for atomify
