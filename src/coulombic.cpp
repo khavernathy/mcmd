@@ -290,12 +290,9 @@ void coulombic_real_force(System &system) {  // units of K/A
             // real space. units are K/A. alpha is 1/A, charge is sqrt(KA)
             erfc_term = erfc(alpha*r);
             for (int n=0; n<3; n++) {
-                double fsum=0;
-                holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*r*r))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
+                holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*rsq))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
                 system.molecules[i].atoms[j].force[n] += holder;
                 system.molecules[ka].atoms[la].force[n] -= holder;
-                fsum += holder;
-                //printf("real-space force: %f\n", fsum);
 
             }
         }
