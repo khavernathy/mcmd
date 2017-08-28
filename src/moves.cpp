@@ -22,9 +22,9 @@ void printEnergies(System &system) {
 
 void translate(System &system, int molid) {
     double randx,randy,randz;
-        	randx = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
-        	randy = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
-        	randz = system.constants.displace_factor * (((double)rand() / (double)RAND_MAX)*2-1);
+        	randx = system.constants.displace_factor * (getrand()*2-1);
+        	randy = system.constants.displace_factor * (getrand()*2-1);
+        	randz = system.constants.displace_factor * (getrand()*2-1);
 
             system.molecules[molid].com[0] += randx;
             system.molecules[molid].com[1] += randy;
@@ -43,8 +43,8 @@ void rotate(System &system, int molid) {
 
         // 1) GET RANDOM ANGLE AND PLANE OF ROTATION.
         double randangle; int plane;
-		randangle = system.constants.rotate_angle_factor*((double)rand()/(double)RAND_MAX); // angle of rotation from 0 -> rotate_angle_factor
-		double randxyz = (double)rand()/(double)RAND_MAX;
+		randangle = system.constants.rotate_angle_factor*getrand(); // angle of rotation from 0 -> rotate_angle_factor
+		double randxyz = getrand();
 		// 1/3 change for a given plane
 		if (randxyz < 0.33333) {
 			plane=0;
@@ -120,8 +120,8 @@ void defineBox(System &system) { // takes input in A
 void changeVolumeMove(System &system) {
 	system.stats.volume_attempts++;
 	// generate small randam distance change for volume adjustment
-	double ranf = (double)rand() / (double)RAND_MAX; // for boltz check
-    double ranv = (double)rand() / (double)RAND_MAX; // for volume change
+	double ranf = getrand();  // for boltz check
+    double ranv = getrand(); // for volume change
     double old_energy, new_energy;
     double new_com[3], old_com[3], delta_pos[3];
     int i,j,n;
@@ -245,7 +245,7 @@ void addMolecule(System &system) {
     double randn[3]; int p,q; //,n;
     double move[3];
     for (p=0; p<3; p++)
-        randn[p] = 0.5 - ((double)rand()/(double)RAND_MAX);
+        randn[p] = 0.5 - getrand();
     for (p=0; p<3; p++) {
         move[p]=0;
         for (q=0; q<3; q++)
@@ -272,7 +272,7 @@ void addMolecule(System &system) {
 	// BOLTZMANN ACCEPT OR REJECT
     double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_INSERT);
 
-	double ranf = (double)rand()/(double)RAND_MAX;
+	double ranf = getrand();
 	if (ranf < boltz_factor && system.constants.iter_success ==0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 		system.stats.insert_accepts++; //accept (keeps new molecule)
 	    system.stats.MCmoveAccepted = true;
@@ -341,7 +341,7 @@ void removeMolecule(System &system) {
     double boltz_factor = get_boltzmann_factor(system, old_potential, new_potential, MOVETYPE_REMOVE);
 
     // accept or reject
-    double ranf = (double)rand()/(double)RAND_MAX;
+    double ranf = getrand();
     if (ranf < boltz_factor && system.constants.iter_success == 0) { // && system.stats.polar.value/(system.stats.count_movables*system.proto[0].atoms.size()) > -100.) {
 	    //printf("accepted remove.\n");
 	    system.stats.remove_accepts++;
@@ -414,7 +414,7 @@ void displaceMolecule(System &system) {
 	double boltzmann_factor = get_boltzmann_factor(system, old_V, new_V, MOVETYPE_DISPLACE);
 
 	// make ranf for probability pick
-	double ranf = (double)rand() / (double)RAND_MAX; // a value between 0 and 1
+	double ranf = getrand(); // a value between 0 and 1
 
 	// apply selection Frenkel Smit p. 30
 	// accept move. // a crude way to make sure polar energy does not explode

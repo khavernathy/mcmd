@@ -23,7 +23,7 @@ void runMonteCarloStep(System &system) {
 	// VOLUME MOVE (only NPT)
 	if (system.constants.ensemble == ENSEMBLE_NPT) {
 		double VCP = system.constants.vcp_factor/(double)system.stats.count_movables; // Volume Change Probability
-		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
+		double ranf = getrand(); // between 0 and 1
         	if (ranf < VCP) {
                     system.checkpoint("doing a volume change move.");
                 	changeVolumeMove(system);
@@ -36,11 +36,11 @@ void runMonteCarloStep(System &system) {
 	// We'll choose 0-0.5 for add; 0.5-1 for remove (equal prob.)
 	if (system.constants.ensemble == ENSEMBLE_UVT) {
 		double IRP = system.constants.insert_factor;
-		double ranf = (double)rand() / (double)RAND_MAX; // between 0 and 1
+		double ranf = getrand(); // between 0 and 1
 		if (ranf < IRP) {
             //system.checkpoint("doing an add or remove.");
 			// we're going to do an add/remove now.
-			double ranf2 = (double)rand() / (double)RAND_MAX; // 0->1
+			double ranf2 = getrand(); // 0->1
 			// ADD A MOLECULE
 			if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.
                 system.checkpoint("doing molecule add move.");

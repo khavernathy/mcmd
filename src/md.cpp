@@ -19,7 +19,7 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
     */
 
     // assuming mean velocity is zero (+ or - boltzmann velocity for particles yields net 0)
-    double ranf = 2*(((double)rand() / (double)RAND_MAX)-0.5); // -1 to +1
+    double ranf = 2*((getrand())-0.5); // -1 to +1
     //return abs(sigma*SQRT2*erfInverse(ranf)); // I'm doing absolute value here bc +- is determined by velocity.
     
     // USE THE SIGMA AS MEAN-VALUE, RANDOMIZE DIRECTION. Seems to overinflate the velocities..
@@ -418,7 +418,7 @@ void integrate(System &system, double dt) {
         if (system.constants.md_mode == MD_MOLECULAR) {
         for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue; // skip frozens
-            ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
+            ranf = getrand(); // 0 -> 1
             if (ranf < probab) {
                 // adjust the velocity components of the molecule.
                 for (n=0; n<3; n++) {
@@ -444,7 +444,7 @@ void integrate(System &system, double dt) {
             for (i =0; i<system.molecules.size(); i++) {
                 for (j=0; j<system.molecules[i].atoms.size(); j++) {
                     if (system.molecules[i].atoms[j].frozen) continue; // skip frozen atoms
-                    ranf = (double)rand() / (double)RAND_MAX; // 0 -> 1
+                    ranf = getrand(); // 0 -> 1
                     if (ranf <probab) {
                         for (n=0; n<3; n++) {
                             system.molecules[i].vel[n] = gaussian(sigma);

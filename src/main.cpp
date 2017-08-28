@@ -525,7 +525,7 @@ int main(int argc, char **argv) {
         // if user defined
         for (int i=0; i<system.molecules.size(); i++) {
             for (int n=0; n<3; n++) {
-                randv = ((double)rand() / (double)RAND_MAX *2 - 1) * system.constants.md_init_vel;
+                randv = (getrand()*2 - 1) * system.constants.md_init_vel;
                 system.molecules[i].vel[n] = randv; // that is, +- 0->1 * user param
             }
         }
@@ -553,7 +553,7 @@ int main(int argc, char **argv) {
         double pm = 0;
         for (int i=0; i<system.molecules.size(); i++) {
             for (int n=0; n<3; n++) {
-                randv = (double)rand() / (double)RAND_MAX;
+                randv = getrand();
                 if (randv > 0.5) pm = 1.0;
                 else pm = -1.0;
 
@@ -602,7 +602,7 @@ int main(int argc, char **argv) {
             getTotalPotential(system); // this is needed on-the-spot because of 
                                        // time-evolution of the system. Otherwise, 
                                        // potential is only re-calculated at corrtime.
-            double ranf2 = (double)rand() / (double)RAND_MAX; // 0->1
+            double ranf2 = getrand(); // 0->1
             // ADD A MOLECULE
             if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.
                 system.checkpoint("doing molecule add move.");
