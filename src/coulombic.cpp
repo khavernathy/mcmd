@@ -308,7 +308,7 @@ void coulombic_real_force(System &system) {  // units of K/A
               			exp(-k_sq/(4*alpha*alpha))* 
                         sin(kvecs[ki][0]*distances[0]+
                         	kvecs[ki][1]*distances[1]+
-                        	kvecs[ki][2]*distances[2])/k_sq; 
+                        	kvecs[ki][2]*distances[2])/k_sq   * 2; // times 2 because it's a half-Ewald sphere 
                     system.molecules[i].atoms[j].force[n] += holder;
                     system.molecules[ka].atoms[la].force[n] -= holder;
                 } // end k-vector loop
@@ -439,7 +439,7 @@ double coulombic_reciprocal(System &system) {
         } // end for l[1], m
     } // end for l[0], l
 
-    potential *= 2.0 * M_PI / system.pbc.volume;
+    potential *= 4.0 * M_PI / system.pbc.volume;
 
     //printf("coulombic_reciprocal: %f K\n",potential);
    return potential;
