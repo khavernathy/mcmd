@@ -206,7 +206,7 @@ class Constants {
 
         int_fast8_t all_pbc=1;
         int_fast8_t auto_reject_option=1; // enables/disables
-        double auto_reject_r=0.76; // Angstroms. If r > this value for any pair, MC will auto-reject a move immediately
+        double auto_reject_r=0.76; // Angstroms. If r < this value for any relevant pair, MC will auto-reject a move immediately
         int_fast8_t auto_reject=0; // on or off (for an individual step!). will go on if auto_reject_r is triggered
         int rejects=0; // counter
 
