@@ -1356,6 +1356,10 @@ void readInput(System &system, char* filename) {
                 else system.constants.ewald_es = 0;
                 std::cout << "Got Ewald electrostatics option = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "kspace_option")) {
+                if (lc[1] == "on") system.constants.kspace_option = 1;
+                std::cout << "Got Ewald Force k-space option = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "pdb_long")) {
                 if (lc[1] == "on") system.constants.pdb_long =1;
                 else system.constants.pdb_long = 0;

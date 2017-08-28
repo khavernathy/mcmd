@@ -267,7 +267,6 @@ void coulombic_real_force(System &system) {  // units of K/A
     } // end for l[0], l
 	// done defining k-space vectors
 
-
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int ka = 0; ka < system.molecules.size(); ka++) {
@@ -296,7 +295,7 @@ void coulombic_real_force(System &system) {  // units of K/A
 
             }
         }
-        if (i < ka) { // k-space terms can be outside cutoff. Skip duplicates though.
+        if (system.constants.kspace_option && i < ka) { // k-space terms can be outside cutoff. Skip duplicates though.
             // k-space. units are K/A, 
             for (int n=0;n<3;n++) { //x,y,z
               // loop k vectors
@@ -309,20 +308,22 @@ void coulombic_real_force(System &system) {  // units of K/A
               			exp(-k_sq/(4*alpha*alpha))* 
                         sin(kvecs[ki][0]*distances[0]+
                         	kvecs[ki][1]*distances[1]+
-                        	kvecs[ki][2]*distances[2])/k_sq;
+                        	kvecs[ki][2]*distances[2])/k_sq; 
                     system.molecules[i].atoms[j].force[n] += holder;
                     system.molecules[ka].atoms[la].force[n] -= holder;
                 } // end k-vector loop
             } // end 3D
-        } // end if condition k-space
+        } // end if condition k-space 
     } // end if not frozen and not zero-charge
     } // end l
     } // end k
     } // end j
     } // end i
 
-    for (int i=0; i<system.constants.ewald_num_k; i++) free(kvecs[i]);
-    free(kvecs);
+    if (system.constants.kspace_option) {
+        for (int i=0; i<system.constants.ewald_num_k; i++) free(kvecs[i]);
+        free(kvecs);
+    }
 
 }
 
