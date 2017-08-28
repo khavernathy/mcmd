@@ -118,7 +118,8 @@ int main(int argc, char **argv) {
 	double time_elapsed;
 	double sec_per_step;
 
-	srand((unsigned)time(NULL)); // initiate random seed
+	srand((unsigned)time(NULL)); // initiate random seed, old version
+    srand48((unsigned)time(NULL)); // initiate drand48 48-bit integer random seed.
 
 	// disable output buffering (print everything immediately to output)
 	setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.

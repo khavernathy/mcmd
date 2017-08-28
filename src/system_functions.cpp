@@ -16,7 +16,11 @@
 using namespace std;
 
 double getrand() {
-    return (double)rand()/(double)RAND_MAX; // a value between 0 and 1.
+
+    return drand48();
+
+
+//    return (double)rand()/(double)RAND_MAX; // a value between 0 and 1.
 }
 
 /* GET BOX LIMIT COORDINATE FOR PBC */
