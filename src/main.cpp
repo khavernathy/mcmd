@@ -273,30 +273,6 @@ int main(int argc, char **argv) {
         } // end for l[0], l
         
         system.constants.ewald_num_k = count_ks;
-        system.constants.ewald_k = (double **) calloc(count_ks, sizeof(double*));
-        for (int i=0; i<count_ks; i++) {
-            system.constants.ewald_k[i] = (double *) malloc(3*sizeof(double));
-            for (int n=0;n<3;n++)
-                system.constants.ewald_k[i][n] = 0;
-        }
-        
-        count_ks=0;
-        // now define the k-vectors
-        for (l[0] = 0; l[0] <= kmax; l[0]++) {
-            for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
-                for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
-                    // skip if norm is out of sphere
-                    if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
-                    /* get reciprocal lattice vectors */
-                    for (p=0; p<3; p++) {
-                        for (q=0, system.constants.ewald_k[count_ks][p] = 0; q < 3; q++) {
-                            system.constants.ewald_k[count_ks][p] += 2.0*M_PI*system.pbc.reciprocal_basis[p][q] * l[q];
-                        }
-                    }
-                    count_ks++;
-                } // end for l[2], n
-            } // end for l[1], m
-        } // end for l[0], l
     } // end MD Ewald k-space setup.
 
     // BEGIN MC OR MD ===========================================================

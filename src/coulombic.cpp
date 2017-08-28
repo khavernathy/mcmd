@@ -245,8 +245,28 @@ void coulombic_real_force(System &system) {  // units of K/A
     for (int i=0; i<system.constants.ewald_num_k; i++) {
         kvecs[i] = (double *) malloc(3*sizeof(double));
         for (int n=0;n<3;n++)
-            kvecs[i][n] = system.constants.ewald_k[i][n]; // copy the system array to local array.
+            kvecs[i][n] = 0; // copy the system array to local array.
     }
+
+    // now define the k-vectors
+	int count_ks=0;
+    for (l[0] = 0; l[0] <= kmax; l[0]++) {
+        for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
+            for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
+                // skip if norm is out of sphere
+                if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
+                /* get reciprocal lattice vectors */
+                for (p=0; p<3; p++) {
+                    for (q=0, kvecs[count_ks][p] = 0; q < 3; q++) {
+                        kvecs[count_ks][p] += 2.0*M_PI*system.pbc.reciprocal_basis[p][q] * l[q];
+                    }
+                }
+                count_ks++;
+            } // end for l[2], n
+        } // end for l[1], m
+    } // end for l[0], l
+	// done defining k-space vectors
+
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -282,21 +302,19 @@ void coulombic_real_force(System &system) {  // units of K/A
         if (i < ka) { // k-space terms can be outside cutoff. Skip duplicates though.
             // k-space. units are K/A, 
             for (int n=0;n<3;n++) { //x,y,z
-              double fsum=0;
               // loop k vectors
                 for (int ki=0; ki < system.constants.ewald_num_k; ki++) {
-                          k_sq = kvecs[ki][0]*kvecs[ki][0] + 
-                        kvecs[ki][1]*kvecs[ki][1] + 
-                        kvecs[ki][2]*kvecs[ki][2];
-                          //printf("chargeprod %f invV %f fourPI %f k[n] %f k_sq %f alpha %f k
-                          holder = chargeprod*invV*fourPI*kvecs[ki][n]* 
-                        exp(-k_sq/(4*alpha*alpha))* 
+                	k_sq = kvecs[ki][0]*kvecs[ki][0] + 
+                    kvecs[ki][1]*kvecs[ki][1] + 
+                    kvecs[ki][2]*kvecs[ki][2];
+                    
+                    holder = chargeprod*invV*fourPI*kvecs[ki][n]* 
+              			exp(-k_sq/(4*alpha*alpha))* 
                         sin(kvecs[ki][0]*distances[0]+
-                        kvecs[ki][1]*distances[1]+
-                        kvecs[ki][2]*distances[2])/k_sq;
-                          system.molecules[i].atoms[j].force[n] += holder;
-                          system.molecules[ka].atoms[la].force[n] -= holder;
-                          fsum += holder;
+                        	kvecs[ki][1]*distances[1]+
+                        	kvecs[ki][2]*distances[2])/k_sq;
+                    system.molecules[i].atoms[j].force[n] += holder;
+                    system.molecules[ka].atoms[la].force[n] -= holder;
                 } // end k-vector loop
             } // end 3D
         } // end if condition k-space
