@@ -178,7 +178,11 @@ class Constants {
 
         // Ewald (for ES)
         double ewald_alpha; // =3.5/cutoff; Really, sqrt(alpha), by Ewald formula.
-        double ewald_kmax = 7;
+        double ewald_kmax = 7; // suitable for most cases.
+        //double** ewald_k; // holds 3D k-space vectors for Ewald summation in Force calc for MD.
+        // actually its faster to make on-the-fly
+        int ewald_num_k; // number of Ewald k vectors stored in ewald_k
+        int kspace_option=0; // default off; option to include k-space contribution to FORCES in md
 
         // Wolf (for polarization)
         //int polar_iterative=1; // turn iterative on. If off, will just do one iteration of dipole calc and get polar energy

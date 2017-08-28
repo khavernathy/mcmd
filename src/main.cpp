@@ -255,6 +255,26 @@ int main(int argc, char **argv) {
         printf("The polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqA, memreqA/1000.);
     }
 
+    // SET UP Ewald k-space if needed
+    if (system.constants.mode == "md" && (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJES || system.constants.potential_form == POTENTIAL_COMMYES || system.constants.potential_form == POTENTIAL_COMMYESPOLAR)) {
+        // based on k-max, find the number of k-vectors to use in Ewald force.
+        int count_ks = 0;
+        double kmax = system.constants.ewald_kmax;
+        int l[3];
+        // define k-space
+        for (l[0] = 0; l[0] <= kmax; l[0]++) {
+            for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
+                for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
+                    // skip if norm is out of sphere
+                    if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
+                    count_ks++;
+                } // end for l[2], n
+            } // end for l[1], m
+        } // end for l[0], l
+        
+        system.constants.ewald_num_k = count_ks;
+    } // end MD Ewald k-space setup.
+
     // BEGIN MC OR MD ===========================================================
 	// =========================== MONTE CARLO ===================================
 	if (system.constants.mode == "mc") {
