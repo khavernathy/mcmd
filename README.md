@@ -35,7 +35,7 @@ Douglas Franz: dfranz@mail.usf.edu
 &emsp;-> Monte Carlo simulation in NPT, NVT, NVE, and &mu;VT ensembles.  <br />
 &emsp;-> Molecular Dynamics simulation in NVT, NVE, and &mu;VT ensembles.  <br />
 &emsp;-> A crystal builder to create fully parameterized supercells from unit cells. <br />
-&emsp;-> A fragment creator for uniquely named atoms. <br /> 
+&emsp;-> A fragment creator based around uniquely named atoms. <br /> 
 &emsp;-> A LAMMPS input file exporter. <br />
 &emsp;-> Trajectories and restart files in various formats. <br />
 &emsp;-> Automatic radial distribution calculator<br />
