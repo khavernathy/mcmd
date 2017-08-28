@@ -47,7 +47,7 @@ typedef struct molecule_t {
 */
 
 __global__
-void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double * basis, double * reciprocal_basis, int pformD, double ewald_alpha) {
+void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double * basis, double * reciprocal_basis, int pformD, double ewald_alpha, int kmax, int kspace) {
     // define thread id
     int i = threadIdx.x + blockDim.x * blockIdx.x;
 
@@ -155,6 +155,13 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
         // Now handle electrostatics
         if (pform == 1) {
             for (n=0;n<3;n++) af[n]=0; // reset register-stored force for anchoratom.
+            double invV;
+            int l[3], p, q; double k[3], k_sq, fourPI = 4.0*M_PI;
+            invV =  basis[0] * (basis[4]*basis[8] - basis[7]*basis[5] );
+            invV += basis[3] * (basis[7]*basis[2] - basis[1]*basis[8] );
+            invV += basis[6] * (basis[1]*basis[5] - basis[5]*basis[2] );
+            invV = 1.0/invV;
+
            for (j=0;j<N;j++) {
                 if (anchoratom.frozen && atom_list[j].frozen) continue; // don't do frozen pairs
                 if (anchoratom.charge == 0 || atom_list[j].charge == 0) continue; // skip 0-force
@@ -193,7 +200,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
                 for (n=0;n<3;n++) dimg[n] = di[n];
             }
 
-
+            // real-space
             if (rimg <= cutoff && (anchoratom.molid < atom_list[j].molid)) { // non-duplicated pairs, not intramolecular, not beyond cutoff
                 chargeprod = anchoratom.charge * atom_list[j].charge;
                 for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
@@ -202,16 +209,36 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
                     af[n] += holder;
                     atomicAdd(&(atom_list[j].f[n]), -holder);                
                 }
-            } else if (anchoratom.molid == atom_list[j].molid) { // intramolecular interaction
-                chargeprod = anchoratom.charge * atom_list[j].charge;
-                rsq=rimg*rimg;
-                for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
+            }
+            // k-space
+            if (kspace && (anchoratom.molid < atom_list[j].molid)) {
+               chargeprod = anchoratom.charge * atom_list[j].charge;
+                
+               for (n=0; n<3; n++) {
+                    for (l[0] = 0; l[0] <= kmax; l[0]++) {
+                    for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
+                    for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
+                        // skip if norm is out of sphere
+                        if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
+                        /* get reciprocal lattice vectors */
+                        for (p=0; p<3; p++) {
+                            for (q=0, k[p] = 0; q < 3; q++) {
+                            k[p] += 2.0*M_PI*reciprocal_basis[3*q+p] * l[q];
+                            }
+                        }
+                        k_sq = k[0]*k[0] + k[1]*k[1] + k[2]*k[2];
 
-                for (n=0;n<3;n++) {
-                    holder = -((chargeprod*erf(alpha*rimg))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*rsq)/(sqrtPI*rimg)))*u[n];
-                    af[n] += holder;
-                    atomicAdd(&(atom_list[j].f[n]), -holder);
-                }
+                        holder = chargeprod * invV * fourPI * k[n] *
+                        exp(-k_sq/(4*alpha*alpha))*
+                        sin(k[0]*dimg[0] + k[1]*dimg[1] + k[2]*dimg[2])/k_sq * 2; // times 2 b/c half-Ewald sphere
+
+                        af[n] += holder;
+                        atomicAdd(&(atom_list[j].f[n]), -holder);
+
+                    } // end for l[2], n
+                    } // end for l[1], m
+                    } // end for l[0], l
+                } // end 3d 
             }
 
             } // end pair loop j 
@@ -327,81 +354,6 @@ void calculateForceNopbcKernel(cuda_atom * atom_list, int N, int pformD) {
 } // end no-pbc force
 
 
-/*
-__global__
-void velocityVerletKernel(cuda_molecule * molecule_list, int N, int md_mode) {
-    // define thread id
-    int i = threadIdx.x + blockDim.x * blockIdx.x;
-    register cuda_molecule anchormolecule = molecule_list[i];
-
-    // I ain't afraid o' no ghost 
-    if(i<N){
-            
-
-
-
-    }
-}
-
-
-
-void CUDA_verlet(System &system) {
-    const int N = (int)system.stats.count_movables;
-    const int block_size = system.constants.cuda_block_size;
-    const int molecules_array_size=sizeof(cuda_molecule)*N;
-    cuda_atom H[N]; // host atoms
-    cuda_atom *D; // device atoms (gpu)
-    for (int i=0;i<system.molecules.size();i++) {
-        for (int n=0;n<3;n++) {
-            H[i].old_acc[n] = system.molecules[i].old_acc[n];
-            H[i].acc[n] = system.molecules[i].acc[n];
-            H[i].old_ang_acc[n] = system.molecules[i].old_ang_acc[n];
-            H[i].ang_acc[n] = system.molecules[i].ang_acc[n];
-            H[i].vel[n] = system.molecules[i].vel[n];
-            H[i].ang_vel[n] = system.molecules[i].ang_vel[n];
-            
-        }
-    }
-
-    // allocate memory on GPU
-    cudaMalloc((void**) &D, molecules_array_size);
-    cudaMemcpy(D, H, molecules_array_size, cudaMemcpyHostToDevice);
-
-    // grid elements
-    int dimGrid = ceil((double)N/block_size);
-    int dimBlock = block_size;
-
-    // determine molecular or atomic motion
-    int md_mode = system.constants.md_mode;
-    if (md_mode == MD_ATOMIC) md_mode = 0;
-    else if (md_mode == MD_MOLECULAR) md_mode = 1;
-
-    velocityVerletKernel<<< dimGrid, dimBlock >>>(D,N,md_mode);
-    // make sure the threads are synced so we don't overflow
-    cudaThreadSynchronize();
-    // copy device data back to host
-    cudaMemcpy(H, D, molecules_array_size, cudaMemcpyDeviceToHost);
-
-    index=0;
-    for (int i=0;i<system.molecules.size();i++) {
-        for (int j=0;j<system.molecules[i].atoms.size();j++) {
-            for (int n=0;n<3;n++) {
-                system.molecules[i].atoms[j].force[n] = H[index].f[n];
-            }
-            index++;
-        }
-    }
-
-    //printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
-
-
-     cudaFree(D);
-
-
-
-}
-*/
-
 void CUDA_force(System &system) {
 
     const int N = (int)system.constants.total_atoms;
@@ -463,7 +415,7 @@ void CUDA_force(System &system) {
     if (theval == POTENTIAL_LJES || theval == POTENTIAL_LJESPOLAR)
         pform=1;
 
-    calculateForceKernel<<< dimGrid, dimBlock >>>(D,N,system.pbc.cutoff, dbasis, dreciprocal_basis, pform, system.constants.ewald_alpha);
+    calculateForceKernel<<< dimGrid, dimBlock >>>(D,N,system.pbc.cutoff, dbasis, dreciprocal_basis, pform, system.constants.ewald_alpha, system.constants.ewald_kmax, system.constants.kspace_option);
     // make sure the threads are synced so we don't overflow
     cudaThreadSynchronize();
     // copy device data back to host
