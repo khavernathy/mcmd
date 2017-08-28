@@ -178,6 +178,7 @@ class Constants {
 
         // Ewald (for ES)
         double ewald_alpha; // =3.5/cutoff; Really, sqrt(alpha), by Ewald formula.
+                            // i have also seen 2.5 / r_c for this quantity (Rapaport, Art of M.D.)
         double ewald_kmax = 7; // suitable for most cases.
         //double** ewald_k; // holds 3D k-space vectors for Ewald summation in Force calc for MD.
         // actually its faster to make on-the-fly
