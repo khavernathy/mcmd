@@ -2,6 +2,7 @@ git pull origin dev:dev      <-- pull from "dev" into current branch
 git branch -D blah           <-- delete branch "blah"
 git checkout otherb          <-- switch to branch "otherb"
 git checkout -b newb         <-- create and switch to new branch "newb"
+git checkout -b newb origin/obranch  <-- download remote existing branch "obranch" to new local branch "newb"
 
 To catch-up with current live-version of a git repo (overwrite your own):
 git remote add upstream https://github.com/whoever/whatever.git
