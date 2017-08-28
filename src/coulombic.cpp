@@ -439,7 +439,7 @@ double coulombic_reciprocal(System &system) {
         } // end for l[1], m
     } // end for l[0], l
 
-    potential *= 4.0 * M_PI / system.pbc.volume;
+    potential *= 2.0 * M_PI / system.pbc.volume;
 
     //printf("coulombic_reciprocal: %f K\n",potential);
    return potential;
