@@ -860,7 +860,7 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(),"restart")) {
                 system.constants.restart_mode = 1;
-                std::cout << "Got restart option = " << lc[1].c_str(); printf("\n");
+                std::cout << "Got restart option."; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "mode")) {
 				system.constants.mode = lc[1].c_str();
