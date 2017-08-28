@@ -47,7 +47,7 @@ typedef struct molecule_t {
 */
 
 __global__
-void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double * basis, double * reciprocal_basis, int pformD, double ewald_alpha, int ewald_num_k, double kmax) {
+void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double * basis, double * reciprocal_basis, int pformD, double ewald_alpha) {
     // define thread id
     int i = threadIdx.x + blockDim.x * blockIdx.x;
 
@@ -155,20 +155,10 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
         // Now handle electrostatics
         if (pform == 1) {
             for (n=0;n<3;n++) af[n]=0; // reset register-stored force for anchoratom.
-          
-                // get inverse volume
-                double invV = basis[0]*(basis[4]*basis[8] - basis[7]*basis[5]);
-                invV +=       basis[3]*(basis[7]*basis[2] - basis[1]*basis[8]);
-                invV +=       basis[6]*(basis[1]*basis[5] - basis[5]*basis[2]);
-                invV = 1.0/invV;
- 
-                double k_sq; double fourPI = M_PI*4;
-
-        for (j=0;j<N;j++) {
+           for (j=0;j<N;j++) {
                 if (anchoratom.frozen && atom_list[j].frozen) continue; // don't do frozen pairs
                 if (anchoratom.charge == 0 || atom_list[j].charge == 0) continue; // skip 0-force
                 if (i==j) continue; // don't do atom with itself
-
 
                // get R (nearest image)
             for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
@@ -204,7 +194,6 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
             }
 
 
-            // real-space forces
             if (rimg <= cutoff && (anchoratom.molid < atom_list[j].molid)) { // non-duplicated pairs, not intramolecular, not beyond cutoff
                 chargeprod = anchoratom.charge * atom_list[j].charge;
                 for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
@@ -213,42 +202,19 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
                     af[n] += holder;
                     atomicAdd(&(atom_list[j].f[n]), -holder);                
                 }
-            }
-            // k-space forces
-			if (anchoratom.molid < atom_list[j].molid) { // no cutoff for this.
-            for (int n=0;n<3;n++) { //x,y,z
-              // loop k vectors
-				// EWALD k-vectors     
-					int l[3],p,q; double k[3] = {0,0,0};
-					for (l[0] = 0; l[0] <= kmax; l[0]++) {
-						for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
-							for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
-								// skip if norm is out of sphere
-								if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
-								
-								/* get reciprocal lattice vectors */				                
-								for (p=0; p<3; p++) {
-								    for (q=0, k[p] = 0; q < 3; q++) {
-								        k[p] += 2.0*M_PI*reciprocal_basis[3*q+p] * l[q];
-								    }
-								}
-								k_sq = k[0]*k[0] + k[1]*k[1] + k[2]*k[2];
-                    holder = chargeprod*invV*fourPI*k[n]*
-                        exp(-k_sq/(4*alpha*alpha))*
-                        sin(k[0]*dimg[0]+
-                            k[1]*dimg[1]+
-                            k[2]*dimg[2])/k_sq;
+            } else if (anchoratom.molid == atom_list[j].molid) { // intramolecular interaction
+                chargeprod = anchoratom.charge * atom_list[j].charge;
+                rsq=rimg*rimg;
+                for (n=0;n<3;n++) u[n] = dimg[n]/rimg;
+
+                for (n=0;n<3;n++) {
+                    holder = -((chargeprod*erf(alpha*rimg))/rsq - (2*chargeprod*alpha*exp(-alpha*alpha*rsq)/(sqrtPI*rimg)))*u[n];
                     af[n] += holder;
                     atomicAdd(&(atom_list[j].f[n]), -holder);
-								
-								
-							} // end for l[2], n
-						} // end for l[1], m
-					} // end for l[0], l
-	            } // end 3D
-            } // end k-space if not duplicate
+                }
+            }
 
-            } // end pair loop j for anchoratom
+            } // end pair loop j 
 
             // finally add ES contribution to anchor-atom
             for (n=0;n<3;n++) atomicAdd(&(atom_list[i].f[n]), af[n]);
@@ -476,8 +442,6 @@ void CUDA_force(System &system) {
     }
     //system.pbc.printBasis();
 
-    
-
     //for (int l=0;l<9;l++) printf("basis[%i] = %f\n", l,basis[l]);
 
     // allocate memory on GPU
@@ -487,8 +451,6 @@ void CUDA_force(System &system) {
     cudaMemcpy(dreciprocal_basis, reciprocal_basis, bs, cudaMemcpyHostToDevice); 
     cudaMalloc((void**) &D, atoms_array_size);
     cudaMemcpy(D, H, atoms_array_size, cudaMemcpyHostToDevice);
-	//cudaMalloc((void**) &Dkvecs, kvecs_size);
-	//cudaMemcpy(Dkvecs, Hkvecs, kvecs_size, cudaMemcpyHostToDevice);
 
     // grid elements
     int dimGrid = ceil((double)N/block_size);
@@ -501,7 +463,7 @@ void CUDA_force(System &system) {
     if (theval == POTENTIAL_LJES || theval == POTENTIAL_LJESPOLAR)
         pform=1;
 
-    calculateForceKernel<<< dimGrid, dimBlock >>>(D,N,system.pbc.cutoff, dbasis, dreciprocal_basis, pform, system.constants.ewald_alpha, system.constants.ewald_num_k, system.constants.ewald_kmax);
+    calculateForceKernel<<< dimGrid, dimBlock >>>(D,N,system.pbc.cutoff, dbasis, dreciprocal_basis, pform, system.constants.ewald_alpha);
     // make sure the threads are synced so we don't overflow
     cudaThreadSynchronize();
     // copy device data back to host
