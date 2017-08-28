@@ -40,7 +40,7 @@ Douglas Franz: dfranz@mail.usf.edu
 &emsp;-> Trajectories and restart files in various formats. <br />
 &emsp;-> Automatic radial distribution calculator<br />
 &emsp;-> Hard-coded molecular models for easy input, including multi-sorbate support<br />
-&emsp;-> Easy system basis parametrization via a, b, c, alpha, beta, gamma crystal values, or basis vectors<br />
+&emsp;-> Easy system basis parametrization via a, b, c, &alpha;, &beta;, &gamma; crystal values, or basis vectors<br />
 &emsp;-> Quick routines for energy/force computation<br />
 &emsp;-> Simulated annealing<br />
 &emsp;-> Any periodic cell is supported for both MC and MD; non-periodic systems also supported.<br />
