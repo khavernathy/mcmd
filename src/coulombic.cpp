@@ -230,7 +230,7 @@ void coulombic_real_force(System &system) {  // units of K/A
     double u[3]; double holder;
     const double sqrtPI = sqrt(M_PI);
     const double fourPI = M_PI*4;
-    int l[3]; double k[3]; int p,q; double k_sq;
+    int l[3]; int p,q; double k_sq;
     double invV = 1./system.pbc.volume;
     int kmax = system.constants.ewald_kmax;
 

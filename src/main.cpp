@@ -260,7 +260,7 @@ int main(int argc, char **argv) {
         // based on k-max, find the number of k-vectors to use in Ewald force.
         int count_ks = 0;
         double kmax = system.constants.ewald_kmax;
-        int l[3], p,q;
+        int l[3];
         // define k-space
         for (l[0] = 0; l[0] <= kmax; l[0]++) {
             for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
