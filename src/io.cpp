@@ -1360,6 +1360,10 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "on") system.constants.kspace_option = 1;
                 std::cout << "Got Ewald Force k-space option = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "ewald_kmax")) {
+                system.constants.ewald_kmax = atof(lc[1].c_str());
+                std::cout << "Got Ewald kmax = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "pdb_long")) {
                 if (lc[1] == "on") system.constants.pdb_long =1;
                 else system.constants.pdb_long = 0;
