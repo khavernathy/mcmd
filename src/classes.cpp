@@ -768,11 +768,8 @@ class Molecule {
 
         // angular velocity
         void calc_ang_vel(double dt) {
-            double cap = 0.00000018; // parameter to cap the angular velocity (keep from rotating crazy)
             for (int n=0; n<3; n++) {
-                ang_vel[n] = ang_vel[n] + 0.5*(ang_acc[n] * old_ang_acc[n])*dt;
-                if (ang_vel[n] > cap) ang_vel[n] = cap;
-                else if (ang_vel[n] < -cap) ang_vel[n] = -cap;
+                ang_vel[n] = ang_vel[n] + 0.5*(ang_acc[n] + old_ang_acc[n])*dt; // in rad/fs
             }
         }
 
