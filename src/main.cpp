@@ -681,7 +681,7 @@ int main(int argc, char **argv) {
             if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp); 
             printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", Temp);
-            printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3e )\n",
+            printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3f )\n",
                   KE, Klin, Krot );
             printf("     PE = %.3f kJ/mol\n",
                   PE

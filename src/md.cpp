@@ -78,7 +78,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 
                 energy_holder *= system.constants.kb/1e10;
 
-                K_total += energy_holder; // rotational: (rad)*kg A^2 / fs^2
+                K_total += energy_holder; // rotational: (rad^2)*kg A^2 / fs^2
                 Krot += energy_holder;
             }
         }
@@ -105,13 +105,13 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     // note this is only valid for single-sorbate (homogenous gas) right now
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
 	static double output[8];
-	output[0] = K_total;
+	output[0] = K_total; 
     output[1] = V_total;
 	output[2] = T;
     output[3] = avg_v;
     output[4] = Ek;
     output[5] = Klin;
-    output[6] = Krot;
+    output[6] = Krot; 
     output[7] = pressure;
 	return output;
 }
