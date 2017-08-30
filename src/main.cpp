@@ -660,12 +660,14 @@ int main(int argc, char **argv) {
                     
                         diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
                     }
-                    D[sorbid] = (diffusion_sum / localN)/(6.0*t); // 6 because 2*dimensionality = 2*3
-                    D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
-                } // end sorbate-type loop
-                //system.stats.diffusion.value = D;
-                //system.stats.diffusion.calcNewStats();
-            }
+                } // end all molecules loop
+                system.stats.msd[sorbid].value = diffusion_sum;
+                system.stats.msd[sorbid].calcNewStats(); // finds and stores average MSD sum
+                double avg_msd_sum = system.stats.msd[sorbid].average;
+
+                D[sorbid] = (avg_msd_sum / (localN *6.0*t)); // 6 because 2*dimensionality = 2*3
+                D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
+            } // end sorbate types loop
             // we've calc'd diffusion coefficients for all sorbates now.
 
             // PRESSURE (my pathetic nRT/V method)

@@ -551,6 +551,7 @@ class Stats {
             frozenmass, pressure,temperature, fdotrsum, dist_within, csp, diffusion;
 
         int max_sorbs=10;
+        vector<obs_t> msd = vector<obs_t>(max_sorbs); 
         vector<obs_t> wtp = vector<obs_t>(max_sorbs);
         vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
         vector<obs_t> Nmov = vector<obs_t>(max_sorbs);
