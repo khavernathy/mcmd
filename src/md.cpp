@@ -217,6 +217,7 @@ void integrate(System &system, double dt) {
     system.checkpoint("moving particles based on forces.");
     // if molecular motion
     if (system.constants.md_mode == MD_MOLECULAR) {
+        double prevangpos[3];
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
 
@@ -225,7 +226,10 @@ void integrate(System &system, double dt) {
                 system.molecules[j].calc_pos(dt);
 
             // ROTATION
+            // TESTING ROTATE-BY-DELTA-THETA INSTEAD OF ROTATE-BY-THETA
+            // THIS IS THE BEST SETUP THUS FAR. NVE IS ALMOST CONSERVING AND THE SYSTEM IS SPATIALLY STABLE
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
+            for (int n=0;n<3;n++) prevangpos[n] = system.molecules[j].ang_pos[n];
             system.molecules[j].calc_ang_pos(dt);
 
             // rotate molecules
@@ -235,7 +239,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                0, system.molecules[j].ang_pos[0] );
+                0, system.molecules[j].ang_pos[0] - prevangpos[0] );
                 for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedx[n] + system.molecules[j].com[n];
 
@@ -244,7 +248,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                1, system.molecules[j].ang_pos[1] );
+                1, system.molecules[j].ang_pos[1] - prevangpos[1] );
                 for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedy[n] + system.molecules[j].com[n];
 
@@ -253,7 +257,7 @@ void integrate(System &system, double dt) {
                 system.molecules[j].atoms[i].pos[0] - system.molecules[j].com[0],
                 system.molecules[j].atoms[i].pos[1] - system.molecules[j].com[1],
                 system.molecules[j].atoms[i].pos[2] - system.molecules[j].com[2],
-                2, system.molecules[j].ang_pos[2] );
+                2, system.molecules[j].ang_pos[2] - prevangpos[2] );
                 for (n=0; n<3; n++)
                     system.molecules[j].atoms[i].pos[n] = rotatedz[n] + system.molecules[j].com[n];
             } // end loop over atoms i

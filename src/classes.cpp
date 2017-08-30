@@ -660,8 +660,6 @@ class Atom {
         /* for debugging */
         void printAll() {
             printf("atom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %f amu; eps = %f K; sig = %f A; alpha = %f A^3; q = %f e\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m/(1.660578e-27), eps, sig, polar, C/408.7816);
-                   
-                   // force: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m, eps, sig,C, force[0], force[1], force[2], acc[0], acc[1], acc[2], old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2]);
         }
 };
 
