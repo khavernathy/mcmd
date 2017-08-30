@@ -9,8 +9,8 @@
 
 double * rotatePoint(System &system, double x, double y, double z, int plane, double angle) {
 
-	double finalx, finaly, finalz;// printf("%f %f %f\n",x,y,z);
-    // the function takes an ANGLE 0->360 so need to preconvert from rads if neededo
+	double finalx, finaly, finalz;
+    // the function takes an ANGLE 0->360, trig functions take rads 
 	angle = angle*M_PI/180.0;
 	if (plane == 0) {
 		finalx = x;
@@ -26,7 +26,7 @@ double * rotatePoint(System &system, double x, double y, double z, int plane, do
 		finalz = z;
 	}
 
-	static double output[3]; //double* output[3]; //vector<double> output; //printf("%f %f %f\n",finalx,finaly,finalz);
+	static double output[3];
         output[0] = finalx;
         output[1] = finaly;
 	    output[2] = finalz;
@@ -35,9 +35,7 @@ double * rotatePoint(System &system, double x, double y, double z, int plane, do
 
 double * rotatePointRadians(System &system, double x, double y, double z, int plane, double angle) {
 
-	double finalx, finaly, finalz;// printf("%f %f %f\n",x,y,z);
-    // the function takes an ANGLE 0->360 so need to preconvert from rads if neededo
-	
+	double finalx, finaly, finalz;
 	if (plane == 0) {
 		finalx = x;
 		finaly = y*cos(angle) -z*sin(angle);
@@ -52,24 +50,10 @@ double * rotatePointRadians(System &system, double x, double y, double z, int pl
 		finalz = z;
 	}
 
-	static double output[3]; //double* output[3]; //vector<double> output; //printf("%f %f %f\n",finalx,finaly,finalz);
+	static double output[3];
         output[0] = finalx;
         output[1] = finaly;
 	    output[2] = finalz;
         return output;
 }
-// -------------- end rotatePoint func ---------------------
 
-/*
-void rotateMolecule(System &system, Molecule mol, string plane, double angle) {
-    angle = angle*M_PI/180.0;
-
-    // for each atom in molecule, rotate it.
-    for (int i=0; i<mol.atoms.size(); i++) {
-        
-        double* rotated = rotatePoint(system, mol.atoms[i].pos[0], mol.atoms[i].pos[1], mol.atoms[i].pos[2], plane, angle);
-
-        for (int n=0; n<3; n++) mol.atoms[i].pos[n] = rotated[n];
-         
-    }
-}*/

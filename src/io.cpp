@@ -21,28 +21,24 @@
 void readInAtomsXYZ(System &system, string filename) {
 	
     // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY). 
-
     string line;
-	ifstream myfile (filename); //("Neons.xyz"); // ("rhtMOF9Zn.xyz"); //("water_1527.dat"); // test2.dat
+	ifstream myfile (filename); 
 	if (myfile.is_open())
 	{
-        //int master_index=-1;
-		//std::string::size_type sz;     // alias of size_t
-		// loop through each line
-        Molecule whatev;
-        system.proto.push_back(whatev); // the first prototype.
+		Molecule whatev;
+        system.proto.push_back(whatev); // the first prototype (movable molecule type).
 		Molecule current_molecule;  
 		system.molecules.push_back(whatev);
         int line_count=0;
+        // loop through each line
         while ( getline (myfile,line) )
 		{
 			vector<string> myvector;
       			istringstream iss(line);
-			//ostream_iterator<string> out_it (cout,",");
 			copy(
 				istream_iterator<string>(iss),
 				istream_iterator<string>(),
-				back_inserter(myvector) // "normally" out_it goes here.
+				back_inserter(myvector) 
 			);
 
             line_count++;
@@ -61,8 +57,6 @@ void readInAtomsXYZ(System &system, string filename) {
             current_atom.polar = system.constants.polars[current_atom.name];
             //==============================================================
             current_atom.V = 0.0;
-			//current_atom.K = 0.0;
-			//current_atom.E = 0.0;
 			current_atom.PDBID = line_count - 2; // skipping first 2 lines
 			current_atom.mol_name = "MOF";
 			    current_atom.frozen = 1;
@@ -70,9 +64,6 @@ void readInAtomsXYZ(System &system, string filename) {
 			current_atom.pos[0] = stod(myvector[1]);
 			current_atom.pos[1] = stod(myvector[2]);
 			current_atom.pos[2] = stod(myvector[3]);
-			//current_atom.prevpos[0] = current_atom.pos[0];
-			//current_atom.prevpos[1] = current_atom.pos[1];
-			//current_atom.prevpos[2] = current_atom.pos[2];
             if (myvector.size() > 4) current_atom.C = stod(myvector[4]) * system.constants.E2REDUCED;
             else current_atom.C = 0.; // default to zero charge unless the column is there
             system.molecules[0].atoms.push_back(current_atom);
@@ -104,26 +95,22 @@ void readInAtoms(System &system, string filename) {
 	ifstream myfile (filename); //("Neons.xyz"); // ("rhtMOF9Zn.xyz"); //("water_1527.dat"); // test2.dat
 	if (myfile.is_open())
 	{
-        //int master_index=-1;
-		//std::string::size_type sz;     // alias of size_t
-		// loop through each line
-                int current_mol_id=-1; // Initializer. Will be changed.
-                int mol_counter=-1;
-		//bool prototype_made = false;
+		int current_mol_id=-1; // Initializer. Will be changed.
+        int mol_counter=-1;
 		bool first_mover_passed = false;
 		int first_mover_id = -1;
         Molecule whatev;
         system.proto.push_back(whatev); // the first prototype.
 		Molecule current_molecule; // initializer. Will be overwritten
-		while ( getline (myfile,line) )
+		// loop through each line
+        while ( getline (myfile,line) )
 		{
 			vector<string> myvector;
       			istringstream iss(line);
-			//ostream_iterator<string> out_it (cout,",");
 			copy(
 				istream_iterator<string>(iss),
 				istream_iterator<string>(),
-				back_inserter(myvector) // "normally" out_it goes here.
+				back_inserter(myvector) 
 			);
 
             // skip blank lines
@@ -147,10 +134,7 @@ void readInAtoms(System &system, string filename) {
 
             if (11 < myvector.size() && myvector[11] != "default") current_atom.polar = stod(myvector[11]);
             else current_atom.polar = system.constants.polars[current_atom.name];
-            //==============================================================
             current_atom.V = 0.0;
-			//current_atom.K = 0.0;
-			//current_atom.E = 0.0;
 			current_atom.PDBID = stoi(myvector[1]); // pulled from input pdb column 2
 			current_atom.mol_name = myvector[3];
             if (myvector[4] == "F")
@@ -168,22 +152,13 @@ void readInAtoms(System &system, string filename) {
                 system.proto[0].fugacity = system.constants.pres;
 			}
 			current_atom.mol_PDBID = stoi(myvector[5]);
-			//current_mol_id = stoi(myvector[5]);
 			current_atom.pos[0] = stod(myvector[6]);
 			current_atom.pos[1] = stod(myvector[7]);
 			current_atom.pos[2] = stod(myvector[8]);
-			//current_atom.prevpos[0] = current_atom.pos[0];
-			//current_atom.prevpos[1] = current_atom.pos[1];
-			//current_atom.prevpos[2] = current_atom.pos[2];
             current_atom.C = stod(myvector[10]) * system.constants.E2REDUCED;
-			//system.atoms.push_back(current_atom); // to master atom list
 
 			// create new molecule if needed.
 			if (current_mol_id != stoi(myvector[5])) {
-				// first save the previous molecule only if not the first instance
-				//if (current_mol_id != -1)
-				//	system.molecules.push_back(current_molecule);
-
 				// make a new molecule.
 				mol_counter++;
 				current_mol_id = stoi(myvector[5]);
@@ -194,7 +169,6 @@ void readInAtoms(System &system, string filename) {
 				    current_molecule.frozen = 0;
                 else if (myvector[4] == "F")
                     current_molecule.frozen = 1;
-				//current_molecule.init_ang_vel(); // for rotations in MD
                 system.molecules.push_back(current_molecule); // make the molecule
 
 				if (myvector[4] == "M")
@@ -218,8 +192,6 @@ void readInAtoms(System &system, string filename) {
 
             if (myvector[4] == "F")
                 system.stats.count_frozens++; // add +1 to frozen atoms count
-			// this would print the whole line.
-			//cout << line << '\n';
             } // end if vector size nonzero
 		}
 		myfile.close();
@@ -239,7 +211,6 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 
 	ofstream myfile;
 	myfile.open (filename, ios_base::app);
-	//long unsigned int size = system.atoms.size();
     int totalatoms;
 
     if (mover_only_flag) totalatoms = system.constants.total_atoms - system.stats.count_frozens;
@@ -485,8 +456,6 @@ if (f == NULL)
                             } // n
                         } // m
                     } // l
-
-
                 } // k
             } // j
         } // i
@@ -625,8 +594,6 @@ if (f == NULL)
                             } // n
                         } // m
                     } // l
-
-
                 } // k
             } // j
         } // i
@@ -755,7 +722,6 @@ void writeLAMMPSfiles(System &system) {
 
 
     fprintf(f, "\n# exclusions\n");
-    //fprintf(f, "neigh_modify exclude group frozen frozen\n");
     fprintf(f, "neigh_modify exclude molecule/intra frozen\n");
     fprintf(f, "neigh_modify exclude molecule/intra moving\n");
 
@@ -847,8 +813,6 @@ void readInput(System &system, char* filename) {
 				back_inserter(lc)
 			);
 
-			//std::cout << lc[0] << ' ';
-			//printf("%\n",lc[0].c_str());
 			if (!lc.empty()) { // ignore blank lines
 
 			if (!strncasecmp(lc[0].c_str(), "!", 1) || (!strncasecmp(lc[0].c_str(), "#", 1))) {
@@ -936,7 +900,6 @@ void readInput(System &system, char* filename) {
                     system.constants.atom_file = lc[1].c_str();
                 }
 
-                //std::cout << "Got XYZ input option = " << lc[1].c_str(); printf("\n");
                 if (system.constants.readinxyz == 1)
                     std::cout << "Got xyz input file = " << lc[1].c_str(); printf("\n");
                 
@@ -1250,11 +1213,6 @@ void readInput(System &system, char* filename) {
                 else system.constants.com_option = 0;
 				std::cout << "Got center-of-mass option = " << lc[1].c_str(); printf("\n");
 
-            /* DEPRECATED
-			} else if (!strcasecmp(lc[0].c_str(),  "rotate_prob")) {
-				system.constants.rotate_prob = atof(lc[1].c_str());
-				std::cout << "Got rotate probability = " << lc[1].c_str(); printf("\n");
-			*/
 			} else if (!strcasecmp(lc[0].c_str(), "free_volume")) {
                 system.constants.free_volume = atof(lc[1].c_str());
                 std::cout << "Got free volume = " << lc[1].c_str() << " A^3."; printf("\n");
@@ -1409,8 +1367,6 @@ void readInput(System &system, char* filename) {
                     system.constants.fragsize.push_back(atoi(lc[x+1].c_str()));
                     std::cout << "Got atoms-per-fragment[" << x+1 << "] = " << lc[x+1].c_str(); printf("\n");
                 }
-                //system.constants.fragsize = atoi(lc[1].c_str());
-                //std::cout << "Got atoms-per-fragment = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "frag_bondlength")) {
                 system.constants.frag_bondlength = atof(lc[1].c_str());
@@ -1560,8 +1516,6 @@ void inputValidation(System &system) {
     for (int i=0; i<system.molecules.size(); i++)
         for (int j=0; j<system.molecules[i].atoms.size(); j++) 
             qsum += system.molecules[i].atoms[j].C;
-
-    //printf("System total charge = %f e = %f sqrt(KA).\n", qsum/system.constants.E2REDUCED, qsum);
 
     if (fabs(qsum/system.constants.E2REDUCED) > 0.005 && // a little bit of lee-way for charge sum.
         (system.constants.mode == "md" || system.constants.mc_pbc) &&      

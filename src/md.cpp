@@ -13,24 +13,13 @@
 double gaussian(double sigma) { // sigma is SD of the gaussian curve
 
     /* NOTE TO SELF
-        the usage of erfInverse here may explode if rand()/RAND_MAX ever yields exactly -1 or +1
+        the usage of erfInverse here may explode if getrand() ever yields exactly -1 or +1
         because erf^-1( +-1) = +-inf
         if that ever happens I just need to check for abs(ranf) == 1 and avoid it.
     */
 
-    // assuming mean velocity is zero (+ or - boltzmann velocity for particles yields net 0)
     double ranf = 2*((getrand())-0.5); // -1 to +1
-    //return abs(sigma*SQRT2*erfInverse(ranf)); // I'm doing absolute value here bc +- is determined by velocity.
-    
-    // USE THE SIGMA AS MEAN-VALUE, RANDOMIZE DIRECTION. Seems to overinflate the velocities..
-    //double pm=1.0;
-    //double ranfsign = (double)rand() / (double)RAND_MAX;
-    //if (ranfsign < 0.5) pm = -1.0;
-    //double displacement = sigma * pm; // this is +/- the goal component velocity (gaussian width is same as mean)
-
     return sigma*SQRT2*erfInverse(ranf); //  + displacement;
-    // if mean was nonzero it would be
-    // mean + sigma*SQRT2*erfInverse(ranf);
     // my green notebook ("Space Group Research #2") has notes on this in 2nd divider.
 }
 
@@ -50,7 +39,6 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
         // from PBC (same as Monte Carlo potential)
         if (system.constants.md_pbc) {
             V_total += getTotalPotential(system);
-            //printf("used getTotalPotential\n");
         // from individual atomic contributions (no PBC)
         } else {
             for (i=0; i<system.molecules.size(); i++) {
@@ -74,12 +62,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
             K_total += energy_holder; // linear: kg A^2 / fs^2
             Klin += energy_holder;
 
-            // energy is conserved in NVE for non-rotating particles. 
-            // for rotating particles, I don't seem to conserve energy in NVE.
             if (system.constants.md_rotations) {
-                // old scalar method
-                //energy_holder = 0.5 * system.molecules[j].inertia * wsq * system.constants.kb / 1e10;
-                
                 // new tensor method.
                 system.molecules[j].calc_inertia_tensor();
                 double wx = system.molecules[j].ang_vel[0];
@@ -109,22 +92,6 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
                 Klin += energy_holder;
             }
         }
-
-        /*
-         * I'm getting the state potential by the MC function instead of dynamic quantities.
-         * It's more foolproof, I do believe.
-        // iteratively sum ROTATIONAL POTENTIAL
-        for (int n=0; n<3; n++) {
-            V_total += -system.molecules[j].torque[n] * system.molecules[j].d_theta[n];
-            //printf("rot pot: %e\n", -system.molecules[j].torque[n] * system.molecules[j].d_theta[n]);
-        }
-
-
-        // iteratively sum LINEAR POTENTIAL
-        for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-            V_total += system.molecules[j].atoms[i].V;
-        }
-        */
     }
 
     avg_v = v_sum / system.stats.count_movables; //system.molecules.size(); // A/fs
@@ -137,25 +104,6 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     // note this is only valid for single-sorbate (homogenous gas) right now
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
-    //T = 1e10*(avg_v*avg_v)*system.proto[0].mass / system.constants.kb;
-
-/*
-    if (system.constants.ensemble == "nvt") {
-        // grab the sum of F.r's
-        double frsum=0;
-        for (int i=0; i<system.pairs.size(); i++) {
-            frsum += system.pairs[i].fdotr;
-        }
-        system.stats.fdotrsum.value = frsum;
-        system.stats.fdotrsum.calcNewStats(); // makes new average based on new value.
-
-        double volInLiters = system.pbc.volume * system.constants.A32L;
-        pressure = (system.stats.count_movables/volInLiters)*
-            system.constants.kb * T + (1.0/(3.0*volInLiters))*system.stats.fdotrsum.average*system.constants.kb;
-        pressure *= system.constants.JL2ATM; // J/L -> atm
-    }
- */
-
 	static double output[8];
 	output[0] = K_total;
     output[1] = V_total;
@@ -201,13 +149,6 @@ void calculateForces(System &system, double dt) {
                 coulombic_real_force(system);
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
                 polarization_force(system);
-            //int index=0;
-            //for (int i=0;i<system.molecules.size();i++)
-              //  for (int j=0;j<system.molecules[i].atoms.size();j++){
-           //         printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
-                //    index++;
-                //}
-            
         } // end if PBC
     // GPU style
     } else {
@@ -253,11 +194,10 @@ void calculateForces(System &system, double dt) {
             }
         } // end if molecular else atomic
     } // end if EXTERNAL force
-
 } // end force function.
 
 // ==================== MOVE ATOMS MD STYLE =========================
-/* THIS IS THE MAIN LOOPING FUNCTION. calculateForces() is called within */
+/* THIS IS THE MAIN INTEGRATOR FUNCTION. calculateForces() is called within */
 void integrate(System &system, double dt) {
     system.checkpoint("started integrate()");
     int i,j,n;
@@ -274,35 +214,18 @@ void integrate(System &system, double dt) {
     }
     // END IF DEBUG
 
-    // 1a) CHANGE POSITIONS OF PARTICLES
-    /* NO NEED FOR SAVING OLD POS
-    // save old positions
-    for (j=0; j<system.molecules.size(); j++) {
-        if (!system.molecules[j].frozen) {
-        for (i=0; i<system.molecules[j].atoms.size(); i++) {
-            for (n=0; n<3; n++) system.molecules[j].atoms[i].prevpos[n] = system.molecules[j].atoms[i].pos[n];
-        } // end for atom i
-        } // end if movable
-    } // end for molecule j
-    // done saving old positions
-    */
-
     system.checkpoint("moving particles based on forces.");
     // if molecular motion
     if (system.constants.md_mode == MD_MOLECULAR) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
 
+            // TRANSLATION
             system.molecules[j].calc_pos(dt);
 
-              // ROTATION
+            // ROTATION
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
             system.molecules[j].calc_ang_pos(dt);
-
-            // note,
-            // maybe the angle of rotation here should be ang_pos - previous_ang_pos,
-            // not ang_pos.
-            // this may be why I have to set a rotation cap on theta (ang_pos).
 
             // rotate molecules
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
@@ -365,8 +288,6 @@ void integrate(System &system, double dt) {
     system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
-	// Normal CPU routine
-    //if (!system.constants.cuda) {
     for (j=0; j<system.molecules.size(); j++) {
 		if (!system.molecules[j].frozen) { // only movable atoms should move.
 
@@ -391,30 +312,16 @@ void integrate(System &system, double dt) {
             }
         } // end if movable
     } // end for j molecules
-    //}
-    // CUDA GPU style
-    //else {
-     //   #ifdef CUDA
-      //  CUDA_verlet(system);
-       // #endif
-    //}
     system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
 
     // 5) apply heat bath in NVT
     if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
-        // this process makes the NVT MD simulation stochastic/ Markov / MC-like, which is good for equilibration results.
-        // the thermostat probability must be recalc'd every new step.
-        //double probab = system.constants.md_thermostat_freq *
-         //           exp(-system.constants.md_thermostat_freq * system.stats.MDtime);
-        //printf("MD thermostat probab = %f\n", probab);
-        // or not? 
+        // this process makes the NVT MD simulation stochastic/ Markov / MC-like, 
+        // which is usually good for obtaining equilibrium quantities.
         double probab = system.constants.md_thermostat_probab;
-
-        double ranf; //, sigma = sqrt(system.constants.kb * system.constants.temp /  system.proto[0].mass) *1e-5; // to A/s
+        double ranf;
         double sigma = system.constants.md_vel_goal;
-        //printf("sigma = %f\n", sigma);
-        //double newvel;
         if (system.constants.md_mode == MD_MOLECULAR) {
         for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue; // skip frozens
@@ -422,21 +329,7 @@ void integrate(System &system, double dt) {
             if (ranf < probab) {
                 // adjust the velocity components of the molecule.
                 for (n=0; n<3; n++) {
-                    //printf("gauss(sigma, mean) = gauss(%f, %f) = %f\n", sigma, mean_velocity, gaussian(sigma, mean_velocity));
                     system.molecules[i].vel[n] = gaussian(sigma);
-                    //printf("Gaussian molecular vel[%i]: %f\n",n, system.molecules[i].vel[n]);
-                    //if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
-                    //else system.molecules[i].vel[n] = newvel;
-                    /*
-                    if (system.molecules[i].vel[n] >= 0) {
-                        //system.molecules[i].vel[n] = system.constants.md_vel_goal;
-                        system.molecules[i].vel[n] = gaussian(sigma,mean_velocity);
-                    }
-                    else {
-                        //system.molecules[i].vel[n] = -system.constants.md_vel_goal;
-                        system.molecules[i].vel[n] = gaussian(sigma, -mean_velocity);
-                    }*/
-
                 }
             }
         }
@@ -448,16 +341,12 @@ void integrate(System &system, double dt) {
                     if (ranf <probab) {
                         for (n=0; n<3; n++) {
                             system.molecules[i].vel[n] = gaussian(sigma);
-                            //if (system.molecules[i].vel[n] < 0) system.molecules[i].vel[n] = -newvel;
-                            //else system.molecules[i].vel[n] = newvel;
-                    //      if (system.molecules[i].atoms[j].vel[n] >= 0) system.molecules[i].atoms[j].vel[n] = system.constants.md_vel_goal;
-                       //     else system.molecules[i].atoms[j].vel[n] = -system.constants.md_vel_goal;
                         }
                     }
                 }
             }
         }
-    } // end if NVT (thermostat)
+    } // end if uVT or NVT (thermostat)
     system.checkpoint("Done with heatbath if NVT/uVT.");
     system.checkpoint("Done with integrate() function.");
 }// end integrate() function

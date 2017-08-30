@@ -348,63 +348,34 @@ void thole_field_nopbc(System &system) {
 // =========================== POLAR POTENTIAL ========================
 double polarization(System &system) {
 
-    // POLAR ITERATIVE METHOD IS WHAT I USE.
+    // POLAR ITERATIVE METHOD FROM THOLE/APPLEQUIST IS WHAT I USE.
     // THERE ARE OTHERS, E.G. MATRIX INVERSION OR FULL EWALD
     // MPMC CAN DO THOSE TOO, BUT WE ALMOST ALWAYS USE ITERATIVE.
     double potential; int i,j,num_iterations;
-
-    // zero out everything on the atoms that pertains to polarness.
-    // except static vars (like charge, polarizability, name, blah)
-    // hopefully this fixes the issue but it will be redundant.
-    // it did not fix the issue but i'm leaving it
-/*
-    for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            system.molecules[i].atoms[j].rank_metric=0;
-            for (int p=0; p<3; p++) {
-                system.molecules[i].atoms[j].dip[p] =0;
-                system.molecules[i].atoms[j].newdip[p]=0;
-                system.molecules[i].atoms[j].olddip[p]=0;
-                system.molecules[i].atoms[j].efield[p]=0;
-                system.molecules[i].atoms[j].efield_self[p]=0;
-                system.molecules[i].atoms[j].efield_induced[p]=0;
-                system.molecules[i].atoms[j].efield_induced_change[p]=0;
-            }
-            system.molecules[i].atoms[j].dipole_rrms=0;
-        }
-    }
-*/
 
     // 00) RESIZE THOLE A MATRIX IF NEEDED
     if (system.constants.ensemble == ENSEMBLE_UVT) { // uVT is the only ensemble that changes N
         thole_resize_matrices(system);
     }
-    //system.checkpoint("done resizing thole matrix.");
 
-    //system.checkpoint("running thole_amatrix().");
     // 0) MAKE THOLE A MATRIX
     thole_amatrix(system); // ***this function also makes the i,j -> single-index atommap.
-    //system.checkpoint("done running thole_amatrix(). Running thole_field()");
 
     // 1) CALCULATE ELECTRIC FIELD AT EACH SITE
     if (system.constants.mc_pbc)
         thole_field(system);
     else
         thole_field_nopbc(system); // maybe in wrong place? doubt it. 4-13-17
-    //system.checkpoint("done with thole_field(). Doing dipole iterations");
 
 
     // 2) DO DIPOLE ITERATIONS
     num_iterations = thole_iterative(system);
-//    printf("num_iterations = %f\n", (double)num_iterations);
     system.stats.polar_iterations = (double)num_iterations;
     system.constants.dipole_rrms = get_dipole_rrms(system);
-    //system.checkpoint("done with dipole iters. Calculating polarization energy");
 
 
     // 3) CALCULATE POLARIZATION ENERGY 1/2 mu*E
     potential=0;
-    //int atom=0;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             potential +=
@@ -413,23 +384,11 @@ double polarization(System &system) {
             if (system.constants.polar_palmo) {
                 potential += dddotprod(system.molecules[i].atoms[j].dip, system.molecules[i].atoms[j].efield_induced_change);
             }
-        // DEBUG
-        /*
-            printf("atom %i \ndip %f %f %f \nefield %f %f %f \nindchang %f %f %f \nef_self %f %f %f \nef_ind %f %f %f\n", atom,
-                system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2],
-                system.molecules[i].atoms[j].efield[0], system.molecules[i].atoms[j].efield[1], system.molecules[i].atoms[j].efield[2],
-                 system.molecules[i].atoms[j].efield_induced_change[0], system.molecules[i].atoms[j].efield_induced_change[1], system.molecules[i].atoms[j].efield_induced_change[2],
-                system.molecules[i].atoms[j].efield_self[0], system.molecules[i].atoms[j].efield_self[1], system.molecules[i].atoms[j].efield_self[2],
-                system.molecules[i].atoms[j].efield_induced[0], system.molecules[i].atoms[j].efield_induced[1], system.molecules[i].atoms[j].efield_induced[2]);
-       */
-          //  atom++;
         }
 
     }
-    //system.checkpoint("POLARIZATION POTENTIAL CALCULATED.");
 
     potential *= -0.5;
-    //printf("POLARIZATION POTENTIAL: %f\n",potential);
     return potential;
 
 } // end polarization() function
@@ -439,7 +398,6 @@ double polarization(System &system) {
 void polarization_force(System &system) {
     // gets force on atoms due to dipoles calculated before (via iterative method)
     // TODO
-    // adam sent a code snippet that should help on slack
 
     int i,j,n;
     double q;

@@ -27,7 +27,6 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
             printf("Loading bias deactivated! (Desired N reached).\n");
         }       
     }
-      //printf("fugac: %f\n", fugacity);
 
     if (system.constants.ensemble == ENSEMBLE_UVT) {
         if (movetype == MOVETYPE_INSERT) {
@@ -63,22 +62,12 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     }
     else if (system.constants.ensemble == ENSEMBLE_NPT) {
         if (movetype == MOVETYPE_VOLUME) {
-            /*
-            system.pbc.old_volume = 200000;
-            system.pbc.volume = 210000;
-            system.constants.pres = 1.;
-            energy_delta = -13.5;
-            system.constants.temp = 300;
-            system.stats.count_movables = 50;
-*/
             // Frenkel Smit p118
             bf= exp(-( (energy_delta)
             + system.constants.pres * system.constants.ATM2REDUCED * 
             (system.pbc.volume - system.pbc.old_volume)
             - (system.stats.count_movables + 1) * system.constants.temp * 
                 log(system.pbc.volume/system.pbc.old_volume))/system.constants.temp);
-
-//            printf("\n\nvolume boltz: %f; v_old %f; v_new %f; vdiff %f; Udiff %f\n\n", bf, system.pbc.old_volume, system.pbc.volume, system.pbc.volume - system.pbc.old_volume, energy_delta);
             
             if (bf < MAXVALUE) system.stats.volume_change_bf_sum += bf;
             else system.stats.volume_change_bf_sum += MAXVALUE;
@@ -92,17 +81,12 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     else if (system.constants.ensemble == ENSEMBLE_NVE) {
         if (movetype == MOVETYPE_DISPLACE) {
             double exponent = 3.0*system.stats.count_movables/2.0;
-            //printf("exponent = %f\n", exponent);
-
-            //printf("num %f\n", pow( (system.constants.total_energy - e_f ), 3.0*system.stats.count_movables/2.0));
-            //printf("denom %f\n", pow( (system.constants.total_energy - e_i), 3.0*system.stats.count_movables/2.0));
             bf = pow(
             (system.constants.total_energy - e_f) , exponent) / 
                 pow(
                     (system.constants.total_energy - e_i) , exponent);
             if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
             else system.stats.displace_bf_sum += MAXVALUE;
-            //printf("bf %f \n", bf);
         }
     }
  
@@ -111,8 +95,6 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
     } 
     else if (std::isinf(bf)) {
         printf("GOT INF! bf = %f\n", bf);
-        //bf = MAXVALUE; 
     }
-    //printf("bf: %f initial %f final %f\n",bf, e_i, e_f);
     return bf;
 }

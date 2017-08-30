@@ -424,11 +424,6 @@ int main(int argc, char **argv) {
                 }
                 printf("N_molecules = %i N_movables = %i N_sites = %i\n", (int)system.molecules.size(), system.stats.count_movables, system.constants.total_atoms);
             }
-            /*
-            if (system.constants.ensemble != "npt") {
-                printf("Chemical potential avg = %.4f +- %.4f K / sorbate molecule \n", system.stats.chempot.average, system.stats.chempot.sd);
-            }
-            */
             if (system.proto.size() == 1 && system.stats.count_frozen_molecules == 0)
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
             if (system.constants.dist_within_option) {
@@ -536,21 +531,9 @@ int main(int argc, char **argv) {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
 
-        //v_init = 1e-5 * sqrt(8.0*system.constants.temp*system.constants.kb/system.proto[0].mass/M_PI);
-				//v_component = sqrt(v_init*v_init / 3.0);
-
-//THIS IS WORKING BEFORE BUT SEEMED TO HAVE HIGH INITIAL v
-// when i swap to the above, the equilibrium T seems much lower.
-				// Frenkel method for NVT v_alpha determination (converted to A/fs) p140
-				v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
+		// Frenkel method for NVT v_alpha determination (converted to A/fs) p140
+		v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
         v_init = sqrt(3*v_component*v_component);
-
-
-// GARBAGE
-//double v_init = sqrt(8.0 * system.constants.R * system.constants.temp /
-  //          (M_PI*system.proto[0].mass*system.constants.NA)) / 1e5; // THIS IS NOT GOOD FOR MULTISORBATE SYSTEM YET. A/fs
-    //    double v_component = sqrt(v_init*v_init / 3.0);
-
         double pm = 0;
         for (int i=0; i<system.molecules.size(); i++) {
             for (int n=0; n<3; n++) {
@@ -566,13 +549,6 @@ int main(int argc, char **argv) {
         system.constants.md_init_vel = v_init;
     }
     system.constants.md_vel_goal = v_component; //sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
-   /*
-        printf("md_vel_goal = %f; v_component = %f; md_init_vel = %f; v_init = %f\n",
-        system.constants.md_vel_goal,
-        v_component,
-        system.constants.md_init_vel,
-        v_init);
-    */
     // end initial velocities
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
@@ -676,7 +652,6 @@ int main(int argc, char **argv) {
 						double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
 						system.stats.pressure.value = nmol*system.constants.R*system.stats.temperature.value/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
 						system.stats.pressure.calcNewStats();
-						//pressure = -PE/system.constants.volume * system.constants.kb * 1e30 * 9.86923e-6; // P/V to atm
             } // end if N>0 (stats calculation) 
 
 			// PRINT OUTPUT
@@ -700,7 +675,6 @@ int main(int argc, char **argv) {
             if (system.constants.cuda) printf("MCMD (CUDA) Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             else printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
-            //printf("testing angular velocity\n");
             printf("Ensemble: %s; N_movables = %i N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
@@ -715,8 +689,6 @@ int main(int argc, char **argv) {
             printf("Total E = %.3f kJ/mol\n", TE);
             printf("Average v = %.2f m/s; v_init = %.2f m/s\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
                 v_avg*1e5, system.constants.md_init_vel*1e5, system.stats.pressure.average, system.stats.pressure.sd );
-            // hiding specific heat until i make sure it's right.
-            //printf("Specific heat: %.4f +- %.4f J/gK\n", system.stats.csp.average, system.stats.csp.sd );
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);

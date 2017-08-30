@@ -17,7 +17,6 @@
 // ACCORDING TO DIFFERENT ENSEMBLES
 void runMonteCarloStep(System &system) {
     system.checkpoint("Entered runMonteCarloStep().");
-    //int_fast8_t model = system.constants.potential_form;
     system.stats.MCmoveAccepted = false; // reset acceptance checker
 
 	// VOLUME MOVE (only NPT)
@@ -38,8 +37,6 @@ void runMonteCarloStep(System &system) {
 		double IRP = system.constants.insert_factor;
 		double ranf = getrand(); // between 0 and 1
 		if (ranf < IRP) {
-            //system.checkpoint("doing an add or remove.");
-			// we're going to do an add/remove now.
 			double ranf2 = getrand(); // 0->1
 			// ADD A MOLECULE
 			if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.

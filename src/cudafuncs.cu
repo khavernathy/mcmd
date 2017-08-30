@@ -28,23 +28,6 @@ typedef struct atom_t {
     int frozen=0;
 } cuda_atom;
 
-/*
-// same but for molecule
-typedef struct molecule_t {
-    double old_ang_acc[3]={0,0,0};
-    double ang_acc[3]={0,0,0};
-    double ang_vel[3]={0,0,0};
-    double ang_pos[3]={0,0,0};
-    double torque[3]={0,0,0};
-    double inertia=0;
-    double mass=0;
-    double old_acc[3]={0,0,0};
-    double acc[3]={0,0,0};
-    double vel[3]={0,0,0};
-    double com[3]={0,0,0};
-    double force[3]={0,0,0};
-} cuda_molecule;
-*/
 
 __global__
 void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double * basis, double * reciprocal_basis, int pformD, double ewald_alpha, int kmax, int kspace) {
@@ -54,22 +37,19 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
     // only run for real atoms (no ghost threads)
     if(i<N){   
         const register cuda_atom anchoratom = atom_list[i];
-        //printf("I AM THREAD %i\n", i);
-        //atom_list[i].pos[0] += cutoff;
-       const int pform = pformD;
-         const double alpha = ewald_alpha;
+        const int pform = pformD;
+        const double alpha = ewald_alpha;
         const double cutoff=cutoffD;
         register double rimg, rsq;
         const double sqrtPI=sqrt(M_PI);
         double d[3], di[3], img[3], dimg[3],r,r2,ri,ri2;
         int q,j,n;
         double sig,eps,r6,s6,u[3]={0,0,0};
-        //int count=0;
         register double af[3] = {0,0,0}; // accumulated forces for anchoratom
         double holder,chargeprod; // for ES force    
-        //printf("basis[3] = %f\n", basis[3]);
         __syncthreads();
-        // order N instead of N^2 bc this runs on all GPU cores at once (basically)
+        // order N (generally, IF N_atoms < N_cores) instead of N^2 bc 
+        // this runs on all GPU cores at once 
 
         // if LJ 
         if (pform == 0 || pform == 1) {
@@ -78,14 +58,12 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
            if (anchoratom.molid == atom_list[j].molid) continue; // skip same molecule 
             if (anchoratom.frozen && atom_list[j].frozen) continue; // skip frozens            
 
-           
             // get R (nearest image)
             for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
             for (n=0;n<3;n++) {
                 img[n]=0;
                 for (q=0;q<3;q++) {
                     img[n] += reciprocal_basis[n*3+q]*d[q];
-                    //if (i==0 && j==1188) printf("img[%i] = reciprocal_basis[%i]*d[%i] = %f\n",p,p*3+q,q,reciprocal_basis[p*3+q]*d[q]);
                 }
                 img[n] = rint(img[n]);
             }
@@ -114,14 +92,6 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
             }
             // distance is now rimg
                
-            //if (i==0) {
-              //  printf("r[%i].%i = %f\n", i,j,rimg);
-                //printf("CUTOFF: %f\n", cutoff);
-                //for (int h=0;h<9;h++) {
-                  //  printf("basis[%i] = %f\n", h, basis[h]);
-                //}
-            //}
-
                 if (rimg <= cutoff) {
            
                  sig = anchoratom.sig;
@@ -246,8 +216,6 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
             // finally add ES contribution to anchor-atom
             for (n=0;n<3;n++) atomicAdd(&(atom_list[i].f[n]), af[n]);
         } // end ES component
-
-        //if (i==0) printf("COUNT: %i\n",count);
     } // end if i<n (all threads)
 }
 
@@ -260,19 +228,14 @@ void calculateForceNopbcKernel(cuda_atom * atom_list, int N, int pformD) {
     // only run for real atoms (no ghost threads)
     if(i<N){   
         const register cuda_atom anchoratom = atom_list[i];
-        //printf("I AM THREAD %i\n", i);
-        //atom_list[i].pos[0] += cutoff;
        const int pform = pformD;
         const double cutoff=10.; // default 10 A for no-pbc cutoff.
         double d[3], r,r2;
         int j,n;
         double sig,eps,r6,s6,u[3]={0,0,0};
-        //int count=0;
         register double af[3] = {0,0,0}; // accumulated forces for anchoratom
         double holder,chargeprod; // for ES force    
-        //printf("basis[3] = %f\n", basis[3]);
         __syncthreads();
-        // order N instead of N^2 bc this runs on all GPU cores at once (basically)
 
         // if LJ 
         if (pform == 0 || pform == 1) {
@@ -388,13 +351,10 @@ void CUDA_force(System &system) {
 
     for (int p=0;p<3;p++) {
         for (int q=0;q<3;q++) {
-            basis[3*q+p] = system.pbc.basis[p][q]; // quite sure correct.
-            reciprocal_basis[3*q+p] = system.pbc.reciprocal_basis[p][q]; // quite sure correct.
+            basis[3*q+p] = system.pbc.basis[p][q]; 
+            reciprocal_basis[3*q+p] = system.pbc.reciprocal_basis[p][q]; 
         }
     }
-    //system.pbc.printBasis();
-
-    //for (int l=0;l<9;l++) printf("basis[%i] = %f\n", l,basis[l]);
 
     // allocate memory on GPU
     cudaMalloc((void**) &dbasis, bs);
@@ -421,7 +381,6 @@ void CUDA_force(System &system) {
     // copy device data back to host
     cudaMemcpy(H, D, atoms_array_size, cudaMemcpyDeviceToHost);
 
-    //for (int i=0;i<N;i++) printf("H[%i] force0 = %f\n", i, H[i].f[0]);
     index=0;
     for (int i=0;i<system.molecules.size();i++) {
         for (int j=0;j<system.molecules[i].atoms.size();j++) {
@@ -432,9 +391,6 @@ void CUDA_force(System &system) {
         }
     }
 
-    //printf("H[0] force = %f %f %f\n",system.molecules[0].atoms[0].force[0], system.molecules[0].atoms[0].force[1], system.molecules[0].atoms[0].force[2]);
- 
-
     // clean up -- so we don't have a memory leak
      cudaFree(D);
      cudaFree(dbasis);
@@ -442,11 +398,14 @@ void CUDA_force(System &system) {
      free(basis);
      free(reciprocal_basis);
 
-
-    // we're done. forces have been calc'd on GPU and written to local mem.
 }
 
 void CUDA_force_nopbc(System &system) {
+
+/*
+    needs works to be fully functional.
+*/
+
 
     const int N = (int)system.constants.total_atoms;
     const int block_size = system.constants.cuda_block_size; 
@@ -503,6 +462,4 @@ void CUDA_force_nopbc(System &system) {
     }
 
      cudaFree(D);
-
-    // we're done. forces have been calc'd on GPU and written to local mem.
 }

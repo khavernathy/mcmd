@@ -20,8 +20,13 @@
 # bash compile.sh gpu debug     (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe HPC)
 
+# bash compile.sh omp           (for OpenMP implementation, not yet functional)
+# bash compile.sh omp linux     (same, optimized for Linux)
+
+# bash compile.sh mpi           (for MPI implementation, not yet functional)
+
+
 ##########################
-###echo "This should take like 10 sec."
 
 
 DEFAULT="cpu"

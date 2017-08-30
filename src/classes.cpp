@@ -534,15 +534,8 @@ class Stats {
                 double prevsd = sd; //printf("counter %f\n",obs.counter);
                 counter = counter+1.0; //printf("counter %f\n",obs.counter);
                 average = ((counter-1.0)*average + x)/counter;
-                //sd = sqrt( ((counter-2.0)*prevsd + (x - average)*(x - prevavg) ) / (counter-1.0));
                 double operand =  prevsd*prevsd + prevavg*prevavg - average*average +((x*x - prevsd*prevsd - prevavg*prevavg)/counter);
                 (operand > 0) ? sd = sqrt( operand ) : sd = 0;
-
-                //if (name == "es") {
-                //if (name == "es" || name == "es_self" || name == "es_real" || name == "es_recip") {
-                //printf("observable %14s :: counter = %5f; value = %-10.5f; prevavg = %-10.5f; average = %-10.5f; prevsd = %-10.5f; sd = %-10.5f\n",
-                //    name.c_str(), counter, value, prevavg, average, prevsd, sd);
-                //}
             }
 
 
@@ -694,8 +687,6 @@ class Molecule {
         double ang_acc[3] = {0,0,0};
         double old_ang_acc[3] = {0,0,0};
         double ang_pos[3] = {0,0,0};
-        //double d_theta[3] = {0,0,0};
-        //vector<double> com = vector<double>(3); // center of mass for molecule. Using for MD rotations
         double mass=0.0;
         double inertia=0.0; //moment of inertia. stored in K fs^2
         double inertia_tensor[6] = {0,0,0,0,0,0}; // xx,yy,zz,xy,yz,xz
@@ -718,7 +709,6 @@ class Molecule {
                 ang_acc[n]=0;
                 old_ang_acc[n]=0;
                 ang_pos[n]=0;
-                //d_theta[n]=0;
             }
             name = "";
             PDBID=0;
@@ -787,34 +777,15 @@ class Molecule {
 
         // linear velocity
         void calc_vel(double dt, double goal) {
-            //double booster=0.0005; // for NVT thermostat.
             for (int n=0; n<3; n++) {
                 vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
             }
-            /*
-           double vmag = sqrt(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
-            for (int n=0; n<3; n++) {
-                if (vel[n] < 0) {  // THE NVT THERMOSTAT :: it changes velocities to try to approach the initial v
-                    if (vel[n] < -goal) vel[n] += booster;
-                    else if (vel[n] > -goal) vel[n] -= booster;
-                } else if (vel[n] > 0) {
-                    if (vel[n] < goal) vel[n] += booster;
-                    else if (vel[n] > goal) vel[n] -= booster;
-                }
-            }
-            */
         }
 
         // angular position // in rad
         void calc_ang_pos(double dt) {
-            //double theta[3];
-            //double cap = 0.0005;
             for (int n=0; n<3; n++) {
-                //theta[n] = ang_pos[n];
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
-                //if (ang_pos[n] > cap) ang_pos[n] = cap; // SET THE ROTATION CAP -- rad/fs
-                //else if (ang_pos[n] < -cap) ang_pos[n] = -cap;
-                //d_theta[n] = ang_pos[n] - theta[n];
             }
         }
 
@@ -840,7 +811,6 @@ class Molecule {
 
             for (int i=0; i<atoms.size(); i++) {
                 double atom_mass = atoms[i].m;
-                //mass_sum += atom_mass;
 
                 x_mass_sum += atoms[i].pos[0]*atom_mass;
                 y_mass_sum += atoms[i].pos[1]*atom_mass;
@@ -1096,7 +1066,6 @@ sigs["Lr"] = 3.236*uff2mpmc;
     // UFF4MOF sigs
     // nevermind, they only give bonding parameters.
 
-
 	// LJ EPSILON VALUES ( /kbk means kcal/mol -> K)
 	eps["HB"] = 34.20; // buch model h2
     eps["H2G"] = 8.8516; // bss model h2
@@ -1224,7 +1193,6 @@ eps["Md"] = 0.011/kbk;
 eps["No"] = 0.011/kbk;
 eps["Lr"] = 0.011/kbk;
 
-
 	// POLARIZABILITIES  // in A^3 
     // these are VAN DUIJNEN EXPONENTIAL DAMPING POLARIZABILITIES
     // IT WOULD BE DIFFERENT FOR LINEAR DAMPING
@@ -1262,7 +1230,6 @@ eps["Lr"] = 0.011/kbk;
 	polars["Pd"] = 5.25926;//*cV/ke;
 	polars["Pt"] = 8.56281;//*cV/ke;
 
-
 	// He-PHAST2
     // NEEDS FIXIN
 	phast2_c6["He"] = 1.407164;
@@ -1271,9 +1238,6 @@ eps["Lr"] = 0.011/kbk;
 	phast2_sigs["He"] = 2.18205*cA; // A -> m
 	phast2_eps["He"] = 4.49880*kb; // K -> J
 	phast2_polar["He"] = 0.20494*cV/ke; // A^3 -> m^3 -> C^2 m^2 / J
-
-
-    
 
 
 }

@@ -98,8 +98,6 @@ double lj(System &system) {
     for (k = i+1; k < system.molecules.size(); k++) {
     for (l =0; l < system.molecules[k].atoms.size(); l++) {
 
-        //if (system.pairs[i][j][k][l].recalculate) {
-
         // do mixing rules
         double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
         if (eps != system.molecules[k].atoms[l].eps)
@@ -117,10 +115,8 @@ double lj(System &system) {
         if (auto_reject_option && r <= auto_reject_r) { // auto-reject feature for bad contacts
             system.constants.auto_reject = 1;
             system.constants.rejects++;
-            //printf("triggered\n");
             return 1e40; // a really big energy
         }
-        //r = system.pairs[i][j][k][l].r;    
 
         sr6 = sig/r; //printf("r=%f\n",r);
         sr6 *= sr6;
@@ -138,16 +134,6 @@ double lj(System &system) {
                 total_pot += lj_fh_corr(system, i,k, r, sr6*sr6, sr6, sig, eps);
         }
         
-        /*
-        // end if recalculate
-        } else {
-            if ((system.constants.rd_lrc=="off" || r <= cutoff)) {
-                this_lj = system.pairs[i][j][k][l].lj;
-                total_lj += this_lj;
-                total_pot += this_lj;
-            }
-        }
-        */
     }  // loop l
     } // loop k 
     } //loop j
@@ -207,7 +193,6 @@ double lj(System &system) {
     system.stats.lj_self_lrc.value = total_rd_self_lrc; 
     system.stats.lj.value = total_lj; 
 
-//printf("potential: %f, self = %f, lrc = %f, lj = %f\n", total_pot, total_rd_self_lrc, total_rd_lrc, total_lj);
     return total_pot;
 
 }
@@ -217,8 +202,6 @@ void lj_force(System &system) {   // units of K/A
 
     const double cutoff = system.pbc.cutoff;
     double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
-    //int count=0; // for the pair values
-    //int index=0;
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i+1; k < system.molecules.size(); k++) {
@@ -232,46 +215,21 @@ void lj_force(System &system) {   // units of K/A
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];    
-        //if (i==0 && j==0) {
-            //printf("r[%i].%i.%i = %f\n",0,k,l, r);
-            //printf("CUTOFF: %f\n", system.pbc.cutoff);
-        //}
         rsq=r*r;
         for (int n=0; n<3; n++) d[n] = distances[n];
 
         r6 = rsq*rsq*rsq;
         s2 = sig*sig;
         s6 = s2*s2*s2;
-                /*
-                if (i != k) { // don't do self-interaction for potential.
-                    sr = sig/r;
-                    sr2 = sr*sr;    
-                    sr6 = sr2*sr2*sr2;
-                }
-                */
             
         if ((!system.constants.rd_lrc || r <= cutoff)) {
-        //if (r <= cutoff) {
             for (int n=0; n<3; n++) {
                 f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                 system.molecules[i].atoms[j].force[n] += f[n];
                 system.molecules[k].atoms[l].force[n] -= f[n];
             }
-            //if (i==0 && j==0) count++;
-
-
-/*
-            // this dot product is calc'd to get pressure.
-            if (system.molecules[i].MF == "M" && system.molecules[k].MF == "M") { // make sure it's gas-to-gas
-            system.pairs[count].fdotr = (f[0] * distances[0] +
-            f[1] * distances[1] +
-            f[2] * distances[2]); // F.r for the sum for pressure calculator.
-            count++;       
-            }
-*/
         }
 
-        //system.molecules[i].atoms[j].V += 4.0*eps*(sr6*sr6 - sr6);
         } // if nonzero sig/eps
         //index++;
     }  // loop l
@@ -279,13 +237,11 @@ void lj_force(System &system) {   // units of K/A
     } //loop j
     } // loop i
     // DONE WITH PAIR INTERACTIONS
-    //printf("COUNT: %i\n", count);
 }
 
 void lj_force_nopbc(System &system) {
 
     double d[3], sr, eps, sig, sr2, sr6, r,rsq,r6,s2,s6, f[3];
-  //  int count=0; // for the pair values
 
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {

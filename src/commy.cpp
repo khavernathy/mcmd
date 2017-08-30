@@ -6,13 +6,17 @@
 #include <string>
 #include <stdlib.h>
 
+/*
+    note: this should not be used for publishable research.
+    It's just a toy-potential for testing different 
+    mathematical forms 
+*/
 
 double commy(System &system) {
     // the communist potential from 1961 van der Waals paper
     // http://iopscience.iop.org/article/10.1070/PU1961v004n02ABEH003330/meta;jsessionid=F9941A012802331F1E4FF488A0F004A9.c4.iopscience.cld.iop.org  
     double total_pot=0; 
     const double cutoff = system.pbc.cutoff;
-    //double volume = system.pbc.volume;
     int i,j,k,l;
     double r,sr6,r7;
     const double numerator= system.constants.HBARC * -23.0;
@@ -56,10 +60,8 @@ double commy(System &system) {
         }
 
         if ((r <= cutoff)) {
-            //printf("num %f denom %f polar1 %f polar2 %f\n", numerator, FourPi*r7, system.molecules[i].atoms[j].polar, system.molecules[k].atoms[l].polar);
             // communist potential is attractive contribution; using normal LJ repulsion contribution
             total_pot += attractive + repulsive;
-            //printf("attractive: %f repulsive: %f\n", attractive, repulsive);
         }
         
     }  // loop l
@@ -67,8 +69,6 @@ double commy(System &system) {
     } //loop j
     } // loop i
 
-
-//    printf("total commy: %e \n", total_pot);
     return total_pot;
 
 }

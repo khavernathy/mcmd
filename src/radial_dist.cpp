@@ -24,7 +24,7 @@ void setupRadialDist(System &system) {
     printf("The number of radial bins to create is %i\n", num_bins);
     printf("The number of different g(r) pair calculations is %i\n", (int)system.stats.radial_centroid.size());
 
-    vector<long unsigned int> dummy; // = vector<long unsigned int>(num_bins); // dummy to push into the vector of g(r)'s
+    vector<long unsigned int> dummy; // dummy to push into the vector of g(r)'s
 
     // make vectors to hold each g(r), and fill each with zero in all bins
     for (int z=0; z<system.stats.radial_centroid.size();z++) {
@@ -38,13 +38,11 @@ void setupRadialDist(System &system) {
     // if dist between 0.0 and 0.2, index 0++, etc.
     // ... if dist between 9.8 and 10.0, index 49++.
 
-  //  printf("Testing radial_bins[48] = %i\n",system.stats.radial_bins[48]);
     return;   
 }
 
 
 /* THIS FUNCTION WILL BE CALLED EVERY CORRTIME AND WILL ADD TO BINS AS NEEDED */ 
-/* every step is excessive and increases step runtime by ~x15        */
 void radialDist(System &system) {
     const double bin_size = system.stats.radial_bin_size;
     const double max_dist = system.stats.radial_max_dist;
@@ -54,7 +52,6 @@ void radialDist(System &system) {
     string centroid = system.stats.radial_centroid[y];
     string counterpart = system.stats.radial_counterpart[y];
 
-    //system.checkpoint("starting loop");
     // loop through all the atom pairs. Doing intramolecular too b/c MD needs it sometimes.
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -68,15 +65,11 @@ void radialDist(System &system) {
                     {
                         double* distances = getDistanceXYZ(system, i, j, k, l);
                         double r = distances[3];     
-                        //printf("distance = %f\n",dist);      
-                        //system.checkpoint("getting index"); 
                         if (r < max_dist) {
                             // determine index of radial_bins
                             int indexr = floor(r / bin_size);  // so 0.02/0.2 -> index 0; 0.25/0.2 -> index 1..
-                            //system.checkpoint("adding to bin");
                             system.stats.radial_bins[y][indexr]++;
                         } // end dist<max_dist
-
                     } // end if proper pair.
                 } // end atoms-in-k loop l
             } // end molecules loop k
@@ -96,7 +89,6 @@ void writeRadialDist(System &system) {
         string radfilename = system.stats.radial_file;
         radfilename = radfilename + suffix;
         remove(radfilename.c_str()); // JIC
-    
 
     ofstream radfile;
     radfile.open (radfilename, ios_base::app);
@@ -115,7 +107,7 @@ void writeRadialDist(System &system) {
         prevspherev = spherev;
     }
     
-    // reset prevspherev
+    // reset previous sphere volume
     prevspherev=0.0;
     
     // loop to write normalized counts
@@ -135,6 +127,8 @@ void writeRadialDist(System &system) {
     return;
 }
 
+
+// this is a special-case g(r) where atoms within a radius from (0,0,0) are counted.
 void countAtomInRadius(System &system, string atomname, double radius) {
     int count=0;
     double r=0;

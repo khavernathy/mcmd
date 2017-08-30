@@ -16,11 +16,7 @@
 using namespace std;
 
 double getrand() {
-
     return drand48();
-
-
-//    return (double)rand()/(double)RAND_MAX; // a value between 0 and 1.
 }
 
 /* GET BOX LIMIT COORDINATE FOR PBC */
@@ -71,7 +67,6 @@ void centerCoordinates(System &system) {
     printf("----> xmin: %.5f ymin: %.5f zmin: %.5f\n", xmin, ymin, zmin);
     printf("----> xlen: %.5f ylen: %.5f zlen: %.5f\n", xmax-xmin, ymax-ymin, zmax-zmin);
 
-	//cout << xmax << ymax << zmax << xmin << ymin << zmin;
 	for (int i=0; i<system.molecules.size(); i++) {
 	for (int j=0; j<system.molecules[i].atoms.size(); j++) {
 		system.molecules[i].atoms[j].pos[0] = system.molecules[i].atoms[j].pos[0] - (xmin + (xmax - xmin)/2.0);
@@ -85,9 +80,8 @@ void centerCoordinates(System &system) {
 
 /* CALCULATE CENTER OF MASS OF THE SYSTEM */
 double * centerOfMass(System &system) {
-   //     long unsigned int size = system.atoms.size();
 
-        double x_mass_sum=0.0; double y_mass_sum=0.0; double z_mass_sum=0.0; double mass_sum=0.0;
+    double x_mass_sum=0.0; double y_mass_sum=0.0; double z_mass_sum=0.0; double mass_sum=0.0;
 
 	for (int j=0; j<system.molecules.size(); j++) {
         for (int i=0; i<system.molecules[j].atoms.size(); i++) {
@@ -178,12 +172,6 @@ else {
     // check in this order: (-x, +x, -y, +y, -z, +z)
     for (int n=0; n<6; n++)
         box_limit[n] = getBoxLimit(system, n, system.molecules[i].com[0], system.molecules[i].com[1], system.molecules[i].com[2]);
-
-    //printf("box_limit values ::\n");
-    //for (int n=0; n<6; n++) printf("%i : %.5f\n",n,box_limit[n]);
-
-    // if outside box checks are correct but moves are not..
-    // NOTE: the r_c cutoff is not actually used in MD
 
         if (system.molecules[i].com[0] < box_limit[0]) { // left of box
             for (int n=0;n<3;n++) tmp_com[n] = system.molecules[i].com[n];
@@ -336,7 +324,7 @@ void addAtomToProto(System &system, int protoid, string name, string molname, st
     atom.sig = sigma;
 
     system.proto[protoid].mass += atom.m;
-    // send it over
+    // push the atom into the protoype molecule
     system.proto[protoid].atoms.push_back(atom);
 
 }
@@ -382,8 +370,8 @@ void moleculePrintout(System &system) {
             system.proto[i].PDBID = last_mol_pdbid+1;
             system.proto[i].frozen = 0;
 
-            //std::cout << "THE SORB MODEL WAS SUPPLIED: " << sorbmodel.c_str(); printf("\n");
-            // each call takes 12 arguments which correspond to PDB-style input
+            // each call to addAtomToProto takes 12 arguments which correspond to PDB-style input
+            // proto id, atom name, molecule name, x, y, z, m, q, a, eps, sig
             // HYDROGEN H2
             if (sorbmodel == "h2_buch") {
                 addAtomToProto(system, i, "H2G", "H2", "M", 0.0, 0.0, 0.0, 2.016, 0.0, 0.0, 34.2, 2.96);
@@ -918,10 +906,9 @@ void setupFugacity(System &system) {
 
 void setupNBias(System &system) {
     // lots of messy math here but all I'm doing is converting
-    // various units to N_molecules. Thus IDC it's messy.
+    // various units to/from N_molecules. 
     
     // frozen atoms total mass
-    // this is the first time the program sets it
     for (int c=0; c<system.molecules.size();c++) {
         for (int d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
@@ -939,16 +926,10 @@ void setupNBias(System &system) {
         thevalue = (-x*system.stats.frozenmass.value/1000.) / system.proto[0].mass / (x/100. -1) / 100.;
     } else if (unit == "wt%ME") {
         thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000/10*100;
-    //} else if (unit == "excmg/g") {
-    //    double mm=system.proto[0].mass*1000*system.constants.NA;
-    //    double frozmm=system.stats.frozenmass.value*system.constants.NA;
-    //    thevalue = (((x*frozmm)/1000.) + (mm*system.constants.free_volume*system.proto[0].fugacity*system.constants.ATM2REDUCED)/system.constants.temp)/mm;   
     } else if (unit == "cm^3/g") {
         thevalue = x * system.stats.frozenmass.value * system.constants.NA / 1000. / 22.4;
-        //thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000 / (system.proto[0].mass*1000*system.constants.NA) * 22.4;
     } else if (unit == "mmol/g") {
         thevalue = x*system.stats.frozenmass.value*system.constants.NA/1000;
-        //thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000 / (system.proto[0].mass * 1000 * system.constants.NA);
     } else if (unit == "mg/g") {
         thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000;
     }
@@ -961,9 +942,6 @@ void setupNBias(System &system) {
 void fragmentMaker(System &system) {
     int numfrags = system.constants.numfrags; // number of base- frags to make
         // (will be multiplied by the number of atoms_per_frag's chosen
-        // e.g. numfrags=20 and atoms_per_frag 50 100 150 
-        // will result in 20*3 = 60 fragments
-    //int fragsize = system.constants.fragsize; // # of atoms in each frag
     
     int currentfrag = 0; // counter for fragments (local)
     int globalfrag = 0; // counter for fragments (global)
@@ -1039,15 +1017,10 @@ void fragmentMaker(System &system) {
                 } // end i
             } // end while loop to find central atom
  
-            //printf("found central atom. building.\n");
             // build it, son.
             double r; // pair distance
-            //int stepper = 0; // trigger to reset the building_points vector as the frag builds
             int builders_size; // = (int)building_points.size();
-            //int iteration_count = 0; // for debug;
             while (currentatom < fragsize) {   
-                //iteration_count++;
-                //printf("iteration # %i;  bondlength = %f\n", iteration_count, bondlength);
                 // find atoms (pseudo-)bonded to the builder atom, fractal style
                 builders_size = (int)building_points.size();
                 vector<vector<double>> temp_building_points;
@@ -1063,10 +1036,6 @@ void fragmentMaker(System &system) {
                         if (r <= bondlength) { // look for a bonded atom
                             // make sure it's not a duplicate atom
                             if (std::find(fragPDBIDs.begin(), fragPDBIDs.end(), system.molecules[i].atoms[j].PDBID) != fragPDBIDs.end()) {
-                                //printf("duplicate atom found. skipping \n");
-                                //for (int uip=0; uip<fragPDBIDs.size(); uip++) {
-                                //    printf("fragPDBIDs[%i] = %i\n", uip, fragPDBIDs[uip]);
-                                //}
                                 continue; 
                             }
                             vector<double> tempvec = vector<double>(3);
@@ -1075,9 +1044,7 @@ void fragmentMaker(System &system) {
                             currentFrag.push_back(system.molecules[i].atoms[j]);
                             fragPDBIDs.push_back(system.molecules[i].atoms[j].PDBID);
                             currentatom++;
-                            //printf("currentatom %i \n",currentatom);
                         } // end if bonded-atom
-                        //printf("dist %f\n", r);
                         if (currentatom >= fragsize) break; // make sure we kill the loop as soon as the max # of atoms hits (don't wait until this inner loop finishes)
                     } // end j
                 } // end i (the pair-loop is over now.)
@@ -1086,23 +1053,18 @@ void fragmentMaker(System &system) {
                     // if no additional bonders were detected, boost the bond-length so we can find some atoms
                     if (building_points == temp_building_points || temp_building_points.size()==0) {
                         bondlength += 0.1;
-                        //printf("increased bondlength. bondlength = %f \n", bondlength);
                     } else {
                         // reset the current (untapped) building points if new connections were found
                         building_points.clear();
-                        //printf("after clearing: %i \n", (int)building_points.size());
                         building_points = temp_building_points;    
                     }
-                    //printf("size of building_points  %i\n", (int)building_points.size()); 
-                    //printf("size of temp_bp          %i\n", (int)temp_building_points.size());
-                    
             } // end while loop adding atoms to frag
 
 
 
             // frag has been made.
             // write the frag and move to next
-            // check duplicate fragment
+            // first check duplicate fragment
             int dupeFlag=0;
             sort( fragPDBIDs.begin(), fragPDBIDs.end() ); // sort so that the dupes are correctly found
             for (int fi=0; fi<fragment_atom_ids.size(); fi++) {
@@ -1143,10 +1105,8 @@ void fragmentMaker(System &system) {
             } else {
                 // the frag was a duplicate, so we skip it from writing
                 duplicatefrags++;
-                //printf("Fragment %i was a duplicate. Not writing.\n", globalfrag+1);
                 currentfrag++;
                 globalfrag++;
-                //continue;
             }
 
             if (x == ((int)atomlabels.size()-1) && currentfrag < numfrags) {
@@ -1171,7 +1131,6 @@ void setupCrystalBuild(System &system) {
     int xdim,ydim,zdim; double xlen,ylen,zlen;
     int i,j;
 
-    //if (system.pbc.alpha == 90 && system.pbc.beta == 90 && system.pbc.gamma == 90) {
         xdim = system.constants.crystalbuild_x;
         ydim = system.constants.crystalbuild_y;
         zdim = system.constants.crystalbuild_z;
@@ -1199,27 +1158,21 @@ void setupCrystalBuild(System &system) {
         printf("Building out crystal by %ix, %iy, %iz of the original.\n", xdim,ydim,zdim);
         printf(" --> using xlen = %f; ylen = %f; zlen = %f;\n", xlen,ylen,zlen);
 
-        //if ((xdim %2 != 0 && xdim>1) || (ydim %2 != 0 && ydim >1) || (zdim % 2 != 0 && zdim > 1)) { std::cout << "ERROR: Crystal-builder only supports multiples of 2 for all dimensions, right now."; exit(EXIT_FAILURE); }
-
         // DUPLICATE IN X
         if (xdim > 1) {
             for (int iter=0; iter < xdim-1; iter++) {
             system.pbc.a += origa;
             system.pbc.calcNormalBasis(); 
             setupBox(system);
-            //int count = 0;
             for (i =0; i <size; i++) {
                 if (system.molecules[i].frozen ) {
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        //std::copy ( system.molecules[i].atoms + j, system.molecules[i].atoms + j +1, newatom);
-                        //printf("%i name %s\n",count, newatom.name.c_str());
                         newatom.pos[0] += xlen*(iter+1);
                         system.molecules[i].mass += newatom.m;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
                         system.stats.count_frozens++; 
-                        //count++;
                     }
                 } else if (system.constants.crystalbuild_includemovers) {
                     Molecule newmolecule = system.molecules[i];
@@ -1257,7 +1210,6 @@ void setupCrystalBuild(System &system) {
                         Atom newatom = system.molecules[i].atoms[j];
                         newatom.pos[1] += ylen*(iter+1);
                         if (system.pbc.gamma != 90.0) newatom.pos[0] -= (iter+1)*origb*sin((system.pbc.gamma-90.0)*M_PI/180.);
-                        //if (system.pbc.gamma != 90.0) newatom.pos[0] -= sqrt(ylen*ylen + origb*origb - 2*ylen*origb*cos((system.pbc.gamma-90.0)*M_PI/180.)); 
                         system.molecules[i].mass += newatom.m;                     
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1347,15 +1299,6 @@ void setupCrystalBuild(System &system) {
                 molec_counter++;
             } // end loop i
             } // end if molecules exist
-
-
-    //} // end if 90/90/90
-    //else {
-    //    std::cout << "ERROR: Non-orthorhombic (i.e. non-90/90/90 degree basis) crystals not supported yet for crystal-builder.";
-    //    exit(EXIT_FAILURE);
-    //}
-
-    
 }
 
 void scaleCharges(System &system) {

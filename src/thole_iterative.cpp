@@ -5,11 +5,9 @@
 
 #define MAX_ITERATION_COUNT 128
 
-//set them to alpha*E_static
+//set dipoles to alpha*E_static
 void init_dipoles (System &system) {
 	unsigned int i, j, p;
-    //int atom =0;
-    //printf("polar gamma: %f\n", system.constants.polar_gamma);
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             for (p=0; p<3; p++) {
@@ -19,17 +17,10 @@ void init_dipoles (System &system) {
                 // improve convergence
                 system.molecules[i].atoms[j].dip[p] *= system.constants.polar_gamma;
             }
-    
-            //printf("atom %i dip %f %f %f\n", atom, system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2]);
-            //atom++;    
-            //printf("mol %i atom %i dip = %f %f %f\n", i, j, system.molecules[i].atoms[j].dip[0], system.molecules[i].atoms[j].dip[1], system.molecules[i].atoms[j].dip[2]);
-
         }
     }
-    //printf("=============================\n");
     return;
 }
-// DONE
 
 void contract_dipoles (System &system, int * ranked_array ) {
     unsigned int i, j, ii, jj, p, index, n, ti, tj, tk, tl;
@@ -41,7 +32,6 @@ void contract_dipoles (System &system, int * ranked_array ) {
         ti = system.atommap[index][0]; tj = system.atommap[index][1];
 
         if ( system.molecules[ti].atoms[tj].polar == 0 ) { //if not polar
-            //aa[index]->ef_induced[p] is already 0
             for (n=0; n<3; n++) {
                 system.molecules[ti].atoms[tj].newdip[n] = 0;
                 system.molecules[ti].atoms[tj].dip[n] = 0;
@@ -72,40 +62,13 @@ void contract_dipoles (System &system, int * ranked_array ) {
                 system.molecules[ti].atoms[tj].dip[p] = system.molecules[ti].atoms[tj].newdip[p];
             }
         }
-
-    //printf("atom %i mu %f %f %f\n", index, system.molecules[ti].atoms[tj].dip[0], system.molecules[ti].atoms[tj].dip[1], system.molecules[ti].atoms[tj].dip[2]);
     } /* end matrix multiply */
-
     return;
 }
 
 void calc_dipole_rrms (System &system) {
     unsigned int i, j, p;
     double carry;
-
-    /*
-    // get the dipole RRMS 
-    for(i = 0; i < system.constants.total_atoms; i++) {
-        ti = system.atommap[i][0]; tj = system.atommap[i][1];
-
-        // mean square difference 
-        system.molecules[ti].atoms[tj].dipole_rrms = 0;
-        for(p = 0; p < 3; p++) {
-            carry = system.molecules[ti].atoms[tj].newdip[p] - system.molecules[ti].atoms[tj].olddip[p];
-            system.molecules[ti].atoms[tj].dipole_rrms += carry*carry;
-        }
-
-        // normalize 
-        system.molecules[ti].atoms[tj].dipole_rrms /= (
-        (system.molecules[ti].atoms[tj].newdip[0] * system.molecules[ti].atoms[tj].newdip[0]) +
-        (system.molecules[ti].atoms[tj].newdip[1] * system.molecules[ti].atoms[tj].newdip[1]) +
-        (system.molecules[ti].atoms[tj].newdip[2] * system.molecules[ti].atoms[tj].newdip[2])
-        );
-        system.molecules[ti].atoms[tj].dipole_rrms = sqrt(system.molecules[ti].atoms[tj].dipole_rrms);
-        if ( !isfinite(system.molecules[ti].atoms[tj].dipole_rrms) ) system.molecules[ti].atoms[tj].dipole_rrms = 0;
-    }
-    */
-//int atom=0;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             // mean square distance
@@ -119,15 +82,9 @@ void calc_dipole_rrms (System &system) {
                 system.molecules[i].atoms[j].dipole_rrms = sqrt(system.molecules[i].atoms[j].dipole_rrms);
 
                 if (system.molecules[i].atoms[j].dipole_rrms != system.molecules[i].atoms[j].dipole_rrms)
-                //if (!isfinite(system.molecules[i].atoms[j].dipole_rrms)) 
                     system.molecules[i].atoms[j].dipole_rrms=0;
-                
-        //printf("atom %i rrms %f\n", atom, system.molecules[i].atoms[j].dipole_rrms);    
-        //atom++;
         }
     }
-
-    
     return;
 }
 
@@ -185,14 +142,7 @@ void palmo_contraction (System &system, int * ranked_array ) {
                 }// end p
             } 
         }
-    
-
-    //printf("atom %i efindc %f %f %f\n", i, system.molecules[ti].atoms[tj].efield_induced_change[0],
-    //system.molecules[ti].atoms[tj].efield_induced_change[1],
-    //system.molecules[ti].atoms[tj].efield_induced_change[2]);
     }
-
-
     return;
 }
 
@@ -200,7 +150,6 @@ void palmo_contraction (System &system, int * ranked_array ) {
 void update_ranking (System &system, int * ranked_array ) {
 	unsigned int i, j, k,l,sorted, tmp, trk, trl, trk1, trl1, rankedj, rankedj1;
 	const double rmin = system.constants.polar_rmin*1.5; 
-    //printf("rmin = %f\n", rmin/1.5);
     double r;
 
     int N = system.constants.total_atoms;
@@ -234,15 +183,6 @@ void update_ranking (System &system, int * ranked_array ) {
         } // j
     } // i end rank metric determination
     
-//    int atom=0;
-  //  for (i=0; i<system.molecules.size(); i++) {
-    //    for (j=0; j<system.molecules[i].atoms.size(); j++) {
-      //      printf("atom %i rank_metric %f hits %i pc %i\n",atom, system.molecules[i].atoms[j].rank_metric,hits,paircount);
-        //    atom++;
-        //} // j
-   // } // i 
-
-
     /* rank the dipoles by bubble sort */
         for(i = 0; i < N; i++) {
             for(j = 0, sorted = 1; j < (N-1); j++) {
@@ -262,13 +202,6 @@ void update_ranking (System &system, int * ranked_array ) {
             }
             if(sorted) break;
         }
-
-
-    //for (int n=0; n<N; n++) {
-     //   int ni=system.atommap[n][0]; int nj=system.atommap[n][1];
-       // printf("ranked_array[%i] = %i rm %f\n", n, ranked_array[n], system.molecules[ni].atoms[nj].rank_metric);
-    //}
-
 	return;
 }
 
@@ -300,7 +233,6 @@ int thole_iterative(System &system) {
         /* if we fail to converge, then return dipoles as alpha*E */
         if(iteration_counter >= MAX_ITERATION_COUNT && system.constants.polar_precision) // && system.constants.polar_precision != 0) {
         {
-           // printf("GOT TO MAX ITER COUNT");
             for(i = 0; i < N; i++) {
                 ti = system.atommap[i][0]; tj = system.atommap[i][1];
                 for(p = 0; p < 3; p++) {
@@ -326,12 +258,6 @@ int thole_iterative(System &system) {
                     system.molecules[i].atoms[j].efield_induced[p] = 0;
             }
         }
-        /*
-        for ( i=0; i<N; i++ ) {
-            ti = system.atommap[i][0]; tj = system.atommap[i][1];
-            for ( p=0; p<3; p++ ) 
-                system.molecules[ti].atoms[tj].efield_induced[p] = 0;
-        }*/
 
         //save the current dipole information if we want to calculate precision (or if needed for relaxation)
         if ( system.constants.polar_rrms || system.constants.polar_precision > 0)  { 

@@ -1,26 +1,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-/* to use this routine, compile with -g defined.
- * call this routine at any point in the execution
- * that you would like to attach.  when execution
- * begins, the process should write out the PIDS
- * of all processes and hang. open a new terminal
- * and start gdb. Attach to the PID of choice. go
- * up the function stack until you are in the scope
- * of the
- * gdb> attach 21456
-
-void attach(void)
-{
-	// debug routine to attach to gdb
-	static int i=0;
-	printf("RANK: %d PID: %d\n",rank,getpid());
-	fflush(NULL);
-	while(!i) sleep(1);
-}
-*/
-
 
 void output(char *msg) {
     printf("%s", msg);
@@ -38,7 +18,7 @@ int cart2frac(double *answer, double *cart, System &system){
 
         for(i=0;i<3;i++){
                 for(j=0;j<3;j++){
-												//we use transpose(recip_basis), because transpose(recip_basis).basis_vector = <1,0,0> , <0,1,0> or <0,0,1>
+		//we use transpose(recip_basis), because transpose(recip_basis).basis_vector = <1,0,0> , <0,1,0> or <0,0,1>
                         answer[i]+=system.pbc.reciprocal_basis[j][i]*cart[j];
                 }
         }
@@ -110,12 +90,6 @@ void compute_bin(double *cart_coords, System &system, int *bin_vector)
 {
 	double frac_coords[3];
 	int Abin,Bbin,Cbin;
-	/* unused variables
-	int xdim=system.grids.histogram->x_dim;
-	int ydim=system.grids.histogram->y_dim;
-	int zdim=system.grids.histogram->z_dim;
-	*/
-
 	/* we need the fractional coords to simplify the bin calculation */
 	cart2frac(frac_coords,cart_coords,system);
 
@@ -164,7 +138,6 @@ void wrap1coord(double *unwrapped, double *wrapped, System &system)
 }
 
 /* population histogram should be performed only every corr time
- * individual nodes store the data on grids.histogram
  * only root will compile the sum into grids.avg_histogram
  * the node only grid.histogram will be rezeroed at every corr time
  * to prevent overflow.
@@ -213,13 +186,10 @@ void write_histogram(FILE *fp_out, int ***grid, System &system)
 	fprintf(fp_out,"\n");
 	fprintf(fp_out,"object 2 class gridconnections counts %d %d %d\n",xdim,ydim,zdim);
 	fprintf(fp_out,"\n");
-	// this line is deprecated; VMD errors out if it's there.
-    //fprintf(fp_out,"object 3 class array type float rank 0 items %d data follows\n",system.grids.histogram->n_data_points);
 
 	for(i=0; i < xdim; i++){
 		for(j=0; j < ydim; j++){
 			for(k=0; k < zdim; k++){
-				//printf("norm_total: %f\n", (float)system.grids.avg_histogram->norm_total);
 				fprintf(fp_out,"%f ",(float)(grid[i][j][k]) / (float)(system.grids.avg_histogram->norm_total));
 				count+=grid[i][j][k];
 			}
@@ -255,35 +225,27 @@ void allocate_histogram_grid(System &system)
 
 	/* allocate a 3D grid for the histogram */
 	system.grids.histogram->grid = (int ***) calloc(x_dim, sizeof(int **));
-	//memnullcheck(system.grids.histogram->grid, sizeof(int **)*x_dim, __LINE__-1, __FILE__);
 	for(i=0; i<x_dim; i++) {
 		system.grids.histogram->grid[i] = (int **) calloc(y_dim, sizeof(int *));
-		//memnullcheck(system.grids.histogram->grid[i],sizeof(int *)*y_dim, __LINE__-1, __FILE__);
 	}
 
 
 	for(i=0; i<x_dim; i++){
 		for(j=0; j<y_dim; j++){
 			system.grids.histogram->grid[i][j] = (int *) calloc(z_dim, sizeof(int));
-			//memnullcheck(system.grids.histogram->grid[i][j],sizeof(int)*z_dim, __LINE__-1, __FILE__);
 		}
 	}
 
-	/* if root, allocate an avg_histogram grid */
-	//if(!rank){
+	/* allocate an avg_histogram grid */
 		system.grids.avg_histogram->grid = (int ***) calloc(x_dim, sizeof(int **));
-		//memnullcheck(system.grids.avg_histogram->grid,x_dim*sizeof(int **),__LINE__-1, __FILE__);
 		for(i=0; i<x_dim; i++) {
 			system.grids.avg_histogram->grid[i] = (int **) calloc(y_dim, sizeof(int *));
-			//memnullcheck(system.grids.avg_histogram->grid[i], y_dim*sizeof(int *), __LINE__-1, __FILE__);
 		}
 		for(i=0; i<x_dim; i++){
 			for(j=0; j<y_dim; j++){
 				system.grids.avg_histogram->grid[i][j] = (int *) calloc(z_dim, sizeof(int));
-				//memnullcheck(system.grids.avg_histogram->grid[i][j],z_dim*sizeof(int), __LINE__-1, __FILE__);
 			}
 		}
-	//}
 
 
 }

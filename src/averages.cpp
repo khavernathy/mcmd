@@ -196,16 +196,6 @@ void computeAverages(System &system) {
     system.stats.polar.calcNewStats();
     system.stats.potential.calcNewStats();
 
-/*
-    // CHEMICAL POTENTIAL dE/dN
-    if (system.constants.ensemble != "npt") {
-        if (0 != system.stats.Nmov.average - system.constants.initial_sorbates) {
-            system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
-                / (system.stats.Nmov.average - system.constants.initial_sorbates);
-            system.stats.chempot.calcNewStats();
-        }
-    }
-*/
     // QST
     if (system.constants.ensemble == ENSEMBLE_UVT && system.proto.size() == 1) { // T must be fixed for Qst
 
@@ -329,28 +319,6 @@ void computeAveragesMDuVT(System &system) {
         system.stats.selectivity[i].calcNewStats();
     }
 
-	// ENERGY (which was already populated in the main() MD loop via getTotalPotential()...)
-/*    system.stats.rd.calcNewStats();
-        system.stats.lj.calcNewStats();
-        system.stats.lj_lrc.calcNewStats();
-        system.stats.lj_self_lrc.calcNewStats();
-    system.stats.es.calcNewStats();
-        system.stats.es_real.calcNewStats();
-        system.stats.es_self.calcNewStats();
-        system.stats.es_recip.calcNewStats();
-    system.stats.polar.calcNewStats();
-    system.stats.potential.calcNewStats();
-*/
-/*
-    // CHEMICAL POTENTIAL dE/dN
-    if (system.constants.ensemble != "npt") {
-        if (0 != system.stats.Nmov.average - system.constants.initial_sorbates) {
-            system.stats.chempot.value = (system.stats.potential.average - system.constants.initial_energy)
-                / (system.stats.Nmov.average - system.constants.initial_sorbates);
-            system.stats.chempot.calcNewStats();
-        }
-    }
-*/
     // QST
     if (system.constants.ensemble == ENSEMBLE_UVT && system.proto.size() == 1) { // T must be fixed for Qst
 
