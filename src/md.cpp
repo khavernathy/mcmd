@@ -221,7 +221,8 @@ void integrate(System &system, double dt) {
             if (!system.molecules[j].frozen) {
 
             // TRANSLATION
-            system.molecules[j].calc_pos(dt);
+            if (system.constants.md_translations)
+                system.molecules[j].calc_pos(dt);
 
             // ROTATION
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
@@ -274,7 +275,7 @@ void integrate(System &system, double dt) {
     system.checkpoint("done moving particles. Checking PBC for all particles");
 
     // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
-    if (system.constants.md_pbc) {
+    if (system.constants.md_pbc && system.constants.md_translations) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
                 checkInTheBox(system,j); // also computes COM 
@@ -300,9 +301,11 @@ void integrate(System &system, double dt) {
             } // end if atomic
             // otherwise handle molecular movement with rigidity.
             else if (system.constants.md_mode == MD_MOLECULAR) {
-                // linear
-                system.molecules[j].calc_acc();
-                system.molecules[j].calc_vel(dt, system.constants.md_vel_goal);
+                // translational
+                if (system.constants.md_translations) {
+                    system.molecules[j].calc_acc();
+                    system.molecules[j].calc_vel(dt);
+                }
 
                 // rotational
                 if (system.constants.md_rotations) {
@@ -322,7 +325,7 @@ void integrate(System &system, double dt) {
         double probab = system.constants.md_thermostat_probab;
         double ranf;
         double sigma = system.constants.md_vel_goal;
-        if (system.constants.md_mode == MD_MOLECULAR) {
+        if (system.constants.md_mode == MD_MOLECULAR && system.constants.md_translations) {
         for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue; // skip frozens
             ranf = getrand(); // 0 -> 1

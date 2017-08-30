@@ -157,7 +157,8 @@ class Constants {
         // MD STUFF
         int  md_corrtime=50; // user defined for MD
         int_fast8_t md_pbc=1; // PBC in molecular dynamics. default on.
-        int_fast8_t md_rotations=1; // MD only.
+        int_fast8_t md_rotations=1; // MD only, rotational motion (of molecules) on
+        int_fast8_t md_translations=1; // MD only, translation motion on
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_vel_goal=0; // 1D vector component of the velocity (which has magnitude md_init_vel)
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
@@ -776,7 +777,7 @@ class Molecule {
         }
 
         // linear velocity
-        void calc_vel(double dt, double goal) {
+        void calc_vel(double dt) {
             for (int n=0; n<3; n++) {
                 vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
             }

@@ -1249,6 +1249,10 @@ void readInput(System &system, char* filename) {
                 else system.constants.md_rotations = 0;
                 std::cout << "Got MD rotations option = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "md_translations")) {
+                if (lc[1] == "off") system.constants.md_translations = 0;
+                std::cout << "Got MD translations option = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {
 				system.constants.sig_override[lc[1]] = atof(lc[2].c_str());
 				std::cout << "Got LJ sigma override for " << lc[1].c_str() << " = " << lc[2].c_str() << " A."; printf("\n");
