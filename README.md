@@ -30,6 +30,8 @@ Take a look at mcmd/src/compile.sh for different options in compilation (OS-spec
 
 # Contact
 Douglas Franz: dfranz@mail.usf.edu
+University of South Florida
+Dept. of Chemistry
 
 # Features
 &emsp;-> Monte Carlo simulation in NPT, NVT, NVE, and &mu;VT ensembles.  <br />
