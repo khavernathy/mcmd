@@ -539,10 +539,16 @@ class Stats {
                 (operand > 0) ? sd = sqrt( operand ) : sd = 0;
             }
 
-
-        } Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
-            lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
-            frozenmass, pressure,temperature, fdotrsum, dist_within, csp, diffusion;
+        // these are the instances of the "observables type" obs_t.
+        // i.e. all the quantities of interest which can be averaged and dealt with.
+        } Nsq,NU,qst,qst_nvt,
+          rd,es,polar,potential,
+          lj_lrc, lj_self_lrc, lj, // lj_self_lrc is really just "self" energy for LJ potential.
+          es_self, es_real, es_recip,
+          tt, tt_lrc, tt_self,
+          chempot,totalmass, frozenmass, 
+          pressure,temperature, fdotrsum, 
+          dist_within, csp, diffusion, volume, z;
 
         int max_sorbs=10;
         vector<obs_t> msd = vector<obs_t>(max_sorbs); 
