@@ -2,9 +2,11 @@
 This is a Monte Carlo / Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials. 
 
 # Quick start:
+<!--
 On HPC clusters, you may need to load a compiler module first:  <br />
 &emsp;-> `module load compilers/gcc/6.2.0` (circe)  <br />
 &emsp;-> `module load gcc/6.3.0` (bridges) <br />
+-->
 1) Download: <br />
 `git clone https://github.com/khavernathy/mcmd` <br />
 
