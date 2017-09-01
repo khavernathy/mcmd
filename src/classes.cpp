@@ -8,13 +8,16 @@
 using namespace std;
 
 enum {
-    POTENTIAL_LJ,
+    POTENTIAL_LJ, // the lennard-jones potential
     POTENTIAL_LJES,
     POTENTIAL_LJPOLAR,
     POTENTIAL_LJESPOLAR,
     POTENTIAL_COMMY, // the communist potential 
     POTENTIAL_COMMYES,
-    POTENTIAL_COMMYESPOLAR
+    POTENTIAL_COMMYESPOLAR,
+    POTENTIAL_TT, // the tang-toennies potential
+    POTENTIAL_TTES,
+    POTENTIAL_TTESPOLAR
 };
 enum {
     ENSEMBLE_UVT,

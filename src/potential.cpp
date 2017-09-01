@@ -11,6 +11,7 @@
 #include "commy.cpp"
 #include "coulombic.cpp"
 #include "polar.cpp"
+#include "tt.cpp"
 #include "pairs.cpp"
 
 // =================== MAIN FUNCTION ======================
@@ -33,9 +34,12 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
         total_rd = lj(system);
     } else if (model == POTENTIAL_COMMY || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
         total_rd = commy(system);
+    } else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
+        total_rd = tt(system);
     }
+    
     // ELECTROSTATIC
-    if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
+    if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
 
         if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
             if (system.constants.ewald_es)
@@ -44,8 +48,9 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
                 total_es = coulombic(system); // plain old coloumb
         }
     }
+    
     // POLARIZATION
-    if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR) {
+    if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTESPOLAR) {
 
         if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
 
