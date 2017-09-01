@@ -8,7 +8,7 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 &emsp;-> `module load gcc/6.3.0` (bridges) <br />
 -->
 1) Download: <br />
-`git clone https://github.com/khavernathy/mcmd` <br />
+`git clone https://github.com/khavernathy/mcmd` or <a href="https://github.com/khavernathy/mcmd/archive/master.zip">download .zip file</a><br />
 
 2) Compile: <br />
 `cd mcmd` <br />
