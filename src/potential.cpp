@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 //#include "distance.cpp"
+#include "mixing.cpp"
 #include "lj.cpp"
 #include "commy.cpp"
 #include "coulombic.cpp"

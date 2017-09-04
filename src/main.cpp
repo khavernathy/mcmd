@@ -55,7 +55,6 @@
 #include "averages.cpp"
 #include "histogram.cpp"
 
-
 using namespace std;
 
 int main(int argc, char **argv) {

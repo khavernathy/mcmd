@@ -36,3 +36,11 @@ double erfInverse(double x) {
 
     return (sgn*sqrt(-tt1 + sqrt(tt1*tt1 - tt2)));
 }
+
+double factorial(double f) {
+	if ( f==0 )
+		return 1.0;
+	return(f * factorial(f - 1));
+}
+
+
