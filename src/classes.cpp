@@ -36,6 +36,7 @@ enum {
     MD_MOLECULAR
 };
 
+
 /* the below stuff was more-or-less adopted from mpmc code */
 typedef struct _histogram {
     int ***grid;
