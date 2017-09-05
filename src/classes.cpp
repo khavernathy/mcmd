@@ -628,8 +628,6 @@ class Atom {
         //double K=0.0; // kinetic energy in K
         //double E=0.0; // total energy in K
 		// Tang-Toennies params.
-        double A=0.0;
-        double b=0.0;
         double c6=0,c8=0,c10=0;
         
         int PDBID; // the atom's PDBID (from input)
