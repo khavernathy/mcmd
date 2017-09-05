@@ -134,6 +134,13 @@ void readInAtoms(System &system, string filename) {
 
             if (11 < myvector.size() && myvector[11] != "default") current_atom.polar = stod(myvector[11]);
             else current_atom.polar = system.constants.polars[current_atom.name];
+            
+            // Tang Toennies params. If TT is active, LJ epsilon is used for B; LJ sigma for A...
+            if (14 < myvector.size()) current_atom.c6 = stod(myvector[14]);
+            if (15 < myvector.size()) current_atom.c8 = stod(myvector[15]);
+            if (16 < myvector.size()) current_atom.c10 = stod(myvector[16]);
+            
+
             current_atom.V = 0.0;
 			current_atom.PDBID = stoi(myvector[1]); // pulled from input pdb column 2
 			current_atom.mol_name = myvector[3];
@@ -1568,7 +1575,7 @@ void inputValidation(System &system) {
         }
     }
     if ( (system.constants.potential_form == POTENTIAL_TT || system.constants.potential_form == POTENTIAL_TTES || system.constants.potential_form == POTENTIAL_TTESPOLAR) && !flag) {
-        std::cout << "ERROR: Tang-Toennies potential was requested but the C6/C8 terms for all atoms are zero.";
+        std::cout << "ERROR: Tang-Toennies potential was requested but the C6/C8 terms for all atoms are zero. In an input .pdb, column 16 = C6, column 17 = C8, and column 18 = C10 (optional). All expressed in atomic units.";
         exit(EXIT_FAILURE);
     }
 
