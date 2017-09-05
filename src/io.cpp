@@ -1560,6 +1560,5 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You specified uVT with a system containing no movable molecules and did not specify a desired sorbate. Try `sorbate_name h2_bssp`, for example.";
         exit(EXIT_FAILURE);
     }
-
 }
 // end input validation function

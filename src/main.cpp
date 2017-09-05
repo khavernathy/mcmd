@@ -168,6 +168,11 @@ int main(int argc, char **argv) {
     }
 
     if (system.constants.histogram_option) {
+        if (system.pbc.volume > 100.*100.*100.) {
+            std::cout << "ERROR: Histogram cannot be enabled for a box with volume > 10^6 cubic angstroms. Current volume is " << to_string(system.pbc.volume) << " A^3. Use `histogram off`, or use a different box size, e.g. `carbasis 99 99 99 90 90 90`." << endl;
+            exit(EXIT_FAILURE);
+        }        
+
         system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
         system.grids.avg_histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
         setup_histogram(system);
