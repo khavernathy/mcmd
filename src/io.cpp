@@ -1560,5 +1560,17 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You specified uVT with a system containing no movable molecules and did not specify a desired sorbate. Try `sorbate_name h2_bssp`, for example.";
         exit(EXIT_FAILURE);
     }
+    // check 0 value for all c6,c8 params for Tang-Toennies.
+    flag = 0;
+    for (int i=0; i<system.molecules.size(); i++) {
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+            if (system.molecules[i].atoms[j].c6 != 0 || system.molecules[i].atoms[j].c8 != 0) flag=1;
+        }
+    }
+    if ( (system.constants.potential_form == POTENTIAL_TT || system.constants.potential_form == POTENTIAL_TTES || system.constants.potential_form == POTENTIAL_TTESPOLAR) && !flag) {
+        std::cout << "ERROR: Tang-Toennies potential was requested but the C6/C8 terms for all atoms are zero.";
+        exit(EXIT_FAILURE);
+    }
+
 }
 // end input validation function
