@@ -1,5 +1,5 @@
 # MCMD
-This is a Monte Carlo / Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials. 
+This is a Monte Carlo and Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials. It is a project that began as a re-write and expansion of <a href="https://github.com/mpmccode/mpmc">Massively Parallel Monte Carlo (MPMC)</a>, another code developed and maintained by our laboratory, led by <a href="http://chemistry.usf.edu/faculty/space/">Brian Space</a> at the University of South Florida, <a href="http://chemistry.usf.edu/">Dept. of Chemistry</a>, <a href="http://chemistry.usf.edu/smmartt/">Smart Metal-organic Materials Advanced Research and Technology Transfer (SMMARTT)</a>.
 
 # Quick start:
 <!--
@@ -70,6 +70,21 @@ MCMD works out-of-the-box on <br />
 &emsp;-> Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed)<br />
 &emsp;-> Raspberry Pi (3, using Raspian OS).<br /><br />
 We recommend Visual Molecular Dynamics (VMD) for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, Ovito, etc.<br />
+
+# Publications
+Below is a list of scientific publications that have been facilitated by this software.
+
+1. Franz, D., Forrest, K. A., Pham, T., & Space, B. (2016). Accurate H2 Sorption Modeling in the rht-MOF NOTT-112 Using Explicit Polarization. Crystal Growth & Design, 16(10), 6024-6032.
+
+2. Pham, T., Forrest, K. A., Franz, D. M., Guo, Z., Chen, B., & Space, B. (2017). Predictive models of gas sorption in a metal–organic framework with open-metal sites and small pore sizes. Physical Chemistry Chemical Physics, 19(28), 18587-18602.
+
+<!--
+pending...
+SIFSIX-14-Cu-i paper
+MPM-1-TIFSIX paper
+Zn-datzbdc paper
+rht-MOF-9 paper
+-->
 
 <!--
 # TODO
