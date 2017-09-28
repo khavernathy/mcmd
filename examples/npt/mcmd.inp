@@ -26,4 +26,7 @@ insert_factor		0.667     ! uVT: prob to insert/delete in uVT
 rotate_prob         0.5
 displace_factor     2.5
 rotate_angle_factor 360.0
+
+histogram off
+
 ! =======================================================
