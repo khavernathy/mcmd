@@ -9,6 +9,7 @@
 using namespace std;
 
 // LENNARD-JONES
+// ==================================
 // Lorentz-Berthelot
 double lj_lb_eps(double e1, double e2) {
     if (e1 != e2) return sqrt(e1*e2);
@@ -19,7 +20,43 @@ double lj_lb_sig(double s1, double s2) {
     else return s1;
 }
 
+// W-H and H are not being used now but code is provided for future use.
+
+// Waldman-Hagler
+double lj_wh_sig(double s1, double s2) {
+    double si6 = s1;
+    si6 *= si6*si6;
+    si6 *= si6;
+
+    double sj6 = s2;
+    sj6 *= sj6*sj6;
+    sj6 *= sj6;
+
+    return pow(0.5*(si6+sj6), 1./6.);
+}
+double lj_wh_eps(double e1, double e2, double s1, double s2) {
+    double si3 = s1*s1*s1;
+    double sj3 = s2*s2*s2;
+    double si6 = si3*si3;
+    double sj6 = sj3*sj3;
+
+    return sqrt(e1*e2) * 2.0*si3*sj3/(si6+sj6);
+}
+
+// Halgren 
+double lj_h_sig(double s1, double s2) {
+    double si2 = s1*s1;
+    double sj2 = s2*s2;
+    return (si2*s1 + sj2*s2)/(si2 + sj2);
+}
+double lj_h_eps(double e1, double e2) {
+    return 4*e1*e2 / pow(sqrt(e1) + sqrt(e2), 2);
+}
+
+
+
 // TANG TOENNIES
+// =======================================
 double tt_sigma(double sigi, double sigj) {
     return 0.5*(sigi + sigj);
 }
