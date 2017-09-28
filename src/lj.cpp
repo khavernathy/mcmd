@@ -100,12 +100,9 @@ double lj(System &system) {
 
         // do mixing rules
         double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
-        if (eps != system.molecules[k].atoms[l].eps)
-            eps = sqrt(eps * system.molecules[k].atoms[l].eps);
-       
-        if (sig != system.molecules[k].atoms[l].sig)
-         sig = 0.5 * (sig + system.molecules[k].atoms[l].sig);
-
+        eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
+        sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);  
+    
         if (sig == 0 || eps == 0) continue; // skip 0 energy interactions
 
         // calculate distance between atoms
@@ -154,10 +151,8 @@ double lj(System &system) {
 
         // do mixing rules
         double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
-        if (eps != system.molecules[k].atoms[l].eps)
-            eps = sqrt(eps * system.molecules[k].atoms[l].eps);
-        if (sig != system.molecules[k].atoms[l].sig)
-         sig = 0.5 * (sig + system.molecules[k].atoms[l].sig);
+        eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
+        sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);
         if (sig == 0 || eps == 0) continue; // skip 0 energy interactions         
 
             double sig3 = fabs(sig);
@@ -208,8 +203,9 @@ void lj_force(System &system) {   // units of K/A
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
         // do mixing rules
-        eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
-        sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
+        sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);
 
         if (!(sig == 0 || eps == 0)) {
         // calculate distance between atoms
@@ -248,10 +244,11 @@ void lj_force_nopbc(System &system) {
     for (int k = i+1; k < system.molecules.size(); k++) {
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
+ 
         // do mixing rules
-        //double eps,sig;
-        eps = sqrt(system.molecules[i].atoms[j].eps * system.molecules[k].atoms[l].eps);
-        sig = 0.5 * (system.molecules[i].atoms[j].sig + system.molecules[k].atoms[l].sig);
+        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
+        sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);
 
         if (!(sig == 0 || eps == 0)) {
         // calculate distance between atoms

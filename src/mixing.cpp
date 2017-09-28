@@ -8,6 +8,16 @@
 
 using namespace std;
 
+// LENNARD-JONES
+// Lorentz-Berthelot
+double lj_lb_eps(double e1, double e2) {
+    if (e1 != e2) return sqrt(e1*e2);
+    else return e1;
+}        
+double lj_lb_sig(double s1, double s2) {
+    if (s1 != s2) return 0.5*(s1 + s2);
+    else return s1;
+}
 
 // TANG TOENNIES
 double tt_sigma(double sigi, double sigj) {
