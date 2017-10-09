@@ -103,6 +103,7 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
 	// calculate temperature from kinetic energy and number of particles
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     // note this is only valid for single-sorbate (homogenous gas) right now
+    // also McQuarrie Stat. Mech. p358 Elementary Kinetic Theory of Transport in Gases
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
 	static double output[8];
 	output[0] = K_total; 
