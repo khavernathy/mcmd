@@ -247,18 +247,20 @@ int main(int argc, char **argv) {
 
         system.last.total_atoms = system.constants.total_atoms;
         int N = 3 * system.constants.total_atoms;
-        system.constants.A_matrix= (double **) calloc(N,sizeof(double*));
-        for (int i=0; i< N; i++ ) {
-            system.constants.A_matrix[i]= (double *) malloc(N*sizeof(double));
-        }
-
         system.last.thole_total_atoms = system.constants.total_atoms;
-
         makeAtomMap(system); // writes the atom indices
+        // NEW ***
+        system.constants.A_matrix = (double **) calloc(N, sizeof(double*));
+        int inc=0, blocksize=3;
+        for (int i=0; i<N; i++) {
+            system.constants.A_matrix[i] = (double *) malloc(blocksize*sizeof(double));
+            inc++;
+            if (inc%3==0) blocksize+=3;
+        }
+        double memreqAN = (double)sizeof(double)*((3*system.constants.total_atoms*3*system.constants.total_atoms - 3*system.constants.total_atoms)/2.0)/(double)1e6;
+        printf("The NEW polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqAN, memreqAN/1000.);
 
-        double memreqA = (double)sizeof(double)*9.0*(double)(int)system.constants.total_atoms*system.constants.total_atoms/(double)1e6;
-        printf("The polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqA, memreqA/1000.);
-    }
+}
 
     // SET UP Ewald k-space if needed
     if (system.constants.mode == "md" && (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJES || system.constants.potential_form == POTENTIAL_COMMYES || system.constants.potential_form == POTENTIAL_COMMYESPOLAR)) {
@@ -494,6 +496,7 @@ int main(int argc, char **argv) {
 
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
         printf("Freeing data structures... ");
+        // NEW ***
         for (int i=0; i< 3* system.constants.total_atoms; i++) {
             free(system.constants.A_matrix[i]);
         }

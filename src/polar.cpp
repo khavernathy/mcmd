@@ -32,7 +32,6 @@ void makeAtomMap(System &system) {
 
 void print_matrix(System &system, int N, double **matrix) {
     //system.checkpoint("PRINTING MATRIX");
-
     int i,j;
     printf("\n");
     for (i=0; i<N; i++) {
@@ -42,13 +41,33 @@ void print_matrix(System &system, int N, double **matrix) {
         printf("\n");
     }
     printf("\n");
+
+    /* This is for the 1/2 A-matrix, deactivated for now. 
+    // NEW ***
+    int blocksize=3, inc=0;
+    printf("\n");
+    for (i=0; i<N; i++) {
+        for (j=0; j<blocksize; j++) {
+            printf("%.3f ", matrix[i][j]);
+        }
+        printf("\n");
+        inc++;
+        if (inc%3==0) blocksize+=3;
+    }
+    */
 }
 
 void zero_out_amatrix(System &system, int N) {
     int i,j;
-    for (i=0; i<3*N; i++)
-        for (j=0; j<3*N; j++)
-            system.constants.A_matrix[i][j] = 0;
+    // NEW ***
+    int blocksize=3, inc=0;
+    for (i=0; i<3*N; i++) {
+        for (j=0; j<blocksize; j++) {
+            system.constants.A_matrix[i][j] = 0;    
+        }
+        inc++;
+        if (inc%3==0) blocksize+=3;
+    }
     return;
 }
 
@@ -88,19 +107,15 @@ void thole_resize_matrices(System &system) {
 
     if(!dN) { return; }
 
-    // grow A matricies by free/malloc (to prevent fragmentation)
-    //free the A matrix
-    for (i=0; i < oldN; i++) free(system.constants.A_matrix[i]);
+    // NEW ***
+    for (i=0; i< oldN; i++) free(system.constants.A_matrix[i]);
     free(system.constants.A_matrix);
-
-
-    //(RE)allocate the A matrix
-    system.constants.A_matrix= (double **) calloc(N,sizeof(double*));
-//    memnullcheck(system.constants.A_matrix,N*sizeof(double*), __LINE__-1, __FILE__);
-
-    for (i=0; i< N; i++ ) {
-        system.constants.A_matrix[i]= (double *) malloc(N*sizeof(double));
-  //      memnullcheck(system.constants.A_matrix[i],N*sizeof(double), __LINE__-1, __FILE__);
+    system.constants.A_matrix = (double **) calloc(N, sizeof(double*));
+    int blocksize=3, inc=0;
+    for (i=0; i<N; i++) {
+        system.constants.A_matrix[i] = (double *) malloc(blocksize*sizeof(double));
+        inc++;
+        if (inc%3==0) blocksize+=3;
     }
 
      return;
@@ -127,7 +142,6 @@ void thole_amatrix(System &system) {
 
     //system.checkpoint("in thole_amatrix() --> zeroing out");
     zero_out_amatrix(system,N);
-    //print_matrix(system, 3*N, system.constants.A_matrix);
     //system.checkpoint("done with zero_out_amatrix()");
 
     ////system.checkpoint("setting diagonals in A");
@@ -137,12 +151,14 @@ void thole_amatrix(System &system) {
         w = system.atommap[i][0];
         x = system.atommap[i][1];
 
-        for(p = 0; p < 3; p++) {
-            if(system.molecules[w].atoms[x].polar != 0.0)
+        // NEW ***
+        for (p=0; p<3; p++) {
+            if (system.molecules[w].atoms[x].polar != 0.0)
                 system.constants.A_matrix[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
             else
                 system.constants.A_matrix[ii+p][ii+p] = MAXVALUE;
         }
+
     }
     ////system.checkpoint("done setting diagonals in A");
 
@@ -193,33 +209,17 @@ void thole_amatrix(System &system) {
 
            // //system.checkpoint("buildling tensor.");
             /* build the tensor */
-            for(p = 0; p < 3; p++) {
-                for(q = 0; q < 3; q++) {
-
-                    system.constants.A_matrix[ii+p][jj+q] = -3.0*distances[p]*distances[q]*damp2*ir5;
-
-                    /* additional diagonal term */
-                    if(p == q) {
-                        system.constants.A_matrix[ii+p][jj+q] += damp1*ir3;
-                    }
-                    //printf("A[%i][%i] = %f\n", ii+p, jj+q, system.constants.A_matrix[ii+p][jj+q]);
+            // NEW *** NEEDED FOR 1/2 MATRIX
+            for (p=0; p<3; p++) {
+                for (q=0; q<3; q++) {
+                       system.constants.A_matrix[jj+p][ii+q] = -3.0*distances[p]*distances[q]*damp2*ir5;
+                       // additional diagonal term
+                       if (p==q)
+                           system.constants.A_matrix[jj+p][ii+q] += damp1*ir3;
                 }
             }
-            ////system.checkpoint("done building tensor. setting lower half.");
-
-            //printf("\n");
-            /* set the lower half of the tensor component */
-            for(p = 0; p < 3; p++) {
-                for(q = 0; q < 3; q++) {
-                   //printf("setting A_matrix[%i][%i] = A_matrix[%i][%i] = %f at 3*N = %i, i=%i, j=%i\n", jj+p, ii+q, ii+p, jj+q, system.constants.A_matrix[jj+p][ii+q], 3*N,i,j);
-                    system.constants.A_matrix[jj+p][ii+q] = system.constants.A_matrix[ii+p][jj+q];
-                } // end q
-            } // end p
         } /* end j */
     } /* end i */
-    //printf("\n===================================================\n\n");
-    //print_matrix(system, N*3, system.constants.A_matrix);
-    //printf("\n===================================================\n\n");
 
     system.constants.polar_rmin = rmin;
     return;

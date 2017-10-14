@@ -197,8 +197,8 @@ class Constants {
         double polar_gamma = 1.03;
         int polar_max_iter = 4;
         double polar_rmin = 0; // minimum polarizable distance between atoms, for ranking.
-        double **A_matrix, **B_matrix, C_matrix[3][3];
-        double *Ahalf_matrix, *Adiag;
+        double **B_matrix, C_matrix[3][3];
+        double **A_matrix;
         int polar_precision=0;
         int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
         int_fast8_t polar_rrms =0;

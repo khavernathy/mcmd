@@ -25,6 +25,28 @@ void init_dipoles (System &system) {
 void contract_dipoles (System &system, int * ranked_array ) {
     unsigned int i, j, ii, jj, p, index, n, ti, tj, tk, tl;
 
+/*
+    printf("A normal\n");
+    for (int z=0; z<9; z++) {
+        for (int c=0;c<9; c++) {
+            printf("%10.3e ", system.constants.A_matrix[z][c]);
+        }
+        printf("\n");
+    }
+    
+    int blocksize=3;
+    int inc=0;
+    printf("A half\n");
+       for (int z=0; z<3*system.constants.total_atoms; z++) {
+        for (int c=0;c<blocksize; c++) {
+            if (z<9) printf("%10.3e ", system.constants.A_matrix_new[z][c]);
+            if(system.constants.A_matrix_new[z][c] != system.constants.A_matrix[z][c]) printf("MISMATCH FOUND at index %i %i.\n", z,c);
+        }
+        inc++;
+        if(inc%3==0) blocksize+=3;
+        if (z<9) printf("\n");
+    }
+  */      
     for(i = 0; i < system.constants.total_atoms; i++) {
         index = ranked_array[i]; //do them in the order of the ranked index
         ii = index*3;
@@ -38,16 +60,29 @@ void contract_dipoles (System &system, int * ranked_array ) {
             }
             continue;
         }
+
         for(j = 0; j < system.constants.total_atoms; j++) {
             jj = j*3;
-            if(index != j) {
+            if(index != j) { // NEW ***
                 tk = system.atommap[j][0]; tl = system.atommap[j][1];
-                for(p = 0; p < 3; p++)
-                    system.molecules[ti].atoms[tj].efield_induced[p] -= 
-                    ((system.constants.A_matrix[ii+p]+jj)[0] * system.molecules[tk].atoms[tl].dip[0]) +
-                    ((system.constants.A_matrix[ii+p]+jj)[1] * system.molecules[tk].atoms[tl].dip[1]) +
-                    ((system.constants.A_matrix[ii+p]+jj)[2] * system.molecules[tk].atoms[tl].dip[2]);
-            
+                for(p = 0; p < 3; p++) {
+                    for (int q=0; q<3; q++) {
+                        // account for the 1/2 matrix
+                        if (j>index) {system.molecules[ti].atoms[tj].efield_induced[p] -=
+                            system.constants.A_matrix[jj+p][ii+q] * system.molecules[tk].atoms[tl].dip[q];
+                        } else { system.molecules[ti].atoms[tj].efield_induced[p] -=
+                            system.constants.A_matrix[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
+                        }
+                        
+                        // correct old matrix
+                         //system.molecules[ti].atoms[tj].efield_induced[p] -= 
+                          //  system.constants.A_matrix[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
+                    } // end q
+                    // correct old matrix, written out dot prod
+                    //(system.constants.A_matrix[ii+p]+jj)[0] * system.molecules[tk].atoms[tl].dip[0] + 
+                    //(system.constants.A_matrix[ii+p]+jj)[1] * system.molecules[tk].atoms[tl].dip[1] +
+                    //(system.constants.A_matrix[ii+p]+jj)[2] * system.molecules[tk].atoms[tl].dip[2];
+                } // end p
             }
         } /* end j */
 
@@ -63,6 +98,7 @@ void contract_dipoles (System &system, int * ranked_array ) {
             }
         }
     } /* end matrix multiply */
+
     return;
 }
 
@@ -117,7 +153,7 @@ int are_we_done_yet (System &system, int iteration_counter ) {
 }
 
 void palmo_contraction (System &system, int * ranked_array ) {
-    unsigned int i, j, ii, jj, index, p, ti,tj, tk, tl;
+    unsigned int i, j, ii, jj, index, p, q,ti,tj, tk, tl;
     int N = system.constants.total_atoms;
 
     /* calculate change in induced field due to this iteration */
@@ -135,10 +171,19 @@ void palmo_contraction (System &system, int * ranked_array ) {
             if(index != j) {
                 tk = system.atommap[j][0]; tl = system.atommap[j][1];
                 for(p = 0; p < 3; p++) {
-                    system.molecules[ti].atoms[tj].efield_induced_change[p] -= 
-                        (system.constants.A_matrix[ii+p]+jj)[0] * system.molecules[tk].atoms[tl].dip[0] +
-                        (system.constants.A_matrix[ii+p]+jj)[1] * system.molecules[tk].atoms[tl].dip[1] +
-                        (system.constants.A_matrix[ii+p]+jj)[2] * system.molecules[tk].atoms[tl].dip[2];
+                    for (q=0; q<3; q++) {
+                        // NEW ***
+                        // account for the 1/2 matrix
+                        if (j>index) {system.molecules[ti].atoms[tj].efield_induced_change[p] -=
+                            system.constants.A_matrix[jj+p][ii+q] * system.molecules[tk].atoms[tl].dip[q];
+                        } else { system.molecules[ti].atoms[tj].efield_induced_change[p] -=
+                            system.constants.A_matrix[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
+                        }
+
+                    // old correct full A matrix
+                    //system.molecules[ti].atoms[tj].efield_induced_change[p] -=
+                    //dddotprod((system.constants.A_matrix[ii+p]+jj), system.molecules[tk].atoms[tl].dip); 
+                } // end q 
                 }// end p
             } 
         }
