@@ -59,14 +59,23 @@ void print_matrix(System &system, int N, double **matrix) {
 
 void zero_out_amatrix(System &system, int N) {
     int i,j;
-    // NEW ***
-    int blocksize=3, inc=0;
-    for (i=0; i<3*N; i++) {
-        for (j=0; j<blocksize; j++) {
-            system.constants.A_matrix[i][j] = 0;    
+    // half matrix
+    if (!system.constants.full_A_matrix_option) {
+        int blocksize=3, inc=0;
+        for (i=0; i<3*N; i++) {
+            for (j=0; j<blocksize; j++) {
+                system.constants.A_matrix[i][j] = 0;    
+            }
+            inc++;
+            if (inc%3==0) blocksize+=3;
         }
-        inc++;
-        if (inc%3==0) blocksize+=3;
+    // full matrix
+    } else {
+        for (i=0;i<3*N;i++) {
+            for (j=0;j<3*N;j++) {
+                system.constants.A_matrix_old[i][j]=0;
+            }
+        }
     }
     return;
 }
@@ -140,29 +149,39 @@ void thole_amatrix(System &system) {
     N = (int)system.constants.total_atoms;
     double rmin = 1.0e40;
 
-    //system.checkpoint("in thole_amatrix() --> zeroing out");
+    system.checkpoint("in thole_amatrix() --> zeroing out");
     zero_out_amatrix(system,N);
-    //system.checkpoint("done with zero_out_amatrix()");
+    system.checkpoint("done with zero_out_amatrix()");
 
-    ////system.checkpoint("setting diagonals in A");
+    system.checkpoint("setting diagonals in A");
     /* set the diagonal blocks */
     for(i = 0; i < N; i++) {
         ii = i*3;
         w = system.atommap[i][0];
         x = system.atommap[i][1];
 
-        // NEW ***
-        for (p=0; p<3; p++) {
-            if (system.molecules[w].atoms[x].polar != 0.0)
-                system.constants.A_matrix[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
-            else
-                system.constants.A_matrix[ii+p][ii+p] = MAXVALUE;
+        // 1/2 matrix
+        if (!system.constants.full_A_matrix_option) {
+            for (p=0; p<3; p++) {
+                if (system.molecules[w].atoms[x].polar != 0.0)
+                    system.constants.A_matrix[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
+                else
+                    system.constants.A_matrix[ii+p][ii+p] = MAXVALUE;
+            }
+        // full matrix
+        } else {
+            for (p=0;p<3;p++) {
+                if (system.molecules[w].atoms[x].polar != 0.0)
+                    system.constants.A_matrix_old[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
+                else
+                    system.constants.A_matrix_old[ii+p][ii+p] = MAXVALUE;
+            }
         }
 
     }
-    ////system.checkpoint("done setting diagonals in A");
+    system.checkpoint("done setting diagonals in A");
 
-    ////system.checkpoint("starting Tij loop");
+    system.checkpoint("starting Tij loop");
     /* calculate each Tij tensor component for each dipole pair */
     for(i = 0; i < (N - 1); i++) {
         ii = i*3;
@@ -201,25 +220,50 @@ void thole_amatrix(System &system) {
             }
 
             //evaluate damping factors
-                    explr = exp(-l*r);
-                    damp1 = 1.0 - explr*(0.5*l2*r2 + l*r + 1.0);
-                    damp2 = damp1 - explr*(l3*r2*r/6.0);
+            explr = exp(-l*r);
+            damp1 = 1.0 - explr*(0.5*l2*r2 + l*r + 1.0);
+            damp2 = damp1 - explr*(l3*r2*r/6.0);
 
-            ////system.checkpoint("got damping factors.");
+            system.checkpoint("got damping factors.");
 
-           // //system.checkpoint("buildling tensor.");
+            system.checkpoint("buildling tensor.");
             /* build the tensor */
-            // NEW *** NEEDED FOR 1/2 MATRIX
-            for (p=0; p<3; p++) {
-                for (q=0; q<3; q++) {
-                       system.constants.A_matrix[jj+p][ii+q] = -3.0*distances[p]*distances[q]*damp2*ir5;
-                       // additional diagonal term
-                       if (p==q)
-                           system.constants.A_matrix[jj+p][ii+q] += damp1*ir3;
+            // 1/2 MATRIX
+            if (!system.constants.full_A_matrix_option) {
+                for (p=0; p<3; p++) {
+                    for (q=0; q<3; q++) {
+                        system.constants.A_matrix[jj+p][ii+q] = -3.0*distances[p]*distances[q]*damp2*ir5;
+                        // additional diagonal term
+                        if (p==q)
+                            system.constants.A_matrix[jj+p][ii+q] += damp1*ir3;
+                    }
                 }
-            }
+            // full matrix
+            } else {
+                for (p=0; p<3; p++) {
+                    for (q=0; q<3; q++) {
+                        system.constants.A_matrix_old[ii+p][jj+q] = -3.0 * distances[p]*distances[q] * damp2 * ir5;
+                        // additional diagonal term
+                        if (p==q)
+                            system.constants.A_matrix_old[ii+p][jj+q] += damp1*ir3;
+                    }
+                }
+            } // end full matrix
+
+
+            // fill in other half of full matrix if app.
+            if (system.constants.full_A_matrix_option) {
+                for (p=0; p<3; p++) {
+                    for (q=0; q<3; q++) {
+                        system.constants.A_matrix_old[jj+p][ii+q] = system.constants.A_matrix_old[ii+p][jj+q];
+                    }
+                }
+            } // end full matrix
         } /* end j */
     } /* end i */
+
+    
+
 
     system.constants.polar_rmin = rmin;
     return;
