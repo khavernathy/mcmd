@@ -116,17 +116,26 @@ void thole_resize_matrices(System &system) {
 
     if(!dN) { return; }
 
-    // NEW ***
-    for (i=0; i< oldN; i++) free(system.constants.A_matrix[i]);
-    free(system.constants.A_matrix);
-    system.constants.A_matrix = (double **) calloc(N, sizeof(double*));
-    int blocksize=3, inc=0;
-    for (i=0; i<N; i++) {
-        system.constants.A_matrix[i] = (double *) malloc(blocksize*sizeof(double));
-        inc++;
-        if (inc%3==0) blocksize+=3;
+    // 1/2 matrix
+    if (!system.constants.full_A_matrix_option) {
+        for (i=0; i< oldN; i++) free(system.constants.A_matrix[i]);
+        free(system.constants.A_matrix);
+        system.constants.A_matrix = (double **) calloc(N, sizeof(double*));
+        int blocksize=3, inc=0;
+        for (i=0; i<N; i++) {
+            system.constants.A_matrix[i] = (double *) malloc(blocksize*sizeof(double));
+            inc++;
+            if (inc%3==0) blocksize+=3;
+        }
+    // full matrix
+    } else {
+        for (i=0; i<oldN; i++) free(system.constants.A_matrix_old[i]);
+        free(system.constants.A_matrix_old);
+        system.constants.A_matrix_old = (double **) calloc(N, sizeof(double*));
+        for (i=0; i<N; i++) {
+            system.constants.A_matrix_old[i] = (double *) malloc(N*sizeof(double));
+        }
     }
-
      return;
 }
 
