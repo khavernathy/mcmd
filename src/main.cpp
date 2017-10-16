@@ -245,20 +245,30 @@ int main(int argc, char **argv) {
 				FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
 				fclose(fp);
 
+        double memreqA;
         system.last.total_atoms = system.constants.total_atoms;
         int N = 3 * system.constants.total_atoms;
         system.last.thole_total_atoms = system.constants.total_atoms;
         makeAtomMap(system); // writes the atom indices
-        // NEW ***
-        system.constants.A_matrix = (double **) calloc(N, sizeof(double*));
-        int inc=0, blocksize=3;
-        for (int i=0; i<N; i++) {
-            system.constants.A_matrix[i] = (double *) malloc(blocksize*sizeof(double));
-            inc++;
-            if (inc%3==0) blocksize+=3;
+        // 1/2 matrix
+        if (!system.constants.full_A_matrix_option) {
+            system.constants.A_matrix = (double **) calloc(N, sizeof(double*));
+            int inc=0, blocksize=3;
+            for (int i=0; i<N; i++) {
+                system.constants.A_matrix[i] = (double *) malloc(blocksize*sizeof(double));
+                inc++;
+                if (inc%3==0) blocksize+=3;
+            }
+            memreqA = (double)sizeof(double)*((3*system.constants.total_atoms*3*system.constants.total_atoms - 3*system.constants.total_atoms)/2.0)/(double)1e6;
+        // full matrix
+        } else {
+            system.constants.A_matrix_old = (double **) calloc(N, sizeof(double*));
+            for (int i=0;i<N;i++) {
+                system.constants.A_matrix_old[i] = (double *) malloc(N * sizeof(double));
+            }
+            memreqA = (double)sizeof(double)* ( N*N )/(double)1e6;
         }
-        double memreqAN = (double)sizeof(double)*((3*system.constants.total_atoms*3*system.constants.total_atoms - 3*system.constants.total_atoms)/2.0)/(double)1e6;
-        printf("The NEW polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqAN, memreqAN/1000.);
+        printf("The polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqA, memreqA/1000.);
 
 }
 
@@ -496,11 +506,19 @@ int main(int argc, char **argv) {
 
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
         printf("Freeing data structures... ");
-        // NEW ***
-        for (int i=0; i< 3* system.constants.total_atoms; i++) {
-            free(system.constants.A_matrix[i]);
+        // 1/2 matrix
+        if (!system.constants.full_A_matrix_option) {
+            for (int i=0; i< 3* system.constants.total_atoms; i++) {
+                free(system.constants.A_matrix[i]);
+            }
+            free(system.constants.A_matrix); system.constants.A_matrix = NULL;
+        // full matrix
+        } else {
+            for (int i=0; i<3*system.constants.total_atoms; i++) {
+                free(system.constants.A_matrix_old[i]);
+            }
+            free(system.constants.A_matrix_old); system.constants.A_matrix_old = NULL;
         }
-        free(system.constants.A_matrix); system.constants.A_matrix = NULL;
     }
     printf("done.\n");
 	printf("MC steps completed. Exiting program.\n"); std::exit(0);
