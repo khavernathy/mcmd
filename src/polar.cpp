@@ -485,6 +485,8 @@ void polarization_force(System &system) {
             for (n=0;n<3;n++) f_local[n]=0;
 
             double* distances = getDistanceXYZ(system,i,j,k,l);
+            r = distances[3];
+            if (r > system.pbc.cutoff) continue; // only within r_cc
             x = distances[0]; y = distances[1]; z = distances[2];
             xy = x*y;
             yz = y*z;
@@ -492,7 +494,6 @@ void polarization_force(System &system) {
             x2 = x*x;
             y2 = y*y;
             z2 = z*z;
-            r = distances[3];
             r2 = r*r;
             r3 = r2*r;
             rinv = 1./r;
