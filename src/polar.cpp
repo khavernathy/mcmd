@@ -447,41 +447,52 @@ double polarization(System &system) {
 } // end polarization() function
 
 
+double dipole_charge_force() {
+    
+}
+
 
 void polarization_force(System &system) {
-    // gets force on atoms due to dipoles calculated before (via iterative method)
-    // TODO
+    // gets force on atoms due to dipoles calculated via iterative method
+    int i,j,k,l,n;
+    double common_factor, r, rinv, r2, r2inv, r3, r3inv;
+    const double polar_damp = system.constants.polar_damp;
 
-    int i,j,n;
-    double q;
-
-    // using UMS p. 423
-    // see also green notebook.
-    // F_polar = q*(-u/alpha + E)
-    // So, we need to converge on the dipoles first, just like for potential calc.
-    // there is no uVT for MD, so no need to re-size the A matrix.
-    // this is very much a test and not suitable for publishable use.
+    if (system.constants.ensemble == ENSEMBLE_UVT) { // uVT is the only ensemble that changes N
+        thole_resize_matrices(system);
+    } 
 
     thole_amatrix(system); // fill in the A-matrix
     thole_field(system); // calculate electric field at each atom (assume PBC)
     int num_iterations = thole_iterative(system); // iteratively solve the dipoles
        system.stats.polar_iterations = (double)num_iterations;
-          system.constants.dipole_rrms = get_dipole_rrms(system);
+       system.constants.dipole_rrms = get_dipole_rrms(system);
+    
     // ready for forces.
-    // it's a many-body potential, not pair-potential, so at this point forces are intrinsic to atoms.
     for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            if (system.molecules[i].atoms[j].frozen) continue; // skip frozens.
-            if (system.molecules[i].atoms[j].polar == 0.) continue; // skip non-polarizable sites
-            if (system.molecules[i].atoms[j].C == 0) continue; // skip 0-force
-            q = system.molecules[i].atoms[j].C;
+    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+        for (k=i+1; k<system.molecules.size(); k++) { // no self-molecule interactions
+        for (l=0; l<system.molecules[k].atoms.size(); k++) {
+            // there are 3 contributions to polar force:
+            // (1) u_i -- q_j  ||  (2) u_j -- q_i  ||  (3) u_i -- u_j
 
-            for (n=0;n<3;n++) {
-                //printf("force before[%i] = %e\n", n, system.molecules[i].atoms[j].force[n]);
-                //printf("gamma: %f; dip: %f; q: %f; polar: %f; efield: %f; efield_self: %f\n", system.constants.polar_gamma, system.molecules[i].atoms[j].dip[n], system.molecules[i].atoms[j].C, system.molecules[i].atoms[j].polar, system.molecules[i].atoms[j].efield[n], system.molecules[i].atoms[j].efield_self[n]);
-                system.molecules[i].atoms[j].force[n] += q*((-system.constants.polar_gamma*system.molecules[i].atoms[j].dip[n]  / system.molecules[i].atoms[j].polar)                               + ((system.molecules[i].atoms[j].efield[n] + system.molecules[i].atoms[j].efield_self[n])));
-                //printf("force after[%i] = %e\n", n, system.molecules[i].atoms[j].force[n]);
+            double* distances = getDistanceXYZ(system,i,j,k,l);
+            r = distances[3];
+            r2 = r*r;
+            r3 = r2*r;
+            rinv = 1./r;
+            r2inv = rinv*rinv;
+            r3inv = r2inv*rinv;
+
+            // 1
+            if (system.molecules[k].atoms[l].C != 0 && system.molecules[i].atoms[j].polar != 0) {
+                common_factor = system.molecules[k].atoms[l].C * r3inv;
             }
-        } // end loop j atoms in i
+            
+            
+
+        }
+        }
+    } // end loop j atoms in i
     } // end loop i molecules
 }
