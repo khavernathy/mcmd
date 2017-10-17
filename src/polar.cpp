@@ -447,16 +447,18 @@ double polarization(System &system) {
 } // end polarization() function
 
 
-double dipole_charge_force() {
-    
-}
-
-
 void polarization_force(System &system) {
     // gets force on atoms due to dipoles calculated via iterative method
     int i,j,k,l,n;
-    double common_factor, r, rinv, r2, r2inv, r3, r3inv;
-    const double polar_damp = system.constants.polar_damp;
+    double common_factor, r, rinv, r2, r2inv, r3, r3inv, r5inv, r7inv;
+    double x2,y2,z2,xy,yz,xz,x,y,z; // distance relations
+    double udotu, ujdotr, uidotr; // dot products
+    const double damp = system.constants.polar_damp;
+    const double cc2inv = (1.0/system.pbc.cutoff)*(1.0/system.pbc.cutoff); // coulombic cutoff is same as LJ; this is -1*f_shift
+    double f_local[3]; // temp forces
+    double u_i[3], u_j[3]; // temp. dipoles
+    double q_i,q_j; // temp. charges
+    double t1, t2, t3, p1, p2, p3, p4, p5; // terms and prefactors
 
     if (system.constants.ensemble == ENSEMBLE_UVT) { // uVT is the only ensemble that changes N
         thole_resize_matrices(system);
@@ -468,15 +470,28 @@ void polarization_force(System &system) {
        system.stats.polar_iterations = (double)num_iterations;
        system.constants.dipole_rrms = get_dipole_rrms(system);
     
-    // ready for forces.
+    // ready for forces; loop all atoms
     for (i=0; i<system.molecules.size(); i++) {
     for (j=0; j<system.molecules[i].atoms.size(); j++) {
+        // initializers for atom
+        q_i = system.molecules[i].atoms[j].C;
+        for (n=0;n<3;n++) u_i[n] = system.molecules[i].atoms[j].dip[n];
+
+        // loop pairs
         for (k=i+1; k<system.molecules.size(); k++) { // no self-molecule interactions
         for (l=0; l<system.molecules[k].atoms.size(); k++) {
-            // there are 3 contributions to polar force:
+            // there are 3 pairwise contributions to polar force:
             // (1) u_i -- q_j  ||  (2) u_j -- q_i  ||  (3) u_i -- u_j
+            for (n=0;n<3;n++) f_local[n]=0;
 
             double* distances = getDistanceXYZ(system,i,j,k,l);
+            x = distances[0]; y = distances[1]; z = distances[2];
+            xy = x*y;
+            yz = y*z;
+            xz = x*z;
+            x2 = x*x;
+            y2 = y*y;
+            z2 = z*z;
             r = distances[3];
             r2 = r*r;
             r3 = r2*r;
@@ -484,15 +499,58 @@ void polarization_force(System &system) {
             r2inv = rinv*rinv;
             r3inv = r2inv*rinv;
 
-            // 1
+            // (1) u_i -- q_j
             if (system.molecules[k].atoms[l].C != 0 && system.molecules[i].atoms[j].polar != 0) {
-                common_factor = system.molecules[k].atoms[l].C * r3inv;
+                q_j = system.molecules[k].atoms[l].C;
+                common_factor = q_j*r3inv;
+    
+                f_local[0] += common_factor*((u_i[0]*(r2inv*(-2*x2 + y2 + z2) - cc2inv*(y2 + z2))) + (u_i[1]*(r2inv*(-3*x*y) + cc2inv*x*y)) + (u_i[2]*(r2inv*(-3*x*z) + cc2inv*x*z)));
+     
+                f_local[1] += common_factor*(u_i[0]*(r2inv*(-3*x*y) + cc2inv*x*y) + u_i[1]*(r2inv*(-2*y2 + x2 + z2) - cc2inv*(x2 + z2)) + u_i[2]*(r2inv*(-3*y*z) + cc2inv*y*z));
+                
+                f_local[2] += common_factor*(u_i[0]*(r2inv*(-3*x*z) + cc2inv*x*z) + u_i[1]*(r2inv*(-3*y*z) + cc2inv*y*z) + u_i[2]*(r2inv*(-2*z2 + x2 + y2) - cc2inv*(x2 + y2)));
+            }
+
+            // (2) u_j -- q_i
+            if (q_i != 0 && system.molecules[k].atoms[l].polar != 0) {
+                for (n=0;n<3;n++) u_j[n] = system.molecules[k].atoms[l].dip[n];
+                common_factor = q_i*r3inv;
+
+                f_local[0] -= common_factor*((u_j[0]*(r2inv*(-2*x2 + y2 + z2) - cc2inv*(y2 + z2))) + (u_j[1]*(r2inv*(-3*x*y) + cc2inv*x*y)) + (u_j[2]*(r2inv*(-3*x*z) + cc2inv*x*z)));
+
+                f_local[1] -= common_factor*(u_j[0]*(r2inv*(-3*x*y) + cc2inv*x*y) + u_j[1]*(r2inv*(-2*y2 + x2 + z2) - cc2inv*(x2 + z2)) + u_j[2]*(r2inv*(-3*y*z) + cc2inv*y*z));
+
+                f_local[2] -= common_factor*(u_j[0]*(r2inv*(-3*x*z) + cc2inv*x*z) + u_j[1]*(r2inv*(-3*y*z) + cc2inv*y*z) + u_j[2]*(r2inv*(-2*z2 + x2 + y2) - cc2inv*(x2 + y2)));
             }
             
-            
+            // (3) u_i -- u_j  -- assume exponential damping.
+            if (system.molecules[i].atoms[j].polar != 0 && system.molecules[k].atoms[l].polar !=0) {
+                r5inv = r2inv*r3inv;
+                r7inv = r5inv*r2inv;
+                udotu = dddotprod(u_i,u_j);
+                uidotr = dddotprod(u_i,distances);
+                ujdotr = dddotprod(u_j,distances);
 
-        }
-        }
+                t1 = exp(-damp*r);
+                t2 = 1. + damp*r + 0.5*damp*damp*r2;
+                t3 = t2 + damp*damp*damp*r3/6.;
+                p1 = 3*r5inv*udotu*(1. - t1*t2) - r7inv*15.*uidotr*ujdotr*(1. - t1*t3);
+                p2 = 3*r5inv*ujdotr*(1. - t1*t3);
+                p3 = 3*r5inv*uidotr*(1. - t1*t3);
+                p4 = -udotu*r3inv*(-t1*(damp*rinv + damp*damp) + rinv*t1*damp*t2);
+                p5 = 3*r5inv*uidotr*ujdotr*(-t1*(rinv*damp + damp*damp + 0.5*r*damp*damp*damp) + rinv*t1*damp*t3);
+
+                f_local[0] += p1*x + p2*u_i[0] + p3*u_j[0] + p4*x + p5*x;
+                f_local[1] += p1*y + p2*u_i[1] + p3*u_j[1] + p4*y + p5*y;
+                f_local[2] += p1*z + p2*u_i[2] + p3*u_j[2] + p4*z + p5*z;
+            }
+            // done with this (i,j)--(k,l) pair. Apply Newton's law
+            for (n=0;n<3;n++) {
+                system.molecules[i].atoms[j].force[n] += f_local[n];
+                system.molecules[k].atoms[l].force[n] -= f_local[n];
+            }
+        } // end loop l atoms in k
+        } // end loop k molecules
     } // end loop j atoms in i
     } // end loop i molecules
-}
+} // end polarization forces function
