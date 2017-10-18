@@ -232,10 +232,9 @@ void thole_amatrix(System &system) {
             explr = exp(-l*r);
             damp1 = 1.0 - explr*(0.5*l2*r2 + l*r + 1.0);
             damp2 = damp1 - explr*(l3*r2*r/6.0);
+            //system.checkpoint("got damping factors.");
 
-            system.checkpoint("got damping factors.");
-
-            system.checkpoint("buildling tensor.");
+            //system.checkpoint("buildling tensor.");
             /* build the tensor */
             // 1/2 MATRIX
             if (!system.constants.full_A_matrix_option) {
@@ -259,7 +258,7 @@ void thole_amatrix(System &system) {
                 }
             } // end full matrix
 
-
+            //system.checkpoint("starting half matrix copy");
             // fill in other half of full matrix if app.
             if (system.constants.full_A_matrix_option) {
                 for (p=0; p<3; p++) {
@@ -271,10 +270,8 @@ void thole_amatrix(System &system) {
         } /* end j */
     } /* end i */
 
-    
-
-
     system.constants.polar_rmin = rmin;
+    system.checkpoint("done setting A matrix");
     return;
 }
 
@@ -455,8 +452,8 @@ void polarization_force(System &system) {
     double udotu, ujdotr, uidotr; // dot products
     const double damp = system.constants.polar_damp;
     const double cc2inv = (1.0/system.pbc.cutoff)*(1.0/system.pbc.cutoff); // coulombic cutoff is same as LJ; this is -1*f_shift
-    double f_local[3]; // temp forces
-    double u_i[3], u_j[3]; // temp. dipoles
+    double f_local[3]={0,0,0}; // temp forces
+    double u_i[3]={0,0,0}, u_j[3]={0,0,0}; // temp. dipoles
     double q_i,q_j; // temp. charges
     double t1, t2, t3, p1, p2, p3, p4, p5; // terms and prefactors
 
@@ -469,7 +466,8 @@ void polarization_force(System &system) {
     int num_iterations = thole_iterative(system); // iteratively solve the dipoles
        system.stats.polar_iterations = (double)num_iterations;
        system.constants.dipole_rrms = get_dipole_rrms(system);
-    
+
+    system.checkpoint("starting force loop");    
     // ready for forces; loop all atoms
     for (i=0; i<system.molecules.size(); i++) {
     for (j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -479,12 +477,13 @@ void polarization_force(System &system) {
 
         // loop pairs
         for (k=i+1; k<system.molecules.size(); k++) { // no self-molecule interactions
-        for (l=0; l<system.molecules[k].atoms.size(); k++) {
+        for (l=0; l<system.molecules[k].atoms.size(); l++) {
             // there are 3 pairwise contributions to polar force:
             // (1) u_i -- q_j  ||  (2) u_j -- q_i  ||  (3) u_i -- u_j
             for (n=0;n<3;n++) f_local[n]=0;
-
+            
             double* distances = getDistanceXYZ(system,i,j,k,l);
+            system.checkpoint("got distance.");
             r = distances[3];
             if (r > system.pbc.cutoff) continue; // only within r_cc
             x = distances[0]; y = distances[1]; z = distances[2];
@@ -499,7 +498,7 @@ void polarization_force(System &system) {
             rinv = 1./r;
             r2inv = rinv*rinv;
             r3inv = r2inv*rinv;
-
+            
             // (1) u_i -- q_j
             if (system.molecules[k].atoms[l].C != 0 && system.molecules[i].atoms[j].polar != 0) {
                 q_j = system.molecules[k].atoms[l].C;
