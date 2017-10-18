@@ -448,7 +448,7 @@ void polarization_force(System &system) {
     // gets force on atoms due to dipoles calculated via iterative method
     int i,j,k,l,n;
     double common_factor, r, rinv, r2, r2inv, r3, r3inv, r5inv, r7inv;
-    double x2,y2,z2,xy,yz,xz,x,y,z; // distance relations
+    double x2,y2,z2,x,y,z; // distance relations
     double udotu, ujdotr, uidotr; // dot products
     const double damp = system.constants.polar_damp;
     const double cc2inv = (1.0/system.pbc.cutoff)*(1.0/system.pbc.cutoff); // coulombic cutoff is same as LJ; this is -1*f_shift
@@ -487,9 +487,6 @@ void polarization_force(System &system) {
             r = distances[3];
             if (r > system.pbc.cutoff) continue; // only within r_cc
             x = distances[0]; y = distances[1]; z = distances[2];
-            xy = x*y;
-            yz = y*z;
-            xz = x*z;
             x2 = x*x;
             y2 = y*y;
             z2 = z*z;
