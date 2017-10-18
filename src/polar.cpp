@@ -495,7 +495,8 @@ void polarization_force(System &system) {
             rinv = 1./r;
             r2inv = rinv*rinv;
             r3inv = r2inv*rinv;
-            
+            for (n=0;n<3;n++) u_j[n] = system.molecules[k].atoms[l].dip[n];            
+
             // (1) u_i -- q_j
             if (system.molecules[k].atoms[l].C != 0 && system.molecules[i].atoms[j].polar != 0) {
                 q_j = system.molecules[k].atoms[l].C;
@@ -510,7 +511,6 @@ void polarization_force(System &system) {
 
             // (2) u_j -- q_i
             if (q_i != 0 && system.molecules[k].atoms[l].polar != 0) {
-                for (n=0;n<3;n++) u_j[n] = system.molecules[k].atoms[l].dip[n];
                 common_factor = q_i*r3inv;
 
                 f_local[0] -= common_factor*((u_j[0]*(r2inv*(-2*x2 + y2 + z2) - cc2inv*(y2 + z2))) + (u_j[1]*(r2inv*(-3*x*y) + cc2inv*x*y)) + (u_j[2]*(r2inv*(-3*x*z) + cc2inv*x*z)));

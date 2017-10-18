@@ -31,8 +31,8 @@
 #define M_PI 3.14159265359
 #endif
 
-// c++ code files of this program
-// ORDER MATTERS HERE
+// c++ code files of this software
+// ORDER MATTERS HERE !!!!!!!!!!!!!
 #ifdef MPI
     #include <mpi.h>
 #endif
@@ -45,10 +45,10 @@
 #include "fugacity.cpp"
 #include "distance.cpp"
 #include "system_functions.cpp" 
+#include "mc.cpp" // this will include potential.cpp, which includes lj, coulombic, polar
 #ifdef CUDA
     #include "cudafuncs.cu"  // CUDA STUFF
 #endif
-#include "mc.cpp" // this will include potential.cpp, which includes lj, coulombic, polar
 #include "md.cpp"
 #include "io.cpp"
 #include "radial_dist.cpp"
@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
     system.pbc.printBasis();
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 539); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 687); // i.e. github commit
     inputValidation(system);
     printf("...input options validated.\n");
     system.checkpoint("...input options validated. Done with system setup functions.");
