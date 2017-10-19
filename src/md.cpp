@@ -30,6 +30,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
     double v_sum=0.0, avg_v = 0.0;
+    double v2_sum=0;
 	double T=0.0, pressure=0;
     double vsq=0., wsq=0.;
     double energy_holder=0.;
@@ -56,6 +57,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
                 vsq += system.molecules[j].vel[n] * system.molecules[j].vel[n];
                 wsq += system.molecules[j].ang_vel[n] * system.molecules[j].ang_vel[n];
             }
+            v2_sum += vsq;
             v_sum += sqrt(vsq); // so we're adding up velocities.
 
             energy_holder = 0.5 * system.molecules[j].mass * vsq;
@@ -95,6 +97,9 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     }
 
     avg_v = v_sum / system.stats.count_movables; //system.molecules.size(); // A/fs
+    double avg_v2 = v2_sum / system.stats.count_movables;
+    double v_rms = sqrt(avg_v2);
+
     K_total = K_total / system.constants.kb * 1e10; // convert to K
     Klin = Klin / system.constants.kb * 1e10; // ""
     Krot = Krot / system.constants.kb * 1e10; // ""
@@ -106,6 +111,9 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     // note this is only valid for single-sorbate (homogenous gas) right now
     // also McQuarrie Stat. Mech. p358 Elementary Kinetic Theory of Transport in Gases
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
+    double T_rms = (v_rms*v_rms)*1e10 * system.proto[0].mass / 3.0 / system.constants.kb;
+    //printf("T_rms = %f K\n", T_rms);
+
     // add to partition function
     double tmp=0;
     if (T>0) tmp = -(K_total+V_total)/T; // K/K = unitless
