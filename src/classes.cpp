@@ -527,7 +527,7 @@ class Stats {
 
         double polar_iterations=0;
 
-        struct obs_t {
+        struct obs_t { // observable types
             string name;
             double counter=0.0;
             double value=0;
@@ -554,7 +554,8 @@ class Stats {
           tt, tt_lrc, tt_self,
           chempot,totalmass, frozenmass, 
           pressure,temperature, fdotrsum, 
-          dist_within, csp, diffusion, volume, z;
+          dist_within, csp, diffusion, volume, z, // z = PV/nRT
+          Q; // Q = partition func.
 
         int max_sorbs=10;
         vector<obs_t> msd = vector<obs_t>(max_sorbs); 

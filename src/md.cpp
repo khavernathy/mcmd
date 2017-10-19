@@ -26,7 +26,7 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
 
 
 // =================  GET TOTAL ENERGY AND EMERGENT TEMPERATURE FROM SYSTEM STATE ===========================
-double * calculateEnergyAndTemp(System &system, double currtime) { // the * is to return an array of doubles as a pointer, not just one double
+double * calculateObservablesMD(System &system, double currtime) { // the * is to return an array of doubles as a pointer, not just one double
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
     double v_sum=0.0, avg_v = 0.0;
@@ -99,6 +99,10 @@ double * calculateEnergyAndTemp(System &system, double currtime) { // the * is t
     Klin = Klin / system.constants.kb * 1e10; // ""
     Krot = Krot / system.constants.kb * 1e10; // ""
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
+
+
+    // add to partition function
+    system.stats.Q.value += exp(-(K_total+V_total)/T); // K/K = unitless
 
 	// calculate temperature from kinetic energy and number of particles
 	// https://en.wikipedia.org/wiki/Thermal_velocity
