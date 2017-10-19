@@ -101,14 +101,17 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
 
 
-    // add to partition function
-    system.stats.Q.value += exp(-(K_total+V_total)/T); // K/K = unitless
-
 	// calculate temperature from kinetic energy and number of particles
 	// https://en.wikipedia.org/wiki/Thermal_velocity
     // note this is only valid for single-sorbate (homogenous gas) right now
     // also McQuarrie Stat. Mech. p358 Elementary Kinetic Theory of Transport in Gases
     T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
+    // add to partition function
+    double tmp=0;
+    if (T>0) tmp = -(K_total+V_total)/T; // K/K = unitless
+    if (tmp < 10) system.stats.Q.value += exp(tmp);
+    //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T)); 
+
 	static double output[8];
 	output[0] = K_total; 
     output[1] = V_total;

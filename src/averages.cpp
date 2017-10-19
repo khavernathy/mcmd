@@ -197,7 +197,11 @@ void computeAverages(System &system) {
     system.stats.potential.calcNewStats();
 
     // Q (partition function)
-    system.stats.Q.value += exp(-system.stats.potential.value / system.constants.temp); // K/K = unitless
+    double tmp=0;
+    if (system.constants.temp>0) tmp = -(system.stats.potential.value)/system.constants.temp; // K/K = unitless
+    if (tmp < 10) system.stats.Q.value += exp(tmp);
+    
+system.stats.Q.value += exp(-system.stats.potential.value / system.constants.temp); // K/K = unitless
 
     // QST
     if (system.constants.ensemble == ENSEMBLE_UVT && system.proto.size() == 1) { // T must be fixed for Qst
