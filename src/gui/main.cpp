@@ -5,10 +5,13 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QWindow>
+#include <QProcess>
+
 //#include <QFileDialog>
 
 #include "backend.h"
 #include "fileio.h"
+#include "viz.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -36,10 +39,10 @@ int main(int argc, char *argv[])
     // c++ classes and corresponding headers for C++ <--> QML comm.
     qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
     qmlRegisterType<FileIO, 1>("FileIO", 1, 0, "FileIO");
+    qmlRegisterType<Viz, 1>("Viz", 1, 0, "Viz");
     //qmlRegisterType<Graphs, 1>("Graphs", 1, 0, "Graphs" );
 
     QQmlApplicationEngine engine;
-
 
 
     // go
@@ -47,6 +50,8 @@ int main(int argc, char *argv[])
 
     QWindow *window = qobject_cast<QWindow*>(engine.rootObjects()[0]);
     window->setProperty("exePath", qApp->applicationDirPath());
+
+
 
     if (engine.rootObjects().isEmpty())
         return -1;

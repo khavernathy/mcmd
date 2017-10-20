@@ -1,6 +1,0 @@
-make clean
-qmake -config release
-make
-
-
-will make a Mac bundle with the app.

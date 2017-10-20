@@ -1,0 +1,11 @@
+1) NEVER CHANGE MAKEFILE ON GITHUB. The makefile should be unique for local systems
+
+2)
+make clean
+qmake -config release
+make
+
+
+will make a Mac bundle with the app.
+
+3) 

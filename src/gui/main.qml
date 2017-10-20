@@ -11,6 +11,7 @@ import Qt.labs.platform 1.0
 
 
 import FileIO 1.0
+import Viz 1.0
 
 ApplicationWindow {
     id: root
@@ -31,6 +32,10 @@ ApplicationWindow {
         //homeDir: "/Users/douglasfranz" // determined dynamically now
         //source: homeDir+"/mcmd/testzone/runlog.log" // determined dynamically now
         onError: console.log(msg);
+    }
+    Viz {
+        id: viz
+        property string traj_name: "traj_movers.pdb";
     }
 
     // main visual stuff begins
@@ -165,7 +170,7 @@ ApplicationWindow {
                 Text {
                     id: dataLocationText
                     width: root.width - button1.width - button2.width - runlogScrollerHolder.width
-                    text: "Data will be written to: \n"+exePath
+                    text: "Simulation data will be written to: \n"+exePath
                     anchors.left: button2.right
                 }
 
@@ -1047,8 +1052,21 @@ ApplicationWindow {
             }
         } // end p4
         Page {
-            Label {
-                text: qsTr("more stuff, 5th")
+            Rectangle {
+                id: viz_rectangle
+                height: parent.height
+                width: parent.width
+                Label {
+                    text: qsTr("more stuff, 5th")
+                }
+                Button {
+                    id: vizbutton
+                    text: "Open VMD"
+                    onClicked: viz.openVMD(viz.traj_name);
+
+
+
+                } // end vizbutton
             }
         } // end p5
     }
@@ -1072,7 +1090,7 @@ ApplicationWindow {
             text: qsTr("g(r) plots")
         }
         TabButton {
-            text: qsTr("blashdd")
+            text: qsTr("Visualization")
         }
     }
 
