@@ -4,27 +4,13 @@ mode              md ! mc or md
 cuda                on
 checkpoints_option  off       
        
-input_atoms ../../atomfiles/NOTT-112+417H2_BSS.pdb   ! PDB ONLY       
+input_atoms ../../../atomfiles/NOTT-112+417H2_BSS.pdb   ! PDB ONLY       
 
 potential_form        ljes      !ljespolar       
 com_option            off     ! center of mass        
  
 carbasis 47.005 47.005 47.005 90 90 90
 
-
-
-!basis1  27.19800  0.00000  0.00000
-!basis2  -13.59900 23.55416  0.00000
-!basis3   0.00000  0.00000 30.99800
-
-
-! radial distribution option      
-radial_dist         off   ! turns on/off radial distribution function. off for speedup        
-radial_bin_size     0.05  ! in A       
-radial_max_dist     10.0 ! in A (maybe a good value is 1/2 box length)        
-radial_centroid     OXY   ! element name      
-radial_counterpart  HYD   ! element name to get distance of w/centroid        
-radial_file         radialdist.dat        
        
 temperature 295.0   
 ensemble nvt   
