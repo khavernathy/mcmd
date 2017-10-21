@@ -337,7 +337,8 @@ void integrate(System &system, double dt) {
             // if atoms allowed to move from molecules
             if (system.constants.md_mode == MD_ATOMIC) {
                 for (i=0; i<system.molecules[j].atoms.size(); i++) {
-                    system.molecules[j].atoms[i].calc_acc();
+                    int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
+                    system.molecules[j].atoms[i].calc_acc(nh, system.constants.lagrange_multiplier);
                     system.molecules[j].atoms[i].calc_vel(dt);
             } // end atomic loop i
             } // end if atomic
@@ -345,7 +346,8 @@ void integrate(System &system, double dt) {
             else if (system.constants.md_mode == MD_MOLECULAR) {
                 // translational
                 if (system.constants.md_translations) {
-                    system.molecules[j].calc_acc();
+                    int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
+                    system.molecules[j].calc_acc(nh, system.constants.lagrange_multiplier);
                     system.molecules[j].calc_vel(dt);
                 }
 
@@ -361,6 +363,7 @@ void integrate(System &system, double dt) {
 
     // 5) apply heat bath in constant-temp ensembles
     if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) {
+        if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like, 
         // which is usually good for obtaining equilibrium quantities.
@@ -391,6 +394,30 @@ void integrate(System &system, double dt) {
                 }
             }
         }
+        }
+        else if (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
+            double vdotF_sum = 0;
+            double mv2_sum = 0;
+            if (system.constants.md_mode == MD_MOLECULAR) {
+                for (i=0; i<system.molecules.size(); i++) {
+                    if (system.molecules[i].frozen) continue;
+                    vdotF_sum += dddotprod(system.molecules[i].vel, system.molecules[i].force);
+                    mv2_sum += system.molecules[i].mass * dddotprod(system.molecules[i].vel, system.molecules[i].vel);
+                }
+                system.constants.lagrange_multiplier = -vdotF_sum / mv2_sum;
+            }
+            else if (system.constants.md_mode == MD_ATOMIC) {
+                for (i=0; i<system.molecules.size(); i++) {
+                    if (system.molecules[i].frozen) continue;
+                    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                        vdotF_sum += dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].force);
+                        mv2_sum += system.molecules[i].atoms[j].m * dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
+                    }
+                }
+                system.constants.lagrange_multiplier = -vdotF_sum / mv2_sum;
+            }
+            // the lagrange multiplier will be applied in the integration calc (for acceleration).
+        } 
     } // end if uVT or NVT (thermostat)
     system.checkpoint("Done with heatbath if NVT/uVT.");
     system.checkpoint("Done with integrate() function.");

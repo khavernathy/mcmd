@@ -35,7 +35,10 @@ enum {
     MD_ATOMIC,
     MD_MOLECULAR
 };
-
+enum {
+    THERMOSTAT_ANDERSEN,
+    THERMOSTAT_NOSEHOOVER
+};
 
 /* the below stuff was more-or-less adopted from mpmc code */
 typedef struct _histogram {
@@ -172,6 +175,8 @@ class Constants {
         int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
         int md_external_force = 0; // option for constant external force in MD
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
+        double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat.
+        int thermostat_type = THERMOSTAT_ANDERSEN; // thermostat type for NVT temperature fixture.
 
 
         map <string,double> sig_override;
@@ -658,10 +663,12 @@ class Atom {
             return output;
         }
 
-        void calc_acc() {
+        void calc_acc(int nh, double lm) {
             for (int n=0; n<3; n++) {
                 old_acc[n] = acc[n];
                 acc[n] = force[n]*1.3806488e-33 / m; // to A / fs^2
+                if (nh)
+                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier
             }
         }
 
@@ -773,10 +780,12 @@ class Molecule {
         }
 
         // linear acceleration
-        void calc_acc() {
+        void calc_acc(int nh, double lm) {
             for (int n=0; n<3; n++) {
                 old_acc[n] = acc[n];
-                acc[n] = force[n] * 1.3806488e-33 /mass; // convert from K/A/kg to A/fs^2
+                acc[n] = force[n]*1.3806488e-33 / mass; // to A / fs^2
+                if (nh)
+                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier
             }
         }
 

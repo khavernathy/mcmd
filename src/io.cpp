@@ -1269,6 +1269,13 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "md_translations")) {
                 if (lc[1] == "off") system.constants.md_translations = 0;
                 std::cout << "Got MD translations option = " << lc[1].c_str(); printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "thermostat")) {
+                if (lc[1] == "andersen") 
+                    system.constants.thermostat_type = THERMOSTAT_ANDERSEN;
+                else if (lc[1] == "nose-hoover")
+                    system.constants.thermostat_type = THERMOSTAT_NOSEHOOVER;
+                std::cout << "Got Thermostat type = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {
 				system.constants.sig_override[lc[1]] = atof(lc[2].c_str());
