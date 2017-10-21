@@ -136,9 +136,11 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
 
     // add to partition function
     double tmp=0;
-    if (T>0) tmp = -(K_total+V_total)/T; // K/K = unitless
-    if (tmp < 10) system.stats.Q.value += exp(tmp);
-    //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T)); 
+    if (T>0) {
+        tmp = -(K_total+V_total)/T; // K/K = unitless
+        if (tmp < 10) system.stats.Q.value += exp(tmp);
+        //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T)); 
+    }
 
 	static double output[8];
 	output[0] = K_total; 
@@ -357,7 +359,7 @@ void integrate(System &system, double dt) {
     } // end for j molecules
     system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
 
-    // 5) apply heat bath in NVT
+    // 5) apply heat bath in constant-temp ensembles
     if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like, 
