@@ -553,21 +553,23 @@ int main(int argc, char **argv) {
         }
         printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
 				system.constants.md_vel_goal = sqrt(system.constants.md_init_vel*system.constants.md_init_vel/3.0);
-    } else {
+    } else if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN) {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
 
 		// Frenkel method for NVT v_alpha determination (converted to A/fs) p140
-		v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
-        v_init = sqrt(3*v_component*v_component);
-        double pm = 0;
-        for (int i=0; i<system.molecules.size(); i++) {
-            for (int n=0; n<3; n++) {
-                randv = getrand();
-                if (randv > 0.5) pm = 1.0;
-                else pm = -1.0;
-
-                system.molecules[i].vel[n] = v_component * pm;
+		for (int z=0; z<system.proto.size(); z++) {
+            v_init = 1e-5 * sqrt(8.*system.constants.kb*system.constants.temp/system.proto[z].mass/M_PI);
+            //v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
+            v_component = sqrt(v_init*v_init/3.);
+            double pm = 0;
+            for (int i=0; i<system.molecules.size(); i++) {
+                if (system.proto[z].name == system.molecules[i].name) {
+                    for (int n=0; n<3; n++) {
+                        pm = (getrand() > 0.5) ? 1.0 : -1.0;
+                        system.molecules[i].vel[n] = v_component * pm;
+                    }
+                }
             }
         }
 

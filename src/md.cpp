@@ -123,8 +123,11 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
         T += 1e10*avg_v*avg_v*system.proto[z].mass*M_PI/8.0/system.constants.kb;
         T_rms += 1e10*v_rms*v_rms*system.proto[z].mass/3.0/system.constants.kb;
         // T_rms is computed here but I'm not using it as the reported T
-        //printf("T_rms = %f K\n", T_rms);
     }
+    
+    //printf("T_rms = %f K\n", T_rms);
+    T /= (double)(int)system.proto.size();
+    T_rms /= (double)(int)system.proto.size();
     avg_v_ALL /= (double)(int)system.proto.size();
 
     // fix units
