@@ -62,3 +62,4 @@ saved_data/*
 saved_data*
 src/gui/*app
 src/gui/Makefile
+src/gui/gui_mcmd.pro.user
