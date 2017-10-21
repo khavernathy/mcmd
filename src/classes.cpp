@@ -667,7 +667,7 @@ class Atom {
                 old_acc[n] = acc[n];
                 acc[n] = force[n]*1.3806488e-33 / m; // to A / fs^2
                 if (nh)
-                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier
+                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier; Rapaport p158
             }
         }
 
@@ -785,7 +785,7 @@ class Molecule {
                 old_acc[n] = acc[n];
                 acc[n] = force[n]*1.3806488e-33 / mass; // to A / fs^2
                 if (nh)
-                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier
+                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier; Rapaport p158
             }
         }
 

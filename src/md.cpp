@@ -411,6 +411,7 @@ void integrate(System &system, double dt) {
             }
         }
         }
+        // Rapaport p158-159
         else if (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
             double vdotF_sum = 0;
             double mv2_sum = 0;
@@ -420,7 +421,7 @@ void integrate(System &system, double dt) {
                     vdotF_sum += dddotprod(system.molecules[i].vel, system.molecules[i].force);
                     mv2_sum += system.molecules[i].mass * dddotprod(system.molecules[i].vel, system.molecules[i].vel);
                 }
-                system.constants.lagrange_multiplier = -vdotF_sum / mv2_sum;
+                system.constants.lagrange_multiplier = -vdotF_sum / (mv2_sum/system.constants.kb*1e10);
             }
             else if (system.constants.md_mode == MD_ATOMIC) {
                 for (i=0; i<system.molecules.size(); i++) {
@@ -430,7 +431,7 @@ void integrate(System &system, double dt) {
                         mv2_sum += system.molecules[i].atoms[j].m * dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
                     }
                 }
-                system.constants.lagrange_multiplier = -vdotF_sum / mv2_sum;
+                system.constants.lagrange_multiplier = -vdotF_sum / (mv2_sum/system.constants.kb*1e10);
             }
             // the lagrange multiplier will be applied in the integration calc (for acceleration).
         } 

@@ -552,7 +552,7 @@ int main(int argc, char **argv) {
             }
         }
         printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
-    } else if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN) {
+    } else if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
         // otherwise use temperature as default via v_RMS
         // default temp is zero so init. vel's will be 0 if no temp is given.
 
