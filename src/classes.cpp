@@ -200,7 +200,7 @@ class Constants {
         double **B_matrix, C_matrix[3][3];
         double **A_matrix;
         double **A_matrix_old; // takes more memory but computations are faster
-        int full_A_matrix_option = 0; // option to enable the full A matrix for polarization
+        int full_A_matrix_option = 1; // option to enable the full A matrix for polarization
         int polar_precision=0;
         int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
         int_fast8_t polar_rrms =0;
