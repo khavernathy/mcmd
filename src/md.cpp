@@ -29,12 +29,17 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
 double * calculateObservablesMD(System &system, double currtime) { // the * is to return an array of doubles as a pointer, not just one double
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
-    double v_sum=0.0, avg_v = 0.0;
-    double v2_sum=0;
-	double T=0.0, pressure=0;
+    double avg_v = 0.0, avg_v2=0.0, v_rms=0.0;
+    double avg_v_ALL=0;
+	double T=0.0, T_rms=0, pressure=0;
     double vsq=0., wsq=0.;
     double energy_holder=0.;
-	int i,j,n;
+	int i,j,n,z;
+
+    double v_sum[(int)system.proto.size()];
+    double v2_sum[(int)system.proto.size()];
+    int N_local[(int)system.proto.size()];
+
 
     // grab fixed potential energy of system
         // from PBC (same as Monte Carlo potential)
@@ -49,9 +54,67 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
             }
         }
 
+    // KINETIC ENERGIES, VELOCITIES, ETC. BY MOLECULE TYPE
+    for (z = 0; z<system.proto.size(); z++) {
+        v2_sum[z] = 0;
+        v_sum[z] = 0;
+        N_local[z] = 0;
+       for (i=0; i<system.molecules.size(); i++) {
+            if (system.proto[z].name == system.molecules[i].name) {
+                N_local[z]++;
+                if (system.constants.md_mode == MD_MOLECULAR) {
+                    vsq=0; wsq=0;
+                    for (n=0; n<3; n++) {
+                        vsq += system.molecules[i].vel[n]*system.molecules[i].vel[n];
+                        wsq += system.molecules[i].ang_vel[n]*system.molecules[i].ang_vel[n];
+                    }
+                    v2_sum[z] += vsq;
+                    v_sum[z] += sqrt(vsq);
+
+                    energy_holder = 0.5 * system.molecules[i].mass * vsq;
+                    K_total += energy_holder;
+                    Klin += energy_holder;
+
+                    if (system.constants.md_rotations) {
+                        // new tensor method.
+                        system.molecules[i].calc_inertia_tensor();
+                        double wx = system.molecules[i].ang_vel[0];
+                        double wy = system.molecules[i].ang_vel[1];
+                        double wz = system.molecules[i].ang_vel[2];
+
+                        energy_holder = 0.5 * (system.molecules[i].inertia_tensor[0]*wx*wx +
+                            system.molecules[i].inertia_tensor[1]*wy*wy +
+                            system.molecules[i].inertia_tensor[2]*wz*wz +
+                            2*system.molecules[i].inertia_tensor[3]*wx*wy +
+                            2*system.molecules[i].inertia_tensor[4]*wy*wz +
+                            2*system.molecules[i].inertia_tensor[5]*wx*wz);
+
+                        energy_holder *= system.constants.kb/1e10;
+
+                        K_total += energy_holder; // rotational: (rad^2)*kg A^2 / fs^2
+                        Krot += energy_holder;
+                    } // end if rotations
+                } // end if molecular motion
+                else if (system.constants.md_mode == MD_ATOMIC) {
+                    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                        vsq=0;
+                        for (n=0; n<3; n++) 
+                            vsq += system.molecules[i].atoms[j].vel[n] * system.molecules[i].atoms[j].vel[n];
+                        v_sum[z] += sqrt(vsq); // sum velocities
+                        v2_sum[z] += vsq;
+                        energy_holder = 0.5*system.molecules[i].atoms[j].m * vsq;
+                        K_total += energy_holder;
+                        Klin += energy_holder;
+                    } // end for atoms j in molecule i
+                } // end if atomic motion
+            } // end if prototype z
+        } // end molecule loop 
+    } // end prototype loop
+/*
+
     // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
     for (j=0; j<system.molecules.size(); j++) {
-       if (system.constants.md_mode == MD_MOLECULAR) {
+       if (system.constants.md_mode == MD_MOLECULAR) { 
             vsq = 0; wsq = 0;
            for (n=0; n<3; n++) {
                 vsq += system.molecules[j].vel[n] * system.molecules[j].vel[n];
@@ -95,24 +158,30 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
             }
         }
     }
+*/
 
-    avg_v = v_sum / system.stats.count_movables; //system.molecules.size(); // A/fs
-    double avg_v2 = v2_sum / system.stats.count_movables;
-    double v_rms = sqrt(avg_v2);
+    // calculate temperature from kinetic energy and number of particles
+	// https://en.wikipedia.org/wiki/Thermal_velocity
+    // also McQuarrie Stat. Mech. p358 Elementary Kinetic Theory of Transport in Gases
+    for (z=0; z<system.proto.size(); z++) {
+        avg_v = v_sum[z] / N_local[z]; //system.stats.count_movables; //system.molecules.size(); // A/fs
+        avg_v2 = v2_sum[z] / N_local[z]; //system.stats.count_movables;
+        avg_v_ALL += avg_v;
+        v_rms = sqrt(avg_v2);
+        // contribution to Temperature from this sorbate
+        T += 1e10*avg_v*avg_v*system.proto[z].mass*M_PI/8.0/system.constants.kb;
+        T_rms += 1e10*v_rms*v_rms*system.proto[z].mass/3.0/system.constants.kb;
+        // T_rms is computed here but I'm not using it as the reported T
+        //printf("T_rms = %f K\n", T_rms);
+    }
+    avg_v_ALL /= (double)(int)system.proto.size();
 
-    K_total = K_total / system.constants.kb * 1e10; // convert to K
-    Klin = Klin / system.constants.kb * 1e10; // ""
-    Krot = Krot / system.constants.kb * 1e10; // ""
+    // fix units
+    K_total /= system.constants.kb * 1e10; // convert to K
+    Klin /= system.constants.kb * 1e10; // ""
+    Krot /= system.constants.kb * 1e10; // ""
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
 
-
-	// calculate temperature from kinetic energy and number of particles
-	// https://en.wikipedia.org/wiki/Thermal_velocity
-    // note this is only valid for single-sorbate (homogenous gas) right now
-    // also McQuarrie Stat. Mech. p358 Elementary Kinetic Theory of Transport in Gases
-    T = (avg_v*1e5)*(avg_v*1e5) * system.proto[0].mass * M_PI / 8.0 / system.constants.kb; // NO GOOD FOR MULTISORBATE
-    double T_rms = (v_rms*v_rms)*1e10 * system.proto[0].mass / 3.0 / system.constants.kb;
-    //printf("T_rms = %f K\n", T_rms);
 
     // add to partition function
     double tmp=0;
@@ -124,7 +193,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
 	output[0] = K_total; 
     output[1] = V_total;
 	output[2] = T;
-    output[3] = avg_v;
+    output[3] = avg_v_ALL;
     output[4] = Ek;
     output[5] = Klin;
     output[6] = Krot; 
