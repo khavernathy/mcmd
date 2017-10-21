@@ -35,7 +35,7 @@ ApplicationWindow {
     }
     Viz {
         id: viz
-        property string traj_name: "traj_movers.pdb";
+        property string traj_name: "traj.pdb";
     }
 
     // main visual stuff begins
@@ -1057,14 +1057,14 @@ ApplicationWindow {
                 height: parent.height
                 width: parent.width
                 Label {
+                    id: viztext
                     text: qsTr("more stuff, 5th")
                 }
                 Button {
                     id: vizbutton
                     text: "Open VMD"
-                    onClicked: viz.openVMD(viz.traj_name);
-
-
+                    onClicked: viz.openVMD(viz.traj_name, exePath);
+                    anchors.left: viztext.right
 
                 } // end vizbutton
             }

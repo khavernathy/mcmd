@@ -16,12 +16,18 @@ Viz::Viz(QObject *parent) :
 
 }
 
-void Viz::openVMD(const QString& traj_name)
+void Viz::openVMD(const QString& traj_name, const QString& exe_path)
 {
 
     // try to open VMD
+    string command = "/usr/local/bin/vmd";
+    command += " -pdb " + exe_path.toStdString() + "/" + traj_name.toStdString();
+    system(command.c_str());
+    qDebug() << "running openVMD() with CLI command = " + QString::fromStdString(command);
+
+    /* other way
     QProcess *process = new QProcess();
-    QString file = "/usr/local/bin/vmd";
+    QString file = "/usr/local/bin/vmd -pdb" + traj_name;
     process->start(file);
-    qDebug() << "running openVMD() with traj_name = " + traj_name;
+    */
 }

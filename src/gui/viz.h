@@ -17,7 +17,7 @@ public:
     explicit Viz(QObject *parent = 0);
 
     // functions
-    Q_INVOKABLE void openVMD(const QString& data);
+    Q_INVOKABLE void openVMD(const QString& data, const QString& data2);
 
 
     // local objects

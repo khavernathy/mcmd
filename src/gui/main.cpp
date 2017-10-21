@@ -26,8 +26,8 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    printf("Result of pwd: ");
-    system("pwd");
+    //printf("Result of pwd: ");
+    //system("pwd");
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 

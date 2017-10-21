@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Viz_t {
-    QByteArrayData data[9];
-    char stringdata0[66];
+    QByteArrayData data[10];
+    char stringdata0[72];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,11 +39,12 @@ QT_MOC_LITERAL(4, 31, 5), // "error"
 QT_MOC_LITERAL(5, 37, 3), // "msg"
 QT_MOC_LITERAL(6, 41, 11), // "setTrajName"
 QT_MOC_LITERAL(7, 53, 7), // "openVMD"
-QT_MOC_LITERAL(8, 61, 4) // "data"
+QT_MOC_LITERAL(8, 61, 4), // "data"
+QT_MOC_LITERAL(9, 66, 5) // "data2"
 
     },
     "Viz\0trajNameChanged\0\0traj_name\0error\0"
-    "msg\0setTrajName\0openVMD\0data"
+    "msg\0setTrajName\0openVMD\0data\0data2"
 };
 #undef QT_MOC_LITERAL
 
@@ -54,7 +55,7 @@ static const uint qt_meta_data_Viz[] = {
        0,       // classname
        0,    0, // classinfo
        4,   14, // methods
-       1,   46, // properties
+       1,   48, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
@@ -68,7 +69,7 @@ static const uint qt_meta_data_Viz[] = {
        6,    1,   40,    2, 0x0a /* Public */,
 
  // methods: name, argc, parameters, tag, flags
-       7,    1,   43,    2, 0x02 /* Public */,
+       7,    2,   43,    2, 0x02 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -78,7 +79,7 @@ static const uint qt_meta_data_Viz[] = {
     QMetaType::Void, QMetaType::QString,    3,
 
  // methods: parameters
-    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString,    8,    9,
 
  // properties: name, type, flags
        3, QMetaType::QString, 0x00495003,
@@ -98,7 +99,7 @@ void Viz::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **
         case 0: _t->trajNameChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 1: _t->error((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 2: _t->setTrajName((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 3: _t->openVMD((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 3: _t->openVMD((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
