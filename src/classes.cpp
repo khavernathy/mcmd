@@ -167,10 +167,9 @@ class Constants {
         int_fast8_t md_rotations=1; // MD only, rotational motion (of molecules) on
         int_fast8_t md_translations=1; // MD only, translation motion on
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
-        double md_vel_goal=0; // 1D vector component of the velocity (which has magnitude md_init_vel)
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         int_fast8_t md_mode = MD_MOLECULAR; // default is to keep molecules rigid (bonded)
-		double md_thermostat_freq = 0.01; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
+		double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
         int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
         int md_external_force = 0; // option for constant external force in MD
@@ -713,6 +712,7 @@ class Molecule {
         double inertia=0.0; //moment of inertia. stored in K fs^2
         double inertia_tensor[6] = {0,0,0,0,0,0}; // xx,yy,zz,xy,yz,xz
         double fugacity=0.0;
+        double md_velx_goal = 0.0; // for Andersen thermostat, unique for unique molecules.
 
         void reInitialize() {
             // if there are no atoms, don't bother

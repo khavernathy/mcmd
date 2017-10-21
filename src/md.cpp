@@ -19,6 +19,7 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
     */
 
     double ranf = 2*((getrand())-0.5); // -1 to +1
+
     return sigma*SQRT2*erfInverse(ranf); //  + displacement;
     // my green notebook ("Space Group Research #2") has notes on this in 2nd divider.
 }
@@ -372,12 +373,18 @@ void integrate(System &system, double dt) {
         // which is usually good for obtaining equilibrium quantities.
         double probab = system.constants.md_thermostat_probab;
         double ranf;
-        double sigma = system.constants.md_vel_goal;
+        double sigma;
         if (system.constants.md_mode == MD_MOLECULAR && system.constants.md_translations) {
         for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue; // skip frozens
             ranf = getrand(); // 0 -> 1
             if (ranf < probab) {
+                for (int z=0; z<system.proto.size(); z++) {
+                    if (system.proto[z].name == system.molecules[i].name) {
+                        sigma = system.proto[z].md_velx_goal;
+                        break;
+                    }
+                }
                 // adjust the velocity components of the molecule.
                 for (n=0; n<3; n++) {
                     system.molecules[i].vel[n] = gaussian(sigma);
@@ -390,6 +397,12 @@ void integrate(System &system, double dt) {
                     if (system.molecules[i].atoms[j].frozen) continue; // skip frozen atoms
                     ranf = getrand(); // 0 -> 1
                     if (ranf <probab) {
+                        for (int z=0; z<system.proto.size(); z++) {
+                            if (system.proto[z].name == system.molecules[i].name) {
+                                sigma = system.proto[z].md_velx_goal;
+                                break;
+                            }
+                        }   
                         for (n=0; n<3; n++) {
                             system.molecules[i].vel[n] = gaussian(sigma);
                         }
