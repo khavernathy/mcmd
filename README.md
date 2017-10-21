@@ -72,11 +72,13 @@ MCMD works out-of-the-box on <br />
 We recommend Visual Molecular Dynamics (VMD) for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, Ovito, etc.<br />
 
 # Publications
-Below is a list of scientific publications that have been facilitated by this software.
+Below is a list of scientific publications/presentations that have been facilitated by this software.
 
-1. Franz, D., Forrest, K. A., Pham, T., & Space, B. (2016). Accurate H2 Sorption Modeling in the rht-MOF NOTT-112 Using Explicit Polarization. Crystal Growth & Design, 16(10), 6024-6032.
+1. Franz, D. M., Forrest, K. A., Pham, T., & Space, B. (2016). Accurate H2 Sorption Modeling in the rht-MOF NOTT-112 Using Explicit Polarization. Crystal Growth & Design, 16(10), 6024-6032.
 
-2. Pham, T., Forrest, K. A., Franz, D. M., Guo, Z., Chen, B., & Space, B. (2017). Predictive models of gas sorption in a metal–organic framework with open-metal sites and small pore sizes. Physical Chemistry Chemical Physics, 19(28), 18587-18602.
+2. Luna, I. B., Franz, D. M. & Space, B. (2017). Theoretical Investigation of Hydrogen Sorption in Metal-organic Framework NOTT-101. 2017 REU-RET Poster Symposium, University of South Florida, Tampa, FL.
+
+3. Pham, T., Forrest, K. A., Franz, D. M., Guo, Z., Chen, B., & Space, B. (2017). Predictive models of gas sorption in a metal–organic framework with open-metal sites and small pore sizes. Physical Chemistry Chemical Physics, 19(28), 18587-18602.
 
 <!--
 pending...
