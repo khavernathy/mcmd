@@ -4,7 +4,7 @@ mode              md ! mc or md
 cuda                on
 checkpoints_option  off       
        
-input_atoms ../../../atomfiles/NOTT-112+417H2_BSS.pdb   ! PDB ONLY       
+input_atoms ../../../../atomfiles/NOTT-112+417H2_BSS.pdb   ! PDB ONLY       
 
 potential_form        ljes      !ljespolar       
 com_option            off     ! center of mass        
