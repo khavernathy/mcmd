@@ -110,55 +110,6 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
             } // end if prototype z
         } // end molecule loop 
     } // end prototype loop
-/*
-
-    // KINETIC ENERGIES, VELOCITIES, AND POTENTIALS //
-    for (j=0; j<system.molecules.size(); j++) {
-       if (system.constants.md_mode == MD_MOLECULAR) { 
-            vsq = 0; wsq = 0;
-           for (n=0; n<3; n++) {
-                vsq += system.molecules[j].vel[n] * system.molecules[j].vel[n];
-                wsq += system.molecules[j].ang_vel[n] * system.molecules[j].ang_vel[n];
-            }
-            v2_sum += vsq;
-            v_sum += sqrt(vsq); // so we're adding up velocities.
-
-            energy_holder = 0.5 * system.molecules[j].mass * vsq;
-            K_total += energy_holder; // linear: kg A^2 / fs^2
-            Klin += energy_holder;
-
-            if (system.constants.md_rotations) {
-                // new tensor method.
-                system.molecules[j].calc_inertia_tensor();
-                double wx = system.molecules[j].ang_vel[0];
-                double wy = system.molecules[j].ang_vel[1];
-                double wz = system.molecules[j].ang_vel[2];
-
-                energy_holder = 0.5 * (system.molecules[j].inertia_tensor[0]*wx*wx +
-                    system.molecules[j].inertia_tensor[1]*wy*wy +
-                    system.molecules[j].inertia_tensor[2]*wz*wz +
-                    2*system.molecules[j].inertia_tensor[3]*wx*wy +
-                    2*system.molecules[j].inertia_tensor[4]*wy*wz + 
-                    2*system.molecules[j].inertia_tensor[5]*wx*wz);
-
-                energy_holder *= system.constants.kb/1e10;
-
-                K_total += energy_holder; // rotational: (rad^2)*kg A^2 / fs^2
-                Krot += energy_holder;
-            }
-        }
-        else if (system.constants.md_mode == MD_ATOMIC) {
-            for (i=0; i<system.molecules[j].atoms.size(); i++) {
-            vsq=0;
-                for (n=0; n<3; n++) vsq += system.molecules[j].atoms[i].vel[n] * system.molecules[j].atoms[i].vel[n];
-                v_sum += sqrt(vsq); // sum velocities
-                energy_holder = 0.5*system.molecules[j].atoms[i].m * vsq;
-                K_total += energy_holder;
-                Klin += energy_holder;
-            }
-        }
-    }
-*/
 
     // calculate temperature from kinetic energy and number of particles
 	// https://en.wikipedia.org/wiki/Thermal_velocity
