@@ -1316,7 +1316,7 @@ void readInput(System &system, char* filename) {
                 system.stats.radial_file = lc[1].c_str();
                 std::cout << "Got radial dist. file = " << lc[1].c_str(); printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "checkpoints_option")) {
+            } else if (!strcasecmp(lc[0].c_str(), "checkpoints_option") || !strcasecmp(lc[0].c_str(), "checkpoints")) {
                 if (lc[1] == "on") system.constants.checkpoints_option = 1;
                 else system.constants.checkpoints_option = 0;
                 std::cout << "Got checkpoints option = " << lc[1].c_str(); printf("\n");

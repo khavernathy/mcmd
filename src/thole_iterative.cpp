@@ -24,29 +24,7 @@ void init_dipoles (System &system) {
 
 void contract_dipoles (System &system, int * ranked_array ) {
     unsigned int i, j, ii, jj, p, index, n, ti, tj, tk, tl;
-
-/*
-    printf("A normal\n");
-    for (int z=0; z<9; z++) {
-        for (int c=0;c<9; c++) {
-            printf("%10.3e ", system.constants.A_matrix[z][c]);
-        }
-        printf("\n");
-    }
-    
-    int blocksize=3;
-    int inc=0;
-    printf("A half\n");
-       for (int z=0; z<3*system.constants.total_atoms; z++) {
-        for (int c=0;c<blocksize; c++) {
-            if (z<9) printf("%10.3e ", system.constants.A_matrix_new[z][c]);
-            if(system.constants.A_matrix_new[z][c] != system.constants.A_matrix[z][c]) printf("MISMATCH FOUND at index %i %i.\n", z,c);
-        }
-        inc++;
-        if(inc%3==0) blocksize+=3;
-        if (z<9) printf("\n");
-    }
-  */      
+      
     for(i = 0; i < system.constants.total_atoms; i++) {
         index = ranked_array[i]; //do them in the order of the ranked index
         ii = index*3;
