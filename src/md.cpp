@@ -177,9 +177,9 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     avg_v_ALL /= (double)(int)system.proto.size();
 
     // fix units
-    K_total /= system.constants.kb * 1e10; // convert to K
-    Klin /= system.constants.kb * 1e10; // ""
-    Krot /= system.constants.kb * 1e10; // ""
+    K_total = K_total/system.constants.kb * 1e10; // convert to K
+    Klin = Klin/system.constants.kb * 1e10; // ""
+    Krot = Krot/system.constants.kb * 1e10; // ""
     Ek = (3.0/2.0)*system.constants.temp; // 3/2 NkT, equipartition kinetic.
 
 
