@@ -895,7 +895,7 @@ void readInput(System &system, char* filename) {
                     }
                 }
 
-            } else if (!strcasecmp(lc[0].c_str(), "fugacity_single")) {
+            } else if (!strcasecmp(lc[0].c_str(), "fugacity_single") || !strcasecmp(lc[0].c_str(), "fugacity")) {
                 system.constants.fugacity_single = 1;
                 system.constants.fugacity_single_sorbate = lc[1];
                 if (lc[1] != "h2" && lc[1] != "co2" && lc[1] != "ch4" && lc[1] != "n2" && lc[1] != "off") {
