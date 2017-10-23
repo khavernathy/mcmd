@@ -541,42 +541,62 @@ int main(int argc, char **argv) {
             if (system.constants.pdb_traj_option && system.constants.pdb_bigtraj_option)
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
-	// assign initial velocities
-    double randv; double DEFAULT = 99999.99;
-    if (system.constants.md_init_vel != DEFAULT) {
-        // if user defined
-        for (int i=0; i<system.molecules.size(); i++) {
-            for (int n=0; n<3; n++) {
-                randv = (getrand()*2 - 1) * sqrt(system.constants.md_init_vel * system.constants.md_init_vel/3.);
-                system.molecules[i].vel[n] = randv; // that is, +- 0->1 * user param
-            }
-        }
-        printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
-    } else if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
-        // otherwise use temperature as default via v_RMS
-        // default temp is zero so init. vel's will be 0 if no temp is given.
-
-        double init_vel_all = 0;
-		// Frenkel method for NVT v_alpha determination (converted to A/fs) p140
-		for (int z=0; z<system.proto.size(); z++) {
-            v_init = 1e-5 * sqrt(8.*system.constants.kb*system.constants.temp/system.proto[z].mass/M_PI);
-            init_vel_all += v_init;
-            //v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
-            system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
-            double pm = 0;
+	    // assign initial velocities
+        double randv; double DEFAULT = 99999.99;
+        if (system.constants.md_init_vel != DEFAULT) {
+            // if user defined
             for (int i=0; i<system.molecules.size(); i++) {
-                if (system.proto[z].name == system.molecules[i].name) {
-                    for (int n=0; n<3; n++) {
-                        pm = (getrand() > 0.5) ? 1.0 : -1.0;
-                        system.molecules[i].vel[n] = system.proto[z].md_velx_goal * pm;
+                for (int n=0; n<3; n++) {
+                    randv = (getrand()*2 - 1) * sqrt(system.constants.md_init_vel * system.constants.md_init_vel/3.);
+                    system.molecules[i].vel[n] = randv; // that is, +- 0->1 * user param
+                }
+            }
+            printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
+        } else if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
+            // otherwise use temperature as default via v_RMS
+            // default temp is zero so init. vel's will be 0 if no temp is given.
+            
+            double DOF = (3*system.stats.count_movables - 3); // 3 N -3
+            double kbTDOF = system.constants.kb * system.constants.temp * DOF; // in J
+            double v_init_AVG = 0; 
+            for (int z=0; z<system.proto.size(); z++) {
+                double v_init = 1e-5*sqrt(kbTDOF / (double)system.stats.count_movables / system.proto[z].mass);
+                system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
+                for (int i=0; i<system.molecules.size(); i++) {
+                    if (system.proto[z].name == system.molecules[i].name) {
+                        v_init_AVG += v_init * (1. / (double)system.stats.count_movables);
+                        for (int n=0;n<3;n++) {
+                            double pm = (getrand() > 0.5) ? 1.0 : -1.0; 
+                            system.molecules[i].vel[n] = pm * system.proto[z].md_velx_goal;
+                        }
                     }
                 }
             }
+            system.constants.md_init_vel = v_init_AVG;
+
+            /*double init_vel_all = 0;
+		    // Frenkel method for NVT ddv_alpha determination (converted to A/fs) p140
+		    for (int z=0; z<system.proto.size(); z++) {
+                //v_init = 1e-5 * sqrt(8.*system.constants.kb*system.constants.temp/system.proto[z].mass/M_PI);
+                v_init = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[z].mass);
+                init_vel_all += v_init;
+                //v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
+                system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
+                double pm = 0;
+                for (int i=0; i<system.molecules.size(); i++) {
+                    if (system.proto[z].name == system.molecules[i].name) {
+                        for (int n=0; n<3; n++) {
+                            pm = (getrand() > 0.5) ? 1.0 : -1.0;
+                            system.molecules[i].vel[n] = system.proto[z].md_velx_goal * pm;
+                        }
+                    }
+                }
+            }
+            init_vel_all /= (double)(int)system.proto.size();
+            system.constants.md_init_vel = init_vel_all; // garbage, basically
+        */
         }
-        init_vel_all /= (double)(int)system.proto.size();
-        system.constants.md_init_vel = init_vel_all; // garbage, basically
-    }
-    // end initial velocities
+        // end initial velocities
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
