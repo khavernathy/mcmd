@@ -364,7 +364,7 @@ int main(int argc, char **argv) {
 
 			// PRINT MAIN OUTPUT
             if (system.constants.ensemble == ENSEMBLE_UVT && system.constants.bias_uptake_switcher)
-                printf("MCMD Monte Carlo: %s (%s): Loading bias (%s)\n", system.constants.jobname.c_str(), argv[1], "on");
+                printf("MCMD Monte Carlo: %s (%s): Loading bias (%s %f %s)\n", system.constants.jobname.c_str(), argv[1], "on:", system.constants.bias_uptake, "molecules");
             else if (system.constants.ensemble == ENSEMBLE_UVT && !system.constants.bias_uptake_switcher)
                 printf("MCMD Monte Carlo: %s (%s): Loading bias (%s)\n", system.constants.jobname.c_str(), argv[1], "off");
             else
