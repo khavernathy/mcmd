@@ -437,6 +437,7 @@ ApplicationWindow {
                     else if (y < pol_line.axisY.min) {
                         pol_line.axisY.min = y;
                     }
+                    pol_line.name = "Pol " + String(y);
                 }
                 function updateESEn(x, y) {
                     es_line.append(x,y);
@@ -452,6 +453,7 @@ ApplicationWindow {
                     else if (y < es_line.axisY.min) {
                         es_line.axisY.min = y;
                     }
+                    es_line.name = "ES " + String(y);
                 }
                 function updateRDEn(x, y) {
                     rd_line.append(x,y);
@@ -467,6 +469,7 @@ ApplicationWindow {
                     else if (y < rd_line.axisY.min) {
                         rd_line.axisY.min = y;
                     }
+                    rd_line.name = "RD " + String(y);
                 }
                 function updateTotalU(x, y) {
                     totalu_line.append(x,y);
@@ -482,6 +485,7 @@ ApplicationWindow {
                     else if (y < totalu_line.axisY.min) {
                         totalu_line.axisY.min = y;
                     }
+                    totalu_line.name = "Total " + String(y);
                 }
 
 
@@ -541,6 +545,7 @@ ApplicationWindow {
                     else if (y < qst_line.axisY.min) {
                         qst_line.axisY.min = y;
                     }
+                    qst_line.name = "Qst " + String (y);
                 }
 
                 LineSeries {
@@ -585,6 +590,7 @@ ApplicationWindow {
                     else if (y < n_line.axisY.min) {
                         n_line.axisY.min = y;
                     }
+                    n_line.name = "N " + String (y);
                 }
                 function updateNAvg(x, y) {
                     navg_line.append(x,y);
@@ -600,6 +606,7 @@ ApplicationWindow {
                     else if (y < navg_line.axisY.min) {
                         navg_line.axisY.min = y;
                     }
+                    navg_line.name = "N avg " + String(y);
                 }
 
                 LineSeries {
@@ -638,6 +645,11 @@ ApplicationWindow {
                     mcs2.value = rem;
                     mcs3.value = dis;
                     mcs4.value = vol;
+
+                    mcs1.label = "Inserts " + String(ins);
+                    mcs2.label = "Removes" + String(rem);
+                    mcs3.label = "Displaces " + String(dis);
+                    mcs4.label = "Volume changes " + String(vol);
 
                 }
 
@@ -694,6 +706,7 @@ ApplicationWindow {
                     else if (y < ke_line.axisY.min) {
                         ke_line.axisY.min = y;
                     }
+                    ke_line.name = "KE "+String(y);
                 }
                 function updatePE(x, y) {
                     pe_line.append(x,y);
@@ -709,6 +722,7 @@ ApplicationWindow {
                     else if (y < ke_line.axisY.min) {
                         ke_line.axisY.min = y;
                     }
+                    pe_line.name = "PE "+String(y);
                 }
                 function updateTE(x, y) {
                     te_line.append(x,y);
@@ -724,6 +738,7 @@ ApplicationWindow {
                     else if (y < ke_line.axisY.min) {
                         ke_line.axisY.min = y;
                     }
+                    te_line.name = "TE "+String(y);
                 }
 
                 LineSeries {
@@ -777,6 +792,7 @@ ApplicationWindow {
                     else if (y < diff_line.axisY.min) {
                         diff_line.axisY.min = y;
                     }
+                    diff_line.name = "D " + String(y);
                 }
 
                 LineSeries {
@@ -821,6 +837,7 @@ ApplicationWindow {
                     else if (y < temp_line.axisY.min) {
                         temp_line.axisY.min = y;
                     }
+                    temp_line.name = "T avg " + String(y);
                 }
                 function updateITemp(x, y) {
                     itemp_line.append(x,y);
@@ -836,6 +853,7 @@ ApplicationWindow {
                     else if (y < itemp_line.axisY.min) {
                         itemp_line.axisY.min = y;
                     }
+                    itemp_line.name = "T now " + String(y);
                 }
 
                 LineSeries {
@@ -884,6 +902,7 @@ ApplicationWindow {
                     else if (y < pres_line.axisY.min) {
                         pres_line.axisY.min = y;
                     }
+                    pres_line.name = "Pressure " + String(y);
                 }
 
                 LineSeries {
@@ -929,6 +948,7 @@ ApplicationWindow {
                     else if (y < vel_line.axisY.min) {
                         vel_line.axisY.min = y;
                     }
+                    vel_line.name = "Velocity " + String(y);
                 }
 
                 LineSeries {
@@ -971,6 +991,7 @@ ApplicationWindow {
                     else if (y < msd_line.axisY.min) {
                         msd_line.axisY.min = y;
                     }
+                    msd_line.name = "MSD " + String(y);
                 }
                 LineSeries {
                     id: msd_line
@@ -984,7 +1005,7 @@ ApplicationWindow {
                     axisY: ValueAxis {
                         min: 0
                         max: 1e-7
-                        titleText: "MSD (r^2)"
+                        titleText: "MSD (A^2)"
                     }
                     name: "MSD"
                 }

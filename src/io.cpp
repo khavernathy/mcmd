@@ -1593,6 +1593,16 @@ void inputValidation(System &system) {
         std::cout << "ERROR: Tang-Toennies potential was requested but the C6/C8 terms for all atoms are zero. In an input .pdb, column 16 = C6, column 17 = C8, and column 18 = C10 (optional). All expressed in atomic units.";
         exit(EXIT_FAILURE);
     }
+    // check for a box
+    int nobox = 1;
+    for (int p=0;p<3;p++)
+        for (int q=0;q<3;q++)
+            if (system.pbc.basis[p][q] != 0.0) nobox = 0;
+    if (nobox) {
+        std::cout << "ERROR: No box information was supplied. Use `carbasis [a] [b] [c] [alpha] [beta] [gamma]`, for example.";
+        exit(EXIT_FAILURE);
+    }
+
 
 }
 // end input validation function
