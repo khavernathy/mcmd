@@ -697,7 +697,7 @@ int main(int argc, char **argv) {
 						// using this until i get a decent NVT frenkel method working.
 						// PE since it's I.G. approximation.
 						double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
-						system.stats.pressure.value = nmol*system.constants.R*system.stats.temperature.value/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
+						system.stats.pressure.value = nmol*system.constants.R*Temp/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
 						system.stats.pressure.calcNewStats();
             } // end if N>0 (stats calculation) 
 
