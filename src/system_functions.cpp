@@ -932,10 +932,12 @@ void setupNBias(System &system) {
         thevalue = x*system.stats.frozenmass.value*system.constants.NA/1000;
     } else if (unit == "mg/g") {
         thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000;
+    } else if (unit == "g/mL" || unit == "g/cm^3") {
+        thevalue = x * 1e6 / 1e30 * (system.pbc.volume) * system.constants.NA / (system.proto[0].mass*1000*system.constants.NA);
     }
 
     system.constants.bias_uptake = thevalue;
-    printf("Calculated bias-uptake goal-N = %f molecules (in the box) from %f %s\n", thevalue, x, unit.c_str());
+    printf("Calculated bias-uptake goal-N = %f molecules (in the box) = %f %s\n", thevalue, x, unit.c_str());
 }
 
 
