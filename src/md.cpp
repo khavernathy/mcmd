@@ -118,18 +118,14 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     for (z=0; z<system.proto.size(); z++) {
         avg_v = v_sum[z] / N_local[z]; //system.stats.count_movables; //system.molecules.size(); // A/fs
         avg_v2 = v2_sum[z] / N_local[z]; //system.stats.count_movables;
-        avg_v_ALL += avg_v;
+        avg_v_ALL += avg_v * (N_local[z] / (double)system.stats.count_movables);
         v_rms = sqrt(avg_v2);
         // contribution to Temperature from this sorbate
-        T += 1e10*avg_v*avg_v*system.proto[z].mass*M_PI/8.0/system.constants.kb;
-        T_rms += 1e10*v_rms*v_rms*system.proto[z].mass/3.0/system.constants.kb;
+        T += 1e10*avg_v*avg_v*system.proto[z].mass*M_PI/8.0/system.constants.kb * (N_local[z] / (double)system.stats.count_movables);
+        T_rms += 1e10*v_rms*v_rms*system.proto[z].mass/3.0/system.constants.kb * (N_local[z] / (double)system.stats.count_movables);
         // T_rms is computed here but I'm not using it as the reported T
     }
-    
-    //printf("T_rms = %f K\n", T_rms);
-    T /= (double)(int)system.proto.size();
-    T_rms /= (double)(int)system.proto.size();
-    avg_v_ALL /= (double)(int)system.proto.size();
+    printf("T_rms = %f\n", T_rms);
 
     // fix units
     K_total = K_total/system.constants.kb * 1e10; // convert to K
