@@ -37,6 +37,10 @@ public:
                READ mode
                WRITE setMode
                NOTIFY modeChanged)
+    Q_PROPERTY(QString jobname
+               READ jobname
+               WRITE setJobname
+               NOTIFY jobnameChanged)
     explicit FileIO(QObject *parent = 0);
 
     // functions
@@ -55,6 +59,7 @@ public:
     QString homeDir() { return mHomedir; };
     QString workingDir() { return mworkingDir; };
     QString mode() { return mmode; };
+    QString jobname() { return mjobname; };
 
     // setting functions
 public slots:
@@ -65,6 +70,7 @@ public slots:
     void setinputSource(const QString& inputSource) { minputSource = inputSource; };
     void setWorkingDir(const QString& workingDir) { mworkingDir = workingDir; };
     void setMode(const QString& mode) { mmode = mode; };
+    void setJobname(const QString& jobname) { mjobname = jobname; };
 
     // change signals
 signals:
@@ -75,6 +81,7 @@ signals:
     void homeDirChanged(const QString& homeDir);
     void workingDirChanged(const QString& workingDir);
     void modeChanged(const QString& mode);
+    void jobnameChanged(const QString& jobname);
     void error(const QString& msg);
 
 private:
@@ -83,6 +90,7 @@ private:
     QString minputSource;
     QString mworkingDir;
     QString mmode; // "mc" or "md"
+    QString mjobname; // the name of the job.
 
 public:
     int mLinecount=0;

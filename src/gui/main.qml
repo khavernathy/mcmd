@@ -270,17 +270,23 @@ ApplicationWindow {
                         var i=0;
                         while (allLines.length > i) {
                             var thisLine = allLines[i].split(/(\s)/).filter( function(e) { return e.trim().length > 0; } );
+                            // initial variables (name, mode, etc.)
                             if (allLines[i].indexOf("Got mode =") !== -1) {
                                 var mode = thisLine[3+fileIO.colOffset];
                                 fileIO.mode = mode; // determines MD or MC at beginning of output.
                             }
+                            else if (allLines[i].indexOf("Got job name") !== -1) {
+                                var jobname = thisLine[4+fileIO.colOffset];
+                                fileIO.jobname = jobname; // determines jobname at beginning of output.
+                            }
+                            // all other variables, which change in time.
                             else if (allLines[i].indexOf("Step") !== -1) {
                                 var step = thisLine[1+fileIO.colOffset];
                                 steps.push(step);
                                 var prg = thisLine[6+fileIO.colOffset].replace("%","");
                                 progresss.push(parseFloat(prg)/100);
                                 var finalstep = thisLine[3+fileIO.colOffset].replace(";","");
-                                statustext.statusvar = "Running... ( Step "+ step+" / "+finalstep + " ); " + prg.replace(";","") + "%";
+                                statustext.statusvar = "Running " + fileIO.jobname + "... ( Step "+ step+" / "+finalstep + " ); " + prg.replace(";","") + "%";
                             }
                             // MD...
                             else if (allLines[i].indexOf("KE") !== -1) {

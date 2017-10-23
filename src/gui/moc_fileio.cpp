@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_FileIO_t {
-    QByteArrayData data[34];
-    char stringdata0[351];
+    QByteArrayData data[37];
+    char stringdata0[385];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,23 +48,26 @@ QT_MOC_LITERAL(13, 140, 17), // "workingDirChanged"
 QT_MOC_LITERAL(14, 158, 10), // "workingDir"
 QT_MOC_LITERAL(15, 169, 11), // "modeChanged"
 QT_MOC_LITERAL(16, 181, 4), // "mode"
-QT_MOC_LITERAL(17, 186, 5), // "error"
-QT_MOC_LITERAL(18, 192, 3), // "msg"
-QT_MOC_LITERAL(19, 196, 9), // "setSource"
-QT_MOC_LITERAL(20, 206, 12), // "setLinecount"
-QT_MOC_LITERAL(21, 219, 10), // "setHomeDir"
-QT_MOC_LITERAL(22, 230, 11), // "setgrSource"
-QT_MOC_LITERAL(23, 242, 14), // "setinputSource"
-QT_MOC_LITERAL(24, 257, 13), // "setWorkingDir"
-QT_MOC_LITERAL(25, 271, 7), // "setMode"
-QT_MOC_LITERAL(26, 279, 4), // "read"
-QT_MOC_LITERAL(27, 284, 4), // "data"
-QT_MOC_LITERAL(28, 289, 7), // "read_gr"
-QT_MOC_LITERAL(29, 297, 10), // "read_input"
-QT_MOC_LITERAL(30, 308, 15), // "startSimulation"
-QT_MOC_LITERAL(31, 324, 5), // "data2"
-QT_MOC_LITERAL(32, 330, 14), // "killSimulation"
-QT_MOC_LITERAL(33, 345, 5) // "write"
+QT_MOC_LITERAL(17, 186, 14), // "jobnameChanged"
+QT_MOC_LITERAL(18, 201, 7), // "jobname"
+QT_MOC_LITERAL(19, 209, 5), // "error"
+QT_MOC_LITERAL(20, 215, 3), // "msg"
+QT_MOC_LITERAL(21, 219, 9), // "setSource"
+QT_MOC_LITERAL(22, 229, 12), // "setLinecount"
+QT_MOC_LITERAL(23, 242, 10), // "setHomeDir"
+QT_MOC_LITERAL(24, 253, 11), // "setgrSource"
+QT_MOC_LITERAL(25, 265, 14), // "setinputSource"
+QT_MOC_LITERAL(26, 280, 13), // "setWorkingDir"
+QT_MOC_LITERAL(27, 294, 7), // "setMode"
+QT_MOC_LITERAL(28, 302, 10), // "setJobname"
+QT_MOC_LITERAL(29, 313, 4), // "read"
+QT_MOC_LITERAL(30, 318, 4), // "data"
+QT_MOC_LITERAL(31, 323, 7), // "read_gr"
+QT_MOC_LITERAL(32, 331, 10), // "read_input"
+QT_MOC_LITERAL(33, 342, 15), // "startSimulation"
+QT_MOC_LITERAL(34, 358, 5), // "data2"
+QT_MOC_LITERAL(35, 364, 14), // "killSimulation"
+QT_MOC_LITERAL(36, 379, 5) // "write"
 
     },
     "FileIO\0sourceChanged\0\0source\0"
@@ -72,9 +75,10 @@ QT_MOC_LITERAL(33, 345, 5) // "write"
     "inputSource\0linecountChanged\0int&\0"
     "linecount\0homeDirChanged\0homeDir\0"
     "workingDirChanged\0workingDir\0modeChanged\0"
-    "mode\0error\0msg\0setSource\0setLinecount\0"
-    "setHomeDir\0setgrSource\0setinputSource\0"
-    "setWorkingDir\0setMode\0read\0data\0read_gr\0"
+    "mode\0jobnameChanged\0jobname\0error\0msg\0"
+    "setSource\0setLinecount\0setHomeDir\0"
+    "setgrSource\0setinputSource\0setWorkingDir\0"
+    "setMode\0setJobname\0read\0data\0read_gr\0"
     "read_input\0startSimulation\0data2\0"
     "killSimulation\0write"
 };
@@ -86,39 +90,41 @@ static const uint qt_meta_data_FileIO[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      21,   14, // methods
-       7,  184, // properties
+      23,   14, // methods
+       8,  200, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       8,       // signalCount
+       9,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,  119,    2, 0x06 /* Public */,
-       4,    1,  122,    2, 0x06 /* Public */,
-       6,    1,  125,    2, 0x06 /* Public */,
-       8,    1,  128,    2, 0x06 /* Public */,
-      11,    1,  131,    2, 0x06 /* Public */,
-      13,    1,  134,    2, 0x06 /* Public */,
-      15,    1,  137,    2, 0x06 /* Public */,
-      17,    1,  140,    2, 0x06 /* Public */,
+       1,    1,  129,    2, 0x06 /* Public */,
+       4,    1,  132,    2, 0x06 /* Public */,
+       6,    1,  135,    2, 0x06 /* Public */,
+       8,    1,  138,    2, 0x06 /* Public */,
+      11,    1,  141,    2, 0x06 /* Public */,
+      13,    1,  144,    2, 0x06 /* Public */,
+      15,    1,  147,    2, 0x06 /* Public */,
+      17,    1,  150,    2, 0x06 /* Public */,
+      19,    1,  153,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      19,    1,  143,    2, 0x0a /* Public */,
-      20,    1,  146,    2, 0x0a /* Public */,
-      21,    1,  149,    2, 0x0a /* Public */,
-      22,    1,  152,    2, 0x0a /* Public */,
-      23,    1,  155,    2, 0x0a /* Public */,
-      24,    1,  158,    2, 0x0a /* Public */,
-      25,    1,  161,    2, 0x0a /* Public */,
+      21,    1,  156,    2, 0x0a /* Public */,
+      22,    1,  159,    2, 0x0a /* Public */,
+      23,    1,  162,    2, 0x0a /* Public */,
+      24,    1,  165,    2, 0x0a /* Public */,
+      25,    1,  168,    2, 0x0a /* Public */,
+      26,    1,  171,    2, 0x0a /* Public */,
+      27,    1,  174,    2, 0x0a /* Public */,
+      28,    1,  177,    2, 0x0a /* Public */,
 
  // methods: name, argc, parameters, tag, flags
-      26,    1,  164,    2, 0x02 /* Public */,
-      28,    1,  167,    2, 0x02 /* Public */,
-      29,    1,  170,    2, 0x02 /* Public */,
-      30,    2,  173,    2, 0x02 /* Public */,
-      32,    1,  178,    2, 0x02 /* Public */,
-      33,    1,  181,    2, 0x02 /* Public */,
+      29,    1,  180,    2, 0x02 /* Public */,
+      31,    1,  183,    2, 0x02 /* Public */,
+      32,    1,  186,    2, 0x02 /* Public */,
+      33,    2,  189,    2, 0x02 /* Public */,
+      35,    1,  194,    2, 0x02 /* Public */,
+      36,    1,  197,    2, 0x02 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -129,6 +135,7 @@ static const uint qt_meta_data_FileIO[] = {
     QMetaType::Void, QMetaType::QString,   14,
     QMetaType::Void, QMetaType::QString,   16,
     QMetaType::Void, QMetaType::QString,   18,
+    QMetaType::Void, QMetaType::QString,   20,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -138,14 +145,15 @@ static const uint qt_meta_data_FileIO[] = {
     QMetaType::Void, QMetaType::QString,    7,
     QMetaType::Void, QMetaType::QString,   14,
     QMetaType::Void, QMetaType::QString,   16,
+    QMetaType::Void, QMetaType::QString,   18,
 
  // methods: parameters
-    QMetaType::QString, QMetaType::QString,   27,
-    QMetaType::QString, QMetaType::QString,   27,
-    QMetaType::QString, QMetaType::QString,   27,
-    QMetaType::Int, QMetaType::QString, QMetaType::QString,   27,   31,
-    QMetaType::Int, QMetaType::QString,   27,
-    QMetaType::Bool, QMetaType::QString,   27,
+    QMetaType::QString, QMetaType::QString,   30,
+    QMetaType::QString, QMetaType::QString,   30,
+    QMetaType::QString, QMetaType::QString,   30,
+    QMetaType::Int, QMetaType::QString, QMetaType::QString,   30,   34,
+    QMetaType::Int, QMetaType::QString,   30,
+    QMetaType::Bool, QMetaType::QString,   30,
 
  // properties: name, type, flags
        3, QMetaType::QString, 0x00495103,
@@ -155,6 +163,7 @@ static const uint qt_meta_data_FileIO[] = {
       12, QMetaType::QString, 0x00495103,
       14, QMetaType::QString, 0x00495103,
       16, QMetaType::QString, 0x00495103,
+      18, QMetaType::QString, 0x00495103,
 
  // properties: notify_signal_id
        0,
@@ -164,6 +173,7 @@ static const uint qt_meta_data_FileIO[] = {
        4,
        5,
        6,
+       7,
 
        0        // eod
 };
@@ -181,25 +191,27 @@ void FileIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 4: _t->homeDirChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 5: _t->workingDirChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 6: _t->modeChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 7: _t->error((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 8: _t->setSource((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 9: _t->setLinecount((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 10: _t->setHomeDir((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 11: _t->setgrSource((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 12: _t->setinputSource((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 13: _t->setWorkingDir((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 14: _t->setMode((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 15: { QString _r = _t->read((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 7: _t->jobnameChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 8: _t->error((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 9: _t->setSource((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 10: _t->setLinecount((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 11: _t->setHomeDir((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 12: _t->setgrSource((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 13: _t->setinputSource((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 14: _t->setWorkingDir((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 15: _t->setMode((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 16: _t->setJobname((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 17: { QString _r = _t->read((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 16: { QString _r = _t->read_gr((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 18: { QString _r = _t->read_gr((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 17: { QString _r = _t->read_input((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 19: { QString _r = _t->read_input((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 18: { int _r = _t->startSimulation((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 20: { int _r = _t->startSimulation((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 19: { int _r = _t->killSimulation((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 21: { int _r = _t->killSimulation((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 20: { bool _r = _t->write((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 22: { bool _r = _t->write((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -257,8 +269,15 @@ void FileIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         }
         {
             typedef void (FileIO::*_t)(const QString & );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&FileIO::error)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&FileIO::jobnameChanged)) {
                 *result = 7;
+                return;
+            }
+        }
+        {
+            typedef void (FileIO::*_t)(const QString & );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&FileIO::error)) {
+                *result = 8;
                 return;
             }
         }
@@ -276,6 +295,7 @@ void FileIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 4: *reinterpret_cast< QString*>(_v) = _t->homeDir(); break;
         case 5: *reinterpret_cast< QString*>(_v) = _t->workingDir(); break;
         case 6: *reinterpret_cast< QString*>(_v) = _t->mode(); break;
+        case 7: *reinterpret_cast< QString*>(_v) = _t->jobname(); break;
         default: break;
         }
     } else if (_c == QMetaObject::WriteProperty) {
@@ -290,6 +310,7 @@ void FileIO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 4: _t->setHomeDir(*reinterpret_cast< QString*>(_v)); break;
         case 5: _t->setWorkingDir(*reinterpret_cast< QString*>(_v)); break;
         case 6: _t->setMode(*reinterpret_cast< QString*>(_v)); break;
+        case 7: _t->setJobname(*reinterpret_cast< QString*>(_v)); break;
         default: break;
         }
     } else if (_c == QMetaObject::ResetProperty) {
@@ -322,29 +343,29 @@ int FileIO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 21)
+        if (_id < 23)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 21;
+        _id -= 23;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 21)
+        if (_id < 23)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 21;
+        _id -= 23;
     }
 #ifndef QT_NO_PROPERTIES
    else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::RegisterPropertyMetaType) {
         qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 8;
     } else if (_c == QMetaObject::QueryPropertyDesignable) {
-        _id -= 7;
+        _id -= 8;
     } else if (_c == QMetaObject::QueryPropertyScriptable) {
-        _id -= 7;
+        _id -= 8;
     } else if (_c == QMetaObject::QueryPropertyStored) {
-        _id -= 7;
+        _id -= 8;
     } else if (_c == QMetaObject::QueryPropertyEditable) {
-        _id -= 7;
+        _id -= 8;
     } else if (_c == QMetaObject::QueryPropertyUser) {
-        _id -= 7;
+        _id -= 8;
     }
 #endif // QT_NO_PROPERTIES
     return _id;
@@ -400,10 +421,17 @@ void FileIO::modeChanged(const QString & _t1)
 }
 
 // SIGNAL 7
-void FileIO::error(const QString & _t1)
+void FileIO::jobnameChanged(const QString & _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 7, _a);
+}
+
+// SIGNAL 8
+void FileIO::error(const QString & _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 8, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE
