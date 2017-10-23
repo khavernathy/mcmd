@@ -175,7 +175,7 @@ class Constants {
         int md_external_force = 0; // option for constant external force in MD
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
         double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat.
-        int thermostat_type = THERMOSTAT_ANDERSEN; // thermostat type for NVT temperature fixture.
+        int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
 
 
         map <string,double> sig_override;
