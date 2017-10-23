@@ -865,10 +865,14 @@ void readInput(System &system, char* filename) {
             
             } else if (!strcasecmp(lc[0].c_str(), "bias_uptake") || !strcasecmp(lc[0].c_str(), "uptake_bias")) {
                 system.constants.bias_uptake = atof(lc[1].c_str());
-                system.constants.bias_uptake_unit = lc[2];
-                system.constants.bias_uptake_switcher=1;
-                std::cout << "Got uptake bias = " << lc[1].c_str() << " " << lc[2].c_str(); printf("\n");
-
+                if (lc.size() > 2) {
+                    system.constants.bias_uptake_unit = lc[2];
+                    system.constants.bias_uptake_switcher=1;
+                    std::cout << "Got uptake bias = " << lc[1].c_str() << " " << lc[2].c_str(); printf("\n");
+                } else {
+                    std::cout << "ERROR: You used the bias_uptake option but did not specify a unit. Use, e.g. `bias_uptake 2.5 wt%`."; printf("\n");
+                    exit(EXIT_FAILURE);
+                }
             } else if (!strcasecmp(lc[0].c_str(), "sorbate_name")) {
                 system.constants.sorbate_name.push_back(lc[1].c_str());
                 std::cout << "Got sorbate model name 1 = " << lc[1].c_str(); printf("\n");
