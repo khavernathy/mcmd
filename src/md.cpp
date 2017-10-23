@@ -125,7 +125,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
         T_rms += 1e10*v_rms*v_rms*system.proto[z].mass/3.0/system.constants.kb * (N_local[z] / (double)system.stats.count_movables);
         // T_rms is computed here but I'm not using it as the reported T
     }
-    printf("T_rms = %f\n", T_rms);
+    //printf("T_rms = %f\n", T_rms);
 
     // fix units
     K_total = K_total/system.constants.kb * 1e10; // convert to K
