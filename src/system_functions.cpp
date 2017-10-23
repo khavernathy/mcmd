@@ -573,7 +573,7 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "HYD", "H2O", "M", 0.757, -0.586, 0.0, 1.008, 0.417, 0.0, 0.0, 0.0);
                 system.proto[i].name = "H2O";
             }
-            else if (sorbmodel == "tip4p") {
+            else if (sorbmodel == "tip4p" || sorbmodel == "water_tip4p") {
                 addAtomToProto(system,i, "OXY", "H2O", "M", 0.0, 0.0, 0.0, 16.0, 0.0, 0.0, 78.0, 3.154);
                 addAtomToProto(system,i, "HYD", "H2O","M",  0.58588, 0.75695, 0.0, 1.008, 0.52, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "HYD", "H2O","M",  0.58588, -0.75695, 0.0, 1.008, 0.52, 0.0, 0.0, 0.0);
