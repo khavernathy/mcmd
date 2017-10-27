@@ -169,7 +169,9 @@ class Constants {
         double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         int_fast8_t md_mode = MD_MOLECULAR; // default is to keep molecules rigid (bonded)
-		double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
+		double md_initial_energy_NVE = 0; // NVE first Newtonian energy, for measuring integrator error over time; in K.
+        double md_NVE_err = 0; // delta(total E) in kJ/mol
+        double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
         int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
         int md_external_force = 0; // option for constant external force in MD

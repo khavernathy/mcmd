@@ -148,7 +148,14 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     output[5] = Klin;
     output[6] = Krot; 
     output[7] = pressure;
-	return output;
+	
+    // first step
+    if (system.stats.MDtime == system.constants.md_dt) {
+        system.constants.md_initial_energy_NVE = K_total+V_total; // in K
+    }
+    system.constants.md_NVE_err = fabs((K_total+V_total)-system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL; // K to kJ/mol
+    
+    return output;
 }
 
 
