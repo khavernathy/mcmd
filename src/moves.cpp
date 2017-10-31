@@ -37,36 +37,37 @@ void translate(System &system, int molid) {
 
 void rotate(System &system, int molid) {
     system.checkpoint("doing a rotation move.");
-        double com[3];
+    double com[3], randangle;
+    int DIM, i, n;
 
-        // 1) GET RANDOM ANGLE AND PLANE OF ROTATION.
-        double randangle; int plane;
+    for (DIM=0; DIM<3; DIM++) { // 3 planes of rotation
+        // 1) GET RANDOM ANGLE 
+        randangle = system.constants.rotate_angle_factor*getrand();
 
         // 2) SAVE CURRENT COM
-        for (int n=0; n<3; n++) com[n] = system.molecules[molid].com[n];
+        for (n=0; n<3; n++) com[n] = system.molecules[molid].com[n];
 
         // 3) MOVE MOLECULE TO ORIGIN TEMPORARILY
-        for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
-            for (int n=0; n<3; n++) {
-                system.molecules[molid].atoms[i].pos[n] -= com[n];
+        for (i=0; i<system.molecules[molid].atoms.size(); i++) {
+            for (n=0; n<3; n++) {
+	            system.molecules[molid].atoms[i].pos[n] -= com[n];
             }
         }
 
         // 4) ROTATE THE MOLECULE ABOUT ORIGIN IN ALL 3 DIMS
-        for (int DIM=0; DIM<3; DIM++) { // DIM is the plane of rotation
-		for (int i=0; i<system.molecules[molid].atoms.size(); i++) {
-                double randangle = system.constants.rotate_angle_factor*getrand(); // rotate between 0 and rotate_angle_factor degrees
-				double* rotated = rotatePoint(system, system.molecules[molid].atoms[i].pos[0], system.molecules[molid].atoms[i].pos[1], system.molecules[molid].atoms[i].pos[2], DIM, randangle);
-				system.molecules[molid].atoms[i].pos[0] = rotated[0];
-				system.molecules[molid].atoms[i].pos[1] = rotated[1];
-				system.molecules[molid].atoms[i].pos[2] = rotated[2];
-		} // end for i
-        } // end 3 dimensions
+	    for (i=0; i<system.molecules[molid].atoms.size(); i++) {
+			double* rotated = rotatePoint(system, system.molecules[molid].atoms[i].pos[0], system.molecules[molid].atoms[i].pos[1], system.molecules[molid].atoms[i].pos[2], DIM, randangle);
+			system.molecules[molid].atoms[i].pos[0] = rotated[0];
+			system.molecules[molid].atoms[i].pos[1] = rotated[1];
+			system.molecules[molid].atoms[i].pos[2] = rotated[2];
+	    } // end for i
 
         // 5) MOVE MOLECULE BACK TO COM POSITION, BUT ROTATED
-        for (int i=0; i<system.molecules[molid].atoms.size(); i++)
-            for (int n=0; n<3; n++)
-                system.molecules[molid].atoms[i].pos[n] += com[n];
+        for (i=0; i<system.molecules[molid].atoms.size(); i++)
+            for (n=0; n<3; n++)
+	            system.molecules[molid].atoms[i].pos[n] += com[n];
+
+    } // end 3D
 } // end rotate();
 
 

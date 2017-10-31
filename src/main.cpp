@@ -445,7 +445,7 @@ int main(int argc, char **argv) {
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
             }
-            if (system.stats.Q.value > 0) printf("Q (parition function) = %.5e\n", system.stats.Q.value);
+            //if (system.stats.Q.value > 0) printf("Q (parition function) = %.5e\n", system.stats.Q.value);
             printf("--------------------\n\n");
 
             // CONSOLIDATE ATOM AND MOLECULE PDBID's
@@ -746,7 +746,7 @@ int main(int argc, char **argv) {
                         printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
                 }
             }
-            if (system.stats.Q.value > 0) printf("Q (parition function) = %.5e\n", system.stats.Q.value);
+            //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);
             // uptake data if uVT
             if (system.constants.ensemble == ENSEMBLE_UVT) { 
 			for (int i=0; i<system.proto.size(); i++) {
