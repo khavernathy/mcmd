@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
         int whatever=std::system(command.c_str());
         printf("RESTARTING previous job from input atoms contained in %s/restart.pdb\n",folder_name.c_str());
     }
-    readInAtoms(system, system.constants.atom_file);
+    if (system.constants.atom_file != "<none>") readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);
 	if (system.constants.autocenter)
         centerCoordinates(system);

@@ -19,7 +19,6 @@
 
 /* xyz read-in of atoms */
 void readInAtomsXYZ(System &system, string filename) {
-	
     // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY). 
     // check if it exists
         struct stat buffer;
@@ -98,6 +97,7 @@ void readInAtoms(System &system, string filename) {
     if (system.constants.readinxyz) { readInAtomsXYZ(system, filename); }
     else {
 
+printf("hi");	
         // check if it exists
         struct stat buffer;
         if (stat (filename.c_str(), &buffer) != 0) {
