@@ -83,7 +83,7 @@ class Constants {
         int_fast8_t ensemble;
         string ensemble_str;
         //int_fast8_t movetype;
-        string atom_file; // input atoms .pdb file
+        string atom_file = "<none>"; // input atoms .pdb file
         string output_traj="traj.xyz"; // system trajectory in xyz
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb
         string output_traj_movers_pdb="traj_movers.pdb"; // system traj (only movers) in pdb
