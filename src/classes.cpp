@@ -207,7 +207,7 @@ class Constants {
         double **A_matrix;
         double **A_matrix_old; // takes more memory but computations are faster
         int full_A_matrix_option = 1; // option to enable the full A matrix for polarization
-        int polar_precision=0;
+        double polar_precision=0; // dipole precision required during iterative routine
         int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
         int_fast8_t polar_rrms =0;
         double dipole_rrms = 0.0;
@@ -531,8 +531,6 @@ class Stats {
         int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
         int count_frozen_molecules=0; // frozen MOLECULES; normally 1
 
-        double polar_iterations=0;
-
         struct obs_t { // observable types
             string name;
             double counter=0.0;
@@ -561,7 +559,7 @@ class Stats {
           chempot,totalmass, frozenmass, 
           pressure,temperature, fdotrsum, 
           dist_within, csp, diffusion, volume, z, // z = PV/nRT
-          Q; // Q = partition func.
+          Q, polar_iterations; // Q = partition func.
 
         int max_sorbs=10;
         vector<obs_t> msd = vector<obs_t>(max_sorbs); 

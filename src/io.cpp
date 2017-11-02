@@ -1228,6 +1228,9 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "off") system.constants.polar_palmo = 0;
                 std::cout << "Got Palmo Polarization = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "polar_precision")) {
+                system.constants.polar_precision = atof(lc[1].c_str());
+                std:cout << "Got required dipole precision (for iterative routine) = " << lc[1].c_str() << " Debye."; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "com_option")) {
 				if (lc[1] == "on") system.constants.com_option = 1;

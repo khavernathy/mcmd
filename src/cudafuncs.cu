@@ -447,7 +447,8 @@ void CUDA_force(System &system) {
         thole_amatrix(system); // populate A matrix
         thole_field(system); // calculate electric field
         int num_iterations = thole_iterative(system); // calculate dipoles
-            system.stats.polar_iterations = (double)num_iterations;
+            system.stats.polar_iterations.value = (double)num_iterations;
+            system.stats.polar_iterations.calcNewStats();
             system.constants.dipole_rrms = get_dipole_rrms(system);
     }
 

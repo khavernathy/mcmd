@@ -402,8 +402,8 @@ int main(int argc, char **argv) {
                 system.stats.rd.average, system.stats.rd.sd, system.stats.rd.average/system.stats.potential.average *100); //, system.stats.lj.average, system.stats.lj_lrc.average, system.stats.lj_self_lrc.average);
 			printf("ES avg =              %.5f +- %.5f K (%.2f %%)\n", //(real = %.4f, recip = %.4f, self = %.4f)\n",
                 system.stats.es.average, system.stats.es.sd, system.stats.es.average/system.stats.potential.average *100); //, system.stats.es_real.average, system.stats.es_recip.average, system.stats.es_self.average);
-			printf("Polar avg =           %.5f +- %.5f K (%.2f %%)\n",
-                system.stats.polar.average, system.stats.polar.sd, system.stats.polar.average/system.stats.potential.average*100);
+			printf("Polar avg =           %.5f +- %.5f K (%.2f %%); iterations = %.3f +- %.3f\n",
+                system.stats.polar.average, system.stats.polar.sd, system.stats.polar.average/system.stats.potential.average*100, system.stats.polar_iterations.average, system.stats.polar_iterations.sd);
 			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
@@ -781,6 +781,10 @@ int main(int argc, char **argv) {
                         printf("U/N avg = %.5f kJ/mol\n", system.stats.qst_nvt.value); //, system.stats.qst_nvt.sd);
                 }
             } // end if uVT
+            if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR)
+                printf("Polarization dipole iterations = %.3f +- %.3f\n",
+                system.stats.polar_iterations.average, system.stats.polar_iterations.sd);
+
 
             printf("--------------------\n\n");
             // CONSOLIDATE ATOM AND MOLECULE PDBID's if uVT
