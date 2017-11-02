@@ -21,6 +21,13 @@
 void readInAtomsXYZ(System &system, string filename) {
 	
     // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY). 
+    // check if it exists
+        struct stat buffer;
+        if (stat (filename.c_str(), &buffer) != 0) {
+            std::cout << "ERROR: The input_atoms file " << filename.c_str() << " doesn't exist."; printf("\n");
+            exit(EXIT_FAILURE);
+        }
+
     string line;
 	ifstream myfile (filename); 
 	if (myfile.is_open())
@@ -91,8 +98,15 @@ void readInAtoms(System &system, string filename) {
     if (system.constants.readinxyz) { readInAtomsXYZ(system, filename); }
     else {
 
+        // check if it exists
+        struct stat buffer;
+        if (stat (filename.c_str(), &buffer) != 0) {
+            std::cout << "ERROR: The input_atoms file " << filename.c_str() << " doesn't exist."; printf("\n");
+            exit(EXIT_FAILURE);
+        }
+
 	string line;
-	ifstream myfile (filename); //("Neons.xyz"); // ("rhtMOF9Zn.xyz"); //("water_1527.dat"); // test2.dat
+	ifstream myfile (filename); 
 	if (myfile.is_open())
 	{
 		int current_mol_id=-1; // Initializer. Will be changed.
