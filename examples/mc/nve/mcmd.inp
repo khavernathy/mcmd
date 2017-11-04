@@ -5,7 +5,7 @@
 name			    mc_nve_example
 mode	 		    mc ! mc or md
 checkpoints_option  off
-input_atoms	  ../../atomfiles/He100.pdb        ! PDB ONLY 
+input_atoms	  ../../../atomfiles/He100.pdb        ! PDB ONLY 
 potential_form 		lj 
 com_option		    off   	! center of mass
 

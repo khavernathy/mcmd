@@ -5,7 +5,7 @@
 
 name			    mc_uvt_example 
 mode	 		    mc 
-input_atoms         ../../atomfiles/rht-MOF-9.pdb
+input_atoms         ../../../atomfiles/rht-MOF-9.pdb
 
 free_volume         11595.4
 

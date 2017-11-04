@@ -6,7 +6,7 @@ name			    mc_nvt_example
 mode	 		    mc ! mc or md
 checkpoints_option  off
 
-input_atoms     ../../atomfiles/NOTT-112+417H2_BSS.pdb
+input_atoms     ../../../atomfiles/NOTT-112+417H2_BSS.pdb
 
 potential_form 		ljes  
 com_option		    off  	! center of mass

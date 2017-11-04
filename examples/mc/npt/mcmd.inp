@@ -8,7 +8,7 @@ name			    npt_example
 mode	 		    mc ! mc or md
 checkpoints_option  off
 rd_lrc              on
-input_atoms    ../../atomfiles/He100.pdb       ! PDB ONLY 
+input_atoms    ../../../atomfiles/He100.pdb       ! PDB ONLY 
 potential_form 		lj  
 
 carbasis 150 150 150 90 90 90
