@@ -42,7 +42,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     // ELECTROSTATIC
     if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
 
-        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
+        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if MD, or if no bad contact was discovered in MC
             if (system.constants.ewald_es)
                 total_es = coulombic_ewald(system); // using ewald method for es
             else
@@ -53,7 +53,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     // POLARIZATION
     if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTESPOLAR) {
 
-        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if no bad contact was discovered in MC
+        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if MD, or no bad contact was discovered in MC
 
                 total_polar = polarization(system);
         }

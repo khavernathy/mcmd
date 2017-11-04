@@ -140,6 +140,7 @@ int main(int argc, char **argv) {
         int whatever=std::system(command.c_str());
         printf("RESTARTING previous job from input atoms contained in %s/restart.pdb\n",folder_name.c_str());
     }
+    if (system.constants.mode == "md") system.constants.auto_reject_option = 0; // FORCE auto-reject off for MD b/c it will give wrong potential energies
     if (system.constants.atom_file != "<none>") readInAtoms(system, system.constants.atom_file);
 	paramOverrideCheck(system);
 	if (system.constants.autocenter)
