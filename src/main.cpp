@@ -737,7 +737,7 @@ int main(int argc, char **argv) {
             if (system.constants.ensemble == ENSEMBLE_NVE)
                 printf("Total E = %.3f :: error = %.3f kJ/mol\n", TE, system.constants.md_NVE_err);
             else
-                printf("Total E = %.3f\n", TE);
+                printf("Total E = %.3f kJ/mol\n", TE);
             printf("Average v = %.2f m/s; v_init = %.2f m/s\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
                 v_avg*1e5, system.constants.md_init_vel*1e5, system.stats.pressure.average, system.stats.pressure.sd );
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
