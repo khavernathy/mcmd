@@ -201,7 +201,7 @@ void update_ranking (System &system, int * ranked_array ) {
                     if (system.molecules[k].atoms[l].polar ==0) continue;
                     if ((i==k && j>=l)) continue; // don't do self, or double count.
                     double* distances = getDistanceXYZ(system, i,j,k,l);
-                    r = distances[3];
+                    r = distances[3]; // in MPMC, this is NOT rimg, as it is here. There may be a reason for that.
                     if (r <= rmin) {
                         system.molecules[i].atoms[j].rank_metric += 1.0;
                         system.molecules[k].atoms[l].rank_metric += 1.0;
