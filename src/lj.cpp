@@ -98,13 +98,6 @@ double lj(System &system) {
     for (k = i+1; k < system.molecules.size(); k++) {
     for (l =0; l < system.molecules[k].atoms.size(); l++) {
 
-        // do mixing rules
-        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
-        eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
-        sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);  
-    
-        if (sig == 0 || eps == 0) continue; // skip 0 energy interactions
-
         // calculate distance between atoms
         double* distances = getDistanceXYZ(system, i, j, k, l);
         r = distances[3];
@@ -114,6 +107,13 @@ double lj(System &system) {
             system.constants.rejects++;
             return 1e40; // a really big energy
         }
+
+        // do mixing rules
+        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
+        sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);  
+    
+        if (sig == 0 || eps == 0) continue; // skip 0 energy interactions
 
         sr6 = sig/r; //printf("r=%f\n",r);
         sr6 *= sr6;
