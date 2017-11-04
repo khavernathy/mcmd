@@ -6,7 +6,7 @@
 name			    multisorb_example
 mode	 		    mc ! mc or md
 checkpoints_option off 
-input_atoms  ../../atomfiles/MOF-5.pdb  ! PDB ONLY 
+input_atoms  ../../../atomfiles/MOF-5.pdb  ! PDB ONLY 
 sorbate_name    co2_phast* h2_bssp ch4_9site* water  ethane*
 sorbate_fugacities 5.0      5.0      5.0      5.0     5.0
 
