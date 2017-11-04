@@ -567,18 +567,30 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system, i, "C2G",  "ETH",  "M", -0.770,   0.000,   0.000,  15.035, 0.0000,  0.00000, 98.00,  3.750);
             }
             // WATER H2O (TIP3P)
-            else if (sorbmodel == "h2o" || sorbmodel == "water" || sorbmodel == "tip3p") {
+            else if (sorbmodel == "h2o" || sorbmodel == "water" || sorbmodel == "tip3p" || sorbmodel == "h2o_tip3p") {
                 addAtomToProto(system,i, "OXY", "H2O", "M", 0.0, 0.0, 0.0, 16.0, -0.834, 0.0, 76.42, 3.151);
                 addAtomToProto(system,i, "HYD", "H2O", "M", -0.757, -0.586, 0.0, 1.008, 0.417, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "HYD", "H2O", "M", 0.757, -0.586, 0.0, 1.008, 0.417, 0.0, 0.0, 0.0);
                 system.proto[i].name = "H2O";
             }
-            else if (sorbmodel == "tip4p" || sorbmodel == "water_tip4p") {
+            else if (sorbmodel == "tip4p" || sorbmodel == "water_tip4p" || sorbmodel == "h2o_tip4p") {
                 addAtomToProto(system,i, "OXY", "H2O", "M", 0.0, 0.0, 0.0, 16.0, 0.0, 0.0, 78.0, 3.154);
                 addAtomToProto(system,i, "HYD", "H2O","M",  0.58588, 0.75695, 0.0, 1.008, 0.52, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "HYD", "H2O","M",  0.58588, -0.75695, 0.0, 1.008, 0.52, 0.0, 0.0, 0.0);
                 addAtomToProto(system,i, "M", "H2O", "M", 0.15, 0.0, 0.0, 0.0, -1.04, 0.0, 0.0, 0.0);
                 system.proto[i].name = "H2O";
+            }
+            else if (sorbmodel == "h2o_roney") { // Ben Roney's polarizable H2O model
+
+                addAtomToProto(system,i,"OXY",  "H2O", "M", 0.000 ,  0.000 ,  0.000, 15.99900, -0.66900,  0.83700, 78.22000,  3.16600); 
+                addAtomToProto(system,i,"HYD","H2O","M",-0.761 , -0.588,   0.000,  1.00790,  0.33450,  0.49500,  0.00000,  0.00000);  
+                addAtomToProto(system,i,"HYD",  "H2O", "M", 0.761 , -0.588 ,  0.000 , 1.00790,  0.33450,  0.49500,  0.00000,  0.00000);
+            }
+            else if (sorbmodel == "h2o_pol3") {
+                addAtomToProto(system,i,"OXY",  "H2O", "M", 0.000,   0.000,   0.000, 15.99900, -0.73000,  0.52800, 78.50225,  3.59600); 
+                addAtomToProto(system,i,"HYD","H2O", "M",-0.816 , -0.577,   0.000,  1.00790,  0.36500,  0.17000,  0.00000,  0.00000);
+                addAtomToProto(system,i,"HYD","H2O", "M",   0.816,  -0.577,   0.000,  1.00790,  0.36500,  0.17000,  0.00000,  0.00000);
+    
             }
             // METHANOL CH3OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz on CCSDT=FULL aug-cc-pvtz geometry (CCCBDB); van Deuynen polariz's
             else if (sorbmodel == "methanol" || sorbmodel == "ch3oh" || sorbmodel == "ch4o") {
