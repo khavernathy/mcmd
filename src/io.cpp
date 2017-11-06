@@ -908,6 +908,17 @@ void readInput(System &system, char* filename) {
                     }
                 }
 
+            } else if (!strcasecmp(lc[0].c_str(), "sorbate_dofs")) {
+                system.constants.sorbate_dof.push_back(atof(lc[1].c_str()));
+                std::cout << "Got degrees of freedom for sorbate 1 = " << lc[1].c_str(); printf("\n");
+
+                for (int i=2; i<=10; i++) {
+                    if (lc.size() >= (i+1)) {
+                        system.constants.sorbate_dof.push_back(atof(lc[i].c_str()));
+                        std::cout << "Got degrees of freedom for sorbate " << i << " = " << lc[i].c_str(); printf("\n");
+                    }
+                }
+
             } else if (!strcasecmp(lc[0].c_str(), "fugacity_single") || !strcasecmp(lc[0].c_str(), "fugacity")) {
                 system.constants.fugacity_single = 1;
                 system.constants.fugacity_single_sorbate = lc[1];

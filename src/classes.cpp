@@ -96,6 +96,7 @@ class Constants {
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
+        vector<int> sorbate_dof; // holds degrees of freedom for sorbates
         int_fast8_t pdb_traj_option=1; // option to write PDB trajectory . default on
         int_fast8_t xyz_traj_option=0; // option for xyz trajectory, default off
         int_fast8_t xyz_traj_movers_option=1; // option for smaller xyz traj (with only movers)
