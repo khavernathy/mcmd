@@ -557,7 +557,7 @@ int main(int argc, char **argv) {
             // otherwise use temperature as default via v_RMS
             // default temp is zero so init. vel's will be 0 if no temp is given.
             
-            double DOF = (3*system.stats.count_movables - 3); // 3 N -3
+            double DOF = getDOF(system); // 3 N -3
             double kbTDOF = system.constants.kb * system.constants.temp * DOF; // in J
             double v_init_AVG = 0; 
             for (int z=0; z<system.proto.size(); z++) {
@@ -575,27 +575,6 @@ int main(int argc, char **argv) {
             }
             system.constants.md_init_vel = v_init_AVG;
 
-            /*double init_vel_all = 0;
-		    // Frenkel method for NVT ddv_alpha determination (converted to A/fs) p140
-		    for (int z=0; z<system.proto.size(); z++) {
-                //v_init = 1e-5 * sqrt(8.*system.constants.kb*system.constants.temp/system.proto[z].mass/M_PI);
-                v_init = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[z].mass);
-                init_vel_all += v_init;
-                //v_component = 1e-5 * sqrt(system.constants.kb*system.constants.temp/system.proto[0].mass);
-                system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
-                double pm = 0;
-                for (int i=0; i<system.molecules.size(); i++) {
-                    if (system.proto[z].name == system.molecules[i].name) {
-                        for (int n=0; n<3; n++) {
-                            pm = (getrand() > 0.5) ? 1.0 : -1.0;
-                            system.molecules[i].vel[n] = system.proto[z].md_velx_goal * pm;
-                        }
-                    }
-                }
-            }
-            init_vel_all /= (double)(int)system.proto.size();
-            system.constants.md_init_vel = init_vel_all; // garbage, basically
-        */
         }
         // end initial velocities
 

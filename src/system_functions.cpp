@@ -1326,3 +1326,9 @@ void scaleCharges(System &system) {
     }
     printf("Finished scaling all atomic charges by %f.\n", system.constants.scale_charges_factor);
 }
+
+double getDOF(System &system) {
+    // needs attention for more general definition
+    int N = system.stats.count_movables;
+    return (N>0) ? 3.0*N-3.0 : 3.0; 
+}

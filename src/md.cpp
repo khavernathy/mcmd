@@ -114,7 +114,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     } // end prototype loop
 
     // get Temperature. Frenkel p64 and p84    
-    double DOF = 3.*(double)system.stats.count_movables - 3.;    
+    double DOF = getDOF(system);    
     double mv2_sum=0;
     for (int i=0;i<system.molecules.size();i++) {
         mv2_sum += 1e10 * system.molecules[i].mass * dddotprod(system.molecules[i].vel,system.molecules[i].vel);
