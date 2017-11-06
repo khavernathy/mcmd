@@ -1335,8 +1335,10 @@ double getDOF(System &system) {
 
 void initialVelMD(System &system) {
         double randv; double DEFAULT = 99999.99;
+        int userflag=0;
+        // user-defined velocities
         if (system.constants.md_init_vel != DEFAULT) {
-            // if user defined
+            userflag=1;
             for (int i=0; i<system.molecules.size(); i++) {
                 for (int n=0; n<3; n++) {
                     randv = (getrand()*2 - 1) * sqrt(system.constants.md_init_vel * system.constants.md_init_vel/3.);
@@ -1344,7 +1346,10 @@ void initialVelMD(System &system) {
                 }
             }
             printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
-        } else if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
+        
+        // thermostat information (and apply init. vel if needed)
+        }
+        if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
             // otherwise use temperature as default via v_RMS
             // default temp is zero so init. vel's will be 0 if no temp is given.
             
@@ -1354,6 +1359,9 @@ void initialVelMD(System &system) {
             for (int z=0; z<system.proto.size(); z++) {
                 double v_init = 1e-5*sqrt(kbTDOF / (double)system.stats.count_movables / system.proto[z].mass);
                 system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
+                
+                // apply thermostat velocities if user did not specify an init. vel.
+                if (!userflag) {
                 for (int i=0; i<system.molecules.size(); i++) {
                     if (system.proto[z].name == system.molecules[i].name) {
                         v_init_AVG += v_init * (1. / (double)system.stats.count_movables);
@@ -1362,6 +1370,7 @@ void initialVelMD(System &system) {
                             system.molecules[i].vel[n] = pm * system.proto[z].md_velx_goal;
                         }
                     }
+                }
                 }
             }
             system.constants.md_init_vel = v_init_AVG;

@@ -713,6 +713,7 @@ class Molecule {
         double inertia_tensor[6] = {0,0,0,0,0,0}; // xx,yy,zz,xy,yz,xz
         double fugacity=0.0;
         double md_velx_goal = 0.0; // for Andersen thermostat, unique for unique molecules.
+        int dof=3; // degrees of freedom.
 
         void reInitialize() {
             // if there are no atoms, don't bother
@@ -735,6 +736,7 @@ class Molecule {
             name = "";
             PDBID=0;
             frozen = 0; // movable
+            dof=0;
             }
         }
 
