@@ -97,7 +97,6 @@ void readInAtoms(System &system, string filename) {
     if (system.constants.readinxyz) { readInAtomsXYZ(system, filename); }
     else {
 
-printf("hi");	
         // check if it exists
         struct stat buffer;
         if (stat (filename.c_str(), &buffer) != 0) {
