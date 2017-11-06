@@ -784,9 +784,21 @@ void moleculePrintout(System &system) {
             }
             system.proto[i].calc_center_of_mass();
 
-        } // end protos loop
+            } // end protos loop
         } // end if we have protos yet
 
+        // check for Manually-entered DOFs
+        if (system.proto.size() > 0 && system.constants.sorbate_dof.size() > 0) {
+            // use manual sorbate Degrees of Freedom
+            if (system.proto.size() != system.constants.sorbate_dof.size()) {
+                printf("ERROR: The number of manual sorbate DOFs you supplied (%i) does not match the number of sorbates in the system (%i)\n", (int)system.constants.sorbate_dof.size(), (int)system.proto.size()); 
+                std::exit(0);
+            }
+
+            // apply the manual DOFs
+            for (int z=0; z<system.proto.size(); z++)
+                system.proto[z].dof = system.constants.sorbate_dof[z];
+        }
 
         // finally, show the current proto molecules
         printf("\n::: PROTOTYPE (SORBATE) MOLECULES :::\n");
