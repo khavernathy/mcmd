@@ -42,6 +42,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     int N_local[(int)system.proto.size()];
 
 
+    if (system.stats.count_movables > 0) { // DON'T BOTHER FOR NO MOVERS
     // grab fixed potential energy of system
         // from PBC (same as Monte Carlo potential)
         if (system.constants.md_pbc) {
@@ -139,6 +140,8 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
         //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T)); 
     }
 
+
+    } // end skipping if N=0
 	static double output[8];
 	output[0] = K_total; 
     output[1] = V_total;
@@ -150,11 +153,12 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
     output[7] = pressure;
 	
     // first step
-    if (system.stats.MDtime == system.constants.md_dt) {
-        system.constants.md_initial_energy_NVE = K_total+V_total; // in K
+    if (system.constants.ensemble == ENSEMBLE_NVE) {
+        if (system.stats.MDtime == system.constants.md_dt) {
+            system.constants.md_initial_energy_NVE = K_total+V_total; // in K
+        }
+        system.constants.md_NVE_err = fabs((K_total+V_total)-system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL; // K to kJ/mol
     }
-    system.constants.md_NVE_err = fabs((K_total+V_total)-system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL; // K to kJ/mol
-    
     return output;
 }
 
