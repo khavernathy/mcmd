@@ -272,7 +272,7 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
 
 // special variation for uVT Molecular Dynamics only
 void computeAveragesMDuVT(System &system) {
-    system.checkpoint("started computeAverages()");
+    system.checkpoint("started computeAveragesMDuVT()");
 
     // MASS OF SYSTEM
     system.stats.totalmass.value = 0.0; system.stats.frozenmass.value = 0.0;
@@ -389,5 +389,5 @@ void computeAveragesMDuVT(System &system) {
             / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
         system.stats.z.calcNewStats();
 
-    system.checkpoint("finished computeAverages()");
+    system.checkpoint("finished computeAveragesMDuVT()");
 }

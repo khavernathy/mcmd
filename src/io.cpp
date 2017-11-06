@@ -1618,7 +1618,10 @@ void inputValidation(System &system) {
         std::cout << "ERROR: No box information was supplied. Use `carbasis [a] [b] [c] [alpha] [beta] [gamma]`, for example.";
         exit(EXIT_FAILURE);
     }
-
+    if (system.constants.histogram_option && system.proto.size() > 1) {
+        std::cout << "ERROR: Histogram is currently only available for single-sorbate systems. Use `histogram off` to fix this error.";
+        exit(EXIT_FAILURE);
+    }
 
 }
 // end input validation function
