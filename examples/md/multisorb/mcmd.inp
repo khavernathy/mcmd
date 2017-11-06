@@ -19,7 +19,7 @@ temperature 295.0
 ensemble nvt
 
 ewald_kmax 3
-
+histogram off
 
        
  ! MOLECULAR DYNAMICS ONLY ===============================     
