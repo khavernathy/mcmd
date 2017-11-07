@@ -141,7 +141,10 @@ int main(int argc, char **argv) {
         printf("RESTARTING previous job from input atoms contained in %s/restart.pdb\n",folder_name.c_str());
     }
     if (system.constants.mode == "md") system.constants.auto_reject_option = 0; // FORCE auto-reject off for MD b/c it will give wrong potential energies
-    if (system.constants.atom_file != "<none>") readInAtoms(system, system.constants.atom_file);
+    if (system.constants.atom_file != "<none>") {
+        readInAtoms(system, system.constants.atom_file);
+        consolidatePDBIDs(system);
+    }
 	paramOverrideCheck(system);
 	if (system.constants.autocenter)
         centerCoordinates(system);
@@ -449,19 +452,9 @@ int main(int argc, char **argv) {
             //if (system.stats.Q.value > 0) printf("Q (parition function) = %.5e\n", system.stats.Q.value);
             printf("--------------------\n\n");
 
-            // CONSOLIDATE ATOM AND MOLECULE PDBID's
-            // quick loop through all atoms to make PDBID's pretty (1->N)
             if (system.molecules.size() > 0) {
-            int molec_counter=1, atom_counter=1;
-            for (int i=0; i<system.molecules.size(); i++) {
-                system.molecules[i].PDBID = molec_counter;
-                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-                    system.molecules[i].atoms[j].PDBID = atom_counter;
-                    system.molecules[i].atoms[j].mol_PDBID = system.molecules[i].PDBID;
-                    atom_counter++;
-                } // end loop j
-                molec_counter++;
-            } // end loop i
+            consolidatePDBIDs(system);
+
             // WRITE RESTART FILE AND OTHER OUTPUTS
             if (system.constants.xyz_traj_option)
                 writeXYZ(system,system.constants.output_traj,frame,t,0,system.constants.xyz_traj_movers_option);
@@ -736,22 +729,11 @@ int main(int argc, char **argv) {
                 printf("Polarization dipole iterations = %.3f +- %.3f\n",
                 system.stats.polar_iterations.average, system.stats.polar_iterations.sd);
 
-
             printf("--------------------\n\n");
-            // CONSOLIDATE ATOM AND MOLECULE PDBID's if uVT
-            // quick loop through all atoms to make PDBID's pretty (1->N)
-            if (system.constants.ensemble == ENSEMBLE_UVT && system.molecules.size() > 0) {
-            int molec_counter=1, atom_counter=1;
-            for (int i=0; i<system.molecules.size(); i++) {
-                system.molecules[i].PDBID = molec_counter;
-                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-                    system.molecules[i].atoms[j].PDBID = atom_counter;
-                    system.molecules[i].atoms[j].mol_PDBID = system.molecules[i].PDBID;
-                    atom_counter++;
-                } // end loop j
-                molec_counter++;
-            } // end loop i
-            } // end if uVT && N>0
+            
+            if (system.molecules.size() > 0) {
+                consolidatePDBIDs(system);
+            } // end if  N>0
 
             // WRITE OUTPUT FILES
             if (system.molecules.size() > 0) { 

@@ -1437,3 +1437,19 @@ void initialVelMD(System &system) {
             
         } // end if thermostat
 } // end initialVelMD()
+
+void consolidatePDBIDs(System &system) {
+// CONSOLIDATE ATOM AND MOLECULE PDBID's
+            // quick loop through all atoms to make PDBID's pretty (1->N)
+            int molec_counter=1, atom_counter=1;
+            for (int i=0; i<system.molecules.size(); i++) {
+                system.molecules[i].PDBID = molec_counter;
+                for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                    system.molecules[i].atoms[j].PDBID = atom_counter;
+                    system.molecules[i].atoms[j].mol_PDBID = system.molecules[i].PDBID;
+                    atom_counter++;
+                } // end loop j
+                molec_counter++;
+            } // end loop i
+            
+}
