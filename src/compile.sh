@@ -7,7 +7,7 @@
 # e.g.
 #
 # bash compile.sh               Defaults to cpu compilation
-# bash compile.sh cpu           (same result; for a single computer on Mac or Linux)
+# bash compile.sh cpu           (same result; for a single computer on Mac or Linux or RaspPi)
 # bash compile.sh cpu linux     (optimized for linux (ONLY))
 # bash compile.sh cpu windows   (for use on Windows ONLY -- you must have gcc installed, e.g. through Cygwin)
 # bash compile.sh cpu debug     (same but with errors/warnings)
