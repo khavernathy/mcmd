@@ -21,7 +21,7 @@ radial_centroid     CuC  CuL  N1   HN   H2G
 radial_counterpart  H2G  H2G  H2G  H2G  H2G
 
 ensemble		    uvt
-mc_corrtime	        100
+mc_corrtime	        1
 finalstep		    1000000
 temperature         77  
 pressure            1.0
