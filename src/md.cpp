@@ -70,7 +70,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
                         vsq += system.molecules[i].vel[n]*system.molecules[i].vel[n];
                         wsq += system.molecules[i].ang_vel[n]*system.molecules[i].ang_vel[n];
                     }
-                    //v2_sum[z] += vsq;
+                    v2_sum[z] += vsq;
                     v_sum[z] += sqrt(vsq);
 
                     energy_holder = 0.5 * system.molecules[i].mass * vsq;
@@ -103,7 +103,7 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
                         for (n=0; n<3; n++) 
                             vsq += system.molecules[i].atoms[j].vel[n] * system.molecules[i].atoms[j].vel[n];
                         v_sum[z] += sqrt(vsq); // sum velocities
-                        //v2_sum[z] += vsq;
+                        v2_sum[z] += vsq;
                         energy_holder = 0.5*system.molecules[i].atoms[j].m * vsq;
                         K_total += energy_holder;
                         Klin += energy_holder;
@@ -113,14 +113,16 @@ double * calculateObservablesMD(System &system, double currtime) { // the * is t
         } // end molecule loop 
     } // end prototype loop
 
-    // get Temperature. Frenkel p64 and p84    
-    double DOF = getDOF(system);    
-    double mv2_sum=0;
-    for (int i=0;i<system.molecules.size();i++) {
-        mv2_sum += 1e10 * system.molecules[i].mass * dddotprod(system.molecules[i].vel,system.molecules[i].vel);
+    // get Temperature. Frenkel p64 and p84 
+    // each sorbate has its own contribution to total T,
+    // scaled by representation N_sorb/N_total
+    for (int z=0; z<system.proto.size(); z++) {
+        double Tcontrib = 1e10*v2_sum[z]*system.proto[z].mass/N_local[z]/system.proto[z].dof/system.constants.kb;
+        Tcontrib *= ((double)N_local[z]/system.stats.count_movables); // ratio of this type N to total N
+        T += Tcontrib;
+        //printf("T from proto %i: %f K \n", z, Tcontrib); 
     }
-    T = mv2_sum / (system.constants.kb*DOF);
-
+    
     for (int z=0; z<system.proto.size(); z++)
         avg_v_ALL += (v_sum[z]/N_local[z])*(N_local[z]/(double)system.stats.count_movables);   
 

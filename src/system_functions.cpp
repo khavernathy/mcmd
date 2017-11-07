@@ -1384,14 +1384,26 @@ double getDOF(System &system) {
     return (N>0) ? 3.0*N-3.0 : 3.0; 
 }
 
+int getNlocal(System &system, int protoid) {
+    // get the number of molecules of a given sorbate-type
+    int N=0;
+    for (int i=0;i<system.molecules.size(); i++)
+        if (system.molecules[i].name == system.proto[protoid].name)
+            N++;
+
+    return N;
+}
+
 void initialVelMD(System &system) {
         double randv; double DEFAULT = 99999.99;
-        int userflag=0;
+        int userflag=0, i, n, z, Nlocal;
+        double v_init, v_init_AVG;
+        
         // user-defined velocities
         if (system.constants.md_init_vel != DEFAULT) {
             userflag=1;
-            for (int i=0; i<system.molecules.size(); i++) {
-                for (int n=0; n<3; n++) {
+            for (i=0; i<system.molecules.size(); i++) {
+                for (n=0; n<3; n++) {
                     randv = (getrand()*2 - 1) * sqrt(system.constants.md_init_vel * system.constants.md_init_vel/3.);
                     system.molecules[i].vel[n] = randv; // that is, +- 0->1 * user param
                 }
@@ -1401,22 +1413,19 @@ void initialVelMD(System &system) {
         // thermostat information (and apply init. vel if needed)
         }
         if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
-            // otherwise use temperature as default via v_RMS
-            // default temp is zero so init. vel's will be 0 if no temp is given.
-            
-            double DOF = getDOF(system); // 3 N -3
-            double kbTDOF = system.constants.kb * system.constants.temp * DOF; // in J
-            double v_init_AVG = 0; 
-            for (int z=0; z<system.proto.size(); z++) {
-                double v_init = 1e-5*sqrt(kbTDOF / (double)system.stats.count_movables / system.proto[z].mass);
+            v_init_AVG=0;
+            for (z=0; z<system.proto.size(); z++) {   
+
+                Nlocal=getNlocal(system, z);
+                v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*system.proto[z].dof / system.proto[z].mass);
                 system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
-                
+
                 // apply thermostat velocities if user did not specify an init. vel.
                 if (!userflag) {
-                for (int i=0; i<system.molecules.size(); i++) {
+                for (i=0; i<system.molecules.size(); i++) {
                     if (system.proto[z].name == system.molecules[i].name) {
                         v_init_AVG += v_init * (1. / (double)system.stats.count_movables);
-                        for (int n=0;n<3;n++) {
+                        for (n=0;n<3;n++) {
                             double pm = (getrand() > 0.5) ? 1.0 : -1.0; 
                             system.molecules[i].vel[n] = pm * system.proto[z].md_velx_goal;
                         }
