@@ -567,6 +567,7 @@ int main(int argc, char **argv) {
         system.stats.MDtime = t;
 		
         // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
+        system.constants.lagrange_multiplier = 0; // reset LM (for NVT thermostat) 
         if (system.stats.count_movables > 0)
             integrate(system,dt);
 

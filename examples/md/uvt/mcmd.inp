@@ -7,31 +7,33 @@ mode              md ! mc or md
        
 input_atoms ../../../atomfiles/SIFSIX14Cui.pdb         
 
-potential_form        ljes       
+potential_form        lj   es       
 com_option            off     ! center of mass        
 xyz_traj_option       on 
 !!checkpoints on
-
+ewald_kmax 3
 
 basis1    25.77960000000000     0.00000000000000     0.00000000000000
 basis2     0.00000000000000    18.50600000000000     0.00000000000000
 basis3    -0.01483000000000     0.00000000000000    18.47629000000000
 
        
-temperature 15.0   
+temperature 250.0   
 ensemble uvt
+thermostat andersen
+
 
 histogram off
 
 sorbate_name     co2_phast   c2h2   
-user_fugacities  10.5         10.5
+user_fugacities  3          3
        
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
-md_dt             0.2  ! fs       
+md_dt             0.5  ! fs       
 md_ft             2 ns        
-md_corrtime       10     ! steps 
-md_insert_frequency 10   ! every x steps, try insert/delete MC style       
+md_corrtime       100     ! steps 
+md_insert_frequency 5   ! every x steps, try insert/delete MC style       
 !md_init_vel         0    ! A / fs^2      
 md_mode             molecular          
 md_rotations        on    
