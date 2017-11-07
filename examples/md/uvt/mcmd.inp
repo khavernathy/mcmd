@@ -20,6 +20,8 @@ basis3    -0.01483000000000     0.00000000000000    18.47629000000000
 temperature 298.0   
 ensemble uvt
 
+histogram off
+
 sorbate_name     co2_phast   c2h2   
 user_fugacities  0.5         0.5
        
