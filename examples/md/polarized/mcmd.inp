@@ -1,0 +1,41 @@
+! Douglas Franz, Space group, USF      
+
+name                  md_polarized_h2o        
+mode                  md ! mc or md       
+checkpoints_option    off       
+       
+input_atoms  input.pdb    
+
+         
+
+potential_form        ljespolar       
+com_option            off     ! center of mass        
+ 
+sorbate_name h2o_pol3
+
+carbasis 30 30 30 90 90 90
+
+radial_dist on
+radial_centroid OXY
+radial_counterpart OXY
+radial_bin_size 0.05
+radial_max_dist 20
+
+
+ensemble nvt
+ewald_kmax 4
+!!! polar_max_iter 20 
+dipole_precision 0.0000001
+temperature 298
+thermostat nose-hoover
+
+
+       
+ ! MOLECULAR DYNAMICS ONLY ===============================     
+md_pbc              on
+md_dt             1  ! fs       
+md_ft             10  ns  ! fs        
+md_corrtime       1    ! steps        
+md_mode             molecular          
+md_rotations        on
+md_translations     on    
