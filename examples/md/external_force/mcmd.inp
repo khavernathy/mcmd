@@ -10,6 +10,7 @@ checkpoints_option  off
 input_atoms input.pdb   ! PDB ONLY
 
 potential_form        ljes
+ewald_kmax            4
 com_option            off     ! center of mass
 
 basis1    25.77960000000000     0.00000000000000     0.00000000000000
@@ -34,7 +35,7 @@ external_force  0.5 0 0   ! vector in nN
 md_pbc            on
 md_dt             0.2  ! fs
 md_ft             20 ns
-md_corrtime       1000     ! steps
+md_corrtime       1     ! steps
 md_mode           molecular
 md_rotations      on    ! asdf
 
