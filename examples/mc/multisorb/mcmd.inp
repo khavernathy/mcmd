@@ -21,6 +21,8 @@ radial_dist on
 radial_centroid     OXY COG CoM H2G
 radial_counterpart  ZN  ZN  ZN  ZN
 
+histogram off
+
 ensemble		    uvt
 
 mc_corrtime	        25
