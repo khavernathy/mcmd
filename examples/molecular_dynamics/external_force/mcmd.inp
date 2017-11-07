@@ -1,5 +1,7 @@
-! Douglas Franz, Space group, USF
+! Douglas Franz, Space group, USF, 2017
 ! Molcular dynamics using external force
+! The artificial external force is applied at each integration step
+! to push the CO2 molecule through the tight MOF channel
 
 
 name              sifsix14cui_co2_md_nvt

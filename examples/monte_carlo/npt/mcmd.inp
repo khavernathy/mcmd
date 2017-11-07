@@ -1,8 +1,9 @@
-! Douglas Franz, Space group, USF
+! Douglas Franz, Space group, USF, 2017
 ! Example of NPT monte carlo (i.e. the box changes volume)
-! 100 Helium atoms
+! good for finding equilibrated density of bulk gases, etc.
+! 100 Helium atoms at ~STP (STP is really 1 bar, not 1 atm)
 ! Note the input file He100.pdb takes advantage of the "default" feature
-! 2017
+
 
 name			    npt_example
 mode	 		    mc ! mc or md

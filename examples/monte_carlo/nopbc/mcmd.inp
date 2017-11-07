@@ -1,6 +1,6 @@
-! Douglas Franz, Space group, USF
-! No-PBC monte carlo example. Ru-tris-bipyridine in a MOF cage with methanol
-! 2017
+! Douglas Franz, Space group, USF, 2017
+! No-PBC monte carlo example. Ru-tris-bipyridine in a MOF cage with 
+! free-moving methanol (solvent) molecules
 
 name			    nopbc_RuBpy_example
 mode	 		    mc ! mc or md

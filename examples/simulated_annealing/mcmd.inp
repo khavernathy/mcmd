@@ -1,9 +1,9 @@
-! Douglas Franz, Space group, USF
+! Douglas Franz, Space group, USF, 2017
 ! NOTT-112 with 417 H2 molecules (BSS model). Very large volume system.
 ! Simulated annealing is on, so the temperature should decrease as the simulation proceeds.
-! 2017
+! And thus the equilibrium state of the system is being pursued computationally
 
-name			    mc_nvt_example 
+name			    sim_annealing_ex 
 mode	 		    mc ! mc or md
 checkpoints_option  off
 

@@ -1,10 +1,11 @@
+! Douglas Franz, Space group, USF, 2017
 ! rht-MOF-9 with hydrogen, to simulate H2 loading
 ! Note the use of built-in sorbate via sorbate_name
-! this is exactly the same as the uvt example,
+! this is exactly the same as the MC uVT example,
 ! but here we reduce the size of the Thole A matrix by ~1/2
 ! this slows performance but conserves memory.
 
-name			    mc_uvt_example 
+name			    half_A_matrix_example 
 mode	 		    mc 
 input_atoms         ../../atomfiles/rht-MOF-9.pdb
 

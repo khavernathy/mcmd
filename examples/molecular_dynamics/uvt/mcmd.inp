@@ -1,13 +1,18 @@
-! Douglas Franz, Space group, USF      
+! Douglas Franz, Space group, USF, 2017      
 ! Molcular dynamics example with a non orthorhombic unit-cell periodic system
 ! CO2+C2H2 in a SIFSIX MOF
+! This is hybrid MC/MD. Molecular dynamics dictates the molecular motion in time
+! but every "md_insert_frequency" timesteps, a Monte-Carlo insert/delete is attempted.
+! May be very useful in tandem with external-force MD to produce an equilibrated, 
+! fully saturated porous-material+gas system.
+! Andersen thermostat is recommended over Nose-Hoover for uVT MD.
 
 name              md_uVT_example        
 mode              md ! mc or md       
        
 input_atoms ../../../atomfiles/SIFSIX14Cui.pdb         
 
-potential_form        lj   es       
+potential_form        lj   !!es       
 com_option            off     ! center of mass        
 xyz_traj_option       on 
 !!checkpoints on
@@ -34,7 +39,6 @@ md_dt             0.5  ! fs
 md_ft             2 ns        
 md_corrtime       100     ! steps 
 md_insert_frequency 5   ! every x steps, try insert/delete MC style       
-!md_init_vel         0    ! A / fs^2      
 md_mode             molecular          
 md_rotations        on    
 

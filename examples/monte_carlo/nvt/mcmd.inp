@@ -1,6 +1,6 @@
-! Douglas Franz, Space group, USF
+! Douglas Franz, Space group, USF, 2017
 ! NOTT-112 with 417 H2 molecules (BSS model). Very large volume system.
-! 2017
+! Note the use of auto-reject to skip unphysical (unrealistic) moves
 
 name			    mc_nvt_example 
 mode	 		    mc ! mc or md

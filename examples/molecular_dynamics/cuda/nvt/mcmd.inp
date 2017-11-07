@@ -1,7 +1,13 @@
-! Douglas Franz, Space group, USF      
-name              mcmd_development        
+! Douglas Franz, Space group, USF, 2017
+! Example using CUDA GPU acceleration for MD force calc's
+! NOTT-112 + hydrogen gas (quite a big system, ~5000 sites)
+! Remember to compile with CUDA if you want to use this
+! e.g. `bash compile.sh gpu`
+
+      
+name              gpu_md_ex  
 mode              md ! mc or md       
-cuda                on
+cuda                on  ! cuda activated here
 checkpoints_option  off       
        
 input_atoms ../../../../atomfiles/NOTT-112+417H2_BSS.pdb   ! PDB ONLY       
@@ -20,6 +26,6 @@ md_pbc              on
 md_dt             0.5  ! fs       
 md_ft             100  ! fs        
 md_corrtime       20     ! steps        
-!md_init_vel         0    ! A / fs^2      
+!md_init_vel         0    ! A / fs      
 md_mode             molecular      !atomic        
 md_rotations        on

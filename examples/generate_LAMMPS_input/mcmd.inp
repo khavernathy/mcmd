@@ -1,5 +1,8 @@
-! This is a comment 
-! Hi
+! Douglas Franz, Space group, USF, 2017
+! This is an example of running normal Monte Carlo  
+! simulation of H2 in a MOF (MOF-5)
+! except, at startup, LAMMPS MD input files 
+! will be written
 
 
 name			    generate_lammps_ex 

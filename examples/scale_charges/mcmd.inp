@@ -1,9 +1,9 @@
-! Douglas Franz, Space group, USF
+! Douglas Franz, Space group, USF, 2017
 ! NOTT-112 with 417 H2 molecules (BSS model). Very large volume system.
-! Exact same as NVT example, but
+! Exact same as Monte Carlo NVT example, but
 ! with charge-scaling option (here the charges are reduced to 90%)
 
-name			    mc_nvt_example 
+name			    scale_charges_example 
 mode	 		    mc ! mc or md
 checkpoints_option  off
 

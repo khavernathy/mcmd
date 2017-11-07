@@ -1,4 +1,8 @@
-! Douglas Franz, Space group, USF      
+! Douglas Franz, Space group, USF, 2017
+! An example of polarized MD; bulk water in a box
+! Polarization is notoriously slower than alternative force fields
+! but has been shown to be necessary for accurate modeling
+! especially for highly inductive intermolecular interactions      
 
 name                  md_polarized_h2o        
 mode                  md ! mc or md       
@@ -24,8 +28,8 @@ radial_max_dist 20
 
 ensemble nvt
 ewald_kmax 4
-!!! polar_max_iter 20 
-dipole_precision 0.0000001
+!!! polar_max_iter 20        ! not using here, but alternative to dipole precision
+dipole_precision 0.0000001   ! in Debye; 1e-7 is quite precise; dipoles iterate until reached
 temperature 298
 thermostat nose-hoover
 

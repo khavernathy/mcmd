@@ -1,9 +1,12 @@
 ! Douglas Franz, Space group, USF, 2017      
 ! Molcular dynamics example with a non orthorhombic unit-cell periodic system
-! NVE Neon atoms in MPM-1-Br  MOF
-! i.e. total energy should be conserved with minimal error
+! Neon atoms in MPM-1-Br  MOF
+! Initial velocities defined by user (in A/fs)
+! Same as NVT except velocity setting
+! ***NOTE: The thermostat will be overidden by 
+! "md_init_vel" (instead of "temperature") if "nose-hoover" is chosen
 
-name              md_NVE_example        
+name              md_NVT_example        
 mode              md ! mc or md       
 checkpoints_option  off       
        
@@ -26,15 +29,15 @@ radial_centroid     Ne   ! element name
 radial_counterpart  Ne   ! element name to get distance of w/centroid        
 radial_file         radialdist.dat        
        
-ensemble nve      
-       
+temperature 295.0   
+ensemble nvt   
+thermostat andersen           
+
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
 md_dt             2  ! fs       
 md_ft             200000  ! fs        
 md_corrtime       1     ! steps        
-md_init_vel         0    ! A / fs     
 md_mode             molecular          
 md_rotations        off    ! important here, because the movable molecules are monatomic.
-
-
+md_init_vel         0.003   !  A/fs

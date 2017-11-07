@@ -1,9 +1,9 @@
-! Douglas Franz, Space group, USF
+! Douglas Franz, Space group, USF, 2017
 ! Multi-sorbate monte carlo example
-! MOF-5 with a bunch of guest molecules at moderately high pressure
-! 2017
+! MOF-5 with a bunch of guest molecules (gases) at moderately high pressure
+! and room temperature
 
-name			    multisorb_example
+name			    mc_multisorb_example
 mode	 		    mc ! mc or md
 checkpoints_option off 
 input_atoms  ../../../atomfiles/MOF-5.pdb  ! PDB ONLY 

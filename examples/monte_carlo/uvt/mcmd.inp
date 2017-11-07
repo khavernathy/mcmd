@@ -1,7 +1,11 @@
-! This is a comment 
-! rht-MOF-9 with hydrogen, to simulate H2 loading
+! Douglas Franz, Space group, USF, 2017
+! Simulating loading capacity with GCMC. 
+! rht-MOF-9 with hydrogen gas
 ! Note the use of built-in sorbate via sorbate_name
-! Hi
+! Also, bias_uptake, which speeds up pre-equilibration time
+! Useful, e.g. if experimental loading is known
+! Feynman-Hibbs corrections on b/c H2 has small mass and T is very low.
+
 
 name			    mc_uvt_example 
 mode	 		    mc 

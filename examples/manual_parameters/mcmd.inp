@@ -1,10 +1,9 @@
-! Douglas Franz, Space group, USF
-! example of defining RD params for atoms 
+! Douglas Franz, Space group, USF, 2017
+! example of manually defining RD params for atoms 
 ! in this input script 
 ! (instead of the input.pdb file)
-! 2017
 
-name			    mc_nvt_example 
+name			    manual_params_example 
 mode	 		    mc ! mc or md
 checkpoints_option  off
 

@@ -1,3 +1,4 @@
+! Douglas Franz, Space group, USF, 2017
 ! This is idenical to the uvt example, except 
 ! we're building out the crystal system at the beginning
 ! and also spitting out some sample fragments of the MOF

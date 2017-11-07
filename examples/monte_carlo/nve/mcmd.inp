@@ -1,6 +1,5 @@
-! Douglas Franz, Space group, USF
-! NVE monte carlo example.
-! 2017
+! Douglas Franz, Space group, USF, 2017
+! NVE monte carlo example, a box w/100 He atoms
 
 name			    mc_nve_example
 mode	 		    mc ! mc or md

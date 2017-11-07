@@ -1409,7 +1409,7 @@ void initialVelMD(System &system) {
                 }
             }
             printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
-        
+             
         // thermostat information (and apply init. vel if needed)
         }
         if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
@@ -1430,10 +1430,10 @@ void initialVelMD(System &system) {
                             system.molecules[i].vel[n] = pm * system.proto[z].md_velx_goal;
                         }
                     }
-                }
-                }
-            }
-            system.constants.md_init_vel = v_init_AVG;
-
-        }
-}
+                } // end molecules loop i
+                system.constants.md_init_vel = v_init_AVG;
+                } // end if user-defined init. vel's
+            } // end prototype loop z
+            
+        } // end if thermostat
+} // end initialVelMD()

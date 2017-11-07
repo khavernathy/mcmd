@@ -1,6 +1,9 @@
-! Douglas Franz, Space group, USF      
+! Douglas Franz, Space group, USF, 2017      
 ! Molcular dynamics example with a non orthorhombic unit-cell periodic system
 ! Neon atoms in MPM-1-Br  MOF
+! Similar to NVE example, except Nose-Hoover thermostat is applied for fixed T
+
+
 name              md_NVT_example        
 mode              md ! mc or md       
 checkpoints_option  off       
@@ -26,12 +29,12 @@ radial_file         radialdist.dat
        
 temperature 295.0   
 ensemble nvt   
-       
+thermostat nose-hoover       
+
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
 md_dt             2  ! fs       
 md_ft             200000  ! fs        
 md_corrtime       1     ! steps        
-!md_init_vel         0    ! A / fs^2      
 md_mode             molecular          
 md_rotations        off    ! important here, because the movable molecules are monatomic.
