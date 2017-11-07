@@ -567,7 +567,8 @@ int main(int argc, char **argv) {
         system.stats.MDtime = t;
 		
         // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
-        integrate(system,dt);
+        if (system.stats.count_movables > 0)
+            integrate(system,dt);
 
         if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
             // try a MC uVT insert/delete
@@ -619,13 +620,15 @@ int main(int argc, char **argv) {
             // calc diffusion
             // R^2 as a function of time should be linear according to physical theory.
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
+                int localN = getNlocal(system, sorbid);
+                if (localN < 1) continue; // skip N=0 sorbates
+
                 // re-initialize these vars for each sorbate
                 for (int h=0;h<3;h++) diffusion_d[h]=0.;
-                diffusion_sum=0.; int localN=0; // localN = num. of sorbates of given type
+                diffusion_sum=0.; 
                 for (i=0; i<system.molecules.size(); i++) {
                     // only consider molecules of this type (for multi-sorb)
                     if (system.molecules[i].name == system.proto[sorbid].name) {
-                        localN++;
                         for (n=0; n<3; n++)
                             diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
                     
