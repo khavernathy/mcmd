@@ -817,7 +817,14 @@ void writeLAMMPSfiles(System &system) {
 
 /* READ INPUT FILE PARAMETERS AND OPTIONS */
 void readInput(System &system, char* filename) {
-	printf("Reading input parameters from %s.\n",filename);
+	// check if it exists
+    struct stat buffer;
+    if (stat (filename, &buffer) != 0) {
+        std::cout << "ERROR: The MCMD input file " << filename << " doesn't exist."; printf("\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Reading input parameters from %s.\n",filename);
 
 	string line;
 	ifstream myfile (filename);
