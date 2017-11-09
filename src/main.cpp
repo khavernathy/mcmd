@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
     // INITIAL WRITEOUTS
     // Prep thermo output file
     FILE *f = fopen(system.constants.thermo_output.c_str(), "w");
-    fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K) #RD(K) #ES(K) #POL(K) #density(g/mL) #temp(K) #pres(atm) #N\n");
+    fprintf(f, "#step #TotalE(K) #LinKE(K)  #RotKE(K)  #PE(K) #RD(K) #ES(K) #POL(K) #density(g/L) #temp(K) #pres(atm) #N\n");
     fclose(f);
     // Prep pdb trajectory if needed
     if (system.constants.pdb_traj_option) {
