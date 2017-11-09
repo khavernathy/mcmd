@@ -111,7 +111,7 @@ class Constants {
         int_fast8_t dist_within_option=0; // a function to calculate atom distances within a certain radius of origin
         string dist_within_target; // the atom to find in above option
         double dist_within_radius; // the radius within which to search from origin
-        int_fast8_t histogram_option = 1; // output histogram data which can be plotted in VMD
+        int_fast8_t histogram_option = 0; // output histogram data which can be plotted in VMD
         int_fast8_t autocenter = 1; // center all atoms about origin automatically. can opt out of it.
         int_fast8_t restart_mode = 0; // option to restart job automatically (by searching for restart.pdb)
         int_fast8_t no_zero_option = 0; // option to disallow zero sorbates in the simulation. default off.
