@@ -937,8 +937,8 @@ Constants::Constants() {
     masses["F"] = 18.998*cM;
 	masses["Ne"] = 20.1797*cM;
 	masses["Na"] = 22.98976928*cM;
-//mg
-//al
+    masses["Mg"] = 24.305*cM;
+    masses["Al"] = 26.981538*cM;
 	masses["Si"] = 28.085*cM;
 	masses["P"] = 30.973*cM;
 	masses["S"] = 32.06*cM;
@@ -946,19 +946,102 @@ Constants::Constants() {
 	masses["Cl"] = 35.45*cM;
 	masses["Ar"] = 39.948*cM;
     masses["ArS"] = 39.948*cM; // Ar SAPT
-// per4
-	masses["Fe"] = 55.845*cM;
-	masses["Co"] = 58.933200*cM;
-    masses["Cu"] = 63.546*cM;
-    masses["Zn"] = 65.39*cM;
-// per4
+masses["K"] = 39.0983*cM;
+masses["Ca"] = 40.078*cM;
+masses["Sc"] = 44.955910*cM;
+masses["Ti"] = 47.867*cM;
+masses["V"] = 50.9415*cM;
+masses["Cr"] = 51.9961*cM;
+masses["Mn"] = 54.938049*cM;
+masses["Fe"] = 55.845*cM;
+masses["Co"] = 58.933200*cM;
+masses["Ni"] = 58.6934*cM;
+masses["Cu"] = 63.546*cM;
+masses["Zn"] = 65.39*cM;
+masses["Ga"] = 69.723*cM;
+masses["Ge"] = 72.61*cM;
+masses["As"] = 74.92160*cM;
+masses["Se"] = 78.96*cM;
+masses["Br"] = 79.904*cM;
 	masses["Kr"] = 83.798*cM;
-	masses["Ru"] = 101.07*cM;
-//per5
-	masses["Xe"] = 131.293*cM;
-//per6
-	masses["Rn"] = 222.0176*cM;
 
+masses["Rb"] = 85.4678*cM;
+masses["Sr"] = 87.62*cM;
+masses["Y"] = 88.90585*cM;
+masses["Zr"] = 91.224*cM;
+masses["Nb"] = 92.90638*cM;
+masses["Mo"] = 95.94*cM;
+masses["Tc"] = 98.0*cM;
+masses["Ru"] = 101.07*cM;
+masses["Rh"] = 102.90550*cM;
+masses["Pd"] = 106.42*cM;
+masses["Ag"] = 107.8682*cM;
+masses["Cd"] = 112.411*cM;
+masses["In"] = 114.818*cM;
+masses["Sn"] = 118.710*cM;
+masses["Sb"] = 121.760*cM;
+masses["Te"] = 127.60*cM;
+masses["I"] = 126.90447*cM;
+masses["Xe"] = 131.29*cM;
+
+masses["Cs"] = 132.90545*cM;
+masses["Ba"] = 137.327*cM;
+masses["La"] = 138.9055*cM;
+masses["Hf"] = 178.49*cM;
+masses["Ta"] = 180.9479*cM;
+masses["W"] = 183.84*cM;
+masses["Re"] = 186.207*cM;
+masses["Os"] = 190.23*cM;
+masses["Ir"] = 192.217*cM;
+masses["Pt"] = 195.078*cM;
+masses["Au"] = 196.96655*cM;
+masses["Hg"] = 200.59*cM;
+masses["Tl"] = 204.3833*cM;
+masses["Pb"] = 207.2*cM;
+masses["Bi"] = 208.98038*cM;
+masses["Po"] = 209.0*cM;
+masses["At"] = 210.*cM;
+masses["Rn"] = 222.0176*cM;
+
+masses["Fr"] = 223.*cM;
+masses["Ra"] = 226.*cM;
+masses["Ac"] = 227.*cM;
+masses["Rf"] = 261.*cM;
+masses["Db"] = 262.*cM;
+masses["Sg"] = 263.*cM;
+masses["Bh"] = 262.*cM;
+masses["Hs"] = 265.*cM;
+masses["Mt"] = 266.*cM;
+
+masses["Ce"] = 140.116*cM;
+masses["Pr"] = 140.90765*cM;
+masses["Nd"] = 144.24*cM;
+masses["Pm"] = 145.*cM;
+masses["Sm"] = 150.36*cM;
+masses["Eu"] = 151.964*cM;
+masses["Gd"] = 157.25*cM;
+masses["Tb"] = 158.92534*cM;
+masses["Dy"] = 162.5*cM;
+masses["Ho"] = 164.93032*cM;
+masses["Er"] = 167.26*cM;
+masses["Tm"] = 168.93421*cM;
+masses["Yb"] = 173.04*cM;
+masses["Lu"] = 174.967*cM;
+
+masses["Th"] = 232.0381*cM;
+masses["Pa"] = 231.03588*cM;
+masses["U"] = 238.0289*cM;
+masses["Np"] = 237.*cM;
+masses["Pu"] = 244.*cM;
+masses["Am"] = 243.*cM;
+masses["Cm"] = 247.*cM;
+masses["Bk"] = 247.*cM;
+masses["Cf"] = 251.*cM;
+masses["Es"] = 252.*cM;
+masses["Fm"] = 257.*cM;
+masses["Md"] = 258.*cM;
+masses["No"] = 259.*cM;
+masses["Lr"] = 262.*cM;
 
 	// LJ SIGMA VALUES (A)
 	sigs["HB"] = 2.96; // buch model h2 (from mpmc sig)
