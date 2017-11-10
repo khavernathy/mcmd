@@ -948,7 +948,8 @@ Constants::Constants() {
     masses["ArS"] = 39.948*cM; // Ar SAPT
 // per4
 	masses["Fe"] = 55.845*cM;
-	masses["Cu"] = 63.546*cM;
+	masses["Co"] = 58.933200*cM;
+    masses["Cu"] = 63.546*cM;
     masses["Zn"] = 65.39*cM;
 // per4
 	masses["Kr"] = 83.798*cM;
