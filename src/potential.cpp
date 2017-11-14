@@ -69,6 +69,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     system.stats.es.value = total_es;
     system.stats.polar.value = total_polar;
     system.stats.potential.value = total_potential;
+    system.stats.potential_sq.value = total_potential*total_potential;
 
     system.checkpoint("ended getTotalPotential()");
 	return total_potential;

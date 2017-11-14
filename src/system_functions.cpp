@@ -849,6 +849,7 @@ void setCheckpoint(System &system) {
         system.last.es_recip = system.stats.es_recip.value;
     system.last.polar = system.stats.polar.value;
     system.last.potential = system.stats.potential.value;
+    system.last.potential_sq = system.stats.potential_sq.value;
         // VOLUME
     system.last.volume = system.stats.volume.value;
         // CHEMICAL POTENTIAL
@@ -884,6 +885,7 @@ void revertToCheckpoint(System &system) {
         system.stats.es_recip.value = system.last.es_recip;
     system.stats.polar.value = system.last.polar;
     system.stats.potential.value = system.last.potential;
+    system.stats.potential_sq.value = system.last.potential_sq;
         // VOLUME
     system.stats.volume.value = system.last.volume;
             // CHEMICAL POTENTIAL
@@ -941,7 +943,7 @@ void initialize(System &system) {
 
         system.stats.fdotrsum.name="fdotrsum";
         system.stats.dist_within.name="dist_within";
-        system.stats.csp.name = "csp";
+        system.stats.heat_capacity.name = "heat_capacity";
         system.stats.diffusion.name="diffusion";
 }
 

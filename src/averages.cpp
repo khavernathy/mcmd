@@ -9,6 +9,8 @@
 using namespace std;
 
 
+/* QUANTITIES AT STARTUP */
+// =======================================================
 void computeInitialValues(System &system) {
 
     // MASS OF SYSTEM
@@ -65,6 +67,7 @@ void computeInitialValues(System &system) {
         	system.stats.polar.average = system.stats.polar.value;
 
             system.stats.potential.average = system.stats.potential.value;
+            system.stats.potential_sq.average = system.stats.potential_sq.value;
             system.constants.initial_energy = system.stats.potential.value;
 
 	// VOLUME
@@ -86,8 +89,6 @@ void computeInitialValues(System &system) {
 
     }
 
-
-
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
     double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*1000*system.constants.NA);
@@ -99,7 +100,8 @@ void computeInitialValues(System &system) {
 }
 
 
-
+/* RECURRING QUANTITIES (EVERY CORRTIME) */
+// ====================================================================
 void computeAverages(System &system) {
     system.checkpoint("started computeAverages()");
     double t = system.stats.MCstep;
@@ -195,6 +197,7 @@ void computeAverages(System &system) {
         system.stats.es_recip.calcNewStats();
     system.stats.polar.calcNewStats();
     system.stats.potential.calcNewStats();
+    system.stats.potential_sq.calcNewStats();
 
     // Q (partition function)
     double tmp=0;
@@ -267,6 +270,12 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
         system.stats.z.calcNewStats();
 
     system.checkpoint("finished computeAverages()");
+
+    // HEAT CAPACITY, kJ/molK
+    if (system.constants.ensemble != ENSEMBLE_NVE) {
+        system.stats.heat_capacity.value = (system.constants.kb*system.constants.NA*1e-3)*(system.stats.potential_sq.average - system.stats.potential.average*system.stats.potential.average)/(system.constants.temp*system.constants.temp);
+        system.stats.heat_capacity.calcNewStats();
+    }
 }
 
 
@@ -380,7 +389,6 @@ void computeAveragesMDuVT(System &system) {
         system.stats.excess[i].calcNewStats();
 
     }
-
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!

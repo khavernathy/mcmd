@@ -553,14 +553,14 @@ class Stats {
         // these are the instances of the "observables type" obs_t.
         // i.e. all the quantities of interest which can be averaged and dealt with.
         } Nsq,NU,qst,qst_nvt,
-          rd,es,polar,potential,
+          rd,es,polar,potential,potential_sq,
           lj_lrc, lj_self_lrc, lj, // lj_self_lrc is really just "self" energy for LJ potential.
           es_self, es_real, es_recip,
           tt, tt_lrc, tt_self,
           chempot,totalmass, frozenmass, 
           pressure,temperature, fdotrsum, 
-          dist_within, csp, diffusion, volume, z, // z = PV/nRT
-          Q, polar_iterations; // Q = partition func.
+          dist_within, diffusion, volume, z, // z = PV/nRT
+          Q, polar_iterations, heat_capacity; // Q = partition func.
 
         int max_sorbs=10;
         vector<obs_t> msd = vector<obs_t>(max_sorbs); 
@@ -600,7 +600,7 @@ Pair::Pair() {}
 class Last {
     public:
         Last();
-        double Nsq,NU,qst,qst_nvt,rd,es,polar,potential,volume,z,
+        double Nsq,NU,qst,qst_nvt,rd,es,polar,potential,potential_sq,volume,z,
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass,pressure,temperature, fdotrsum, dist_within, csp, diffusion;
 

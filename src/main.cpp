@@ -446,6 +446,9 @@ int main(int argc, char **argv) {
             }
             if (system.proto.size() == 1 && system.stats.count_frozen_molecules == 0)
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
+            if (system.constants.ensemble != ENSEMBLE_NVE && system.proto.size() ==1)
+                printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
+                
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
             }
@@ -603,10 +606,6 @@ int main(int argc, char **argv) {
             Klin = ETarray[5] * system.constants.K2KJMOL;
             Krot = ETarray[6] * system.constants.K2KJMOL;
             pressure = ETarray[7]; // not using this yet. NVT pressure derived from forces/stat mech stuff. Frenkel p84
-            // pretty sure Csp (specific heat) is wrong below. Not printing in output yet.
-            system.stats.csp.value = (TE*1000/system.constants.NA);
-                system.stats.csp.value /= -((Temp)*system.proto[0].mass*1000*system.stats.count_movables);
-                system.stats.csp.calcNewStats(); // the minus above i think is needed.
             system.stats.temperature.value = Temp;
                 system.stats.temperature.calcNewStats();
 
