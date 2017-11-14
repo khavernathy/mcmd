@@ -596,7 +596,7 @@ int main(int argc, char **argv) {
 
             if (system.stats.count_movables > 0) {
             // get KE and PE and T at this step.
-            double* ETarray = calculateObservablesMD(system, t);
+            double* ETarray = calculateObservablesMD(system);
             KE = ETarray[0] * system.constants.K2KJMOL;
             PE = ETarray[1] * system.constants.K2KJMOL;
             TE = KE+PE;
@@ -724,6 +724,12 @@ int main(int argc, char **argv) {
                         printf("U/N avg = %.5f kJ/mol\n", system.stats.qst_nvt.value); //, system.stats.qst_nvt.sd);
                 }
             } // end if uVT
+            if ((system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_NVE) && system.proto.size() == 1) {
+                if (system.stats.heat_capacity.value > 1e-5)
+                    printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
+                else 
+                    printf("Heat capacity = %.5e +- %.5e kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
+            }
             if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR)
                 printf("Polarization dipole iterations = %.3f +- %.3f\n",
                 system.stats.polar_iterations.average, system.stats.polar_iterations.sd);
