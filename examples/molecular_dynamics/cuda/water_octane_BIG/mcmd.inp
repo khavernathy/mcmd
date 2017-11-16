@@ -5,6 +5,7 @@
 ! Even with CUDA this system is quite large, and especially
 ! expensive because we are including k-space Ewald forces
 ! We recommend trying the _SMALL example first.
+! especially if you're using a GPU for display at the same time
 
 name              cuda_md_gas_water        
 mode              md ! mc or md
