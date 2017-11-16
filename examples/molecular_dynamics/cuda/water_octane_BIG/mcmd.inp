@@ -4,6 +4,7 @@
 ! e.g. bash compile.sh gpu
 ! Even with CUDA this system is quite large, and especially
 ! expensive because we are including k-space Ewald forces
+! We recommend trying the _SMALL example first.
 
 name              cuda_md_gas_water        
 mode              md ! mc or md
@@ -26,13 +27,13 @@ temperature 298.0
 thermostat nose-hoover
 ensemble nvt
 
-sorbate_name octane h2o_tip4p
+sorbate_name octane h2o_tip3p
 
 
  ! MOLECULAR DYNAMICS ONLY ===============================
 md_pbc              on
 md_dt             2  ! fs
-md_ft             20 ns
+md_ft             5 ns
 md_corrtime       10     ! steps
 md_mode             molecular
 md_rotations        on
