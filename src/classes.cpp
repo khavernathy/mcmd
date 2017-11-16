@@ -529,6 +529,7 @@ class Stats {
         double bf_avg, ibf_avg, rbf_avg, dbf_avg, vbf_avg;
 
         int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
+        vector<int> movids; // holds the internal IDs of movable molecules (in system.molecules)
         int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
         int count_frozen_molecules=0; // frozen MOLECULES; normally 1
 

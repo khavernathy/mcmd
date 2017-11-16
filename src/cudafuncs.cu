@@ -59,6 +59,13 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
 
            if (anchoratom.molid == atom_list[j].molid) continue; // skip same molecule 
             if (anchoratom.frozen && atom_list[j].frozen) continue; // skip frozens            
+            
+            // LB mixing
+            sig = anchoratom.sig;
+            if (sig != atom_list[j].sig) sig = 0.5*(sig+atom_list[j].sig);
+            eps = anchoratom.eps;
+            if (eps != atom_list[j].eps) eps = sqrt(eps * atom_list[j].eps);
+            if (sig == 0 || eps == 0) continue;
 
             // get R (nearest image)
             for (n=0;n<3;n++) d[n] = anchoratom.pos[n] - atom_list[j].pos[n];
@@ -93,27 +100,18 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
                 for (n=0;n<3;n++) dimg[n] = di[n];
             }
             // distance is now rimg
-               
-                if (rimg <= cutoff) {
-           
-                 sig = anchoratom.sig;
-                if (sig != atom_list[j].sig) sig = 0.5*(sig+atom_list[j].sig);
-                eps = anchoratom.eps;
-                if (eps != atom_list[j].eps) eps = sqrt(eps * atom_list[j].eps);
-
-                if (sig == 0 || eps == 0) continue;
-
+    
+            if (rimg <= cutoff) {
                 r6 = rsq*rsq*rsq;
                 s6 = sig*sig;
                 s6 *= s6 * s6;
         
-                    for (n=0;n<3;n++) {
-                        holder = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-                        atomicAdd(&(atom_list[j].f[n]), -holder); 
-                        af[n] += holder;      
-                    }
+                for (n=0;n<3;n++) {
+                    holder = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                    atomicAdd(&(atom_list[j].f[n]), -holder); 
+                    af[n] += holder;      
                 }
-
+            }
         } // end pair j
         
         // finally add the accumulated forces (stored on register) to the anchor atom

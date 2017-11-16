@@ -144,6 +144,10 @@ int main(int argc, char **argv) {
     if (system.constants.atom_file != "<none>") {
         readInAtoms(system, system.constants.atom_file);
         consolidatePDBIDs(system);
+        // collect movable molecule IDs
+        for (int i=0; i<system.molecules.size(); i++)
+            if (!system.molecules[i].frozen)
+                system.stats.movids.push_back(i);
     }
 	paramOverrideCheck(system);
 	if (system.constants.autocenter)

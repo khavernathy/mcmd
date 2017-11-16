@@ -18,6 +18,19 @@ void printEnergies(System &system) {
     return;
 }
 
+int getRandomMovableMolecule(System &system) {
+    // re-do list of movable IDs only if uVT (the vector is defined in main.cpp)   
+    if (system.constants.ensemble == ENSEMBLE_UVT) {
+        system.stats.movids.clear();
+        // get a list of movable IDs
+        for (int i=0; i<system.molecules.size(); i++)
+            if (!system.molecules[i].frozen)
+                system.stats.movids.push_back(i);
+    }
+    // get random id
+    return system.stats.movids[floor(getrand()*(double)system.stats.count_movables)];
+}
+
 void translate(System &system, int molid) {
     double randx,randy,randz;
         	randx = system.constants.displace_factor * (getrand()*2-1);
@@ -275,13 +288,7 @@ void removeMolecule(System &system) {
     double old_potential = system.stats.potential.value; //getTotalPotential(system);
 
     system.checkpoint("getting random movable.");
-    // select random movable molecule
-    int_fast8_t frozen = 1;
-    int randm = -1;
-    while (frozen != 0) {
-            randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozen_molecules;
-            frozen = system.molecules[randm].frozen;
-    }
+    int randm = getRandomMovableMolecule(system);
     system.checkpoint("random movable selected.");
 
     // save a copy of this moleucule.
@@ -321,13 +328,8 @@ void displaceMolecule(System &system) {
 
     if (system.stats.count_movables == 0) return; // skip if no sorbate molecules are in the cell.
     system.stats.displace_attempts++;
-    int_fast8_t frozen=1;
-    int randm = -1;
-    while (frozen != 0) {
-            randm = (rand() % (int)(system.stats.count_movables)) + (int)system.stats.count_frozen_molecules;
-            frozen = system.molecules[randm].frozen;
-    }
-	system.checkpoint("Got the random molecule.");
+	int randm = getRandomMovableMolecule(system);
+    system.checkpoint("Got the random molecule.");
 
     for (int n=0; n<3; n++) tmpcom[n] = system.molecules[randm].com[n];
 
