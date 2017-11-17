@@ -80,9 +80,11 @@ Below is a list of scientific publications/presentations that have been facilita
 
 3. Pham, T., Forrest, K. A., Franz, D. M., Guo, Z., Chen, B., & Space, B. (2017). Predictive models of gas sorption in a metal–organic framework with open-metal sites and small pore sizes. Physical Chemistry Chemical Physics, 19(28), 18587-18602.
 
+4. Pham, T., Forrest, K. A., Franz, D. M., & Space, B. (2017). Experimental and theoretical investigations of the gas adsorption sites in rht-metal-organic frameworks. CrystEngComm, 19, 4646-4665.
+
 <!--
 pending...
-SIFSIX-14-Cu-i paper
+SIFSIX-14-Cu-i paper  -- nope, they didn't add our work.
 MPM-1-TIFSIX paper
 Zn-datzbdc paper
 rht-MOF-9 paper
