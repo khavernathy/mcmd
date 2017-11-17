@@ -1397,12 +1397,12 @@ int getNlocal(System &system, int protoid) {
 }
 
 void initialVelMD(System &system) {
-        double randv; double DEFAULT = 99999.99;
+        double randv;
         int userflag=0, i, n, z, Nlocal;
         double v_init, v_init_AVG;
         
         // user-defined velocities
-        if (system.constants.md_init_vel != DEFAULT) {
+        if (system.constants.md_manual_init_vel) {
             userflag=1;
             for (i=0; i<system.molecules.size(); i++) {
                 for (n=0; n<3; n++) {

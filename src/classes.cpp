@@ -167,7 +167,8 @@ class Constants {
         int_fast8_t md_pbc=1; // PBC in molecular dynamics. default on.
         int_fast8_t md_rotations=1; // MD only, rotational motion (of molecules) on
         int_fast8_t md_translations=1; // MD only, translation motion on
-        double md_init_vel=99999.99; // placeholder value. Will be overwritten. A / fs. User can set. Will be random +- up to this num.
+        int_fast8_t md_manual_init_vel=0; // flag for user-defined initial velocities; default off
+        double md_init_vel=0.; //  A / fs. User can set.
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         int_fast8_t md_mode = MD_MOLECULAR; // default is to keep molecules rigid (bonded)
 		double md_initial_energy_NVE = 0; // NVE first Newtonian energy, for measuring integrator error over time; in K.

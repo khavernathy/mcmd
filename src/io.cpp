@@ -1086,8 +1086,9 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got MD corrtime = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "md_init_vel")) {
+                system.constants.md_manual_init_vel = 1;
                 system.constants.md_init_vel = atof(lc[1].c_str());
-                std::cout << "Got MD initial velocity for all molecules = " << lc[1].c_str(); printf("\n");
+                std::cout << "Got MD initial velocity for all molecules = " << lc[1].c_str() << " A/fs."; printf("\n");
 			} else if (!strcasecmp(lc[0].c_str(), "md_mode")) {
                 if (lc[1] == "atomic")
                     system.constants.md_mode = MD_ATOMIC;
@@ -1560,6 +1561,10 @@ void inputValidation(System &system) {
     }
     if (system.constants.mode == "md" && !system.constants.md_pbc) {
         std::cout << "ERROR: MD mode is on but MD PBC was set off. This feature is not available. (You must have a periodic box for MD). For example, use a huge box with 'manual_cutoff 10`, to get the effect of free space.";
+        exit(EXIT_FAILURE);
+    }
+    if (system.constants.mode == "md" && system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER && system.constants.md_manual_init_vel == 1) {
+        std::cout << "ERROR: You cannot use the Nose-Hoover (default) thermostat in NVT MD with a user-defined initial velocity (initial velocities must be determined automatically for this thermostat). Try deleting the line `md_init_vel XXXXX` in the input.";
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode == "md" && system.constants.md_mode == MD_ATOMIC) {
