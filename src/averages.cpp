@@ -535,7 +535,18 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
         system.stats.heat_capacity.calcNewStats();
     // Frenkel, p85
     } else if (system.constants.ensemble == ENSEMBLE_NVE && system.proto.size() == 1) {
-        system.stats.heat_capacity.value = (system.constants.kb*system.constants.NA/1000.)*(3./(2.*(-2.*(double)system.stats.count_movables*(system.stats.kinetic_sq.average - system.stats.kinetic.average*system.stats.kinetic.average)/(3.*system.stats.temperature.value*system.stats.temperature.value) + 1.)));
+        double kb = system.constants.kb;
+        double kb2 = system.constants.kb*kb;
+        double kb3 = system.constants.kb*kb2;
+        double T = system.stats.temperature.value;
+        double T2 = system.stats.temperature.value*T;
+        double N = (double)system.stats.count_movables;
+        double Kflux = kb2*(system.stats.kinetic_sq.average - system.stats.kinetic.average*system.stats.kinetic.average);     
+
+        system.stats.heat_capacity.value = 4.*N/(9.*kb3*T2);
+        system.stats.heat_capacity.value *= (Kflux - 3.*kb2*T2/(2.*N));
+        system.stats.heat_capacity.value = 1.0/system.stats.heat_capacity.value;
+        system.stats.heat_capacity.value *= system.constants.NA/1000.; // kJ/molK
         system.stats.heat_capacity.calcNewStats();
     }
 
