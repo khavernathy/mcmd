@@ -1398,7 +1398,7 @@ int getNlocal(System &system, int protoid) {
 
 void initialVelMD(System &system) {
         double randv;
-        int userflag=0, i, n, z, Nlocal;
+        int userflag=0, i, n, z;
         double v_init, v_init_AVG;
         
         // user-defined velocities
@@ -1415,10 +1415,11 @@ void initialVelMD(System &system) {
         // thermostat information (and apply init. vel if needed)
         }
         if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN || system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
+            int Nlocal;
             v_init_AVG=0;
             for (z=0; z<system.proto.size(); z++) {   
 
-                Nlocal=getNlocal(system, z);
+                Nlocal = getNlocal(system, z);
                 v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*system.proto[z].dof / system.proto[z].mass);
                 system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
 
