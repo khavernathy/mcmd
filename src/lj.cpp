@@ -203,7 +203,8 @@ void lj_force(System &system) {   // units of K/A
     for (int l =0; l < system.molecules[k].atoms.size(); l++) {
 
         // do mixing rules
-        double eps = system.molecules[i].atoms[j].eps,sig=system.molecules[i].atoms[j].sig;
+        eps = system.molecules[i].atoms[j].eps;
+        sig=system.molecules[i].atoms[j].sig;
         eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
         sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);
 

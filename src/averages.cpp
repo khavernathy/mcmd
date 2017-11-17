@@ -406,9 +406,9 @@ void computeAveragesMDuVT(System &system) {
 double * calculateObservablesMD(System &system) { // the * is to return an array of doubles as a pointer, not just one double
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
-    double avg_v = 0.0, avg_v2=0.0, v_rms=0.0;
+    
     double avg_v_ALL=0;
-	double T=0.0, T_rms=0, pressure=0;
+	double T=0.0, pressure=0;
     double vsq=0., wsq=0.;
     double energy_holder=0.;
 	int i,j,n,z;

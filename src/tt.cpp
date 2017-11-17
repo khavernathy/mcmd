@@ -46,8 +46,6 @@ double tt_damp(int n, double br) {
 double tt(System &system) {
     double potential=0, repulsive=0, attractive = 0;
     double c6,c8,c10,sig,b; // for the pair itself.
-    double A; // leading coefficient for repulsive energy
-    double lrc; // long-range contribution
 
     // energy from atom pairs
     for (int i=0; i<system.molecules.size(); i++) {

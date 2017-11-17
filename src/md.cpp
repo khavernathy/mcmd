@@ -137,7 +137,7 @@ void integrate(System &system, double dt) {
             // TESTING ROTATE-BY-DELTA-THETA INSTEAD OF ROTATE-BY-THETA
             // THIS IS THE BEST SETUP THUS FAR. NVE IS ALMOST CONSERVING AND THE SYSTEM IS SPATIALLY STABLE
             if (system.constants.md_rotations && system.molecules[j].atoms.size() > 1) {
-            for (int n=0;n<3;n++) prevangpos[n] = system.molecules[j].ang_pos[n];
+            for (n=0;n<3;n++) prevangpos[n] = system.molecules[j].ang_pos[n];
             system.molecules[j].calc_ang_pos(dt);
 
             // rotate molecules

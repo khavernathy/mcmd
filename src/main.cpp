@@ -531,7 +531,6 @@ int main(int argc, char **argv) {
 
 	// ===================== MOLECULAR DYNAMICS ==============================================
 	else if (system.constants.mode == "md") {
-        double v_component=0., v_init=0.;
 
         // write initial XYZ
         if (system.constants.xyz_traj_option)
@@ -542,9 +541,8 @@ int main(int argc, char **argv) {
             if (system.constants.pdb_traj_option && system.constants.pdb_bigtraj_option)
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
-
         initialVelMD(system);
-	            // end initial velocities
+	      // end initial velocities
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
