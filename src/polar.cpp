@@ -73,7 +73,7 @@ void zero_out_amatrix(System &system, int N) {
     } else {
         for (i=0;i<3*N;i++) {
             for (j=0;j<3*N;j++) {
-                system.constants.A_matrix_old[i][j]=0;
+                system.constants.A_matrix_full[i][j]=0;
             }
         }
     }
@@ -129,11 +129,11 @@ void thole_resize_matrices(System &system) {
         }
     // full matrix
     } else {
-        for (i=0; i<oldN; i++) free(system.constants.A_matrix_old[i]);
-        free(system.constants.A_matrix_old);
-        system.constants.A_matrix_old = (double **) calloc(N, sizeof(double*));
+        for (i=0; i<oldN; i++) free(system.constants.A_matrix_full[i]);
+        free(system.constants.A_matrix_full);
+        system.constants.A_matrix_full = (double **) calloc(N, sizeof(double*));
         for (i=0; i<N; i++) {
-            system.constants.A_matrix_old[i] = (double *) malloc(N*sizeof(double));
+            system.constants.A_matrix_full[i] = (double *) malloc(N*sizeof(double));
         }
     }
      return;
@@ -181,9 +181,9 @@ void thole_amatrix(System &system) {
         } else {
             for (p=0;p<3;p++) {
                 if (system.molecules[w].atoms[x].polar != 0.0)
-                    system.constants.A_matrix_old[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
+                    system.constants.A_matrix_full[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
                 else
-                    system.constants.A_matrix_old[ii+p][ii+p] = MAXVALUE;
+                    system.constants.A_matrix_full[ii+p][ii+p] = MAXVALUE;
             }
         }
 
@@ -250,10 +250,10 @@ void thole_amatrix(System &system) {
             } else {
                 for (p=0; p<3; p++) {
                     for (q=0; q<3; q++) {
-                        system.constants.A_matrix_old[ii+p][jj+q] = -3.0 * distances[p]*distances[q] * damp2 * ir5;
+                        system.constants.A_matrix_full[ii+p][jj+q] = -3.0 * distances[p]*distances[q] * damp2 * ir5;
                         // additional diagonal term
                         if (p==q)
-                            system.constants.A_matrix_old[ii+p][jj+q] += damp1*ir3;
+                            system.constants.A_matrix_full[ii+p][jj+q] += damp1*ir3;
                     }
                 }
             } // end full matrix
@@ -263,7 +263,7 @@ void thole_amatrix(System &system) {
             if (system.constants.full_A_matrix_option) {
                 for (p=0; p<3; p++) {
                     for (q=0; q<3; q++) {
-                        system.constants.A_matrix_old[jj+p][ii+q] = system.constants.A_matrix_old[ii+p][jj+q];
+                        system.constants.A_matrix_full[jj+p][ii+q] = system.constants.A_matrix_full[ii+p][jj+q];
                     }
                 }
             } // end full matrix

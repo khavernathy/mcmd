@@ -207,7 +207,7 @@ class Constants {
         double polar_rmin = 0; // minimum polarizable distance between atoms, for ranking.
         double **B_matrix, C_matrix[3][3];
         double **A_matrix;
-        double **A_matrix_old; // takes more memory but computations are faster
+        double **A_matrix_full; // takes more memory but computations are faster
         int full_A_matrix_option = 1; // option to enable the full A matrix for polarization
         double polar_precision=0; // dipole precision required during iterative routine
         int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)

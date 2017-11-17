@@ -55,7 +55,7 @@ void contract_dipoles (System &system, int * ranked_array ) {
                         // full matrix computation
                         } else {
                             system.molecules[ti].atoms[tj].efield_induced[p] -=
-                                system.constants.A_matrix_old[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
+                                system.constants.A_matrix_full[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
                         }
                     } // end q
                     // correct old matrix, written out dot prod
@@ -162,7 +162,7 @@ void palmo_contraction (System &system, int * ranked_array ) {
                         // full matrix
                         } else {
                             system.molecules[ti].atoms[tj].efield_induced_change[p] -=
-                                system.constants.A_matrix_old[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
+                                system.constants.A_matrix_full[ii+p][jj+q] * system.molecules[tk].atoms[tl].dip[q];
                         }
 
                     // old correct full A matrix

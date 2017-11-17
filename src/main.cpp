@@ -270,9 +270,9 @@ int main(int argc, char **argv) {
             memreqA = (double)sizeof(double)*((3*system.constants.total_atoms*3*system.constants.total_atoms - 3*system.constants.total_atoms)/2.0)/(double)1e6;
         // full matrix
         } else {
-            system.constants.A_matrix_old = (double **) calloc(N, sizeof(double*));
+            system.constants.A_matrix_full = (double **) calloc(N, sizeof(double*));
             for (int i=0;i<N;i++) {
-                system.constants.A_matrix_old[i] = (double *) malloc(N * sizeof(double));
+                system.constants.A_matrix_full[i] = (double *) malloc(N * sizeof(double));
             }
             memreqA = (double)sizeof(double)* ( N*N )/(double)1e6;
         }
@@ -517,9 +517,9 @@ int main(int argc, char **argv) {
         // full matrix
         } else {
             for (int i=0; i<3*system.constants.total_atoms; i++) {
-                free(system.constants.A_matrix_old[i]);
+                free(system.constants.A_matrix_full[i]);
             }
-            free(system.constants.A_matrix_old); system.constants.A_matrix_old = NULL;
+            free(system.constants.A_matrix_full); system.constants.A_matrix_full = NULL;
         }
     }
     printf("done.\n");
