@@ -63,3 +63,7 @@ saved_data*
 src/gui/*app
 src/gui/Makefile
 src/gui/gui_mcmd.pro.user
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake

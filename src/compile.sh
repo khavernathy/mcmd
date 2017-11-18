@@ -16,6 +16,8 @@
 
 # bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
 
+# bash compile.sh cmake         (compile serial version using cmake. Not recommended for best performance.)
+
 # bash compile.sh gpu           (for a single computer with CUDA compatible GPU installed).
 # bash compile.sh gpu debug     (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe HPC)
@@ -41,6 +43,8 @@ elif [ $1 == "mpi" ]; then
     option="mpi"
 elif [ $1 == "omp" ]; then
     option="omp"
+elif [ $1 == "cmake" ]; then
+    option="cmake"
 else
 echo "Invalid options detected. Not compiling. Read the header comments for compilation examples."
 fi
@@ -101,6 +105,14 @@ elif [[ "$option" == "icpu" ]]; then
     else
         icpc --std=c++11 -fast -unroll-aggressive -O3 -o ../mcmd main.cpp
     fi
+#######################################################################
+elif [[ "$option" == "cmake" ]]; then
+    # cmake serial compilation
+    echo "Using cmake to compile MCMD."
+    cd ..
+    cmake .
+    make
+    cd src
 #######################################################################
 elif [[ "$option" == "mpi" ]]; then
     # MPI compilation
