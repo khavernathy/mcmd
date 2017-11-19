@@ -50,15 +50,23 @@ double tt(System &system) {
     // energy from atom pairs
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-            // skip 0-energy
-            if (system.molecules[i].atoms[j].eps == 0 || system.molecules[i].atoms[j].sig == 0) continue;
-            for (int k=i+1; k<system.molecules.size(); k++) {
+            for (int k=i; k<system.molecules.size(); k++) {
                 for (int l=0; l<system.molecules[k].atoms.size(); l++) {
-                    // skip 0-energy
-                    if (system.molecules[k].atoms[l].eps == 0 || system.molecules[k].atoms[l].sig ==0) continue;
                     // skip frozens
                     if (system.molecules[i].frozen && system.molecules[k].frozen) continue;
                     
+                    // do mixing
+                    c6  = tt_c6(system.molecules[i].atoms[j].c6, system.molecules[k].atoms[l].c6);
+                    c8  = tt_c8(system.molecules[i].atoms[j].c8, system.molecules[k].atoms[l].c8);
+                    c10 = tt_c10(c6,c8);
+                    sig = tt_sigma(system.molecules[i].atoms[j].sig, system.molecules[k].atoms[l].sig);
+                    b   = tt_b(system.molecules[i].atoms[j].eps, system.molecules[k].atoms[l].eps);  
+
+                    // LRC applies to all unique pairs (and should include intramolec.)
+                    if (system.constants.rd_lrc && ((i==k && j<l) || (i<k))   ) {
+                        potential += tt_lrc(system, c6, c8, c10); 
+                    }
+
                     double* distances = getDistanceXYZ(system, i,j,k,l);
                     const double r = distances[3];
                     const double r2 = r*r;
@@ -66,21 +74,13 @@ double tt(System &system) {
                     const double r6 = r4*r2;
                     const double r8 = r6*r2;
                     const double r10 = r8*r2;
-                    if (r <= system.pbc.cutoff) {
-                        printf("r = %f\n", r);
-                        // do mixing
-                        c6  = tt_c6(system.molecules[i].atoms[j].c6, system.molecules[k].atoms[l].c6);
-                        c8  = tt_c8(system.molecules[i].atoms[j].c8, system.molecules[k].atoms[l].c8);
-                        c10 = tt_c10(c6,c8);
-                        sig = tt_sigma(system.molecules[i].atoms[j].sig, system.molecules[k].atoms[l].sig);
-                        b   = tt_b(system.molecules[i].atoms[j].eps, system.molecules[k].atoms[l].eps);  
-                
+                    if (r <= system.pbc.cutoff && i<k) { // not intramolecular
                         repulsive = 315.7750382111558307123944638*exp(-b*(r-sig));
 
                         attractive = -tt_damp(6,b*r)*c6/r6 - tt_damp(8,b*r)*c8/r8 - tt_damp(10,b*r)*c10/r10;
 
                         // total potential from this pair with LRC.
-                        potential += repulsive + attractive; // + tt_lrc(system, c6, c8, c10);
+                        potential += attractive + repulsive;
 
                     }// end if within r_c
 
@@ -88,15 +88,17 @@ double tt(System &system) {
             }// end k
         }// end j
     }// end i
-/*
-    // and calculate self contribution to energy
-    for (int i=0; i<system.molecules.size(); i++) {
-        if (system.molecules[i].frozen) continue; // skip frozen
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-            potential += tt_self(system, i, j);
+
+    // and calculate self LRC contribution to energy if needed.
+    if (system.constants.rd_lrc) {
+        for (int i=0; i<system.molecules.size(); i++) {
+            if (system.molecules[i].frozen) continue; // skip frozen
+            for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                potential += tt_self(system, i, j);
+            }
         }
     }
-*/
+    
     return potential;
 }
 
