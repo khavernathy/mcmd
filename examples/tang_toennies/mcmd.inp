@@ -1,0 +1,12 @@
+mode mc
+name tt
+ensemble nvt
+temperature 298
+steps 0
+mc_corrtime 0
+
+rd_lrc   on
+
+input_atoms ../../atomfiles/acetylene.pqr
+potential_form tt
+carbasis 60 60 60 90 90 90
