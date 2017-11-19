@@ -1,9 +1,14 @@
+! Douglas Franz, Space group, USF, 2017
+! Using the Tang-Toennies potential for MC simulation
+! This is a big box of acetylene molecules parametrized 
+! using the Tang-Toennies potential.
+
 mode mc
 name tt
 ensemble nvt
 temperature 298
-steps 0
-mc_corrtime 0
+steps 1000
+mc_corrtime 10
 
 rd_lrc   on
 
