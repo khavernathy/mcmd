@@ -74,7 +74,8 @@ double tt(System &system) {
                     const double r6 = r4*r2;
                     const double r8 = r6*r2;
                     const double r10 = r8*r2;
-                    if (r <= system.pbc.cutoff && i<k) { // not intramolecular
+                    //if (r <= system.pbc.cutoff && i<k) { // not intramolecular
+                    if (i<k) { // test MPMC
                         repulsive = 315.7750382111558307123944638*exp(-b*(r-sig));
 
                         attractive = -tt_damp(6,b*r)*c6/r6 - tt_damp(8,b*r)*c8/r8 - tt_damp(10,b*r)*c10/r10;
