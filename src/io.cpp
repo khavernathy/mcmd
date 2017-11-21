@@ -1039,7 +1039,7 @@ void readInput(System &system, char* filename) {
 				system.constants.stepsize = atoi(lc[1].c_str());
 				std::cout << "Got step size = " << lc[1].c_str(); printf("\n");
 
-			} else if (!strcasecmp(lc[0].c_str(), "finalstep") || !strcasecmp(lc[0].c_str(), "steps")) {
+			} else if (!strcasecmp(lc[0].c_str(), "finalstep") || !strcasecmp(lc[0].c_str(), "steps") || !strcasecmp(lc[0].c_str(), "numsteps")) {
 				system.constants.finalstep = atoi(lc[1].c_str());
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
 
