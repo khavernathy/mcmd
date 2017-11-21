@@ -1183,7 +1183,7 @@ void readInput(System &system, char* filename) {
 				system.constants.pres = atof(lc[1].c_str());
 				std::cout << "Got pressure = " << lc[1].c_str() << " atm"; printf("\n");
 
-			} else if (!strcasecmp(lc[0].c_str(), "insert_factor")) {
+			} else if (!strcasecmp(lc[0].c_str(), "insert_factor") || !strcasecmp(lc[0].c_str(), "insert_probability")) {
 				system.constants.insert_factor = atof(lc[1].c_str());
 				std::cout << "Got insert/delete factor = " << lc[1].c_str(); printf("\n");
 
