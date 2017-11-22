@@ -53,9 +53,11 @@ void calculateForces(System &system, double dt) {
         else {
             if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
                 lj_force(system);
-            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
+            else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
+                tt_forces(system);
+            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
                 coulombic_real_force(system);
-            if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+            if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
                 polarization_force(system);
         } // end if PBC
     // GPU style
