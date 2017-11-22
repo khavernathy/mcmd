@@ -143,6 +143,8 @@ void tt_forces(System &system) {
                     //if (r <= system.pbc.cutoff && i<k) { // not intramolecular
                     if (i<k) { // not intramolecular 
                         for (int q=0; q<3; q++) { // 3 DIMS
+                            holder = 0;
+
                             // repulsion force
                             holder += 315.7750382111558307123944638*b*distances[q]*exp(b*sig)*exp(-b*r)/r;
 
