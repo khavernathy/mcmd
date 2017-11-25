@@ -344,7 +344,7 @@ void moleculePrintout(System &system) {
     }
     */
 
-    if (system.constants.mode == "mc" || system.constants.mode == "md") { // prototypes will be considered for MC and MD (for multisorb stuff)  
+    if (system.constants.mode == "mc" || system.constants.mode == "md" || system.constants.mode == "sp") { // prototypes will be considered for MC and MD (for multisorb stuff)  
     // CHANGE THE PROTOTYPE IF USER SUPPLIED A KEYWORD IN INPUT
     // THIS WILL OVERWRITE ANY PROTOTYPE IN THE INPUT ATOMS FILE if user put it there, e.g. whatever.pdb
         if (system.constants.sorbate_name.size() > 0) {

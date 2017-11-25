@@ -43,10 +43,16 @@ void singlePointEnergy(System &system) {
         ax = x-comx; ay = y-comy; az=z-comz;
         a2 = ax*ax + ay*ay + az*az;
 
-        // dipole
+        // dipole 
+        
         multipole1[0] += q*ax;
         multipole1[1] += q*ay;
         multipole1[2] += q*az;
+        /*    
+        multipole1[0] += q*x;
+        multipole1[1] += q*y;
+        multipole1[2] += q*z;
+        */
 
         // quadrupole
         multipole2[0] += q*(1.5*(ax*ax) - 0.5*(a2));

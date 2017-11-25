@@ -1532,8 +1532,10 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode=="sp" && system.molecules.size() != 1) {
-        std::cout << "ERROR: You asked for a single-point energy but the input has multiple molecules. Make sure only 1 molecule is in your input. If you want energy for multiple molecules just use `mode mc` with `steps 0` and `mc_corrtime 0`."; printf("\n");
-        exit(EXIT_FAILURE);
+        if (system.proto.size() != 1) {
+            std::cout << "ERROR: You asked for a single-point energy but the input does not have 1 molecule. Make sure only 1 molecule is in your input atoms file, or use `sorbate_name h2o_tip4p`, for example. If you want energy for multiple molecules just use `mode mc` with `steps 0` and `mc_corrtime 0`."; printf("\n");
+            exit(EXIT_FAILURE);
+        }
     }
     if (system.constants.mode != "sp" && (e != ENSEMBLE_NPT && e != ENSEMBLE_NVT && e != ENSEMBLE_UVT && e != ENSEMBLE_NVE)) {
         std::cout << "ERROR: No ensemble specified. Use   ensemble uvt   , for example." << endl;
