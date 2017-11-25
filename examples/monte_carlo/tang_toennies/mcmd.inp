@@ -4,7 +4,7 @@
 ! using the Tang-Toennies potential.
 
 mode mc
-name tt
+name tang_toennies_example
 ensemble nvt
 temperature 298
 steps 1000
@@ -12,6 +12,7 @@ mc_corrtime 10
 
 rd_lrc   on
 
-input_atoms ../../atomfiles/acetylene.pqr
-potential_form tt
+input_atoms ../../../atomfiles/acetylene.pqr
+potential_form ttes
+ewald_kmax 4
 carbasis 60 60 60 90 90 90
