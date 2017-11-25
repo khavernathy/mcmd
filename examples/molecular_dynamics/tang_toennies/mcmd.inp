@@ -7,8 +7,8 @@ mode md
 name tang_toennies_example
 ensemble nvt
 temperature 298
-steps 1000
-mc_corrtime 10
+md_dt 1
+md_ft 100 ps
 
 rd_lrc   on
 
