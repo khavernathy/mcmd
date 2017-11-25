@@ -50,6 +50,7 @@
     #include "cudafuncs.cu"  // CUDA STUFF
 #endif
 #include "md.cpp"
+#include "sp.cpp"
 #include "io.cpp"
 #include "radial_dist.cpp"
 #include "averages.cpp"
@@ -770,5 +771,17 @@ int main(int argc, char **argv) {
         } // end if corrtime (quite sure.)
 		count_md_steps++;
 	} // end MD timestep loop
-	} // end if MD i.e. not MC (quite sure.)
+	} // end if MD
+
+    // SINGLE-POINT ENERGY MODE
+    else if (system.constants.mode == "sp") {
+        printf("\n| ==================================== |\n");
+	    printf("|  BEGINNING SINGLE POINT CALCULATION  |\n");
+	    printf("| ==================================== |\n\n");
+
+        singlePointEnergy(system); 
+        
+
+    } // end if Single-Point mode (not md or mc)
+
 } // end main()

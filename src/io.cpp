@@ -1527,11 +1527,15 @@ void inputValidation(System &system) {
     // get errors because the user is a noob
     
     int e = system.constants.ensemble;
-    if (system.constants.mode != "mc" && system.constants.mode != "md") {
-        std::cout << "ERROR: No mode specified. Use   mode mc  --or--  mode md." << endl;
+    if (system.constants.mode != "mc" && system.constants.mode != "md" && system.constants.mode != "sp") {
+        std::cout << "ERROR: No mode specified. Use   mode mc  --or--  mode md --or-- mode sp." << endl;
         exit(EXIT_FAILURE);
     }
-    if (e != ENSEMBLE_NPT && e != ENSEMBLE_NVT && e != ENSEMBLE_UVT && e != ENSEMBLE_NVE) {
+    if (system.constants.mode=="sp" && system.molecules.size() != 1) {
+        std::cout << "ERROR: You asked for a single-point energy but the input has multiple molecules. Make sure only 1 molecule is in your input. If you want energy for multiple molecules just use `mode mc` with `steps 0` and `mc_corrtime 0`."; printf("\n");
+        exit(EXIT_FAILURE);
+    }
+    if (system.constants.mode != "sp" && (e != ENSEMBLE_NPT && e != ENSEMBLE_NVT && e != ENSEMBLE_UVT && e != ENSEMBLE_NVE)) {
         std::cout << "ERROR: No ensemble specified. Use   ensemble uvt   , for example." << endl;
         exit(EXIT_FAILURE);
     }
@@ -1539,7 +1543,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: Monte carlo was activated but you need to specify finalstep, e.g.  finalstep 100000" << endl;
         exit(EXIT_FAILURE);
     }
-    if ((e == ENSEMBLE_UVT || e == ENSEMBLE_NPT || e == ENSEMBLE_NVT ) && system.constants.temp == 0) {
+    if (system.constants.mode != "sp" && ((e == ENSEMBLE_UVT || e == ENSEMBLE_NPT || e == ENSEMBLE_NVT ) && system.constants.temp == 0)) {
         std::cout << "ERROR: You specified an ensemble with constant T but didn't supply T (or you set T=0)." << endl;
         exit(EXIT_FAILURE);
     }
@@ -1582,7 +1586,7 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     // charge sum check
-    if (system.constants.charge_sum_check) {
+    if (system.constants.charge_sum_check && system.constants.mode != "sp") {
     double qsum=0;
     for (int i=0; i<system.molecules.size(); i++)
         for (int j=0; j<system.molecules[i].atoms.size(); j++) 
