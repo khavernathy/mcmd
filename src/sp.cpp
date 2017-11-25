@@ -88,19 +88,22 @@ void singlePointEnergy(System &system) {
     for (n=0; n<6; n++)
         multipole2[n] *= system.constants.eA2D;
 
-    printf("Multipole 0 (total charge)\n");
-    printf("{ %9.5f   } e\n\n", multipole0);
+    for (n=0; n<18; n++)
+        o[n] *= system.constants.eA2D;
 
-    printf("Multipole 1 (dipole moment)\n");
-    printf("{ %9.5f %9.5f %9.5f   } Debye\n", multipole1[0], multipole1[1], multipole1[2]);
-    printf("(dipole magnitude)  = { %9.5f   } Debye\n\n", dipole_magnitude);
+    printf("Multipole 0 (total charge), e\n");
+    printf("{ %9.5f   } \n\n", multipole0);
+
+    printf("Multipole 1 (dipole moment), Debye\n");
+    printf("{ %9.5f %9.5f %9.5f   } \n", multipole1[0], multipole1[1], multipole1[2]);
+    printf("(dipole magnitude)  = { %9.5f   } \n\n", dipole_magnitude);
     
-    printf("Multipole 2 (quadrupole moment)\n");
-    printf("{ %9.5f %9.5f %9.5f   } Debye A\n", multipole2[0], multipole2[3], multipole2[4]);
-    printf("{ %9.5f %9.5f %9.5f   } Debye A\n", multipole2[3], multipole2[1], multipole2[5]);
-    printf("{ %9.5f %9.5f %9.5f   } Debye A\n\n", multipole2[4], multipole2[5], multipole2[2]);
+    printf("Multipole 2 (quadrupole moment), Debye A\n");
+    printf("{ %9.5f %9.5f %9.5f   } \n", multipole2[0], multipole2[3], multipole2[4]);
+    printf("{ %9.5f %9.5f %9.5f   } \n", multipole2[3], multipole2[1], multipole2[5]);
+    printf("{ %9.5f %9.5f %9.5f   } \n\n", multipole2[4], multipole2[5], multipole2[2]);
 
-    printf("Multipole 3 (octapole moment)\n");
+    printf("Multipole 3 (octapole moment), Debye A^2\n");
     printf("{ %9.5f %9.5f %9.5f\n", o[0], o[9], o[10]);
     printf("{ %9.5f %9.5f %9.5f\n", o[9], o[1], o[11]);
     printf("{ %9.5f %9.5f %9.5f\n", o[10], o[11], o[2]);
