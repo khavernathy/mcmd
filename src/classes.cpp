@@ -908,7 +908,7 @@ Constants::Constants() {
     K2KJMOL = kb*NA/1000; // K -> kJ/mol
     HBARC = 22898848.135746032; // in K*A
     vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
-    eA2D = 1./0.20819434; // eA * this = Debye
+    eA2D = 1./0.20819434; // eA * this = Debye; or eA^2 * this = Debye*A, etc.
     au2D = 2.5411968777103207; // au * this = Debye
 
     // ATOM DEFAULTS LIBRARY

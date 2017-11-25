@@ -1551,7 +1551,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You specified MD mode but selected an incompatible ensemble. MD supports uVT, NVT and NVE only." << endl;
         exit(EXIT_FAILURE);
     }
-    if (system.pbc.a == 0 && system.pbc.b == 0 && system.pbc.c == 0 && system.pbc.alpha == 0 && system.pbc.beta ==0 && system.pbc.gamma == 0) {
+    if (system.constants.mode != "sp" && (system.pbc.a == 0 && system.pbc.b == 0 && system.pbc.c == 0 && system.pbc.alpha == 0 && system.pbc.beta ==0 && system.pbc.gamma == 0)) {
         std::cout << "ERROR: You didn't supply a basis to build the box. Even simulations with no PBC need a box." << endl;
         exit(EXIT_FAILURE);
     }
@@ -1621,7 +1621,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You turned the crystal-builder on but did not specify a (correct) dimension to duplicate. e.g., `crystalbuild_y 2` is acceptable but `crystalbuild_y 0` is not. Leave the option off if you don't want to use it. (i.e. x y z are set to 1 by default).";
         exit(EXIT_FAILURE);
     }
-    if (e == ENSEMBLE_UVT && system.stats.count_movables <= 0 && system.constants.sorbate_name.size() ==0) {
+    if (system.constants.mode!="sp" && e == ENSEMBLE_UVT && system.stats.count_movables <= 0 && system.constants.sorbate_name.size() ==0) {
         std::cout << "ERROR: You specified uVT with a system containing no movable molecules and did not specify a desired sorbate. Try `sorbate_name h2_bssp`, for example.";
         exit(EXIT_FAILURE);
     }
