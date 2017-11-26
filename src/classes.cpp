@@ -76,7 +76,8 @@ class Constants {
 		Constants();
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
             ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED,
-            DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC, vand2mpmc, eA2D, au2D; // all defined below.
+            DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC, vand2mpmc, eA2D, au2D,
+            K2Eh; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md"
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
@@ -252,7 +253,8 @@ class Pbc {
         double x_min,x_max,y_min,y_max,z_min,z_max;
         double basis[3][3];
         double reciprocal_basis[3][3];
-		double cutoff=0.;
+		double cutoff=0.; // to truncate long-range interactions
+        double mincutoff=2.55; // to neglect close-range interactions (in Single-Point calc)
         double volume, inverse_volume, old_volume;
         double a=0, b=0, c=0, alpha=0, beta=0, gamma=0;
         double box_vertices[8][3];
@@ -910,6 +912,7 @@ Constants::Constants() {
     vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
     eA2D = 1./0.20819434; // eA * this = Debye; or eA^2 * this = Debye*A, etc.
     au2D = 2.5411968777103207; // au * this = Debye
+    K2Eh = 0.0000032; // K * this = Hartrees
 
     // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle

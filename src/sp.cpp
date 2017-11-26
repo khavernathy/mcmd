@@ -11,7 +11,7 @@ using namespace std;
 
 void singlePointEnergy(System &system) {
 
-    int i; // atom id
+    int i,j; // atom id
     int n; // dimensions
     double q, x, y, z, comx, comy, comz, ax,ay,az,a2; // temporary charge holder, pos. vector
     double multipole0 = 0; // charge sum
@@ -121,6 +121,45 @@ void singlePointEnergy(System &system) {
     printf("                                                                  %9.5f %9.5f %9.5f }\n\n", o[16], o[17], o[8]);
 
 
+    double r, potential, sig, eps, sr6;
+    double lj,es;
+    // LJ RD
+    for (i=0; i<system.molecules[0].atoms.size(); i++) {
+        for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
+            sig = lj_lb_sig(system.molecules[0].atoms[i].sig, system.molecules[0].atoms[j].sig);
+            eps = lj_lb_eps(system.molecules[0].atoms[i].eps, system.molecules[0].atoms[j].eps);
+            if (sig == 0 || eps == 0) continue;
+            double* distances = getDistanceXYZ(system, 0,i,0,j);
+            r = distances[3];
+
+            if (r >= system.pbc.mincutoff) {
+                sr6 = sig/r;
+                sr6 *= sr6;
+                sr6 *= sr6*sr6;
+                lj += 4.0*eps*(sr6*sr6 - sr6);
+            } // end if r >= rmin
+        } // end j
+    } // end i
+
+    double chargeprod;
+    // ES
+    for (i=0; i<system.molecules[0].atoms.size(); i++) {
+        for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
+            chargeprod = system.molecules[0].atoms[i].C * system.molecules[0].atoms[j].C;
+
+            if (!chargeprod) continue;
+
+            double* distances = getDistanceXYZ(system,0,i,0,j);
+            r = distances[3];
+            if (1) { //system.pbc.mincutoff) {
+               es += chargeprod/r;
+            }
+        }
+    } 
+
+    potential=lj+es;
+    printf("LJ = %f K; ES = %f K\n", lj,es);
+    printf("Total Energy = %9.5f K\n             = %9.5f Eh\n", potential, potential*system.constants.K2Eh);
 
     return;
 }
