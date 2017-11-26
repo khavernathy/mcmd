@@ -121,8 +121,10 @@ void singlePointEnergy(System &system) {
     printf("                                                                  %9.5f %9.5f %9.5f }\n\n", o[16], o[17], o[8]);
 
 
-    double r, potential, sig, eps, sr6;
-    double lj,es;
+    system.constants.all_pbc=0; // force no PBC
+    double r, potential=0, sig, eps, sr6;
+    double lj=0,es=0;
+    
     // LJ RD
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
@@ -131,7 +133,6 @@ void singlePointEnergy(System &system) {
             if (sig == 0 || eps == 0) continue;
             double* distances = getDistanceXYZ(system, 0,i,0,j);
             r = distances[3];
-
             if (r >= system.pbc.mincutoff) {
                 sr6 = sig/r;
                 sr6 *= sr6;
@@ -152,14 +153,14 @@ void singlePointEnergy(System &system) {
             double* distances = getDistanceXYZ(system,0,i,0,j);
             r = distances[3];
             if (1) { //system.pbc.mincutoff) {
-               es += chargeprod/r;
+                es += chargeprod/r;
             }
         }
     } 
 
     potential=lj+es;
-    printf("LJ = %f K; ES = %f K\n", lj,es);
-    printf("Total Energy = %9.5f K\n             = %9.5f Eh\n", potential, potential*system.constants.K2Eh);
+    //printf("LJ = %f K; ES = %f K\n", lj,es);
+    printf("Total Energy = %9.5f K\n             = %9.5f Eh\n             = %9.5f kJ/mol\n", potential, potential*system.constants.K2Eh, potential*system.constants.K2KJMOL);
 
     return;
 }
