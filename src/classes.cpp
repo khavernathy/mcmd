@@ -916,7 +916,7 @@ Constants::Constants() {
     vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
     eA2D = 1./0.20819434; // eA * this = Debye; or eA^2 * this = Debye*A, etc.
     au2D = 2.5411968777103207; // au * this = Debye
-    K2Eh = 0.0000032; // K * this = Hartrees
+    K2Eh = 1.0/3.1577513e5;//   0.0000032; // K * this = Hartrees
     bohr = 0.529177; // Bohr radius a_B in Angstroms
 
     // ATOM DEFAULTS LIBRARY
