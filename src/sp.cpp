@@ -9,6 +9,11 @@ using namespace std;
  * Functions for single-point energy of a given molecule
 */
 
+double avgr(double r) {
+    // returns sqrt(<r^2>) of a sphere with radius r.
+    return sqrt(3./5.*r*r);
+}
+
 void singlePointEnergy(System &system) {
 
     int i,j; // atom id
@@ -179,6 +184,7 @@ void singlePointEnergy(System &system) {
     // THIS ASSUMES NEUTRALITY OF THE MOLECULE
     double elec=0, negi, posj;
     double bohr = system.constants.bohr;
+    double reducefactor;
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         for (j=0; j<system.molecules[0].atoms.size(); j++) {
             Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
@@ -189,8 +195,16 @@ void singlePointEnergy(System &system) {
             double* distances = getDistanceXYZ(system,0,i,0,j);
             r = distances[3];
 
-            if (i==j) elec += 0.5*(negi*posj/bohr); // b/c this will be double-counted; approx as bohr
-            else elec += negi*posj/r;
+            if (i==j) {
+                // 1 - (x-1)/x is a decreasing factor from 1 to 0, for Hydrogen, this factor is 1,
+                // for large elements, it is closer to zero.
+                // we use this to reduce the effective average distance between electrons within atoms.
+                double Ni = (double)system.constants.elements[system.molecules[0].atoms[i].name];
+                reducefactor = 1.0 - (Ni - 1.0)/Ni;
+                double radius = system.constants.radii[system.molecules[0].atoms[i].name];
+                r = avgr(radius);
+                elec += (negi*posj/r); //  approx r as fraction of bohr radius
+            } else elec += negi*posj/r;
 
 
         }
@@ -204,7 +218,17 @@ void singlePointEnergy(System &system) {
         Ninteracts = (Ni*Ni - Ni)/2.;
         elecrepul += system.constants.E2REDUCED*-1*system.constants.E2REDUCED*-1*Ninteracts;
     }
-    
+    // now contributions from elec's on different atoms
+    for (i=0; i<system.molecules[0].atoms.size(); i++) {
+        for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
+            Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
+            Zj = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[j].name];
+            double* distances = getDistanceXYZ(system, 0,i,0,j);
+            r = distances[3];
+            elecrepul += Zi*Zj/r;
+        
+        }
+    }    
 
 
     double toh = system.constants.K2Eh;

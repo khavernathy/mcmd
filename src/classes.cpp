@@ -134,6 +134,8 @@ class Constants {
 		map <string,double> phast2_c6; map <string,double> phast2_c8; map <string,double> phast2_c10; map <string,double> phast2_sigs; map <string,double> phast2_eps; map <string,double> phast2_polar; // phast2 defaults
 		map <string,double> polars; // polarizability database for defaults. Mostly vanD. Defined below
         map <string,double> elements; // H:1 ; He:2 ; etc.
+        map <string,double> radii;
+
         int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
         int polars_vand=0; // 1 would defaul all atoms to van Duijnen polarizablitiy parameters
 
@@ -1363,6 +1365,7 @@ eps["Lr"] = 0.011/kbk;
 	phast2_eps["He"] = 4.49880*kb; // K -> J
 	phast2_polar["He"] = 0.20494*cV/ke; // A^3 -> m^3 -> C^2 m^2 / J
 
+// ATOMIC NUMBERS Z (proton count)
 elements["H"] = 1.0;
 elements["He"] = 2.0;
 elements["Li"] = 3.0;
@@ -1472,4 +1475,102 @@ elements["Sg"] = 106.0;
 elements["Bh"] = 107.0;
 elements["Hs"] = 108.0;
 elements["Mt"] = 109.0;
+
+// ATOMIC RADII (VDW RADII) in Angstroms
+// http://www.crystalmaker.com/support/tutorials/crystalmaker/atomic-radii/index.html
+// E Clementi, D L Raimondi, W P Reinhardt (1963) J Chem Phys. 38:2686.
+radii["H"] = 0.53;
+radii["He"] = 0.31;
+radii["Li"] = 1.67;
+radii["Be"] = 1.12;
+radii["B"] = 0.87;
+radii["C"] = 0.67;
+radii["N"] = 0.56;
+radii["O"] = 0.48;
+radii["F"] = 0.42;
+radii["Ne"] = 0.38;
+radii["Na"] = 1.9;
+radii["Mg"] = 1.45;
+radii["Al"] = 1.18;
+radii["Si"] = 1.11;
+radii["P"] = 0.98;
+radii["S"] = 0.88;
+radii["Cl"] = 0.79;
+radii["Ar"] = 0.71;
+radii["K"] = 2.43;
+radii["Ca"] = 1.94;
+radii["Sc"] = 1.84;
+radii["Ti"] = 1.76;
+radii["V"] = 1.71;
+radii["Cr"] = 1.66;
+radii["Mn"] = 1.61;
+radii["Fe"] = 1.56;
+radii["Co"] = 1.52;
+radii["Ni"] = 1.49;
+radii["Cu"] = 1.45;
+radii["Zn"] = 1.42;
+radii["Ga"] = 1.36;
+radii["Ge"] = 1.25;
+radii["As"] = 1.14;
+radii["Se"] = 1.03;
+radii["Br"] = 0.94;
+radii["Kr"] = 0.88;
+radii["Rb"] = 2.65;
+radii["Sr"] = 2.19;
+radii["Y"] = 2.12;
+radii["Zr"] = 2.06;
+radii["Nb"] = 1.98;
+radii["Mo"] = 1.9;
+radii["Tc"] = 1.83;
+radii["Ru"] = 1.78;
+radii["Rh"] = 1.73;
+radii["Pd"] = 1.69;
+radii["Ag"] = 1.65;
+radii["Cd"] = 1.61;
+radii["In"] = 1.56;
+radii["Sn"] = 1.45;
+radii["Sb"] = 1.33;
+radii["Te"] = 1.23;
+radii["I"] = 1.15;
+radii["Xe"] = 1.08;
+radii["Cs"] = 2.98;
+radii["Ba"] = 2.53;
+radii["La"] = 1.95;
+radii["Ce"] = 1.85;
+radii["Pr"] = 2.47;
+radii["Nd"] = 2.06;
+radii["Pm"] = 2.05;
+radii["Sm"] = 2.38;
+radii["Eu"] = 2.31;
+radii["Gd"] = 2.33;
+radii["Tb"] = 2.25;
+radii["Dy"] = 2.28;
+radii["Ho"] = 2.26;
+radii["Er"] = 2.26;
+radii["Tm"] = 2.22;
+radii["Yb"] = 2.22;
+radii["Lu"] = 2.17;
+radii["Hf"] = 2.08;
+radii["Ta"] = 2;
+radii["W"] = 1.93;
+radii["Re"] = 1.88;
+radii["Os"] = 1.85;
+radii["Ir"] = 1.8;
+radii["Pt"] = 1.77;
+radii["Au"] = 1.74;
+radii["Hg"] = 1.71;
+radii["Tl"] = 1.56;
+radii["Pb"] = 1.54;
+radii["Bi"] = 1.43;
+radii["Po"] = 1.35;
+radii["At"] = 1.27;
+radii["Rn"] = 1.2;
+radii["Ac"] = 1.95;
+radii["Th"] = 1.8;
+radii["Pa"] = 1.8;
+radii["U"] = 1.75;
+radii["Np"] = 1.75;
+radii["Pu"] = 1.75;
+radii["Am"] = 1.75;
+
 }
