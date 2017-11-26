@@ -125,6 +125,7 @@ void singlePointEnergy(System &system) {
     double r, potential=0, sig, eps, sr6;
     double lj=0,es=0;
     
+    // Repulsion-Dispersion from long-range (non-bonded)
     // LJ RD
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
@@ -142,6 +143,7 @@ void singlePointEnergy(System &system) {
         } // end j
     } // end i
 
+    // Coulombic interactions
     double chargeprod;
     // ES
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
@@ -158,9 +160,62 @@ void singlePointEnergy(System &system) {
         }
     } 
 
-    potential=lj+es;
-    //printf("LJ = %f K; ES = %f K\n", lj,es);
-    printf("Total Energy = %9.5f K\n             = %9.5f Eh\n             = %9.5f kJ/mol\n", potential, potential*system.constants.K2Eh, potential*system.constants.K2KJMOL);
+    // Nuclear repulsions
+    double nucrepul=0;
+    double Zi, Zj, qi, qj; // atomic num's
+    for (i=0; i<system.molecules[0].atoms.size(); i++) {
+        for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
+            Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
+            Zj = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[j].name];
+            
+            double* distances = getDistanceXYZ(system,0,i,0,j);
+            r = distances[3];
+
+            nucrepul += (Zi)*(Zj)/r;
+        }
+    }
+
+    // Electron-nucleus attractions
+    // THIS ASSUMES NEUTRALITY OF THE MOLECULE
+    double elec=0, negi, posj;
+    double bohr = system.constants.bohr;
+    for (i=0; i<system.molecules[0].atoms.size(); i++) {
+        for (j=0; j<system.molecules[0].atoms.size(); j++) {
+            Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
+            Zj = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[j].name];
+            negi = -Zi;
+            posj = Zj;
+
+            double* distances = getDistanceXYZ(system,0,i,0,j);
+            r = distances[3];
+
+            if (i==j) elec += 0.5*(negi*posj/bohr); // b/c this will be double-counted; approx as bohr
+            else elec += negi*posj/r;
+
+
+        }
+    }
+
+    double elecrepul=0; double Ni; double Ninteracts;
+    // each atom's electrons repel their local neighbors (on the same atom)
+    // THIS ASSUMES NEUTRALITY OF THE MOLECULE
+    for (i=0; i<system.molecules[0].atoms.size(); i++) {
+        Ni = (double)system.constants.elements[system.molecules[0].atoms[i].name];
+        Ninteracts = (Ni*Ni - Ni)/2.;
+        elecrepul += system.constants.E2REDUCED*-1*system.constants.E2REDUCED*-1*Ninteracts;
+    }
+    
+
+
+    double toh = system.constants.K2Eh;
+    potential = lj + es + nucrepul + elec + elecrepul;
+   
+    printf("========================================================================================\n"); 
+    printf("The below is a very crude, non quantum-mechanical approximation to the molecular energy:\n\n");
+    
+    printf("LJ RD (>= %f)  = %f Eh;\nES                   = %f Eh\nNuc. Repul.          = %f Eh\nElectronic Disp.     = %f Eh\nElectronic Repul.    = %f Eh\n\n", system.pbc.mincutoff, lj*toh, es*toh, nucrepul*toh, elec*toh, elecrepul*toh);
+    
+    printf("Total Energy         = %9.5f Eh\n                     = %9.5f K\n                     = %9.5f kJ/mol\n", potential*system.constants.K2Eh, potential, potential*system.constants.K2KJMOL);
 
     return;
 }

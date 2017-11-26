@@ -1451,6 +1451,14 @@ void consolidatePDBIDs(System &system) {
                     atom_counter++;
                 } // end loop j
                 molec_counter++;
-            } // end loop i
-            
+            } // end loop i            
+}
+
+int getNElectrons(System &system, int molid) {
+    int i;
+    int numelec=0;
+    for (i=0; i < system.molecules[molid].atoms.size(); i++) {
+         numelec += system.constants.elements[system.molecules[molid].atoms[i].name];
+    }
+    return numelec - system.constants.user_charge; // so if user says it's +2, we remove those.
 }

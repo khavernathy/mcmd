@@ -77,7 +77,7 @@ class Constants {
 		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
             ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED,
             DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC, vand2mpmc, eA2D, au2D,
-            K2Eh; // all defined below.
+            K2Eh, bohr; // all defined below.
 		string jobname="default_jobname";
         string mode; // "mc" or "md"
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
@@ -244,6 +244,9 @@ class Constants {
         double frag_bondlength = 2.1; // Angstroms, default.
 
         int write_lammps = 0; // option to write out LAMMPS input files 
+
+        // single-point calculations
+        int user_charge=0; // molecular charge for single point calc's
 };
 
 class Pbc {
@@ -914,6 +917,7 @@ Constants::Constants() {
     eA2D = 1./0.20819434; // eA * this = Debye; or eA^2 * this = Debye*A, etc.
     au2D = 2.5411968777103207; // au * this = Debye
     K2Eh = 0.0000032; // K * this = Hartrees
+    bohr = 0.529177; // Bohr radius a_B in Angstroms
 
     // ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle

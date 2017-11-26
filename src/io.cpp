@@ -864,7 +864,11 @@ void readInput(System &system, char* filename) {
                 system.constants.cuda_block_size = atoi(lc[1].c_str());
                 std::cout << "Got cuda block size (threads per block) = " << lc[1].c_str(); printf("\n");
 
-			} else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
+            } else if (!strcasecmp(lc[0].c_str(), "charge")) {
+                system.constants.user_charge = atoi(lc[1].c_str());
+                std::cout << "Got user-input charge = " << lc[1].c_str() << " e"; printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
                 if (lc[1] == "nvt") {
                     system.constants.ensemble = ENSEMBLE_NVT;
                     system.constants.ensemble_str = "NVT";
