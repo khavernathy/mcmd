@@ -202,7 +202,7 @@ void singlePointEnergy(System &system) {
                 double Ni = (double)system.constants.elements[system.molecules[0].atoms[i].name];
                 reducefactor = 1.0 - (Ni - 1.0)/Ni;
                 double radius = system.constants.radii[system.molecules[0].atoms[i].name];
-                r = avgr(radius);
+                r = avgr(radius);//*reducefactor;
                 elec += (negi*posj/r); //  approx r as fraction of bohr radius
             } else elec += negi*posj/r;
 
