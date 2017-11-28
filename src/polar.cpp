@@ -553,3 +553,8 @@ void polarization_force(System &system) {
     } // end loop j atoms in i
     } // end loop i molecules
 } // end polarization forces function
+
+
+void get_long_range_polarization()
+{
+}

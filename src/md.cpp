@@ -179,6 +179,11 @@ void integrate(System &system, double dt) {
             if (!system.molecules[j].frozen) {
             for (i=0; i<system.molecules[j].atoms.size(); i++) {
                 system.molecules[j].atoms[i].calc_pos(dt);
+                /*
+                 * TODO: apply constraints
+                 * within atom class
+                 * can call local map of all bonds
+                 */
             }
             }
         }
