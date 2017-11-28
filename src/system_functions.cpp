@@ -480,7 +480,24 @@ void moleculePrintout(System &system) {
                 addAtomToProto(system,i, "N2E", "N2", "M", -0.550, 0.0, 0.0, 14.0067, -0.482, 0.0, 36.0, 3.31);
                 system.proto[i].name = "N2";
                 system.proto[i].dof = 5;
+            } else if (sorbmodel == "n2_nonpolar") {
+                addAtomToProto(system,i,"N2G", "N2", "M", 0.000,   0.000,   0.000,  0.00000,  1.04742,  0.00000, 17.60293,  3.44522);
+                addAtomToProto(system,i,"N2E", "N2", "M", 0.549,   0.000,   0.000, 14.00670, -0.52371,  0.00000,  0.00000,  0.00000);
+                addAtomToProto(system,i,"N2E", "N2", "M", -0.549,   0.000,   0.000, 14.00670, -0.52371,  0.00000,  0.00000,  0.00000);
+                addAtomToProto(system,i,"N2N", "N2", "M", 0.738,   0.000,   0.000,  0.00000,  0.00000,  0.00000, 18.12772,  3.15125);
+                addAtomToProto(system,i,"N2N", "N2", "M", -0.738,   0.000,   0.000,  0.00000,  0.00000,  0.00000, 18.12772,  3.15125);
+                system.proto[i].name = "N2";
+                system.proto[i].dof = 5;
+            } else if (sorbmodel == "n2_polar") {
+                addAtomToProto(system,i,"N2G", "N2", "M", 0.192, 1.574, -4.563,  0.00000, 1.04742, 1.45590, 20.63650,  3.42344);
+                addAtomToProto(system,i,"N2E", "N2", "M", -0.346, 1.624, -4.662, 14.00670, -0.52371,  0.51380,  0.00000,  0.00000);
+                addAtomToProto(system,i,"N2E", "N2", "M", 0.730, 1.524,  -4.463, 14.00670, -0.52371,  0.51380,  0.00000,  0.00000);
+                addAtomToProto(system,i,"N2N", "N2", "M", -0.537, 1.642, -4.698,  0.00000, 0.00000,  0.00000, 16.14200,  3.16141);
+                addAtomToProto(system,i,"N2N", "N2", "M", 0.921, 1.506,  -4.428,  0.00000,  0.00000,  0.00000, 16.14200,  3.16141);
+                system.proto[i].name = "N2";
+                system.proto[i].dof = 5;
             }
+
             // METHANE CH4
             else if (sorbmodel == "ch4_trappe") {
                 addAtomToProto(system,i, "CHG", "CH4", "M", 0.0, 0.0, 0.0, 16.0426, 0.0, 0.0, 148.0, 3.73);
