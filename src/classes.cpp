@@ -1331,8 +1331,6 @@ eps["Lr"] = 0.011/kbk;
     polars["Cl"] = 16.1979*vand2mpmc;
     polars["Br"] = 23.5714*vand2mpmc;
     polars["I"] = 36.9880*vand2mpmc;
-
-
 	//polars["H"] = 0.41380;//*cV/ke;
 	polars["HW"] = 0.41380;//*cV/ke; // H in water (my model)
     polars["HS"] = 0.41380; // H SAPT
@@ -1349,9 +1347,10 @@ eps["Lr"] = 0.011/kbk;
     polars["SS"] = 2.474; // S SAPT
 	polars["Cl"] = 2.40028;//*cV/ke;
     polars["ArS"] = 1.63922; // Ar SAPT
-	polars["Cu"] = 2.19630;//*cV/ke;
+	polars["Co"] = 3.26440; // from Kay/Shannelle.
+    polars["Cu"] = 2.19630;//*cV/ke;
 	polars["Zn"] = 1.98870;//*cV/ke;
-	//polars["Br"]
+	polars["Br"] = 3.49300; // used in MPM-1-Br work
 	polars["Ru"] = 5.191; // I calculated this by Adam's fitting method.
 	polars["Pd"] = 5.25926;//*cV/ke;
 	polars["Pt"] = 8.56281;//*cV/ke;
