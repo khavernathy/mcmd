@@ -235,7 +235,7 @@ void singlePointEnergy(System &system) {
     potential = lj + es + nucrepul + elec + elecrepul;
    
     printf("========================================================================================\n"); 
-    printf("The below is a very crude, non quantum-mechanical approximation to the molecular energy:\n\n");
+    printf("The below is a very crude, pseudo-quantum mechanical approximation to the molecular energy:\n\n");
     
     printf("LJ RD (>= %f)  = %f Eh;\nES                   = %f Eh\nNuc. Repul.          = %f Eh\nElectronic Disp.     = %f Eh\nElectronic Repul.    = %f Eh\n\n", system.pbc.mincutoff, lj*toh, es*toh, nucrepul*toh, elec*toh, elecrepul*toh);
     

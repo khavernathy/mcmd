@@ -1,0 +1,13 @@
+! Douglas Franz, Space group, USF, 2017
+! Single-point energy calculation of a RuBpy complex
+! Note, for single-point energy calculation to work,
+! All atoms must have real periodic-table names
+! e.g. Cu, not CU or Cu2.
+
+name			    RuBpy_singlepoint_ex
+mode	 		    sp
+input_atoms        ../../../atomfiles/RuBpy.pdb
+
+
+
+
