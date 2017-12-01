@@ -228,11 +228,15 @@ void thole_amatrix(System &system) {
                 ir5 = ir3*ir*ir;
             }
 
-            //evaluate damping factors
+            //evaluate damping factors for tensor T
             explr = exp(-l*r);
             damp1 = 1.0 - explr*(0.5*l2*r2 + l*r + 1.0);
             damp2 = damp1 - explr*(l3*r2*r/6.0);
             //system.checkpoint("got damping factors.");
+
+            /* Here, we can add the term for the dipole interaction tensor T,
+             * for long-range "Full Ewald Polarization" (FEP)
+             * given on pg 184112-4 of Keith: J. Chem. Phys. 139, 184112 (2013) */ 
 
             //system.checkpoint("buildling tensor.");
             /* build the tensor */
@@ -275,8 +279,16 @@ void thole_amatrix(System &system) {
     return;
 }
 
+/* Here we can add a standard method for calculating non-induced Electric field
+ * in order to do FEP, Full Ewald Polarization (including long-range)
+ * mentioned by Keith in J. Chem. Phys. 139, 184112 (2013) (pg 4)
+ * see https://physics.stackexchange.com/questions/308006/how-to-calculate-static-electric-field-produced-by-multiple-point-charges-at-a-p
+ * */
+
+
 void thole_field(System &system) {
-    // wolf thole field
+    // Wolf Electric field with damping, for Thole polarization.
+    // pg. 184112-5 of Keith: J. Chem. Phys. 139, 184112 (2013) 
     int i,j,k,l,p;
     const double SMALL_dR = 1e-12;
     double r, rr; //r and 1/r (reciprocal of r)
@@ -319,32 +331,26 @@ void thole_field(System &system) {
                         bigmess=(erfc(a*r)*rr*rr+2.0*a*OneOverSqrtPi*exp(-a*a*r*r)*rr);
 
                     for ( p=0; p<3; p++ ) {
-                        //see JCP 124 (234104)
+                        //see JCP 124 (234104) [[ Keith: J. Chem. Phys. 139, 184112 (2013) ]]
                         if ( a == 0 ) {
-
-                            // the commented-out charge=0 check here doesn't save time really.
-                            //if (system.molecules[k].atoms[l].C != 0) {
+                                // no damping
                                 system.molecules[i].atoms[j].efield[p] +=
                                 (system.molecules[k].atoms[l].C)*
                                 (rr*rr-rR*rR)*distances[p]*rr;
-                            //}
-                            //if (system.molecules[i].atoms[j].C != 0) {
+                                
                                 system.molecules[k].atoms[l].efield[p] -=
                                 (system.molecules[i].atoms[j].C )*
                                 (rr*rr-rR*rR)*distances[p]*rr;
-                            //}
 
                         } else {
-                            //if (system.molecules[k].atoms[l].C != 0) {
+                                // with damping (default)
                                 system.molecules[i].atoms[j].efield[p] +=
                                 (system.molecules[k].atoms[l].C )*
                                 (bigmess-cutoffterm)*distances[p]*rr;
-                            //}
-                            //if (system.molecules[i].atoms[j].C != 0) {
+                                
                                 system.molecules[k].atoms[l].efield[p] -=
                                 (system.molecules[i].atoms[j].C )*
                                 (bigmess-cutoffterm)*distances[p]*rr;
-                            //}
                          }
                       //      printf("efield[%i]: %f\n", p,system.molecules[i].atoms[j].efield[p]);
 
