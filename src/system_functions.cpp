@@ -1479,3 +1479,9 @@ int getNElectrons(System &system, int molid) {
     }
     return numelec - system.constants.user_charge; // so if user says it's +2, we remove those.
 }
+
+// function to find all bonds for all atoms.
+void findBonds(System &system) {
+    
+
+}
