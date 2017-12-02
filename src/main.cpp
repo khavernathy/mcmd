@@ -792,7 +792,7 @@ int main(int argc, char **argv) {
 // ============================ OPTIMIZATION ==================================================
     else if (system.constants.mode == "opt") {
         printf("\n| ==================================== |\n");
-        printf("|   BEGINNING STRUCTURE OPTIMIZATION    |\n");
+        printf("|   BEGINNING STRUCTURE OPTIMIZATION   |\n");
         printf("| ==================================== |\n\n");
     
         optimize(system);

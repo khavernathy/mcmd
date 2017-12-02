@@ -672,7 +672,7 @@ class Atom {
         double dipole_rrms=0;
 		/*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
         
-        vector<int> bonds; // IDs of bonded atoms
+        map<int,double> bonds; // IDs of bonded atoms w/bondlength
         
         double * get_acc() {
             static double output[3];

@@ -1480,8 +1480,23 @@ int getNElectrons(System &system, int molid) {
     return numelec - system.constants.user_charge; // so if user says it's +2, we remove those.
 }
 
-// function to find all bonds for all atoms.
+// function to find all unique bonds for all atoms.
 void findBonds(System &system) {
-    
-
+    int i,j,l;
+    double r;
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            // for each atom, we find its bonded neighbors by a distance search
+            for (l=j+1; l<system.molecules[i].atoms.size(); l++) {
+               double* distances = getDistanceXYZ(system, i,j,i,l);
+               r = distances[3];
+               if (r < system.constants.frag_bondlength) {
+                   
+                    system.molecules[i].atoms[j].bonds.insert(std::pair<int,double>(l,r));
+                    
+               }           
+            }   
+         
+        } // end j
+    } // end i
 }
