@@ -1532,17 +1532,21 @@ void inputValidation(System &system) {
     // get errors because the user is a noob
     
     int e = system.constants.ensemble;
+    int mcmd_flag;
+    if (system.constants.mode == "sp" || system.constants.mode == "opt") mcmd_flag=0;
+    else mcmd_flag=1;
+
     if (system.constants.mode != "mc" && system.constants.mode != "md" && system.constants.mode != "sp" && system.constants.mode != "opt") {
         std::cout << "ERROR: No valid mode specified. Use mode [mc, md, sp, opt]. e.g. `mode mc` for Monte Carlo simulation." << endl;
         exit(EXIT_FAILURE);
     }
-    if ((system.constants.mode=="sp" || system.constants.mode=="opt") && system.molecules.size() != 1) {
+    if (!mcmd_flag && system.molecules.size() != 1) {
         if (system.proto.size() != 1) {
             std::cout << "ERROR: You asked for a single-point energy (or optimization) but the input does not have 1 molecule. Make sure only 1 molecule is in your input atoms file, or use `sorbate_name h2o_tip4p`, for example. If you want energy for multiple molecules just use `mode mc` with `steps 0` and `mc_corrtime 0`."; printf("\n");
             exit(EXIT_FAILURE);
         }
     }
-    if (system.constants.mode != "sp" && (e != ENSEMBLE_NPT && e != ENSEMBLE_NVT && e != ENSEMBLE_UVT && e != ENSEMBLE_NVE)) {
+    if (mcmd_flag && (e != ENSEMBLE_NPT && e != ENSEMBLE_NVT && e != ENSEMBLE_UVT && e != ENSEMBLE_NVE)) {
         std::cout << "ERROR: No ensemble specified. Use   ensemble uvt   , for example." << endl;
         exit(EXIT_FAILURE);
     }
@@ -1550,7 +1554,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: Monte carlo was activated but you need to specify finalstep, e.g.  finalstep 100000" << endl;
         exit(EXIT_FAILURE);
     }
-    if (system.constants.mode != "sp" && ((e == ENSEMBLE_UVT || e == ENSEMBLE_NPT || e == ENSEMBLE_NVT ) && system.constants.temp == 0)) {
+    if (mcmd_flag && ((e == ENSEMBLE_UVT || e == ENSEMBLE_NPT || e == ENSEMBLE_NVT ) && system.constants.temp == 0)) {
         std::cout << "ERROR: You specified an ensemble with constant T but didn't supply T (or you set T=0)." << endl;
         exit(EXIT_FAILURE);
     }
@@ -1558,7 +1562,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You specified MD mode but selected an incompatible ensemble. MD supports uVT, NVT and NVE only." << endl;
         exit(EXIT_FAILURE);
     }
-    if (system.constants.mode != "sp" && (system.pbc.a == 0 && system.pbc.b == 0 && system.pbc.c == 0 && system.pbc.alpha == 0 && system.pbc.beta ==0 && system.pbc.gamma == 0)) {
+    if (mcmd_flag && (system.pbc.a == 0 && system.pbc.b == 0 && system.pbc.c == 0 && system.pbc.alpha == 0 && system.pbc.beta ==0 && system.pbc.gamma == 0)) {
         std::cout << "ERROR: You didn't supply a basis to build the box. Even simulations with no PBC need a box." << endl;
         exit(EXIT_FAILURE);
     }
@@ -1593,7 +1597,7 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     // charge sum check
-    if (system.constants.charge_sum_check && system.constants.mode != "sp") {
+    if (system.constants.charge_sum_check && mcmd_flag) {
     double qsum=0;
     for (int i=0; i<system.molecules.size(); i++)
         for (int j=0; j<system.molecules[i].atoms.size(); j++) 
@@ -1628,7 +1632,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You turned the crystal-builder on but did not specify a (correct) dimension to duplicate. e.g., `crystalbuild_y 2` is acceptable but `crystalbuild_y 0` is not. Leave the option off if you don't want to use it. (i.e. x y z are set to 1 by default).";
         exit(EXIT_FAILURE);
     }
-    if (system.constants.mode!="sp" && e == ENSEMBLE_UVT && system.stats.count_movables <= 0 && system.constants.sorbate_name.size() ==0) {
+    if (mcmd_flag && e == ENSEMBLE_UVT && system.stats.count_movables <= 0 && system.constants.sorbate_name.size() ==0) {
         std::cout << "ERROR: You specified uVT with a system containing no movable molecules and did not specify a desired sorbate. Try `sorbate_name h2_bssp`, for example.";
         exit(EXIT_FAILURE);
     }
@@ -1648,7 +1652,7 @@ void inputValidation(System &system) {
     for (int p=0;p<3;p++)
         for (int q=0;q<3;q++)
             if (system.pbc.basis[p][q] != 0.0) nobox = 0;
-    if (nobox && system.constants.mode != "sp") {
+    if (nobox && mcmd_flag) {
         std::cout << "ERROR: No box information was supplied. Use `carbasis [a] [b] [c] [alpha] [beta] [gamma]`, for example.";
         exit(EXIT_FAILURE);
     }
