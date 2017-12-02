@@ -794,6 +794,8 @@ int main(int argc, char **argv) {
         printf("\n| ==================================== |\n");
         printf("|   BEGINNING STRUCTURE OPTIMIZATION    |\n");
         printf("| ==================================== |\n\n");
+    
+        optimize(system);
     } // end optimization mode
 
 } // end main()

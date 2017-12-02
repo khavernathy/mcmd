@@ -1536,9 +1536,9 @@ void inputValidation(System &system) {
         std::cout << "ERROR: No valid mode specified. Use mode [mc, md, sp, opt]. e.g. `mode mc` for Monte Carlo simulation." << endl;
         exit(EXIT_FAILURE);
     }
-    if (system.constants.mode=="sp" && system.molecules.size() != 1) {
+    if ((system.constants.mode=="sp" || system.constants.mode=="opt") && system.molecules.size() != 1) {
         if (system.proto.size() != 1) {
-            std::cout << "ERROR: You asked for a single-point energy but the input does not have 1 molecule. Make sure only 1 molecule is in your input atoms file, or use `sorbate_name h2o_tip4p`, for example. If you want energy for multiple molecules just use `mode mc` with `steps 0` and `mc_corrtime 0`."; printf("\n");
+            std::cout << "ERROR: You asked for a single-point energy (or optimization) but the input does not have 1 molecule. Make sure only 1 molecule is in your input atoms file, or use `sorbate_name h2o_tip4p`, for example. If you want energy for multiple molecules just use `mode mc` with `steps 0` and `mc_corrtime 0`."; printf("\n");
             exit(EXIT_FAILURE);
         }
     }
