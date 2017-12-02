@@ -244,6 +244,7 @@ class Constants {
         int numfrags=0; // number of fragments to create in fragmentMaker function
         vector<int> fragsize = {250}; // num. of atoms in a frag, default
         double frag_bondlength = 2.1; // Angstroms, default.
+        double bondlength = 1.5; // for bonding MD, default
 
         int write_lammps = 0; // option to write out LAMMPS input files 
 

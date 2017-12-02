@@ -1490,8 +1490,8 @@ void findBonds(System &system) {
             for (l=j+1; l<system.molecules[i].atoms.size(); l++) {
                double* distances = getDistanceXYZ(system, i,j,i,l);
                r = distances[3];
-               if (r < system.constants.frag_bondlength) {
-                   
+               if (r < system.constants.bondlength) {
+                    //printf("r = %f\n", r);
                     system.molecules[i].atoms[j].bonds.insert(std::pair<int,double>(l,r));
                     
                }           

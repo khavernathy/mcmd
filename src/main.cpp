@@ -781,7 +781,7 @@ int main(int argc, char **argv) {
         printf("\n| ==================================== |\n");
 	    printf("|  BEGINNING SINGLE POINT CALCULATION  |\n");
 	    printf("| ==================================== |\n\n");
-
+        system.constants.all_pbc=0; // force no PBC
         singlePointEnergy(system); 
         
 
@@ -794,7 +794,8 @@ int main(int argc, char **argv) {
         printf("\n| ==================================== |\n");
         printf("|   BEGINNING STRUCTURE OPTIMIZATION   |\n");
         printf("| ==================================== |\n\n");
-    
+        system.constants.all_pbc=0; // force no PBC 
+        findBonds(system);
         optimize(system);
     } // end optimization mode
 

@@ -126,7 +126,6 @@ void singlePointEnergy(System &system) {
     printf("                                                                  %9.5f %9.5f %9.5f }\n\n", o[16], o[17], o[8]);
 
 
-    system.constants.all_pbc=0; // force no PBC
     double r, potential=0, sig, eps, sr6;
     double lj=0,es=0;
     
