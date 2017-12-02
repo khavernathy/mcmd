@@ -51,6 +51,7 @@
 #endif
 #include "md.cpp"
 #include "sp.cpp"
+#include "optimize.cpp"
 #include "io.cpp"
 #include "radial_dist.cpp"
 #include "averages.cpp"
