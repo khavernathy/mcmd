@@ -772,8 +772,10 @@ int main(int argc, char **argv) {
 		count_md_steps++;
 	} // end MD timestep loop
 	} // end if MD
+// ============================= END MOLECULAR DYNAMICS =======================================
 
-    // SINGLE-POINT ENERGY MODE
+
+// ============================= SINGLE POINT ENERGY ==========================================
     else if (system.constants.mode == "sp") {
         printf("\n| ==================================== |\n");
 	    printf("|  BEGINNING SINGLE POINT CALCULATION  |\n");
@@ -783,5 +785,14 @@ int main(int argc, char **argv) {
         
 
     } // end if Single-Point mode (not md or mc)
+// ============================ END SINGLE POINT ENERGY =======================================
+
+
+// ============================ OPTIMIZATION ==================================================
+    else if (system.constants.mode == "opt") {
+        printf("\n| ==================================== |\n");
+        printf("|   BEGINNING STRUCTURE OPTIMIZATION    |\n");
+        printf("| ==================================== |\n\n");
+    } // end optimization mode
 
 } // end main()

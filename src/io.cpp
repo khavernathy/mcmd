@@ -856,6 +856,7 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "mode")) {
 				system.constants.mode = lc[1].c_str();
 				std::cout << "Got mode = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "cuda")) {
                 if (lc[1] == "on")
                     system.constants.cuda = 1;
@@ -1531,8 +1532,8 @@ void inputValidation(System &system) {
     // get errors because the user is a noob
     
     int e = system.constants.ensemble;
-    if (system.constants.mode != "mc" && system.constants.mode != "md" && system.constants.mode != "sp") {
-        std::cout << "ERROR: No mode specified. Use   mode mc  --or--  mode md --or-- mode sp." << endl;
+    if (system.constants.mode != "mc" && system.constants.mode != "md" && system.constants.mode != "sp" && system.constants.mode != "opt") {
+        std::cout << "ERROR: No valid mode specified. Use mode [mc, md, sp, opt]. e.g. `mode mc` for Monte Carlo simulation." << endl;
         exit(EXIT_FAILURE);
     }
     if (system.constants.mode=="sp" && system.molecules.size() != 1) {
