@@ -92,23 +92,44 @@ void findBonds(System &system) {
 double stretch_energy(System &system) {
     double potential = 0;
     const double lambda = 0.1332; // Bond-order correction parameter.
-    double ri,rj,alpha,rBO,rEN,Dij,kij,rij; // bond params
+    double ri,rj,Xi,Xj,Xij,alpha,rBO,rEN,Dij,kij,Zi,Zj,rij; // bond params
+    double mainterm; // main chunk of potential, to be squared..
     int i,j,l; // atom indices
     double r; // actual, current distance for pair.
+    /* ============================ */
+    double BO = 1.0; // assume single bonds for now!!!
+    /* ============================ */
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             ri = system.constants.UFF_bonds[system.molecules[i].atoms[j].UFFlabel.c_str()];
-            printf("ri = %f\n", ri);
-            for (l=j+1; l<system.molecules[i].atoms.size(); l++) {
+            Xi = system.constants.UFF_electroneg[system.molecules[i].atoms[j].name.c_str()];
+            Zi = system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()];
+
+            // loop through bonds of this atom.
+            for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
+                l = it->first; // id of bonded atom (on this molecule) 
+                rj = system.constants.UFF_bonds[system.molecules[i].atoms[l].UFFlabel.c_str()];
+                Xj = system.constants.UFF_electroneg[system.molecules[i].atoms[l].name.c_str()];
+                Zj = system.constants.UFF_Z[system.molecules[i].atoms[l].UFFlabel.c_str()];
+
+                rBO = -lambda*(ri + rj)*log(BO);
+                Xij = sqrt(Xi) - sqrt(Xj);
+                rEN = ri*rj*(Xij*Xij)/(Xi*ri + Xj*rj);
+                rij = ri + rj + rBO + rEN;
+                kij = Zi*Zj/(rij*rij*rij);
+                Dij = BO*70.0;
+                alpha = sqrt(0.5*kij/Dij);
+
                 double* distances = getDistanceXYZ(system, i,j,i,l);
                 r = distances[3];
-
-
+                mainterm = exp(-alpha*(r-rij)) - 1.0;
+                potential += Dij*(mainterm*mainterm);
+                
             }
         }
     }
 
-    return 0;
+    return 0.5*potential; // because I double-counted the bonds.
 }
 
 // get the total potential from angle bends
