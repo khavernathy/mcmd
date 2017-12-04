@@ -129,12 +129,17 @@ class Constants {
         // DEFAULT ELEMENT/SITE PARAMETERS
         map <string,double> masses; // mass database for defaults.
 		map <string,double> sigs; // LJ sigmas database for defaults. (mostly UFF). Defined below
-		map <string,double> eps; // LJ epsions database for defaults. (mostly UFF). Defined lated
+		map <string,double> eps; // LJ epsions database for defaults. (mostly UFF). Defined below
         map <string,double>UFF4MOFsigs; // UFF4MOF sigma params. http://pubs.acs.org.ezproxy.lib.usf.edu/doi/pdf/10.1021/acs.jctc.6b00664
 		map <string,double> phast2_c6; map <string,double> phast2_c8; map <string,double> phast2_c10; map <string,double> phast2_sigs; map <string,double> phast2_eps; map <string,double> phast2_polar; // phast2 defaults
 		map <string,double> polars; // polarizability database for defaults. Mostly vanD. Defined below
         map <string,double> elements; // H:1 ; He:2 ; etc.
-        map <string,double> radii;
+        map <string,double> radii; // VDW radii of elements
+        map <string,double> UFF_bonds; // UFF equilibrium bond-lengths in A
+        map <string,double> UFF_angles; // UFF theta equilibrium angles, in degrees
+        map <string,double> UFF_Z; // UFF Effective charge Z
+        map <string,double> UFF_torsions; // UFF torsion angle barriers, kcal/mol
+        map <string,double> UFF_electroneg; // UFF electronegativity, in eV
 
         int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
         int polars_vand=0; // 1 would defaul all atoms to van Duijnen polarizablitiy parameters
@@ -1575,5 +1580,169 @@ radii["U"] = 1.75;
 radii["Np"] = 1.75;
 radii["Pu"] = 1.75;
 radii["Am"] = 1.75;
+
+
+// =============
+// UFF BONDING PARAMETERS
+UFF_bonds["H_"] = 0.354; UFF_angles["H_"] = 180; UFF_Z["H_"] = 0.712;
+UFF_bonds["H_b"] = 0.46; UFF_angles["H_b"] = 83.5; UFF_Z["H_b"] = 0.712;
+UFF_bonds["He4+4"] = 0.849; UFF_angles["He4+4"] = 90; UFF_Z["He4+4"] = 0.098;
+UFF_bonds["Li"] = 1.336; UFF_angles["Li"] = 180; UFF_Z["Li"] = 1.026;
+UFF_bonds["Be3+2"] = 1.074; UFF_angles["Be3+2"] = 109.47; UFF_Z["Be3+2"] = 1.565;
+UFF_bonds["B_3"] = 0.838; UFF_angles["B_3"] = 109.47; UFF_Z["B_3"] = 1.755;
+UFF_bonds["B_2"] = 0.828; UFF_angles["B_2"] = 120; UFF_Z["B_2"] = 1.755;
+UFF_bonds["C_3"] = 0.757; UFF_angles["C_3"] = 109.47; UFF_Z["C_3"] = 1.912;
+UFF_bonds["C_R"] = 0.729; UFF_angles["C_R"] = 120; UFF_Z["C_R"] = 1.912;
+UFF_bonds["C_2"] = 0.732; UFF_angles["C_2"] = 120; UFF_Z["C_2"] = 1.912;
+UFF_bonds["C_1"] = 0.706; UFF_angles["C_1"] = 180; UFF_Z["C_1"] = 1.912;
+UFF_bonds["N_3"] = 0.7; UFF_angles["N_3"] = 106.7; UFF_Z["N_3"] = 2.544;
+UFF_bonds["N_R"] = 0.699; UFF_angles["N_R"] = 120; UFF_Z["N_R"] = 2.544;
+UFF_bonds["N_2"] = 0.685; UFF_angles["N_2"] = 111.2; UFF_Z["N_2"] = 2.544;
+UFF_bonds["N_1"] = 0.656; UFF_angles["N_1"] = 180; UFF_Z["N_1"] = 2.544;
+UFF_bonds["O_3"] = 0.658; UFF_angles["O_3"] = 104.51; UFF_Z["O_3"] = 2.3;
+UFF_bonds["O_3_z"] = 0.528; UFF_angles["O_3_z"] = 146; UFF_Z["O_3_z"] = 2.3;
+UFF_bonds["O_R"] = 0.68; UFF_angles["O_R"] = 110; UFF_Z["O_R"] = 2.3;
+UFF_bonds["O_2"] = 0.634; UFF_angles["O_2"] = 120; UFF_Z["O_2"] = 2.3;
+UFF_bonds["O_1"] = 0.639; UFF_angles["O_1"] = 180; UFF_Z["O_1"] = 2.3;
+UFF_bonds["F_"] = 0.668; UFF_angles["F_"] = 180; UFF_Z["F_"] = 1.735;
+UFF_bonds["Ne4+4"] = 0.92; UFF_angles["Ne4+4"] = 90; UFF_Z["Ne4+4"] = 0.194;
+UFF_bonds["Na"] = 1.539; UFF_angles["Na"] = 180; UFF_Z["Na"] = 1.081;
+UFF_bonds["Mg3+2"] = 1.421; UFF_angles["Mg3+2"] = 109.47; UFF_Z["Mg3+2"] = 1.787;
+UFF_bonds["Al3"] = 1.244; UFF_angles["Al3"] = 109.47; UFF_Z["Al3"] = 1.792;
+UFF_bonds["Si3"] = 1.117; UFF_angles["Si3"] = 109.47; UFF_Z["Si3"] = 2.323;
+UFF_bonds["P_3+3"] = 1.101; UFF_angles["P_3+3"] = 93.8; UFF_Z["P_3+3"] = 2.863;
+UFF_bonds["P_3+5"] = 1.056; UFF_angles["P_3+5"] = 109.47; UFF_Z["P_3+5"] = 2.863;
+UFF_bonds["P_3+q"] = 1.056; UFF_angles["P_3+q"] = 109.47; UFF_Z["P_3+q"] = 2.863;
+UFF_bonds["S_3+2"] = 1.064; UFF_angles["S_3+2"] = 92.1; UFF_Z["S_3+2"] = 2.703;
+UFF_bonds["S_3+4"] = 1.049; UFF_angles["S_3+4"] = 103.2; UFF_Z["S_3+4"] = 2.703;
+UFF_bonds["S_3+6"] = 1.027; UFF_angles["S_3+6"] = 109.47; UFF_Z["S_3+6"] = 2.703;
+UFF_bonds["S_R"] = 1.077; UFF_angles["S_R"] = 92.2; UFF_Z["S_R"] = 2.703;
+UFF_bonds["S_2"] = 0.854; UFF_angles["S_2"] = 120; UFF_Z["S_2"] = 2.703;
+UFF_bonds["Cl"] = 1.044; UFF_angles["Cl"] = 180; UFF_Z["Cl"] = 2.348;
+UFF_bonds["Ar4+4"] = 1.032; UFF_angles["Ar4+4"] = 90; UFF_Z["Ar4+4"] = 0.3;
+UFF_bonds["K_"] = 1.953; UFF_angles["K_"] = 180; UFF_Z["K_"] = 1.165;
+UFF_bonds["Ca6+2"] = 1.761; UFF_angles["Ca6+2"] = 90; UFF_Z["Ca6+2"] = 2.141;
+UFF_bonds["Sc3+3"] = 1.513; UFF_angles["Sc3+3"] = 109.47; UFF_Z["Sc3+3"] = 2.592;
+UFF_bonds["Ti3+4"] = 1.412; UFF_angles["Ti3+4"] = 109.47; UFF_Z["Ti3+4"] = 2.659;
+UFF_bonds["Ti6+4"] = 1.412; UFF_angles["Ti6+4"] = 90; UFF_Z["Ti6+4"] = 2.659;
+UFF_bonds["V_3+5"] = 1.402; UFF_angles["V_3+5"] = 109.47; UFF_Z["V_3+5"] = 2.679;
+UFF_bonds["Cr6+3"] = 1.345; UFF_angles["Cr6+3"] = 90; UFF_Z["Cr6+3"] = 2.463;
+UFF_bonds["Mn6+2"] = 1.382; UFF_angles["Mn6+2"] = 90; UFF_Z["Mn6+2"] = 2.43;
+UFF_bonds["Fe3+2"] = 1.27; UFF_angles["Fe3+2"] = 109.47; UFF_Z["Fe3+2"] = 2.43;
+UFF_bonds["Fe6+2"] = 1.335; UFF_angles["Fe6+2"] = 90; UFF_Z["Fe6+2"] = 2.43;
+UFF_bonds["Co6+3"] = 1.241; UFF_angles["Co6+3"] = 90; UFF_Z["Co6+3"] = 2.43;
+UFF_bonds["Ni4+2"] = 1.164; UFF_angles["Ni4+2"] = 90; UFF_Z["Ni4+2"] = 2.43;
+UFF_bonds["Cu3+1"] = 1.302; UFF_angles["Cu3+1"] = 109.47; UFF_Z["Cu3+1"] = 1.756;
+UFF_bonds["Zn3+2"] = 1.193; UFF_angles["Zn3+2"] = 109.47; UFF_Z["Zn3+2"] = 1.308;
+UFF_bonds["Ga3+3"] = 1.26; UFF_angles["Ga3+3"] = 109.47; UFF_Z["Ga3+3"] = 1.821;
+UFF_bonds["Ge3"] = 1.197; UFF_angles["Ge3"] = 109.47; UFF_Z["Ge3"] = 2.789;
+UFF_bonds["As3+3"] = 1.211; UFF_angles["As3+3"] = 92.1; UFF_Z["As3+3"] = 2.864;
+UFF_bonds["Se3+2"] = 1.19; UFF_angles["Se3+2"] = 90.6; UFF_Z["Se3+2"] = 2.764;
+UFF_bonds["Br"] = 1.192; UFF_angles["Br"] = 180; UFF_Z["Br"] = 2.519;
+UFF_bonds["Kr4+4"] = 1.147; UFF_angles["Kr4+4"] = 90; UFF_Z["Kr4+4"] = 0.452;
+UFF_bonds["Rb"] = 2.26; UFF_angles["Rb"] = 180; UFF_Z["Rb"] = 1.592;
+UFF_bonds["Sr6+2"] = 2.052; UFF_angles["Sr6+2"] = 90; UFF_Z["Sr6+2"] = 2.449;
+UFF_bonds["Y_3+3"] = 1.698; UFF_angles["Y_3+3"] = 109.47; UFF_Z["Y_3+3"] = 3.257;
+UFF_bonds["Zr3+4"] = 1.564; UFF_angles["Zr3+4"] = 109.47; UFF_Z["Zr3+4"] = 3.667;
+UFF_bonds["Nb3+5"] = 1.473; UFF_angles["Nb3+5"] = 109.47; UFF_Z["Nb3+5"] = 3.618;
+UFF_bonds["Mo6+6"] = 1.467; UFF_angles["Mo6+6"] = 90; UFF_Z["Mo6+6"] = 3.4;
+UFF_bonds["Mo3+6"] = 1.484; UFF_angles["Mo3+6"] = 109.47; UFF_Z["Mo3+6"] = 3.4;
+UFF_bonds["Tc6+5"] = 1.322; UFF_angles["Tc6+5"] = 90; UFF_Z["Tc6+5"] = 3.4;
+UFF_bonds["Ru6+2"] = 1.478; UFF_angles["Ru6+2"] = 90; UFF_Z["Ru6+2"] = 3.4;
+UFF_bonds["Rh6+3"] = 1.332; UFF_angles["Rh6+3"] = 90; UFF_Z["Rh6+3"] = 3.508;
+UFF_bonds["Pd4+2"] = 1.338; UFF_angles["Pd4+2"] = 90; UFF_Z["Pd4+2"] = 3.21;
+UFF_bonds["Ag1+1"] = 1.386; UFF_angles["Ag1+1"] = 180; UFF_Z["Ag1+1"] = 1.956;
+UFF_bonds["Cd3+2"] = 1.403; UFF_angles["Cd3+2"] = 109.47; UFF_Z["Cd3+2"] = 1.65;
+UFF_bonds["In3+3"] = 1.459; UFF_angles["In3+3"] = 109.47; UFF_Z["In3+3"] = 2.07;
+UFF_bonds["Sn3"] = 1.398; UFF_angles["Sn3"] = 109.47; UFF_Z["Sn3"] = 2.961;
+UFF_bonds["Sb3+3"] = 1.407; UFF_angles["Sb3+3"] = 91.6; UFF_Z["Sb3+3"] = 2.704;
+UFF_bonds["Te3+2"] = 1.386; UFF_angles["Te3+2"] = 90.25; UFF_Z["Te3+2"] = 2.882;
+UFF_bonds["I_"] = 1.382; UFF_angles["I_"] = 180; UFF_Z["I_"] = 2.65;
+UFF_bonds["Xe4+4"] = 1.267; UFF_angles["Xe4+4"] = 90; UFF_Z["Xe4+4"] = 0.556;
+UFF_bonds["Cs"] = 2.57; UFF_angles["Cs"] = 180; UFF_Z["Cs"] = 1.573;
+UFF_bonds["Ba6+2"] = 2.277; UFF_angles["Ba6+2"] = 90; UFF_Z["Ba6+2"] = 2.727;
+UFF_bonds["La3+3"] = 1.943; UFF_angles["La3+3"] = 109.47; UFF_Z["La3+3"] = 3.3;
+UFF_bonds["Ce6+3"] = 1.841; UFF_angles["Ce6+3"] = 90; UFF_Z["Ce6+3"] = 3.3;
+UFF_bonds["Pr6+3"] = 1.823; UFF_angles["Pr6+3"] = 90; UFF_Z["Pr6+3"] = 3.3;
+UFF_bonds["Nd6+3"] = 1.816; UFF_angles["Nd6+3"] = 90; UFF_Z["Nd6+3"] = 3.3;
+UFF_bonds["Pm6+3"] = 1.801; UFF_angles["Pm6+3"] = 90; UFF_Z["Pm6+3"] = 3.3;
+UFF_bonds["Sm6+3"] = 1.78; UFF_angles["Sm6+3"] = 90; UFF_Z["Sm6+3"] = 3.3;
+UFF_bonds["Eu6+3"] = 1.771; UFF_angles["Eu6+3"] = 90; UFF_Z["Eu6+3"] = 3.3;
+UFF_bonds["Gd6+3"] = 1.735; UFF_angles["Gd6+3"] = 90; UFF_Z["Gd6+3"] = 3.3;
+UFF_bonds["Tb6+3"] = 1.732; UFF_angles["Tb6+3"] = 90; UFF_Z["Tb6+3"] = 3.3;
+UFF_bonds["Dy6+3"] = 1.71; UFF_angles["Dy6+3"] = 90; UFF_Z["Dy6+3"] = 3.3;
+UFF_bonds["Ho6+3"] = 1.696; UFF_angles["Ho6+3"] = 90; UFF_Z["Ho6+3"] = 3.416;
+UFF_bonds["Er6+3"] = 1.673; UFF_angles["Er6+3"] = 90; UFF_Z["Er6+3"] = 3.3;
+UFF_bonds["Tm6+3"] = 1.66; UFF_angles["Tm6+3"] = 90; UFF_Z["Tm6+3"] = 3.3;
+UFF_bonds["Yb6+3"] = 1.637; UFF_angles["Yb6+3"] = 90; UFF_Z["Yb6+3"] = 2.618;
+UFF_bonds["Lu6+3"] = 1.671; UFF_angles["Lu6+3"] = 90; UFF_Z["Lu6+3"] = 3.271;
+UFF_bonds["Hf3+4"] = 1.611; UFF_angles["Hf3+4"] = 109.47; UFF_Z["Hf3+4"] = 3.921;
+UFF_bonds["Ta3+5"] = 1.511; UFF_angles["Ta3+5"] = 109.47; UFF_Z["Ta3+5"] = 4.075;
+UFF_bonds["W_6+6"] = 1.392; UFF_angles["W_6+6"] = 90; UFF_Z["W_6+6"] = 3.7;
+UFF_bonds["W_3+4"] = 1.526; UFF_angles["W_3+4"] = 109.47; UFF_Z["W_3+4"] = 3.7;
+UFF_bonds["W_3+6"] = 1.38; UFF_angles["W_3+6"] = 109.47; UFF_Z["W_3+6"] = 3.7;
+UFF_bonds["Re6+5"] = 1.372; UFF_angles["Re6+5"] = 90; UFF_Z["Re6+5"] = 3.7;
+UFF_bonds["Re3+7"] = 1.314; UFF_angles["Re3+7"] = 109.47; UFF_Z["Re3+7"] = 3.7;
+UFF_bonds["Os6+6"] = 1.372; UFF_angles["Os6+6"] = 90; UFF_Z["Os6+6"] = 3.7;
+UFF_bonds["Ir6+3"] = 1.371; UFF_angles["Ir6+3"] = 90; UFF_Z["Ir6+3"] = 3.731;
+UFF_bonds["Pt4+2"] = 1.364; UFF_angles["Pt4+2"] = 90; UFF_Z["Pt4+2"] = 3.382;
+UFF_bonds["Au4+3"] = 1.262; UFF_angles["Au4+3"] = 90; UFF_Z["Au4+3"] = 2.625;
+UFF_bonds["Hg1+2"] = 1.34; UFF_angles["Hg1+2"] = 180; UFF_Z["Hg1+2"] = 1.75;
+UFF_bonds["Tl3+3"] = 1.518; UFF_angles["Tl3+3"] = 120; UFF_Z["Tl3+3"] = 2.068;
+UFF_bonds["Pb3"] = 1.459; UFF_angles["Pb3"] = 109.47; UFF_Z["Pb3"] = 2.846;
+UFF_bonds["Bi3+3"] = 1.512; UFF_angles["Bi3+3"] = 90; UFF_Z["Bi3+3"] = 2.47;
+UFF_bonds["Po3+2"] = 1.5; UFF_angles["Po3+2"] = 90; UFF_Z["Po3+2"] = 2.33;
+UFF_bonds["At"] = 1.545; UFF_angles["At"] = 180; UFF_Z["At"] = 2.24;
+UFF_bonds["Rn4+4"] = 1.42; UFF_angles["Rn4+4"] = 90; UFF_Z["Rn4+4"] = 0.583;
+UFF_bonds["Fr"] = 2.88; UFF_angles["Fr"] = 180; UFF_Z["Fr"] = 1.847;
+UFF_bonds["Ra6+2"] = 2.512; UFF_angles["Ra6+2"] = 90; UFF_Z["Ra6+2"] = 2.92;
+UFF_bonds["Ac6+3"] = 1.983; UFF_angles["Ac6+3"] = 90; UFF_Z["Ac6+3"] = 3.9;
+UFF_bonds["Th6+4"] = 1.721; UFF_angles["Th6+4"] = 90; UFF_Z["Th6+4"] = 4.202;
+UFF_bonds["Pa6+4"] = 1.711; UFF_angles["Pa6+4"] = 90; UFF_Z["Pa6+4"] = 3.9;
+UFF_bonds["U_6+4"] = 1.684; UFF_angles["U_6+4"] = 90; UFF_Z["U_6+4"] = 3.9;
+UFF_bonds["Np6+4"] = 1.666; UFF_angles["Np6+4"] = 90; UFF_Z["Np6+4"] = 3.9;
+UFF_bonds["Pu6+4"] = 1.657; UFF_angles["Pu6+4"] = 90; UFF_Z["Pu6+4"] = 3.9;
+UFF_bonds["Am6+4"] = 1.66; UFF_angles["Am6+4"] = 90; UFF_Z["Am6+4"] = 3.9;
+UFF_bonds["Cm6+3"] = 1.801; UFF_angles["Cm6+3"] = 90; UFF_Z["Cm6+3"] = 3.9;
+UFF_bonds["Bk6+3"] = 1.761; UFF_angles["Bk6+3"] = 90; UFF_Z["Bk6+3"] = 3.9;
+UFF_bonds["Cf6+3"] = 1.75; UFF_angles["Cf6+3"] = 90; UFF_Z["Cf6+3"] = 3.9;
+UFF_bonds["Es6+3"] = 1.724; UFF_angles["Es6+3"] = 90; UFF_Z["Es6+3"] = 3.9;
+UFF_bonds["Fm6+3"] = 1.712; UFF_angles["Fm6+3"] = 90; UFF_Z["Fm6+3"] = 3.9;
+UFF_bonds["Md6+3"] = 1.689; UFF_angles["Md6+3"] = 90; UFF_Z["Md6+3"] = 3.9;
+UFF_bonds["No6+3"] = 1.679; UFF_angles["No6+3"] = 90; UFF_Z["No6+3"] = 3.9;
+UFF_bonds["Lw6+3"] = 1.698; UFF_angles["Lw6+3"] = 90; UFF_Z["Lw6+3"] = 3.9;
+
+UFF_torsions["C_3"] = 2.119;
+UFF_torsions["N_3"] = 0.45;
+UFF_torsions["O_3"] = 0.018;
+UFF_torsions["Si3"] = 1.225;
+UFF_torsions["P_3"] = 2.4;
+UFF_torsions["S_3"] = 0.484;
+UFF_torsions["Ge3"] = 0.701;
+UFF_torsions["As3"] = 1.5;
+UFF_torsions["Se3"] = 0.335;
+UFF_torsions["Sn3"] = 0.199;
+UFF_torsions["Sb3"] = 1.1;
+UFF_torsions["Te3"] = 0.3;
+UFF_torsions["Pb3"] = 0.1;
+UFF_torsions["Bi3"] = 1;
+UFF_torsions["Po3"] = 0.3;
+
+UFF_electroneg["Li"] = 3.006;
+UFF_electroneg["C"] = 5.343;
+UFF_electroneg["N"] = 6.899;
+UFF_electroneg["O"] = 8.741;
+UFF_electroneg["F"] = 10.874;
+UFF_electroneg["Na"] = 2.843;
+UFF_electroneg["Si"] = 4.168;
+UFF_electroneg["P"] = 5.463;
+UFF_electroneg["S"] = 6.928;
+UFF_electroneg["Cl"] = 8.564;
+UFF_electroneg["K"] = 2.421;
+UFF_electroneg["Br"] = 7.79;
+UFF_electroneg["Rb"] = 2.331;
+UFF_electroneg["I"] = 6.822;
+UFF_electroneg["Cs"] = 2.183;
+UFF_electroneg["H"] = 4.528;
 
 }
