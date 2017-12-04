@@ -52,6 +52,7 @@
 #include "md.cpp"
 #include "sp.cpp"
 #include "optimize.cpp"
+#include "bonding.cpp"
 #include "io.cpp"
 #include "radial_dist.cpp"
 #include "averages.cpp"
