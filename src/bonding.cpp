@@ -13,7 +13,43 @@ using namespace std;
 // function to determine UFF atom-type based on
 // name of element and number of bonds
 string getUFFlabel(System &system, string name, int num_bonds) {
-    return "hey";
+    // starting with just the organic-y atom-types.
+    if (name == "H") {
+        if (num_bonds==1 || num_bonds == 2)
+            return "H_"; // assume it's never H_b, borate hydrogen
+    } else if (name == "B") {
+        if (num_bonds == 3) return "B_2";
+        else if (num_bonds == 4) return "B_3";
+    } else if (name == "C") {
+        if (num_bonds == 2) return "C_1";
+        else if (num_bonds == 3) return "C_2";
+        else if (num_bonds == 4) return "C_3";
+        // need to dynamically account for resonant C_R too...
+    } else if (name == "N") {
+        if (num_bonds == 1 || num_bonds == 2) return "N_1";
+        else if (num_bonds == 3) return "N_2";
+        else if (num_bonds == 4) return "N_3";
+        // account for N_R...
+    } else if (name == "O") {
+       if (num_bonds == 1 || num_bonds == 2) return "O_1";
+       else if (num_bonds == 3) return "O_2";
+       else if (num_bonds == 4) return "O_3";
+       // account for O_R...
+    } else if (name == "F") {
+        return "F_";
+    } else if (name == "P") {
+        // weird geometries
+    } else if (name == "S") {
+        // weird geometries
+    } else if (name == "Cl") {
+        return "Cl";
+    } else if (name == "Br") {
+        return "Br";
+    } else if (name == "I") {
+        return "I_";
+    }
+        
+    return "NOTFOUND";
 }
 
 // function to find all bonds for all atoms.
