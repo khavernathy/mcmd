@@ -45,6 +45,7 @@
 #include "fugacity.cpp"
 #include "distance.cpp"
 #include "system_functions.cpp" 
+#include "bonding.cpp"
 #include "mc.cpp" // this will include potential.cpp, which includes lj, coulombic, polar
 #ifdef CUDA
     #include "cudafuncs.cu"  // CUDA STUFF
@@ -52,7 +53,6 @@
 #include "md.cpp"
 #include "sp.cpp"
 #include "optimize.cpp"
-#include "bonding.cpp"
 #include "io.cpp"
 #include "radial_dist.cpp"
 #include "averages.cpp"

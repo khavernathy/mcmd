@@ -83,12 +83,31 @@ void findBonds(System &system) {
 /*
  * Essentially everything below comes from the parameters and
  * functional forms prescribed in UFF, via
+ * Rappe et al.
  * J. Am. Chem. Soc. Vol. 114, No. 25, 1992
  * */
 
 // get the total potential from bond stretches
 // via the Morse potential
 double stretch_energy(System &system) {
+    double potential = 0;
+    const double lambda = 0.1332; // Bond-order correction parameter.
+    double ri,rj,alpha,rBO,rEN,Dij,kij,rij; // bond params
+    int i,j,l; // atom indices
+    double r; // actual, current distance for pair.
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            ri = system.constants.UFF_bonds[system.molecules[i].atoms[j].UFFlabel.c_str()];
+            printf("ri = %f\n", ri);
+            for (l=j+1; l<system.molecules[i].atoms.size(); l++) {
+                double* distances = getDistanceXYZ(system, i,j,i,l);
+                r = distances[3];
+
+
+            }
+        }
+    }
+
     return 0;
 }
 

@@ -34,7 +34,7 @@ void optimize(System &system) {
     while (!converged) {
         randatom = pickRandomAtom(system);
         
-    
+        double whatever=stretch_energy(system);
         return; // for now.
         
         
