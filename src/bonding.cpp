@@ -99,13 +99,14 @@ double get_rij(System &system, int i, int j, int k, int l) {
     const double rBO = -lambda*(ri + rj)*log(BO);
     const double Xij = sqrt(Xi) - sqrt(Xj);
     const double rEN = ri*rj*(Xij*Xij)/(Xi*ri + Xj*rj);
-    return ri + rj + rBO + rEN;
+    return ri + rj + rBO + rEN; // in Angstroms
 }
 
+// get Force constant kij for a bond.
 double get_kij(System &system, int i, int j, int k, int l, double rij) {
     const double Zi = system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()];
     const double Zj = system.constants.UFF_Z[system.molecules[k].atoms[l].UFFlabel.c_str()];
-    return Zi*Zj/(rij*rij*rij);
+    return 664.12*Zi*Zj/(rij*rij*rij) * system.constants.kek; // in kcal/molA^2
 }
 
 // get the total potential from bond stretches
@@ -129,27 +130,28 @@ double stretch_energy(System &system) {
                 rij = get_rij(system,i,j,i,l); // in Angstroms
                 kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
 
-                Dij = BO*70.0;
+                Dij = BO*70.0; // in kcal/mol
                 alpha = sqrt(0.5*kij/Dij);
 
                 double* distances = getDistanceXYZ(system, i,j,i,l);
                 r = distances[3];
                 mainterm = exp(-alpha*(r-rij)) - 1.0;
-                potential += Dij*(mainterm*mainterm);
+                potential += Dij*(mainterm*mainterm); // in kcal/mol
                 
             }
         }
     }
 
-    return 0.5*potential/system.constants.kbk; 
-    // because I double-counted the bonds.
-    // and convert to Kelvin
+    return 0.5*potential/system.constants.kbk; // in Kelvin
+    // *0.5 because I double-counted the bonds.
 }
 
 // get angle-force parameter for IJK triplet 
 double get_Kijk(System &system, double rij, double rjk, double rik, double Zi, double Zk, double angle) {
     const double beta = 664.12/(rij*rjk);
-    return beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1 - cos(angle)*cos(angle)) - rik*rik*cos(angle));
+    double answer = beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1-cos(angle)*cos(angle)) - rik*rik*cos(angle));
+    printf("K_ijk = %f\n", answer * system.constants.kek);
+    return answer * system.constants.kek; // in kcal/molrad^2  ???
 }
 
 // get the angle ABC where B is center atom, on molecule i
@@ -186,10 +188,10 @@ double angle_bend_energy(System &system) {
             for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
                 l = it->first; // id of bonded atom (on this molecule) 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
-                theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()];
-                C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));
-                C1 = -4.0*C2*cos(theta_ijk);
-                C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0);
+                theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
+                C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
+                C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
+                C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
 
                 for (std::map<int,double>::iterator it2=system.molecules[i].atoms[l].bonds.begin(); it2 != system.molecules[i].atoms[l].bonds.end(); ++it2) {
                     m = it2->first;
@@ -201,7 +203,7 @@ double angle_bend_energy(System &system) {
                     printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
                     angle = get_angle(system, i, j, l, m);  
-                    potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle));
+                    potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol ???
                 } // end atom m  (the "K" in IJK)
                 
             } // end atom l (the "J" [middle] in IJK)
