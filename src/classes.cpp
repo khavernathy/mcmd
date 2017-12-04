@@ -1585,6 +1585,7 @@ radii["Am"] = 1.75;
 
 // =============
 // UFF BONDING PARAMETERS
+// bonds in Angstrom; Angles in degrees; Eff. Charge (Z) in e(lementary charge) 
 UFF_bonds["H_"] = 0.354; UFF_angles["H_"] = 180; UFF_Z["H_"] = 0.712;
 UFF_bonds["H_b"] = 0.46; UFF_angles["H_b"] = 83.5; UFF_Z["H_b"] = 0.712;
 UFF_bonds["He4+4"] = 0.849; UFF_angles["He4+4"] = 90; UFF_Z["He4+4"] = 0.098;

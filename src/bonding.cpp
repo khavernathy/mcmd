@@ -87,12 +87,32 @@ void findBonds(System &system) {
  * J. Am. Chem. Soc. Vol. 114, No. 25, 1992
  * */
 
+// provide rij parameter given needed information (atom IDs)
+double get_rij(System &system, int i, int j, int k, int l) {
+    const double ri = system.constants.UFF_bonds[system.molecules[i].atoms[j].UFFlabel.c_str()];
+    const double rj = system.constants.UFF_bonds[system.molecules[k].atoms[l].UFFlabel.c_str()];
+    const double Xi = system.constants.UFF_electroneg[system.molecules[i].atoms[j].name.c_str()];
+    const double Xj = system.constants.UFF_electroneg[system.molecules[k].atoms[l].name.c_str()];
+    const double BO = 1.0; // assume all single bonds for now.
+    const double lambda = 0.1332; // Bond-order correction parameter
+
+    const double rBO = -lambda*(ri + rj)*log(BO);
+    const double Xij = sqrt(Xi) - sqrt(Xj);
+    const double rEN = ri*rj*(Xij*Xij)/(Xi*ri + Xj*rj);
+    return ri + rj + rBO + rEN;
+}
+
+double get_kij(System &system, int i, int j, int k, int l, double rij) {
+    const double Zi = system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()];
+    const double Zj = system.constants.UFF_Z[system.molecules[k].atoms[l].UFFlabel.c_str()];
+    return Zi*Zj/(rij*rij*rij);
+}
+
 // get the total potential from bond stretches
 // via the Morse potential
 double stretch_energy(System &system) {
     double potential = 0;
-    const double lambda = 0.1332; // Bond-order correction parameter.
-    double ri,rj,Xi,Xj,Xij,alpha,rBO,rEN,Dij,kij,Zi,Zj,rij; // bond params
+    double alpha,Dij,kij,rij; // bond params
     double mainterm; // main chunk of potential, to be squared..
     int i,j,l; // atom indices
     double r; // actual, current distance for pair.
@@ -101,22 +121,14 @@ double stretch_energy(System &system) {
     /* ============================ */
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            ri = system.constants.UFF_bonds[system.molecules[i].atoms[j].UFFlabel.c_str()];
-            Xi = system.constants.UFF_electroneg[system.molecules[i].atoms[j].name.c_str()];
-            Zi = system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()];
 
             // loop through bonds of this atom.
             for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
                 l = it->first; // id of bonded atom (on this molecule) 
-                rj = system.constants.UFF_bonds[system.molecules[i].atoms[l].UFFlabel.c_str()];
-                Xj = system.constants.UFF_electroneg[system.molecules[i].atoms[l].name.c_str()];
-                Zj = system.constants.UFF_Z[system.molecules[i].atoms[l].UFFlabel.c_str()];
 
-                rBO = -lambda*(ri + rj)*log(BO);
-                Xij = sqrt(Xi) - sqrt(Xj);
-                rEN = ri*rj*(Xij*Xij)/(Xi*ri + Xj*rj);
-                rij = ri + rj + rBO + rEN;
-                kij = Zi*Zj/(rij*rij*rij);
+                rij = get_rij(system,i,j,i,l); // in Angstroms
+                kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
+
                 Dij = BO*70.0;
                 alpha = sqrt(0.5*kij/Dij);
 
@@ -129,14 +141,75 @@ double stretch_energy(System &system) {
         }
     }
 
-    return 0.5*potential; // because I double-counted the bonds.
+    return 0.5*potential/system.constants.kbk; 
+    // because I double-counted the bonds.
+    // and convert to Kelvin
+}
+
+// get angle-force parameter for IJK triplet 
+double get_Kijk(System &system, double rij, double rjk, double rik, double Zi, double Zk, double angle) {
+    const double beta = 664.12/(rij*rjk);
+    return beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1 - cos(angle)*cos(angle)) - rik*rik*cos(angle));
+}
+
+// get the angle ABC where B is center atom, on molecule i
+double get_angle(System &system, int i, int A, int B, int C) {
+    double AB[3] = {0,0,0};
+    double BC[3] = {0,0,0};
+
+    for (int n=0;n<3;n++) {
+        AB[n] = system.molecules[i].atoms[B].pos[n] - system.molecules[i].atoms[A].pos[n];
+        BC[n] = system.molecules[i].atoms[C].pos[n] - system.molecules[i].atoms[B].pos[n];
+    }
+    
+    const double dotprod = dddotprod(AB,BC);
+    const double ABm = sqrt(dddotprod(AB,AB));
+    const double BCm = sqrt(dddotprod(BC,BC));
+
+    double thing=acos(dotprod/(ABm*BCm)); // returns in radians
+    //printf("angle %i %i %i = %f \n", A,B,C, thing*180./M_PI);
+    return thing;
 }
 
 // get the total potential from angle bends
 // via simple Fourier small cosine expansion
 double angle_bend_energy(System &system) {
-    return 0;
-}
+    double potential=0;
+    const double deg2rad = M_PI/180.0;
+    int i,j,l,m;
+    double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
+    double angle; // the actual angle IJK
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+
+            // loop through bonds of this atom.
+            for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
+                l = it->first; // id of bonded atom (on this molecule) 
+                rij = get_rij(system,i,j,i,l); // in Angstroms
+                theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()];
+                C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));
+                C1 = -4.0*C2*cos(theta_ijk);
+                C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0);
+
+                for (std::map<int,double>::iterator it2=system.molecules[i].atoms[l].bonds.begin(); it2 != system.molecules[i].atoms[l].bonds.end(); ++it2) {
+                    m = it2->first;
+                    if (j==m) continue; // don't do duplicate angle ABA
+                    rjk = get_rij(system,i,l,i,m);
+                    rik = get_rij(system,i,j,i,m);
+                    K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+                    printf("K_ijk = %f \n", K_ijk);
+                    printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
+
+                    angle = get_angle(system, i, j, l, m);  
+                    potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle));
+                } // end atom m  (the "K" in IJK)
+                
+            } // end atom l (the "J" [middle] in IJK)
+        } // end atom j (the "I" in IJK);
+    } // end molecule loop i
+
+    return potential/system.constants.kbk; // convert to Kelvin
+} // end angle bend energy
 
 // get the total potential from torsions
 // via simple Fourier small cosine expansion
