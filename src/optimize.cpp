@@ -16,7 +16,7 @@ void perturbAtom(System &system, int i) {
     return;
 }
 
-// Optimize the molecule via MM forcefield(s)
+// Optimize the molecule (ID=0) via MM forcefield(s)
 void optimize(System &system) {
 
     int i;
@@ -32,7 +32,7 @@ void optimize(System &system) {
     // the molecular energy is minimized
     int converged = 0;
     double error_tolerance = 0.00000001;
-    int step_limit = 5;
+    int step_limit = 100;
     double Ei,Ef;
     double delta_E;
     double boltzmann;
@@ -40,11 +40,11 @@ void optimize(System &system) {
     int randatom;
     int step=0;
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-    printf("Step %i :: Energy = %f; diff = %f K; \n", 0,angle_bend_energy(system), 0.0);
+    printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0,stretch_energy(system), 0.0);
 
     while (!converged) {
-        //Ei = stretch_energy(system) + angle_bend_energy(system);
-        Ei = angle_bend_energy(system);
+        Ei = stretch_energy(system); // + angle_bend_energy(system);
+        //Ei = angle_bend_energy(system);
 
         // select random atom and perturb it.
         randatom = pickRandomAtom(system);
@@ -53,28 +53,28 @@ void optimize(System &system) {
 
         // get new energy
         Ef = 0;
-        //Ef += stretch_energy(system);
-        Ef += angle_bend_energy(system);
+        Ef += stretch_energy(system);
+        //Ef += angle_bend_energy(system);
         delta_E = Ef - Ei;
 
       //  printf("Ef after = %f\n", Ef);
 
         //boltzmann = exp(-delta_E/0.00001); // just for now..
         //if (getrand() < boltzmann) {
-        if (delta_E < 0.1) { 
+        if (delta_E < 0.001) { 
            // accept
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-            printf("Step %i :: Energy = %f; diff = %f K; \n", step,Ef, delta_E);
+            printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", step,Ef, delta_E);
             if (fabs(delta_E) < error_tolerance) {
-                printf("Finished with energy = %f K \n", Ef);
+                printf("Finished with energy = %f kcal/mol \n", Ef);
                 converged=1;
             }
         } else {
             // reject
             for (int n=0;n<3;n++) system.molecules[0].atoms[randatom].pos[n] = tmp_pos[n];
             if (step >= step_limit) {
-                printf("Finished with energy = %f K \n", Ei); 
+                printf("Finished with energy = %f kcal/mol \n", Ei); 
                 converged=1;
             }
         }

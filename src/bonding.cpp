@@ -106,7 +106,7 @@ double get_rij(System &system, int i, int j, int k, int l) {
 double get_kij(System &system, int i, int j, int k, int l, double rij) {
     const double Zi = system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()];
     const double Zj = system.constants.UFF_Z[system.molecules[k].atoms[l].UFFlabel.c_str()];
-    return 664.12*Zi*Zj/(rij*rij*rij) * system.constants.kek; // in kcal/molA^2
+    return 664.12*Zi*Zj/(rij*rij*rij); // in kcal/molA^2, as-is
 }
 
 // get the total potential from bond stretches
@@ -129,20 +129,21 @@ double stretch_energy(System &system) {
 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
                 kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
+      //          printf("rij = %f; kij = %f\n", rij, kij);
 
                 Dij = BO*70.0; // in kcal/mol
-                alpha = sqrt(0.5*kij/Dij);
+                alpha = sqrt(0.5*kij/Dij); // in 1/A
 
                 double* distances = getDistanceXYZ(system, i,j,i,l);
                 r = distances[3];
-                mainterm = exp(-alpha*(r-rij)) - 1.0;
+                mainterm = exp(-alpha*(r-rij)) - 1.0; // unitless
                 potential += Dij*(mainterm*mainterm); // in kcal/mol
                 
             }
         }
     }
 
-    return 0.5*potential/system.constants.kbk; // in Kelvin
+    return 0.5*potential; // in kcal/mol
     // *0.5 because I double-counted the bonds.
 }
 
@@ -210,7 +211,7 @@ double angle_bend_energy(System &system) {
         } // end atom j (the "I" in IJK);
     } // end molecule loop i
 
-    return potential/system.constants.kbk; // convert to Kelvin
+    return potential; // in kcal/mol
 } // end angle bend energy
 
 // get the total potential from torsions
