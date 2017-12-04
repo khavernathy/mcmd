@@ -15,13 +15,12 @@ void perturbAtom(System &system, int i, int j) {
 
 // Optimize the molecule via MM forcefield(s)
 void optimize(System &system) {
-    printf("hi\n");
 
     int i;
     // print out all the bonds
     printf("Bond summary: \n============= \n");
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
-        printf("Atom %i bonds:\n", i);
+        printf("Atom %i (UFF: %s) bonds:\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
         for (std::map<int,double>::iterator it=system.molecules[0].atoms[i].bonds.begin(); it!=system.molecules[0].atoms[i].bonds.end(); ++it)
             std::cout << "    " << system.molecules[0].atoms[i].name.c_str() << "-" << system.molecules[0].atoms[it->first].name.c_str() << " " << it->first << " => " << it->second << '\n';
     }
