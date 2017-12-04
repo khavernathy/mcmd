@@ -74,10 +74,40 @@ Grid::Grid() {}
 class Constants {
 	public:
 		Constants();
-		double e,kb,kbk,fs,cC,keSI,ke,eV,cM,cA,cJ,NA,cV,R,mpmc2uff,uff2mpmc,
-            ATM2REDUCED,kg2em, E2REDUCED, TORQUE2REDUCED, FORCE2REDUCED,
-            DEBYE2SKA, JL2ATM, A32L, K2KJMOL, HBARC, vand2mpmc, eA2D, au2D,
-            K2Eh, bohr; // all defined below.
+        const double e = 2.71828183; // ya boi Euler
+        const double kb = 1.3806488e-23; // Boltzmann's in J/K
+        const double kbk = 0.0019872041; // Boltzmann's in kcal/(mol K)
+        const double fs = 1.0e-15; // fs -> second
+        const double cC = 1.60217662e-19; //  e -> coulombs
+        const double keSI = 8.9875517873681764e9; // ke, Coulomb's constant, Nm^2/C^2 or Jm/C^2.
+        const double ke = keSI/kb*1e10*cC*cC; // ke in KA / e^2
+        const double eV = 6.242e18; // 1J = eV electron volts
+        const double cM = 1.660578e-27; // kg / particle from g/mol
+        const double cA = 1.0e-10; // 1 angstroem = cA meters
+        const double cJ = 6.94786e-21; // 1 kcal/mol = cJ Joules
+        const double NA = 6.022140857e23; //  particles per mol
+        const double kek = keSI * cC*cC * 0.00239006 * 1e10 * NA; // ke in kcalA / mol e^2
+        const double cV = 10.0e-30; // alpha * cV = alpha in m^3
+        const double R = 8.3144598; // J / mol K
+        const double mpmc2uff = pow(2.0,(1.0/6.0)); // mpmc sig * mpmc2uff = UFF sig
+        const double uff2mpmc = 1.0/mpmc2uff; // UFF sig * uff2mpmc = mpmc sig (the RIGHT sigma for LJ)
+        const double ATM2REDUCED = 0.0073389366; // atm -> K/A^3
+        const double kg2em = 9.10938291e-31; // kg -> electron mass in kg
+        const double E2REDUCED = 408.7816; // e -> sqrt(K*A)
+        const double TORQUE2REDUCED = kb * 1e-30 * 1e20; // K -> kg A^2 / fs^2
+        const double FORCE2REDUCED = kb * 1e-30 * 1e20; // K/A -> kg A/fs^2
+        const double DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
+        const double JL2ATM = 0.00986923297; // J/L to atm
+        const double A32L = 1e-27; // A^3 to liters.
+        const double K2KJMOL = kb*NA/1000; // K -> kJ/mol
+        const double HBARC = 22898848.135746032; // in K*A
+        const double vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
+        const double eA2D = 1./0.20819434; // eA * this = Debye; or eA^2 * this = Debye*A, etc.
+        const double au2D = 2.5411968777103207; // au * this = Debye
+        const double K2Eh = 1.0/3.1577513e5;//   0.0000032; // K * this = Hartrees
+        const double bohr = 0.529177; // Bohr radius a_B in Angstroms
+
+
 		string jobname="default_jobname";
         string mode; // "mc" or "md"
         int_fast8_t checkpoints_option=0; // enables checkpoints for debuggin
@@ -899,39 +929,7 @@ class Molecule {
 Molecule::Molecule() {}
 
 Constants::Constants() {
-	e = 2.71828183; // ya boi Euler
-	kb = 1.3806488e-23; // Boltzmann's in J/K
-	kbk = 0.0019872041; // Boltzmann's in kcal/(mol K)
-    fs = 1.0e-15; // fs -> second
-	cC = 1.60217662e-19; //  e -> coulombs
-	keSI = 8.9875517873681764e9; // ke, Coulomb's constant, Nm^2/C^2 or Jm/C^2.
-	ke = keSI/kb*1e10*cC*cC; // ke in KA / e^2
-    eV = 6.242e18; // 1J = eV electron volts
-	cM = 1.660578e-27; // kg / particle from g/mol
-	cA = 1.0e-10; // 1 angstroem = cA meters
-	cJ = 6.94786e-21; // 1 kcal/mol = cJ Joules
-	NA = 6.022140857e23; //  particles per mol
-	cV = 10.0e-30; // alpha * cV = alpha in m^3
-	R = 8.3144598; // J / mol K
-    mpmc2uff = pow(2.0,(1.0/6.0)); // mpmc sig * mpmc2uff = UFF sig
-    uff2mpmc = 1.0/mpmc2uff; // UFF sig * uff2mpmc = mpmc sig (the RIGHT sigma for LJ)
-    ATM2REDUCED = 0.0073389366; // atm -> K/A^3
-    kg2em = 9.10938291e-31; // kg -> electron mass in kg
-    E2REDUCED = 408.7816; // e -> sqrt(K*A)
-    TORQUE2REDUCED = kb * 1e-30 * 1e20; // K -> kg A^2 / fs^2
-    FORCE2REDUCED = kb * 1e-30 * 1e20; // K/A -> kg A/fs^2
-    DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
-    JL2ATM = 0.00986923297; // J/L to atm
-    A32L = 1e-27; // A^3 to liters.
-    K2KJMOL = kb*NA/1000; // K -> kJ/mol
-    HBARC = 22898848.135746032; // in K*A
-    vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
-    eA2D = 1./0.20819434; // eA * this = Debye; or eA^2 * this = Debye*A, etc.
-    au2D = 2.5411968777103207; // au * this = Debye
-    K2Eh = 1.0/3.1577513e5;//   0.0000032; // K * this = Hartrees
-    bohr = 0.529177; // Bohr radius a_B in Angstroms
-
-    // ATOM DEFAULTS LIBRARY
+	// ATOM DEFAULTS LIBRARY
 	// MASS VALUES g/mol -> kg/particle
 	masses["HB"] = 2.016*cM; // buch model	h2
 	masses["H2G"] = 0.0*cM;
