@@ -223,9 +223,14 @@ double angle_bend_energy(System &system) {
 // get the total potential from torsions
 // via simple Fourier small cosine expansion
 double torsions_energy(System &system) {
+    double potential=0;
+    const double deg2rad = M_PI/180.0;
+    int i,j,l,m,n; // molecule i, atoms (j,l,m and n)
     
 
-    return 0;
+
+
+    return potential; // in kcal/mol
 }
 
 
