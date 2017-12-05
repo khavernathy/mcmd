@@ -150,9 +150,9 @@ double stretch_energy(System &system) {
 // get angle-force parameter for IJK triplet 
 double get_Kijk(System &system, double rij, double rjk, double rik, double Zi, double Zk, double angle) {
     const double beta = 664.12/(rij*rjk);
-    double answer = beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1-cos(angle)*cos(angle)) - rik*rik*cos(angle));
-    printf("K_ijk = %f\n", answer * system.constants.kek);
-    return answer * system.constants.kek; // in kcal/molrad^2  ???
+    //printf("angle = %f\n", angle*180.0/M_PI);
+    //printf("K_ijk = %f\n",  beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1-cos(angle)*cos(angle)) - rik*rik*cos(angle)));
+    return  beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1-cos(angle)*cos(angle)) - rik*rik*cos(angle));
 }
 
 // get the angle ABC where B is center atom, on molecule i
@@ -169,9 +169,13 @@ double get_angle(System &system, int i, int A, int B, int C) {
     const double ABm = sqrt(dddotprod(AB,AB));
     const double BCm = sqrt(dddotprod(BC,BC));
 
-    double thing=acos(dotprod/(ABm*BCm)); // returns in radians
-    //printf("angle %i %i %i = %f \n", A,B,C, thing*180./M_PI);
-    return thing;
+    return M_PI - acos(dotprod/(ABm*BCm)); // returns in radians
+}
+
+// get r_ik, a parameter for angle bends, ** different from r_ij (and r_jk) **
+double get_rik(System &system, double rij, double rjk, double angle) {
+    // angle is in radians
+    return sqrt(rij*rij + rjk*rjk - 2*rij*rjk*cos(angle));
 }
 
 // get the total potential from angle bends
@@ -193,25 +197,28 @@ double angle_bend_energy(System &system) {
                 C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
                 C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
                 C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
-
+                //printf("theta_0 = %f\n", theta_ijk/deg2rad);
+                    
                 for (std::map<int,double>::iterator it2=system.molecules[i].atoms[l].bonds.begin(); it2 != system.molecules[i].atoms[l].bonds.end(); ++it2) {
                     m = it2->first;
                     if (j==m) continue; // don't do duplicate angle ABA
-                    rjk = get_rij(system,i,l,i,m);
-                    rik = get_rij(system,i,j,i,m);
-                    K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
-                    printf("K_ijk = %f \n", K_ijk);
-                    printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
-
                     angle = get_angle(system, i, j, l, m);  
-                    potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol ???
+                    //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
+                    rjk = get_rij(system,i,l,i,m);
+                    rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
+                    K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+                    //printf("K_ijk = %f \n", K_ijk);
+                    //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
+
+                    potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
                 } // end atom m  (the "K" in IJK)
                 
             } // end atom l (the "J" [middle] in IJK)
         } // end atom j (the "I" in IJK);
     } // end molecule loop i
 
-    return potential; // in kcal/mol
+    return 0.5*potential; // in kcal/mol
+    // 0.5 bc we double counted bonds.
 } // end angle bend energy
 
 // get the total potential from torsions

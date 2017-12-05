@@ -504,11 +504,6 @@ int main(int argc, char **argv) {
 	printf("Displace accepts:      %i\n", system.stats.displace_accepts);
 	printf("Volume change accepts: %i\n", system.stats.volume_change_accepts);
     printf("Auto-rejects (r <= %.5f A): %i\n", system.constants.auto_reject_r, system.constants.rejects);
-
-	std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-        time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
-	printf("Total wall time = %f s\n",time_elapsed);
-
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
         printf("Freeing data structures... ");
         // 1/2 matrix
@@ -799,5 +794,13 @@ int main(int argc, char **argv) {
         findBonds(system);
         optimize(system);
     } // end optimization mode
+
+
+
+    // Final timing stats.
+	std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+        time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
+	printf("Total wall time = %f s\n",time_elapsed);
+
 
 } // end main()
