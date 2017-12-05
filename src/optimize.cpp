@@ -40,19 +40,19 @@ void optimize(System &system) {
     // the molecular energy is minimized
     int converged = 0;
     double error_tolerance = 0.00001;
-    int step_limit = 1000; //100;
-    double Ei,Ef;
+    int step_limit = 10000; //100;
+    double Ei = stretch_energy(system) + angle_bend_energy(system);
+    double Ef;
     double delta_E;
     double boltzmann;
     double tmp_pos[3] = {0,0,0};
     int randatom;
     int step=0;
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-    printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0,stretch_energy(system) + angle_bend_energy(system), 0.0);
+    printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0, Ei, 0.0);
 
     while (!converged) {
         Ei = stretch_energy(system) + angle_bend_energy(system);
-        //Ei = angle_bend_energy(system);
 
         // select random atom and perturb it.
         randatom = pickRandomAtom(system);
@@ -74,7 +74,7 @@ void optimize(System &system) {
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
             printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", step,Ef, delta_E);
-            if (fabs(delta_E) < error_tolerance) {
+            if (fabs(delta_E) < error_tolerance && delta_E!=0) {
                 printf("Finished with energy = %f kcal/mol \n", Ef);
                 converged=1;
             }

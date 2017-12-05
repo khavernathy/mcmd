@@ -15,8 +15,7 @@ using namespace std;
 string getUFFlabel(System &system, string name, int num_bonds) {
     // starting with just the organic-y atom-types.
     if (name == "H") {
-        if (num_bonds==1 || num_bonds == 2)
-            return "H_"; // assume it's never H_b, borate hydrogen
+        return "H_"; // assume it's never H_b (borane hydrogen)
     } else if (name == "B") {
         if (num_bonds == 3) return "B_2";
         else if (num_bonds == 4) return "B_3";
@@ -218,12 +217,14 @@ double angle_bend_energy(System &system) {
     } // end molecule loop i
 
     return 0.5*potential; // in kcal/mol
-    // 0.5 bc we double counted bonds.
+    // 0.5 bc we double counted angles.
 } // end angle bend energy
 
 // get the total potential from torsions
 // via simple Fourier small cosine expansion
 double torsions_energy(System &system) {
+    
+
     return 0;
 }
 
