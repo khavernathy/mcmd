@@ -39,6 +39,10 @@ enum {
     THERMOSTAT_ANDERSEN,
     THERMOSTAT_NOSEHOOVER
 };
+enum {
+    OPTIMIZE_MC,  // Monte Carlo sytle opt.
+    OPTIMIZE_SD   // steepest descent opt.
+};
 
 /* the below stuff was more-or-less adopted from mpmc code */
 typedef struct _histogram {
@@ -279,12 +283,18 @@ class Constants {
         int numfrags=0; // number of fragments to create in fragmentMaker function
         vector<int> fragsize = {250}; // num. of atoms in a frag, default
         double frag_bondlength = 2.1; // Angstroms, default.
-        double bondlength = 1.5; // for bonding MD, default
 
         int write_lammps = 0; // option to write out LAMMPS input files 
 
-        // single-point calculations
+        /* SINGLE-POINT OPTIONS */
         int user_charge=0; // molecular charge for single point calc's
+
+        /* OPTIMIZATION OPTIONS */
+        double bondlength = 1.5; // for bonding MD, default
+        double opt_error = 0.00001; // error, in kcal/mol for convergence
+        int opt_step_limit = 10000; // limit for convergence steps
+        int opt_mode = OPTIMIZE_MC; // monte carlo style optimization as default
+
 };
 
 class Pbc {
@@ -709,7 +719,7 @@ class Atom {
 		/*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
        
         string UFFlabel; // the UFF-style label for this atom. 
-        map<int,double> bonds; // IDs of bonded atoms w/bondlength
+        map<int,int> bonds; // <IDs of bonded atom, unique ID of bond>
         
         double * get_acc() {
             static double output[3];

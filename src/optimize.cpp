@@ -29,18 +29,25 @@ void optimize(System &system) {
 
     int i;
     // print out all the bonds
-    printf("Dynamically-found Bonds Summary: \n============= \n");
+    printf("Dynamically-found Bonds Summary:\n");
+    printf("================================\n");
+    printf("Elements :: atom-id :: bond-id\n");
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         printf("Atom %i (UFF: %s) bonds:\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
-        for (std::map<int,double>::iterator it=system.molecules[0].atoms[i].bonds.begin(); it!=system.molecules[0].atoms[i].bonds.end(); ++it)
-            std::cout << "    " << system.molecules[0].atoms[i].name.c_str() << "-" << system.molecules[0].atoms[it->first].name.c_str() << " " << it->first << " => " << it->second << '\n';
+        for (std::map<int,int>::iterator it=system.molecules[0].atoms[i].bonds.begin(); it!=system.molecules[0].atoms[i].bonds.end(); ++it) {
+            printf("%3s%2s%3s :: %1s%5i%1s :: %1s%5i%1s\n", 
+                    system.molecules[0].atoms[i].name.c_str(), "--", system.molecules[0].atoms[it->first].name.c_str(), 
+                    " ", it->first, " ",
+                    " ", it->second, " ");
+        }
     }
+    printf("================================\n");
 
     // iterate monte-carlo style pertubations until
     // the molecular energy is minimized
     int converged = 0;
-    double error_tolerance = 0.00001;
-    int step_limit = 10000; //100;
+    double error_tolerance = system.constants.opt_error;
+    int step_limit = system.constants.opt_step_limit; //100;
     double Ei = stretch_energy(system) + angle_bend_energy(system);
     double Ef;
     double delta_E;
@@ -51,9 +58,9 @@ void optimize(System &system) {
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
     printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0, Ei, 0.0);
 
-    string mode = "MC";
+    int optmode = system.constants.opt_mode;
     // Monte Carlo sytle opt.
-    if (mode == "MC") {
+    if (optmode == OPTIMIZE_MC) {
     while (!converged) {
         Ei = stretch_energy(system) + angle_bend_energy(system);
 
@@ -94,7 +101,7 @@ void optimize(System &system) {
     } // end MC style opt
     
     // steepest desent (follow the negative gradient)
-    else if (mode == "SD") {
+    else if (optmode == OPTIMIZE_SD) {
         while (!converged) {
             Ei = stretch_energy(system) + angle_bend_energy(system);
             morse_gradient(system);

@@ -56,6 +56,7 @@ void findBonds(System &system) {
     int i,j,l;
     double r;
     int local_bonds=0;
+    int unique_id=0; // master bond id
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
@@ -67,7 +68,8 @@ void findBonds(System &system) {
                r = distances[3];
                if (r < system.constants.bondlength) {
                     local_bonds++;
-                    system.molecules[i].atoms[j].bonds.insert(std::pair<int,double>(l,r));
+                    system.molecules[i].atoms[j].bonds.insert(std::pair<int,int>(l,unique_id));
+                    unique_id++;
                } // end if r < bond-length      
             } // end pair (i,j) -- (i,l)  
          
@@ -123,7 +125,7 @@ double stretch_energy(System &system) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
 
             // loop through bonds of this atom.
-            for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
+            for (std::map<int,int>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
                 l = it->first; // id of bonded atom (on this molecule) 
 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
@@ -189,7 +191,7 @@ double angle_bend_energy(System &system) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
 
             // loop through bonds of this atom.
-            for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
+            for (std::map<int,int>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
                 l = it->first; // id of bonded atom (on this molecule) 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
                 theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
@@ -198,7 +200,7 @@ double angle_bend_energy(System &system) {
                 C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
                 //printf("theta_0 = %f\n", theta_ijk/deg2rad);
                     
-                for (std::map<int,double>::iterator it2=system.molecules[i].atoms[l].bonds.begin(); it2 != system.molecules[i].atoms[l].bonds.end(); ++it2) {
+                for (std::map<int,int>::iterator it2=system.molecules[i].atoms[l].bonds.begin(); it2 != system.molecules[i].atoms[l].bonds.end(); ++it2) {
                     m = it2->first;
                     if (j==m) continue; // don't do duplicate angle ABA
                     angle = get_angle(system, i, j, l, m);  
@@ -252,7 +254,7 @@ double morse_gradient(System &system) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
 
             // loop through bonds of this atom.
-            for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
+            for (std::map<int,int>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
                 l = it->first; // id of bonded atom (on this molecule) 
 
                 rij = get_rij(system,i,j,i,l); // in Angstroms

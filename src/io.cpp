@@ -1448,6 +1448,25 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "off") system.constants.charge_sum_check = 0;
                 std::cout << "Got charge sum check option = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "bondlength")) {
+                system.constants.bondlength = atof(lc[1].c_str());
+                std::cout << "Got max-bondlength parameter (for dynamic bond detection = " << lc[1].c_str() << " A."; printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "opt_convergence")) {
+                system.constants.opt_error = atof(lc[1].c_str());
+                std::cout << "Got optimization convergence = " << lc[1].c_str() << " kcal/mol."; printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "opt_step_limit")) {
+                system.constants.opt_step_limit = atoi(lc[1].c_str());
+                std::cout << "Got optimization step limit = " << lc[1].c_str() << " steps."; printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "opt_mode")) {
+                if (lc[1] == "mc")
+                    system.constants.opt_mode = OPTIMIZE_MC;
+                else if (lc[1] == "sd")
+                    system.constants.opt_mode = OPTIMIZE_SD;
+                std::cout << "Got optimization mode = " << lc[1].c_str(); printf("\n");
+
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
 		} // end while reading lines
