@@ -236,3 +236,57 @@ double torsions_energy(System &system) {
 
 
 
+
+// Morse potential gradient for a given point
+double morse_gradient(System &system) {
+    printf(" -------------------------- | \n");
+    // x,y,z is the point of interest for this gradient
+    // ij tells us whether it's the 1st atom or 2nd within definition of delta x (+1 or -1)
+    double alpha,Dij,kij,rij; // bond params
+    int i,j,l; // atom indices
+    double r; // actual, current distance for pair.
+    /* ============================ */
+    double BO = 1.0; // assume single bonds for now!!!
+    /* ============================ */
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+
+            // loop through bonds of this atom.
+            for (std::map<int,double>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
+                l = it->first; // id of bonded atom (on this molecule) 
+
+                rij = get_rij(system,i,j,i,l); // in Angstroms
+                kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
+      //          printf("rij = %f; kij = %f\n", rij, kij);
+
+                Dij = BO*70.0; // in kcal/mol
+                alpha = sqrt(0.5*kij/Dij); // in 1/A
+
+                double* distances = getDistanceXYZ(system, i,j,i,l);
+                r = distances[3];
+    
+                // NEGATIVE gradient for a single bond is 6D (3D on each atom)
+                // the first atom first (xi, yi, zi)
+                double grad, delta;
+                for (int n=0;n<3;n++) {
+                    delta = system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
+                    grad = 2*alpha*Dij*delta*exp(alpha*(rij-r))/r;
+                    grad *= -1 * (1 - exp(alpha*(rij-r)));
+                    printf("%f\n", grad);
+                }
+                // xj, yj, zj
+                for (int n=0;n<3;n++) {
+                    delta = system.molecules[i].atoms[l].pos[n] - system.molecules[i].atoms[j].pos[n];
+                    grad = 2*alpha*Dij*delta*exp(alpha*(rij-r))/r;
+                    grad *= -1 * (1 - exp(alpha*(rij-r)));
+                    printf("%f\n", grad);
+                }
+
+            }
+        }
+    }
+
+    return 0; //.5*potential; // in kcal/mol
+    // *0.5 because I double-counted the bonds.
+}
+

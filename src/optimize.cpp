@@ -51,6 +51,9 @@ void optimize(System &system) {
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
     printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0, Ei, 0.0);
 
+    string mode = "SD";
+    // Monte Carlo sytle opt.
+    if (mode == "MC") {
     while (!converged) {
         Ei = stretch_energy(system) + angle_bend_energy(system);
 
@@ -60,9 +63,7 @@ void optimize(System &system) {
         perturbAtom(system, randatom, move_factor(Ei));
 
         // get new energy
-        Ef = 0;
-        Ef += stretch_energy(system);
-        Ef += angle_bend_energy(system);
+        Ef = stretch_energy(system) + angle_bend_energy(system);
         delta_E = Ef - Ei;
 
       //  printf("Ef after = %f\n", Ef);
@@ -90,5 +91,27 @@ void optimize(System &system) {
         }
 
     } // end while loop for convergence
+    } // end MC style opt
+    
+    // steepest desent (follow the negative gradient)
+    else if (mode == "SD") {
+        while (!converged) {
+            Ei = stretch_energy(system) + angle_bend_energy(system);
+            morse_gradient(system);
+            Ef = stretch_energy(system) + angle_bend_energy(system);
+            delta_E = Ef - Ei;
+
+            if (fabs(delta_E) < error_tolerance && delta_E!=0) {
+                 printf("Finished with energy = %f kcal/mol \n", Ef);
+                converged=1;
+            }
+
+            if (step >= step_limit) {
+                printf("Finished with energy = %f kcal/mol \n", Ei);
+                converged=1;
+            }
+            step++;
+        }
+    }
 
 } // end optimize
