@@ -51,7 +51,7 @@ void optimize(System &system) {
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
     printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0, Ei, 0.0);
 
-    string mode = "SD";
+    string mode = "MC";
     // Monte Carlo sytle opt.
     if (mode == "MC") {
     while (!converged) {
