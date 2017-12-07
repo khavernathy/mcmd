@@ -343,7 +343,7 @@ double angle_bend_gradient(System &system) {
 
 
                     // HALF BECAUSE THE ANGLES WILL BE DOUBLE COUNTED.
-                    double POT += 0.5 * K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
+                    double POT=0; POT += 0.5 * K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
                 } // end atom m  (the "K" in IJK)
                 
             } // end atom l (the "J" [middle] in IJK)
