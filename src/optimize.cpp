@@ -105,7 +105,7 @@ void optimize(System &system) {
 
         //boltzmann = exp(-delta_E/0.00001); // just for now..
         //if (getrand() < boltzmann) {
-        if (delta_E < 0.001) { // allow some positives a la Monte Carlo 
+        if (delta_E < 0) { // allow some positives a la Monte Carlo 
            // accept
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
