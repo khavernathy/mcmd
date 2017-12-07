@@ -108,6 +108,8 @@ void optimize(System &system) {
             Ef = stretch_energy(system) + angle_bend_energy(system);
             delta_E = Ef - Ei;
 
+            printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", step,Ef, delta_E);
+
             if (fabs(delta_E) < error_tolerance && delta_E!=0) {
                  printf("Finished with energy = %f kcal/mol \n", Ef);
                 converged=1;

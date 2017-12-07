@@ -17,7 +17,7 @@ class System {
         Stats stats;
         Last last; // to hold previous values for reversion if needed (checkpointing variables)
 
-        vector<vector<int>> atommap;
+        vector<vector<int>> atommap; // index map from [(i,j), atom-atom] notation to [(i,j,k,l) molecule/atom-molecule/atom]
         vector<vector<vector<vector<Pair>>>> pairs; // r
 
         // histogram stuff

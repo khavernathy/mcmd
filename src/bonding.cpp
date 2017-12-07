@@ -145,7 +145,6 @@ double stretch_energy(System &system) {
     }
 
     return 0.5*potential; // in kcal/mol
-    // *0.5 because I double-counted the bonds.
 }
 
 // get angle-force parameter for IJK triplet 
@@ -219,7 +218,6 @@ double angle_bend_energy(System &system) {
     } // end molecule loop i
 
     return 0.5*potential; // in kcal/mol
-    // 0.5 bc we double counted angles.
 } // end angle bend energy
 
 // get the total potential from torsions
@@ -289,6 +287,5 @@ double morse_gradient(System &system) {
     }
 
     return 0; //.5*potential; // in kcal/mol
-    // *0.5 because I double-counted the bonds.
 }
 
