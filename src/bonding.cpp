@@ -335,6 +335,10 @@ double morse_gradient(System &system) {
     return 0; //.5*potential; // in kcal/mol
 }
 
+double simple_r(double xi, double xj, double yi, double yj, double zi, double zj) {
+    return sqrt((xi-xj)*(xi-xj) + (yi-yj)*(yi-yj) + (zi-zj)*(zi-zj));
+}
+
 // get the total potential from angle bends
 // via simple Fourier small cosine expansion
 double angle_bend_gradient(System &system) {
@@ -342,7 +346,11 @@ double angle_bend_gradient(System &system) {
     int i,j,l,m;
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
     double angle; // the actual angle IJK
-    
+    double grad;
+    double cos1, cos2, B, C, xi, yi, zi, xj, yj, zj, xk, yk, zk, dij, djk; 
+        // cos-derivative terms in the gradient, + other terms.
+
+
     for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
 
         i = system.constants.uniqueAngles[it].mol;
@@ -352,6 +360,7 @@ double angle_bend_gradient(System &system) {
         
             
         rij = get_rij(system,i,j,i,l); // in Angstroms
+        // force field theta is that of the middle atom "l" in j-l-m
         theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
         C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
         C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
@@ -366,10 +375,33 @@ double angle_bend_gradient(System &system) {
         //printf("K_ijk = %f \n", K_ijk);
         //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
+        // compute the gradient for all angle components (xyz for 3 atoms = 9)
+        // gradient is [dE/dx_i...] which ends up as a sum of two cosine derivs (d/dx C0 term -> 0)
+        // this gets funky b/c gradient looks different for each direction x,y,z
+        // just do dE/dx_i now.
+        xi = system.molecules[i].atoms[j].pos[0]; 
+        yi = system.molecules[i].atoms[j].pos[1];
+        zi = system.molecules[i].atoms[j].pos[2];
+        xj = system.molecules[i].atoms[l].pos[0];
+        yj = system.molecules[i].atoms[l].pos[1];
+        zj = system.molecules[i].atoms[l].pos[2];
+        xk = system.molecules[i].atoms[m].pos[0];
+        yk = system.molecules[i].atoms[m].pos[1];
+        zk = system.molecules[i].atoms[m].pos[2];
 
+        B = (yi-yj)*(yk-yj) + (zi-zj)*(zk-zj);
+        C = (yi-yj)*(yi-yj) + (zi-zj)*(zi-zj);
 
-         // HALF BECAUSE THE ANGLES WILL BE DOUBLE COUNTED.
-         double POT=0; POT += 0.5 * K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
+        dij = simple_r(xi,xj,yi,yj,zi,zj);
+        djk = simple_r(xj,xk,yj,yk,zj,zk);
+
+        cos1 = ((B*(xj-xi) + C*(xk-xj))/(djk*dij*dij*dij));
+        cos2 = 2*(((xk-xj)/(djk*dij)) - (( (xi-xj)*(B + (xk-xj)*(xi-xj)))/(djk*dij*dij*dij))) * sin(2*acos((B + (xk-xj)*(xi-xj))/(djk*dij))) / sqrt(1 - pow((B + (xk-xj)*(xi-xj)),2)/(djk*djk*dij*dij));
+
+        grad = K_ijk*(C1*cos1 + C2*cos2);
+        system.molecules[i].atoms[j].energy_grad[0] += 0; // grad;
+
+        double POT=K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
             
     }
 
