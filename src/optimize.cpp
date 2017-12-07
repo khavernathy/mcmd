@@ -102,9 +102,23 @@ void optimize(System &system) {
     
     // steepest desent (follow the negative gradient)
     else if (optmode == OPTIMIZE_SD) {
+        const double move_factor = 0.0005;
         while (!converged) {
             Ei = stretch_energy(system) + angle_bend_energy(system);
-            morse_gradient_step(system);
+            // re-initialize gradient
+            for (int i=0; i<system.molecules[0].atoms.size(); i++) 
+                for (int n=0;n<3;n++)
+                    system.molecules[0].atoms[i].energy_grad[n]=0;
+            
+            // compute the gradients
+            morse_gradient(system);
+            angle_bend_gradient(system);
+
+            // move the atoms by their (negative!) gradients
+            for (int i=0; i<system.molecules[0].atoms.size(); i++) 
+                for (int n=0;n<3;n++)
+                    system.molecules[0].atoms[i].pos[n] -= move_factor * system.molecules[0].atoms[i].energy_grad[n];
+
             Ef = stretch_energy(system) + angle_bend_energy(system);
             delta_E = Ef - Ei;
 

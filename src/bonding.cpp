@@ -253,8 +253,7 @@ double torsions_energy(System &system) {
 
 
 // Morse potential gradient for all bonded atoms, to minimize energy
-double morse_gradient_step(System &system) {
-    printf(" -------------------------- | \n");
+double morse_gradient(System &system) {
     // x,y,z is the point of interest for this gradient
     // ij tells us whether it's the 1st atom or 2nd within definition of delta x (+1 or -1)
     double alpha,Dij,kij,rij; // bond params
@@ -264,8 +263,6 @@ double morse_gradient_step(System &system) {
     double BO = 1.0; // assume single bonds for now!!!
     /* ============================ */
     double prefactor,grad,delta;
-    double grad_magnitude=0;
-    const double move_factor=0.0005; // a small dx multiplier to the gradient
         // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
 
 
@@ -284,18 +281,14 @@ double morse_gradient_step(System &system) {
                 double* distances = getDistanceXYZ(system, i,j,i,l);
                 r = distances[3];
     
-                // NEGATIVE gradient for a single bond is 6D (3D on each atom, 1 for each D.O.F.)
-                // the first atom first (xi, yi, zi)
-                prefactor = -2*alpha*Dij*exp(alpha*(rij-r))/r;
+                // gradient for a single bond is 6D (3D on each atom, 1 for each D.O.F.)
+                prefactor = 2*alpha*Dij*exp(alpha*(rij-r))/r;
                 for (int n=0;n<3;n++) {
                     delta = system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
                     grad = prefactor * delta;
                     grad *= (1 - exp(alpha*(rij-r)));
-                    grad_magnitude += grad*grad;
-                    printf("%f\n", grad);
-                    // move the atom position elements in direction of energy minimum
-                    system.molecules[i].atoms[j].pos[n] += grad*move_factor;
-                    system.molecules[i].atoms[l].pos[n] -= grad*move_factor;
+                    system.molecules[i].atoms[j].energy_grad[n] += grad;
+                    system.molecules[i].atoms[l].energy_grad[n] -= grad;
                 }
                 // xj, yj, zj
                 // since gradient of the other atom is just minus the other, we apply a Newton-pair style thing above
@@ -305,7 +298,6 @@ double morse_gradient_step(System &system) {
                     delta = system.molecules[i].atoms[l].pos[n] - system.molecules[i].atoms[j].pos[n];
                     grad = prefactor * delta;
                     grad *= (1 - exp(alpha*(rij-r)));
-                    grad_magnitude += grad*grad;
                     printf("%f\n", grad);
                     // move the atom position element in direction of energy minimum
                     system.molecules[i].atoms[l].pos[n] += grad*move_factor;
@@ -313,8 +305,52 @@ double morse_gradient_step(System &system) {
                 */
 
             }
-    grad_magnitude = sqrt(grad_magnitude); // in case i need it later.
 
     return 0; //.5*potential; // in kcal/mol
 }
+
+// get the total potential from angle bends
+// via simple Fourier small cosine expansion
+double angle_bend_gradient(System &system) {
+    const double deg2rad = M_PI/180.0;
+    int i,j,l,m;
+    double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
+    double angle; // the actual angle IJK
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+
+            // loop through bonds of this atom.
+            for (int it=0; it<system.molecules[i].atoms[j].bonds.size(); it++) {
+                l = system.molecules[i].atoms[j].bonds[it]; // id of bonded atom (on this molecule) 
+                rij = get_rij(system,i,j,i,l); // in Angstroms
+                theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
+                C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
+                C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
+                C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
+                //printf("theta_0 = %f\n", theta_ijk/deg2rad);
+                    
+                for (int it2=0; it2<system.molecules[i].atoms[l].bonds.size(); it2++) {
+                    m = system.molecules[i].atoms[l].bonds[it2];
+                    if (j==m) continue; // don't do duplicate angle ABA
+                    angle = get_angle(system, i, j, l, m);  
+                    //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
+                    rjk = get_rij(system,i,l,i,m);
+                    rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
+                    K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+                    //printf("K_ijk = %f \n", K_ijk);
+                    //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
+
+
+
+                    // HALF BECAUSE THE ANGLES WILL BE DOUBLE COUNTED.
+                    double POT += 0.5 * K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
+                } // end atom m  (the "K" in IJK)
+                
+            } // end atom l (the "J" [middle] in IJK)
+        } // end atom j (the "I" in IJK);
+    } // end molecule loop i
+
+    return 0.; // in kcal/mol
+} // end angle bend energy
+
 
