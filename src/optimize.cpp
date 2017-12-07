@@ -104,11 +104,14 @@ void optimize(System &system) {
     else if (optmode == OPTIMIZE_SD) {
         while (!converged) {
             Ei = stretch_energy(system) + angle_bend_energy(system);
-            morse_gradient(system);
+            morse_gradient_step(system);
             Ef = stretch_energy(system) + angle_bend_energy(system);
             delta_E = Ef - Ei;
 
+            step++;
+            writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
             printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", step,Ef, delta_E);
+             
 
             if (fabs(delta_E) < error_tolerance && delta_E!=0) {
                  printf("Finished with energy = %f kcal/mol \n", Ef);
@@ -119,7 +122,6 @@ void optimize(System &system) {
                 printf("Finished with energy = %f kcal/mol \n", Ei);
                 converged=1;
             }
-            step++;
         }
     }
 

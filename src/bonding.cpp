@@ -252,8 +252,8 @@ double torsions_energy(System &system) {
 
 
 
-// Morse potential gradient for a given point
-double morse_gradient(System &system) {
+// Morse potential gradient for all bonded atoms, to minimize energy
+double morse_gradient_step(System &system) {
     printf(" -------------------------- | \n");
     // x,y,z is the point of interest for this gradient
     // ij tells us whether it's the 1st atom or 2nd within definition of delta x (+1 or -1)
@@ -263,6 +263,11 @@ double morse_gradient(System &system) {
     /* ============================ */
     double BO = 1.0; // assume single bonds for now!!!
     /* ============================ */
+    double prefactor,grad,delta;
+    double grad_magnitude=0;
+    const double move_factor=0.0005; // a small dx multiplier to the gradient
+        // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
+
 
             for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
                 i = system.constants.uniqueBonds[it].mol;
@@ -279,24 +284,36 @@ double morse_gradient(System &system) {
                 double* distances = getDistanceXYZ(system, i,j,i,l);
                 r = distances[3];
     
-                // NEGATIVE gradient for a single bond is 6D (3D on each atom)
+                // NEGATIVE gradient for a single bond is 6D (3D on each atom, 1 for each D.O.F.)
                 // the first atom first (xi, yi, zi)
-                double grad, delta;
+                prefactor = -2*alpha*Dij*exp(alpha*(rij-r))/r;
                 for (int n=0;n<3;n++) {
                     delta = system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
-                    grad = 2*alpha*Dij*delta*exp(alpha*(rij-r))/r;
-                    grad *= -1 * (1 - exp(alpha*(rij-r)));
+                    grad = prefactor * delta;
+                    grad *= (1 - exp(alpha*(rij-r)));
+                    grad_magnitude += grad*grad;
                     printf("%f\n", grad);
+                    // move the atom position elements in direction of energy minimum
+                    system.molecules[i].atoms[j].pos[n] += grad*move_factor;
+                    system.molecules[i].atoms[l].pos[n] -= grad*move_factor;
                 }
                 // xj, yj, zj
-                for (int n=0;n<3;n++) {
+                // since gradient of the other atom is just minus the other, we apply a Newton-pair style thing above
+                // instead of recomputing.
+                /*
+                    for (int n=0;n<3;n++) {
                     delta = system.molecules[i].atoms[l].pos[n] - system.molecules[i].atoms[j].pos[n];
-                    grad = 2*alpha*Dij*delta*exp(alpha*(rij-r))/r;
-                    grad *= -1 * (1 - exp(alpha*(rij-r)));
+                    grad = prefactor * delta;
+                    grad *= (1 - exp(alpha*(rij-r)));
+                    grad_magnitude += grad*grad;
                     printf("%f\n", grad);
+                    // move the atom position element in direction of energy minimum
+                    system.molecules[i].atoms[l].pos[n] += grad*move_factor;
                 }
+                */
 
             }
+    grad_magnitude = sqrt(grad_magnitude); // in case i need it later.
 
     return 0; //.5*potential; // in kcal/mol
 }
