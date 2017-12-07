@@ -25,12 +25,14 @@ string getUFFlabel(System &system, string name, int num_bonds) {
         else if (num_bonds == 4) return "C_3";
         // need to dynamically account for resonant C_R too...
     } else if (name == "N") {
-        if (num_bonds == 1 || num_bonds == 2) return "N_1";
+        if (num_bonds == 1) return "N_1";
+        else if (num_bonds == 2) return "N_3";
         else if (num_bonds == 3) return "N_2";
         else if (num_bonds == 4) return "N_3";
         // account for N_R...
     } else if (name == "O") {
-       if (num_bonds == 1 || num_bonds == 2) return "O_1";
+       if (num_bonds == 1) return "O_1";
+       else if (num_bonds == 2) return "O_3";
        else if (num_bonds == 3) return "O_2";
        else if (num_bonds == 4) return "O_3";
        // account for O_R...
