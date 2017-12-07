@@ -170,24 +170,24 @@ double stretch_energy(System &system) {
     double BO = 1.0; // assume single bonds for now!!!
     /* ============================ */
 
-            // loop through bonds of this atom.
-            for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
-                i = system.constants.uniqueBonds[it].mol;
-                j = system.constants.uniqueBonds[it].atom1;
-                l = system.constants.uniqueBonds[it].atom2;
+    // loop through bonds of this atom.
+    for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+        i = system.constants.uniqueBonds[it].mol;
+        j = system.constants.uniqueBonds[it].atom1;
+        l = system.constants.uniqueBonds[it].atom2;
 
-                rij = get_rij(system,i,j,i,l); // in Angstroms
-                kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
-      //          printf("rij = %f; kij = %f\n", rij, kij);
+        rij = get_rij(system,i,j,i,l); // in Angstroms
+        kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
+//          printf("rij = %f; kij = %f\n", rij, kij);
 
-                Dij = BO*70.0; // in kcal/mol
-                alpha = sqrt(0.5*kij/Dij); // in 1/A
+        Dij = BO*70.0; // in kcal/mol
+        alpha = sqrt(0.5*kij/Dij); // in 1/A
 
-                double* distances = getDistanceXYZ(system, i,j,i,l);
-                r = distances[3];
-                mainterm = exp(-alpha*(r-rij)) - 1.0; // unitless
-                potential += Dij*(mainterm*mainterm); // in kcal/mol
-            }
+        double* distances = getDistanceXYZ(system, i,j,i,l);
+        r = distances[3];
+        mainterm = exp(-alpha*(r-rij)) - 1.0; // unitless
+        potential += Dij*(mainterm*mainterm); // in kcal/mol
+    }
 
     return potential; // in kcal/mol
 }
@@ -232,38 +232,33 @@ double angle_bend_energy(System &system) {
     int i,j,l,m;
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
     double angle; // the actual angle IJK
-    for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+    
+    for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
+        i = system.constants.uniqueAngles[it].mol;
+        j = system.constants.uniqueAngles[it].atom1;
+        l = system.constants.uniqueAngles[it].atom2;
+        m = system.constants.uniqueAngles[it].atom3;
 
-            // loop through bonds of this atom.
-            for (int it=0; it<system.molecules[i].atoms[j].bonds.size(); it++) {
-                l = system.molecules[i].atoms[j].bonds[it]; // id of bonded atom (on this molecule) 
-                rij = get_rij(system,i,j,i,l); // in Angstroms
-                theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
-                C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
-                C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
-                C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
-                //printf("theta_0 = %f\n", theta_ijk/deg2rad);
-                    
-                for (int it2=0; it2<system.molecules[i].atoms[l].bonds.size(); it2++) {
-                    m = system.molecules[i].atoms[l].bonds[it2];
-                    if (j==m) continue; // don't do duplicate angle ABA
-                    angle = get_angle(system, i, j, l, m);  
-                    //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
-                    rjk = get_rij(system,i,l,i,m);
-                    rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
-                    K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
-                    //printf("K_ijk = %f \n", K_ijk);
-                    //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
-                    potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
-                } // end atom m  (the "K" in IJK)
-                
-            } // end atom l (the "J" [middle] in IJK)
-        } // end atom j (the "I" in IJK);
-    } // end molecule loop i
+        rij = get_rij(system,i,j,i,l); // in Angstroms
+        theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
+        C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
+        C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
+        C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
+        //printf("theta_0 = %f\n", theta_ijk/deg2rad);
+            
+        angle = get_angle(system, i, j, l, m);  
+        //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
+        rjk = get_rij(system,i,l,i,m);
+        rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
+        K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+        //printf("K_ijk = %f \n", K_ijk);
+        //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
-    return 0.5*potential; // in kcal/mol
+        potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
+    
+    }
+    return potential; // in kcal/mol
 } // end angle bend energy
 
 // get the total potential from torsions
@@ -347,39 +342,36 @@ double angle_bend_gradient(System &system) {
     int i,j,l,m;
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
     double angle; // the actual angle IJK
-    for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+    
+    for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
 
-            // loop through bonds of this atom.
-            for (int it=0; it<system.molecules[i].atoms[j].bonds.size(); it++) {
-                l = system.molecules[i].atoms[j].bonds[it]; // id of bonded atom (on this molecule) 
-                rij = get_rij(system,i,j,i,l); // in Angstroms
-                theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
-                C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
-                C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
-                C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
-                //printf("theta_0 = %f\n", theta_ijk/deg2rad);
-                    
-                for (int it2=0; it2<system.molecules[i].atoms[l].bonds.size(); it2++) {
-                    m = system.molecules[i].atoms[l].bonds[it2];
-                    if (j==m) continue; // don't do duplicate angle ABA
-                    angle = get_angle(system, i, j, l, m);  
-                    //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
-                    rjk = get_rij(system,i,l,i,m);
-                    rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
-                    K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
-                    //printf("K_ijk = %f \n", K_ijk);
-                    //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
+        i = system.constants.uniqueAngles[it].mol;
+        j = system.constants.uniqueAngles[it].atom1;
+        l = system.constants.uniqueAngles[it].atom2;
+        m = system.constants.uniqueAngles[it].atom3;
+        
+            
+        rij = get_rij(system,i,j,i,l); // in Angstroms
+        theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
+        C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
+        C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
+        C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
+        //printf("theta_0 = %f\n", theta_ijk/deg2rad);
+            
+        angle = get_angle(system, i, j, l, m);  
+        //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
+        rjk = get_rij(system,i,l,i,m);
+        rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
+        K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+        //printf("K_ijk = %f \n", K_ijk);
+        //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
 
 
-                    // HALF BECAUSE THE ANGLES WILL BE DOUBLE COUNTED.
-                    double POT=0; POT += 0.5 * K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
-                } // end atom m  (the "K" in IJK)
-                
-            } // end atom l (the "J" [middle] in IJK)
-        } // end atom j (the "I" in IJK);
-    } // end molecule loop i
+         // HALF BECAUSE THE ANGLES WILL BE DOUBLE COUNTED.
+         double POT=0; POT += 0.5 * K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
+            
+    }
 
     return 0.; // in kcal/mol
 } // end angle bend energy
