@@ -34,11 +34,11 @@ void optimize(System &system) {
     printf("Elements :: atom-id :: bond-id\n");
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         printf("Atom %i (UFF: %s) bonds:\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
-        for (std::map<int,int>::iterator it=system.molecules[0].atoms[i].bonds.begin(); it!=system.molecules[0].atoms[i].bonds.end(); ++it) {
-            printf("%3s%2s%3s :: %1s%5i%1s :: %1s%5i%1s\n", 
-                    system.molecules[0].atoms[i].name.c_str(), "--", system.molecules[0].atoms[it->first].name.c_str(), 
-                    " ", it->first, " ",
-                    " ", it->second, " ");
+        for (int it=0; it<system.molecules[0].atoms[i].bonds.size(); it++) {
+            printf("%3s%2s%3s :: %1s%5i%1s\n", 
+                    system.molecules[0].atoms[i].name.c_str(), "--", system.molecules[0].atoms[system.molecules[0].atoms[i].bonds[it]].name.c_str(), 
+                    " ", system.molecules[0].atoms[i].bonds[it], " "
+                    );
         }
     }
     printf("================================\n");

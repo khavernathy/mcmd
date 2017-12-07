@@ -53,10 +53,11 @@ string getUFFlabel(System &system, string name, int num_bonds) {
 
 // function to find all bonds for all atoms.
 void findBonds(System &system) {
+    
     int i,j,l;
     double r;
     int local_bonds=0;
-    int unique_id=0; // master bond id
+    int duplicateFlag=0;
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
@@ -68,8 +69,25 @@ void findBonds(System &system) {
                r = distances[3];
                if (r < system.constants.bondlength) {
                     local_bonds++;
-                    system.molecules[i].atoms[j].bonds.insert(std::pair<int,int>(l,unique_id));
-                    unique_id++;
+
+                    system.molecules[i].atoms[j].bonds.push_back(l);
+
+                    // check for duplicate bond.
+                    duplicateFlag=0;
+                    for (int n=0;n<system.constants.uniqueBonds.size();n++) {
+                        if (system.constants.uniqueBonds[n].mol == i &&
+                            system.constants.uniqueBonds[n].atom1 == l &&
+                            system.constants.uniqueBonds[n].atom2 == j) {
+                            
+                            duplicateFlag=1; break;
+                        }
+                    }
+                    if (!duplicateFlag) {
+                        // this bond is unique
+                        Constants::UniqueBond tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l;         
+                        system.constants.uniqueBonds.push_back(tmp);
+                    }
+                    
                } // end if r < bond-length      
             } // end pair (i,j) -- (i,l)  
          
@@ -121,12 +139,12 @@ double stretch_energy(System &system) {
     /* ============================ */
     double BO = 1.0; // assume single bonds for now!!!
     /* ============================ */
-    for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
 
             // loop through bonds of this atom.
-            for (std::map<int,int>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
-                l = it->first; // id of bonded atom (on this molecule) 
+            for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+                i = system.constants.uniqueBonds[it].mol;
+                j = system.constants.uniqueBonds[it].atom1;
+                l = system.constants.uniqueBonds[it].atom2;
 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
                 kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
@@ -139,12 +157,9 @@ double stretch_energy(System &system) {
                 r = distances[3];
                 mainterm = exp(-alpha*(r-rij)) - 1.0; // unitless
                 potential += Dij*(mainterm*mainterm); // in kcal/mol
-                
             }
-        }
-    }
 
-    return 0.5*potential; // in kcal/mol
+    return potential; // in kcal/mol
 }
 
 // get angle-force parameter for IJK triplet 
@@ -190,8 +205,8 @@ double angle_bend_energy(System &system) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
 
             // loop through bonds of this atom.
-            for (std::map<int,int>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
-                l = it->first; // id of bonded atom (on this molecule) 
+            for (int it=0; it<system.molecules[i].atoms[j].bonds.size(); it++) {
+                l = system.molecules[i].atoms[j].bonds[it]; // id of bonded atom (on this molecule) 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
                 theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
                 C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
@@ -199,8 +214,8 @@ double angle_bend_energy(System &system) {
                 C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
                 //printf("theta_0 = %f\n", theta_ijk/deg2rad);
                     
-                for (std::map<int,int>::iterator it2=system.molecules[i].atoms[l].bonds.begin(); it2 != system.molecules[i].atoms[l].bonds.end(); ++it2) {
-                    m = it2->first;
+                for (int it2=0; it2<system.molecules[i].atoms[l].bonds.size(); it2++) {
+                    m = system.molecules[i].atoms[l].bonds[it2];
                     if (j==m) continue; // don't do duplicate angle ABA
                     angle = get_angle(system, i, j, l, m);  
                     //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
@@ -248,12 +263,11 @@ double morse_gradient(System &system) {
     /* ============================ */
     double BO = 1.0; // assume single bonds for now!!!
     /* ============================ */
-    for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
 
-            // loop through bonds of this atom.
-            for (std::map<int,int>::iterator it=system.molecules[i].atoms[j].bonds.begin(); it!=system.molecules[i].atoms[j].bonds.end(); ++it) {
-                l = it->first; // id of bonded atom (on this molecule) 
+            for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+                i = system.constants.uniqueBonds[it].mol;
+                j = system.constants.uniqueBonds[it].atom1;
+                l = system.constants.uniqueBonds[it].atom2;
 
                 rij = get_rij(system,i,j,i,l); // in Angstroms
                 kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
@@ -283,8 +297,6 @@ double morse_gradient(System &system) {
                 }
 
             }
-        }
-    }
 
     return 0; //.5*potential; // in kcal/mol
 }

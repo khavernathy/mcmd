@@ -294,7 +294,10 @@ class Constants {
         double opt_error = 0.00001; // error, in kcal/mol for convergence
         int opt_step_limit = 10000; // limit for convergence steps
         int opt_mode = OPTIMIZE_MC; // monte carlo style optimization as default
-
+        struct UniqueBond {
+            int mol, atom1, atom2; // indices of molecule + atoms of bond
+        };
+        vector<UniqueBond> uniqueBonds; // holds all unique bonds
 };
 
 class Pbc {
@@ -719,7 +722,7 @@ class Atom {
 		/*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
        
         string UFFlabel; // the UFF-style label for this atom. 
-        map<int,int> bonds; // <IDs of bonded atom, unique ID of bond>
+        vector<int> bonds; // <IDs of bonded atoms>
         
         double * get_acc() {
             static double output[3];
