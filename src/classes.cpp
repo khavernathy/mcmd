@@ -298,6 +298,10 @@ class Constants {
             int mol, atom1, atom2; // indices of molecule + atoms of bond
         };
         vector<UniqueBond> uniqueBonds; // holds all unique bonds
+        struct UniqueAngle {
+            int mol, atom1, atom2, atom3;
+        };
+        vector<UniqueAngle> uniqueAngles; // holds all unique 3-atom angles
 };
 
 class Pbc {

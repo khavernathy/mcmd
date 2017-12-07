@@ -51,13 +51,14 @@ string getUFFlabel(System &system, string name, int num_bonds) {
     return "NOTFOUND";
 }
 
-// function to find all bonds for all atoms.
+// function to find all bonds (and angles) for all atoms.
 void findBonds(System &system) {
     
-    int i,j,l;
-    double r;
+    int i,j,l,m;
+    double r, ra; // bond r, angle bond r
     int local_bonds=0;
-    int duplicateFlag=0;
+    int duplicateFlag=0; //bond dupes
+    int duplicateAngleFlag=0; // angle dupes
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
@@ -86,6 +87,35 @@ void findBonds(System &system) {
                         // this bond is unique
                         Constants::UniqueBond tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l;         
                         system.constants.uniqueBonds.push_back(tmp);
+                    }
+
+                    // now loop for angles
+                    for (m=0; m<system.molecules[i].atoms.size(); m++) {
+                        if (j==m) continue; // don't do ABA angles (0 degrees)
+                        if (l==m) continue; // don't do ABB angles (0 degrees)
+                        double* distancesa = getDistanceXYZ(system, i,l,i,m);
+                        ra = distancesa[3];                
+
+                        if (ra < system.constants.bondlength) {
+
+                            // check for duplicate angles
+                            duplicateAngleFlag = 0;
+                            for (int n=0;n<system.constants.uniqueAngles.size();n++) {
+                                if (system.constants.uniqueAngles[n].mol == i &&
+                                    system.constants.uniqueAngles[n].atom1 == m &&
+                                    system.constants.uniqueAngles[n].atom2 == l &&
+                                    system.constants.uniqueAngles[n].atom3 == j) {
+                                    
+                                    duplicateAngleFlag=1; break;
+
+                                }   
+                            }
+                            if (!duplicateAngleFlag) {
+                                // this angle is unique
+                                Constants::UniqueAngle tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l; tmp.atom3=m;
+                                system.constants.uniqueAngles.push_back(tmp);
+                            }
+                        }
                     }
                     
                } // end if r < bond-length      

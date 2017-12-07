@@ -29,22 +29,50 @@ void optimize(System &system) {
 
     int i;
     // print out all the bonds
+    printf("==================================================================\n");
     printf("Dynamically-found Bonds Summary:\n");
-    printf("================================\n");
-    printf("Elements :: atom-id :: bond-id\n");
-    for (i=0; i<system.molecules[0].atoms.size(); i++) {
-        printf("Atom %i (UFF: %s) bonds:\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
-        for (int it=0; it<system.molecules[0].atoms[i].bonds.size(); it++) {
-            printf("%3s%2s%3s :: %1s%5i%1s\n", 
-                    system.molecules[0].atoms[i].name.c_str(), "--", system.molecules[0].atoms[system.molecules[0].atoms[i].bonds[it]].name.c_str(), 
-                    " ", system.molecules[0].atoms[i].bonds[it], " "
+    printf("==================================================================\n");
+    printf("bond-id :: mol-id :: atom1 :: atom2 :: elements\n");
+    for (int n=0; n<system.constants.uniqueBonds.size(); n++) {
+        //printf("Atom %i (UFF: %s)\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
+                    int mol=system.constants.uniqueBonds[n].mol;
+                    int atom1=system.constants.uniqueBonds[n].atom1;
+                    int atom2=system.constants.uniqueBonds[n].atom2;
+            printf("%7i :: %6i :: %5i :: %5i :: %4s%1s%4s\n",
+                    n,
+                    mol,
+                    atom1,
+                    atom2,
+                    system.molecules[mol].atoms[atom1].name.c_str(),
+                    "-",
+                    system.molecules[mol].atoms[atom2].name.c_str()
                     );
-        }
     }
-    printf("================================\n");
+    printf("==================================================================\n");
+    // and angles
+    printf("Dynamically-found Angles Summary:\n");
+    printf("==================================================================\n");
+    printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 :: elements\n");
+    for (int n=0;n<system.constants.uniqueAngles.size();n++) {
+        int mol = system.constants.uniqueAngles[n].mol;
+        int atom1= system.constants.uniqueAngles[n].atom1;
+        int atom2 = system.constants.uniqueAngles[n].atom2;
+        int atom3 = system.constants.uniqueAngles[n].atom3;
+        printf("%8i :: %6i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s\n", n, 
+                mol,
+                atom1,
+                atom2,
+                atom3,
+                system.molecules[mol].atoms[atom1].name.c_str(),
+                "-",
+                system.molecules[mol].atoms[atom2].name.c_str(),
+                "-",
+                system.molecules[mol].atoms[atom3].name.c_str());
+    }
+    printf("==================================================================\n");
 
-    // iterate monte-carlo style pertubations until
-    // the molecular energy is minimized
+
+    /* START OPTIMIZATION */
     int converged = 0;
     double error_tolerance = system.constants.opt_error;
     int step_limit = system.constants.opt_step_limit; //100;
