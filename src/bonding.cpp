@@ -172,19 +172,20 @@ double get_Kijk(System &system, double rij, double rjk, double rik, double Zi, d
 
 // get the angle ABC where B is center atom, on molecule i
 double get_angle(System &system, int i, int A, int B, int C) {
+    // https://stackoverflow.com/questions/19729831/angle-between-3-points-in-3d-space
     double AB[3] = {0,0,0};
     double BC[3] = {0,0,0};
 
     for (int n=0;n<3;n++) {
-        AB[n] = system.molecules[i].atoms[B].pos[n] - system.molecules[i].atoms[A].pos[n];
+        AB[n] = system.molecules[i].atoms[A].pos[n] - system.molecules[i].atoms[B].pos[n];
         BC[n] = system.molecules[i].atoms[C].pos[n] - system.molecules[i].atoms[B].pos[n];
     }
     
     const double dotprod = dddotprod(AB,BC);
     const double ABm = sqrt(dddotprod(AB,AB));
     const double BCm = sqrt(dddotprod(BC,BC));
-
-    return M_PI - acos(dotprod/(ABm*BCm)); // returns in radians
+    
+    return acos(dotprod/(ABm*BCm)); // returns in radians
 }
 
 // get r_ik, a parameter for angle bends, ** different from r_ij (and r_jk) **
