@@ -84,9 +84,15 @@ void optimize(System &system) {
     int randatom;
     int step=0;
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
+    
+    int optmode = system.constants.opt_mode;
+    if (optmode == OPTIMIZE_SD)
+        printf("STEEPEST DESCENT STRUCTURE OPTIMIZATION\n");
+    else if (optmode == OPTIMIZE_MC)
+        printf("MONTE CARLO STRUCTURE OPTIMIZATION\n");
+
     printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0, Ei, 0.0);
 
-    int optmode = system.constants.opt_mode;
     // Monte Carlo sytle opt.
     if (optmode == OPTIMIZE_MC) {
     while (!converged) {
