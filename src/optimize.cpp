@@ -21,8 +21,8 @@ double move_factor(double energy, int N) {
     // the move_factor scales down to 0 as energy approaches 0
     // thus we save some time optimizing by not trying dumb (big) moves 
     // when energy is very low.
-    // normalized by 5 kcal/mol per atom
-    return 1.0 -exp(-energy*energy / (5.0*N)); // reverse bell-curve
+    // normalized by 10 kcal/mol per atom
+    return 1.0 -exp(-energy*energy / (10.0*N*N)); // reverse bell-curve
 }
 
 void outputEnergies(System &system, int step, double Ef, double delta_E) {

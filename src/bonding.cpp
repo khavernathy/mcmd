@@ -341,11 +341,6 @@ double angle_bend_energy(System &system) {
 } // end angle bend energy
 
 
-double get_Vjk(double vj, double vk) {
-    // sp3 -- sp3
-    return sqrt(vj*vk);
-}
-
 double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     // current dihedral angle for i--j--k--l atoms
     /*
@@ -393,6 +388,43 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     return acos(dotplanes/(mag1*mag2)); 
 }
 
+double * get_torsion_params(System &system, string a1, string a2) {
+    static double o[3];
+    // output 0 -- equilibrium angle
+    // output 1 -- V_jk (energy param)
+    // output 2 -- n (periodicity)
+
+    // based on the shared bond of the torsion
+    // sp3--sp3
+    if (a1.find("_3") != std::string::npos && a2.find("_3") != std::string::npos) {    
+        o[0] = 60; // "or 180" 
+        o[1] = sqrt(system.constants.UFF_torsions[a1] * system.constants.UFF_torsions[a2]); 
+        o[2] = 3;
+    }
+    // sp3--sp2
+    else if ((a1.find("_3") != std::string::npos && a2.find("_2") != std::string::npos) || (a1.find("_2") != std::string::npos && a2.find("_3") != std::string::npos)) {
+        o[0]=0;
+        o[1]=1.0; 
+        o[2] = 6;
+    }
+    // sp2--sp2
+    else if (a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos) {    
+        o[0]=180; // "or 60"
+        const double BO = 1.5; // assume resonance bond order..
+        double Uj=1.25,Uk=1.25; // assume second period...
+        o[1] = 5.0*sqrt(Uj*Uk)*(1.0 + 4.18*log(BO)); 
+        o[2] = 2; 
+    }
+    // sp--sp
+    else if (a1.find("_1") != std::string::npos && a2.find("_1") != std::string::npos) {    
+        o[0]=180; 
+        o[1]=0; 
+        o[2] = 0;
+    }
+
+    return o;
+}
+
 // get the total potential from torsions
 // via simple Fourier small cosine expansion
 double torsions_energy(System &system) {
@@ -407,15 +439,12 @@ double torsions_energy(System &system) {
         m = system.constants.uniqueDihedrals[it].atom3;
         p = system.constants.uniqueDihedrals[it].atom4;
 
-        vj = system.constants.UFF_torsions[system.molecules[i].atoms[l].UFFlabel.c_str()];
-        vk = system.constants.UFF_torsions[system.molecules[i].atoms[m].UFFlabel.c_str()];
-        vjk = get_Vjk(vj, vk);
+        double * params = get_torsion_params(system, system.molecules[i].atoms[l].UFFlabel, system.molecules[i].atoms[m].UFFlabel);
+        phi_ijkl = params[0]*deg2rad;
+        vjk = params[1]; 
+        n = params[2];
+        
         dihedral = get_dihedral_angle(system, i, j,l,m,p);
-    //    printf("dihedral = %f\n", dihedral);
-
-        phi_ijkl = 60.0*deg2rad; // ...
-        n = 3.0; // ..
-
         potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
     }
 
