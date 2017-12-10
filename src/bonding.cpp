@@ -549,8 +549,65 @@ double angle_bend_gradient(System &system) {
 } // end angle bend energy
 
 
+double LJ_intramolec(System &system) {
+    // this is a non-bonding potential, but I'm including it here as a separate function
+    // for optimizations, with unique units (kcal/mol) from the MC/MD lj.cpp (Kelvin)
+    // the latter of which excludes all intramolecular contributions.
+    double potential=0;
+    int mol,i,j, qualified, y,z;
+    double eps, sig, r, sr6;
+    for (mol=0; mol<system.molecules.size(); mol++) {
+        // all pairs inside the molecule
+        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
+            for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
+                // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
+                qualified = 1;
+                for (y=0; y<system.constants.uniqueBonds.size();y++) {
+                    if (system.constants.uniqueBonds[y].mol==mol &&
+                        ((
+                        system.constants.uniqueBonds[y].atom1==i &&
+                        system.constants.uniqueBonds[y].atom2==j
+                        ) || 
+                        (
+                        system.constants.uniqueBonds[y].atom1==j &&
+                        system.constants.uniqueBonds[y].atom2==i
+                        ))) {
+                        qualified=0;  break;
+                    } // end if bonded therefore unqualified
+                } // end bonds loop
+                for (z=0; z<system.constants.uniqueAngles.size();z++) {
+                    if (system.constants.uniqueAngles[z].mol==mol &&
+                       ((
+                        system.constants.uniqueAngles[z].atom1==i &&
+                        system.constants.uniqueAngles[z].atom3==j
+                       ) ||
+                       (
+                        system.constants.uniqueAngles[z].atom3==i &&
+                        system.constants.uniqueAngles[z].atom1==j
+                       ))) {
+                       qualified=0; break;
+                    } // end if 1--3 therefore unqualified
+                }
+
+                if (qualified) {
+                    eps = sqrt(system.molecules[mol].atoms[i].eps * system.molecules[mol].atoms[j].eps);
+                    sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
+                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
+                    r = distances[3];
+                    sr6 = sig/r;
+                    sr6 *= sr6;
+                    sr6 *= sr6*sr6;
+                    potential += 4.0*eps*(sr6*sr6 - sr6);
+                           
+                }
+            } // end pair-atom j
+        } // end atom loop i
+    } // end molecule loop mol
+    return potential*system.constants.kbk; // to kcal/mol
+} // LJ intramolecular potential function
+
 double totalBondedEnergy(System &system) {
-    return stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system);
+    return stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system) + LJ_intramolec(system);
 }
 
 
