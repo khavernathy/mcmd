@@ -619,15 +619,16 @@ class Stats {
 
         // these are the instances of the "observables type" obs_t.
         // i.e. all the quantities of interest which can be averaged and dealt with.
-        } Nsq,NU,qst,qst_nvt,
-          rd,es,polar,
+        } Nsq,NU,qst,qst_nvt, 
+          rd,es,polar, // all energies in K unless otherwise stated
           potential,potential_sq,
           kinetic, kinetic_sq,
           totalE, totalE_sq,
-          Klin, Krot, Ulin, Urot,     // linear (translational) and rotational energies
+          Klin, Krot, Ulin, Urot, // linear (translational) and rotational energies
           lj_lrc, lj_self_lrc, lj, // lj_self_lrc is really just "self" energy for LJ potential.
           es_self, es_real, es_recip,
           tt, tt_lrc, tt_self,
+          Ustretch, Uangles, Udihedrals, UintraLJ, Ubonded_tot, // bonded energies in kcal/mol
           chempot,totalmass, frozenmass, 
           pressure,temperature, fdotrsum, 
           dist_within, diffusion, volume, z, // z = PV/nRT

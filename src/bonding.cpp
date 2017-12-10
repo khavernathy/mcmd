@@ -264,6 +264,7 @@ double stretch_energy(System &system) {
         potential += Dij*(mainterm*mainterm); // in kcal/mol
     }
 
+    system.stats.Ustretch.value = potential;
     return potential; // in kcal/mol
 }
 
@@ -333,6 +334,7 @@ double angle_bend_energy(System &system) {
         potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
     
     }
+    system.stats.Uangles.value = potential;
     return potential; // in kcal/mol
 } // end angle bend energy
 
@@ -410,6 +412,7 @@ double torsions_energy(System &system) {
         potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
     }
 
+    system.stats.Udihedrals.value = potential;
     return potential; // in kcal/mol
 }
 
@@ -603,11 +606,14 @@ double LJ_intramolec(System &system) {
             } // end pair-atom j
         } // end atom loop i
     } // end molecule loop mol
+    system.stats.UintraLJ.value = potential*system.constants.kbk;
     return potential*system.constants.kbk; // to kcal/mol
 } // LJ intramolecular potential function
 
 double totalBondedEnergy(System &system) {
-    return stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system) + LJ_intramolec(system);
+    // each function here saves the component energies to Stats class. (system.stats)
+    system.stats.Ubonded_tot.value = stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system) + LJ_intramolec(system);
+    return system.stats.Ubonded_tot.value;
 }
 
 

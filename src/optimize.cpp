@@ -25,14 +25,24 @@ double move_factor(double energy, int N) {
     return 1.0 -exp(-energy*energy / (100.0*N*N)); // reverse bell-curve
 }
 
+void outputEnergies(System &system, int step, double Ef, double delta_E) {
+    printf("==============================================================\n");
+    printf("Step %i\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n", step,Ef, delta_E);
+    printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\n",
+          system.stats.Ustretch.value,
+          system.stats.Uangles.value,
+          system.stats.Udihedrals.value,
+          system.stats.UintraLJ.value); 
+}
+
 // Optimize the molecule (ID=0) via MM forcefield(s)
 void optimize(System &system) {
 
     int i;
     // print out all the bonds
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
     printf("Dynamically-found Bonds Summary:\n");
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
     printf("bond-id :: mol-id :: atom1 :: atom2 :: elements\n");
     for (int n=0; n<system.constants.uniqueBonds.size(); n++) {
         //printf("Atom %i (UFF: %s)\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
@@ -50,9 +60,9 @@ void optimize(System &system) {
                     );
     }
     // and angles
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
     printf("Dynamically-found Angles Summary:\n");
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
     printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 :: elements\n");
     for (int n=0;n<system.constants.uniqueAngles.size();n++) {
         int mol = system.constants.uniqueAngles[n].mol;
@@ -71,9 +81,9 @@ void optimize(System &system) {
                 system.molecules[mol].atoms[atom3].name.c_str());
     }
     // and Dihedrals
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
     printf("Dynamically-found Dihedrals Summary:\n");
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
     printf("dihedral-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 :: elements\n");
     for (int n=0; n<system.constants.uniqueDihedrals.size();n++) {
         int mol = system.constants.uniqueDihedrals[n].mol;
@@ -92,7 +102,7 @@ void optimize(System &system) {
             system.molecules[mol].atoms[atom4].name.c_str());
     }
 
-    printf("==================================================================\n");
+    printf("===============================================================================\n");
 
     /* START OPTIMIZATION */
     int converged = 0;
@@ -138,8 +148,9 @@ void optimize(System &system) {
            // accept
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-            printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", step,Ef, delta_E);
+            outputEnergies(system, step, Ef, delta_E);
             if (fabs(delta_E) < error_tolerance && delta_E!=0) {
+                outputEnergies(system, step, Ef, delta_E);
                 printf("Finished with energy = %f kcal/mol \n", Ef);
                 converged=1;
             }
@@ -150,8 +161,9 @@ void optimize(System &system) {
 
         // check max-steps convergence
         if (step >= step_limit) {
-                printf("Finished with energy = %f kcal/mol \n", Ei); 
-                converged=1;
+            outputEnergies(system, step, Ef, delta_E);    
+            printf("Finished with energy = %f kcal/mol \n", Ef); 
+            converged=1;
         }
 
     } // end while loop for convergence
@@ -181,17 +193,12 @@ void optimize(System &system) {
 
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-            printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", step,Ef, delta_E);
-             
+            outputEnergies(system, step, Ef, delta_E);
 
-            if (fabs(delta_E) < error_tolerance && delta_E!=0) {
+            if ((fabs(delta_E) < error_tolerance && delta_E!=0) || step >= step_limit) {
+                 outputEnergies(system, step, Ef, delta_E);
                  printf("Finished with energy = %f kcal/mol \n", Ef);
-                converged=1;
-            }
-
-            if (step >= step_limit) {
-                printf("Finished with energy = %f kcal/mol \n", Ei);
-                converged=1;
+                 converged=1;
             }
         }
     }
