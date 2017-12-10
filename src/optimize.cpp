@@ -16,12 +16,13 @@ void perturbAtom(System &system, int i, double mf) {
     return;
 }
 
-double move_factor(double energy) {
+double move_factor(double energy, int N) {
     // a simple scalar modifier to the explorable volume for optimization
     // the move_factor scales down to 0 as energy approaches 0
     // thus we save some time optimizing by not trying dumb (big) moves 
     // when energy is very low.
-    return 1.0 -exp(-energy*energy); // reverse bell-curve
+    // normalized by 100 kcal/mol per atom
+    return 1.0 -exp(-energy*energy / (100.0*N)); // reverse bell-curve
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
@@ -116,13 +117,14 @@ void optimize(System &system) {
 
     // Monte Carlo sytle opt.
     if (optmode == OPTIMIZE_MC) {
+        int N = (int)system.molecules[0].atoms.size();
     while (!converged) {
         Ei = totalBondedEnergy(system);
 
         // select random atom and perturb it.
         randatom = pickRandomAtom(system);
         for (int n=0;n<3;n++) tmp_pos[n] = system.molecules[0].atoms[randatom].pos[n];
-        perturbAtom(system, randatom, move_factor(Ei));
+        perturbAtom(system, randatom, move_factor(Ei, N));
 
         // get new energy
         Ef = totalBondedEnergy(system);
