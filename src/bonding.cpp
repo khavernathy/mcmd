@@ -71,7 +71,12 @@ void findBonds(System &system) {
                if (j==l) continue; // don't do self-atom
                double* distances = getDistanceXYZ(system, i,j,i,l);
                r = distances[3];
-               if (r < system.constants.bondlength) {
+               
+               // avoid H-H bonds, except when H2 is the molecule.
+               if (r < system.constants.bondlength
+                    && (!((system.molecules[i].atoms[j].name == "H" &&
+                        system.molecules[i].atoms[l].name == "H") &&
+                        system.molecules[i].atoms.size() != 2))) {
                     local_bonds++;
 
                     system.molecules[i].atoms[j].bonds.push_back(l);
@@ -98,8 +103,12 @@ void findBonds(System &system) {
                         if (l==m) continue; // don't do ABB angles (0 degrees)
                         double* distancesa = getDistanceXYZ(system, i,l,i,m);
                         ra = distancesa[3];                
-
-                        if (ra < system.constants.bondlength) {
+                    
+                        // avoid H-H bonds, except when H2 is the molecule.
+                        if (ra < system.constants.bondlength
+                            && (!((system.molecules[i].atoms[m].name == "H" &&
+                            system.molecules[i].atoms[l].name == "H") &&
+                            system.molecules[i].atoms.size() != 2))) {
 
                             // check for duplicate angles
                             duplicateAngleFlag = 0;
@@ -123,16 +132,31 @@ void findBonds(System &system) {
                             for (p=0; p<system.molecules[i].atoms.size(); p++) {
                                 double * distancesh = getDistanceXYZ(system,i,m,i,p);
                                 rh = distancesh[3];
+                                if (j==l) continue; // don't do AABC
+                                if (j==p) continue; // don't do ABCA
+                                if (l==m) continue; // don't do ABBC
+                                if (m==p) continue; // don't do ABCC
+                                if (j==m) continue; // don't do ABAC
+                                if (l==p) continue; // don't do ABCB
 
-                                if (rh < system.constants.bondlength) {
+                                // avoid H-H bonds, except when H2 is the molecule.
+                                if (rh < system.constants.bondlength
+                                    && (!((system.molecules[i].atoms[p].name == "H" &&
+                                    system.molecules[i].atoms[m].name == "H") &&
+                                    system.molecules[i].atoms.size() != 2))) {
                                     // check duplicate dihedral
                                     duplicateDihFlag = 0;
                                     for (int n=0;n<system.constants.uniqueDihedrals.size();n++) {
-                                        if (system.constants.uniqueDihedrals[n].mol==i &&
+                                        if ((system.constants.uniqueDihedrals[n].mol==i &&
                                             system.constants.uniqueDihedrals[n].atom1==p &&
                                             system.constants.uniqueDihedrals[n].atom2==m &&
                                             system.constants.uniqueDihedrals[n].atom3==l &&
-                                            system.constants.uniqueDihedrals[n].atom4==j) {
+                                            system.constants.uniqueDihedrals[n].atom4==j) ||
+                                            (system.constants.uniqueDihedrals[n].mol==i &&
+                                            system.constants.uniqueDihedrals[n].atom1==p &&
+                                            system.constants.uniqueDihedrals[n].atom2==m &&
+                                            system.constants.uniqueDihedrals[n].atom3==l &&
+                                            system.constants.uniqueDihedrals[n].atom4==j )) {
 
                                                 duplicateDihFlag = 1;break;
                                         }
@@ -158,6 +182,26 @@ void findBonds(System &system) {
 
         } // end j
     } // end i
+
+    // check for unphysical H-H bonds
+        for (int n=0;n<system.constants.uniqueBonds.size();n++) {
+            int mol=system.constants.uniqueBonds[n].mol;
+            int a1=system.constants.uniqueBonds[n].atom1;
+            int a2=system.constants.uniqueBonds[n].atom2;
+            if (system.molecules[mol].atoms[a1].name == "H" &&
+                system.molecules[mol].atoms[a2].name == "H") {
+                
+                printf("H-H bond: %i %i (bondid %i)\n", a1,a2,n);
+                // see if this H-H is not H2 molecule.
+                if (system.molecules[mol].atoms[a1].bonds.size() > 1 ||
+                    system.molecules[mol].atoms[a2].bonds.size() > 1) {
+
+                }
+            }
+
+        }
+
+
 }
 
 /*
