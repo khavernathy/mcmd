@@ -24,6 +24,10 @@ double move_factor(double energy) {
     return 1.0 -exp(-energy*energy); // reverse bell-curve
 }
 
+double totalBondedEnergy(System &system) {
+    return stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system);
+}
+
 // Optimize the molecule (ID=0) via MM forcefield(s)
 void optimize(System &system) {
 
@@ -97,7 +101,7 @@ void optimize(System &system) {
     int converged = 0;
     double error_tolerance = system.constants.opt_error;
     int step_limit = system.constants.opt_step_limit; //100;
-    double Ei = stretch_energy(system) + angle_bend_energy(system);
+    double Ei = totalBondedEnergy(system);
     double Ef;
     double delta_E;
     double boltzmann;
@@ -117,7 +121,7 @@ void optimize(System &system) {
     // Monte Carlo sytle opt.
     if (optmode == OPTIMIZE_MC) {
     while (!converged) {
-        Ei = stretch_energy(system) + angle_bend_energy(system);
+        Ei = totalBondedEnergy(system);
 
         // select random atom and perturb it.
         randatom = pickRandomAtom(system);
@@ -125,7 +129,7 @@ void optimize(System &system) {
         perturbAtom(system, randatom, move_factor(Ei));
 
         // get new energy
-        Ef = stretch_energy(system) + angle_bend_energy(system);
+        Ef = totalBondedEnergy(system);
         delta_E = Ef - Ei;
 
       //  printf("Ef after = %f\n", Ef);
@@ -159,7 +163,7 @@ void optimize(System &system) {
     else if (optmode == OPTIMIZE_SD) {
         const double move_factor = 0.0005;
         while (!converged) {
-            Ei = stretch_energy(system) + angle_bend_energy(system);
+            Ei = totalBondedEnergy(system);
             // re-initialize gradient
             for (int i=0; i<system.molecules[0].atoms.size(); i++) 
                 for (int n=0;n<3;n++)
@@ -174,7 +178,7 @@ void optimize(System &system) {
                 for (int n=0;n<3;n++)
                     system.molecules[0].atoms[i].pos[n] -= move_factor * system.molecules[0].atoms[i].energy_grad[n];
 
-            Ef = stretch_energy(system) + angle_bend_energy(system);
+            Ef = totalBondedEnergy(system);
             delta_E = Ef - Ei;
 
             step++;

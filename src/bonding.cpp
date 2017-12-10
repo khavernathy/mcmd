@@ -336,15 +336,37 @@ double angle_bend_energy(System &system) {
     return potential; // in kcal/mol
 } // end angle bend energy
 
+
+double get_Vjk(double vj, double vk) {
+    // sp3 -- sp3
+    return sqrt(vj*vk);
+}
+
+double get_dihedral_angle(System &system, int i, int j, int k, int l, int m) {
+    // current dihedral angle for i--j--k--l atoms
+    return 0; 
+}
+
 // get the total potential from torsions
 // via simple Fourier small cosine expansion
 double torsions_energy(System &system) {
     double potential=0;
+    double vjk, vj, vk, n;
     const double deg2rad = M_PI/180.0;
-    int i,j,l,m,n; // molecule i, atoms (j,l,m and n)
-    
-    
+    int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
+    for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+        i = system.constants.uniqueDihedrals[it].mol;
+        j = system.constants.uniqueDihedrals[it].atom1;
+        l = system.constants.uniqueDihedrals[it].atom2;
+        m = system.constants.uniqueDihedrals[it].atom3;
+        p = system.constants.uniqueDihedrals[it].atom4;
 
+        vj = system.constants.UFF_torsions[system.molecules[i].atoms[l].UFFlabel.c_str()];
+        vk = system.constants.UFF_torsions[system.molecules[i].atoms[m].UFFlabel.c_str()];
+        vjk = get_Vjk(vj, vk);
+   
+        potential += 0;//0.5*vjk;
+    }
 
     return potential; // in kcal/mol
 }
