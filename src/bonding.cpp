@@ -549,3 +549,8 @@ double angle_bend_gradient(System &system) {
 } // end angle bend energy
 
 
+double totalBondedEnergy(System &system) {
+    return stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system);
+}
+
+

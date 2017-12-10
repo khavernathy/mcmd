@@ -24,10 +24,6 @@ double move_factor(double energy) {
     return 1.0 -exp(-energy*energy); // reverse bell-curve
 }
 
-double totalBondedEnergy(System &system) {
-    return stretch_energy(system) + angle_bend_energy(system) + torsions_energy(system);
-}
-
 // Optimize the molecule (ID=0) via MM forcefield(s)
 void optimize(System &system) {
 
