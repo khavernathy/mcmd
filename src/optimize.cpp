@@ -22,7 +22,7 @@ double move_factor(double energy, int N) {
     // thus we save some time optimizing by not trying dumb (big) moves 
     // when energy is very low.
     // normalized by 250 kcal/mol per atom
-    return 1.0 -exp(-energy*energy / (250.0*N)); // reverse bell-curve
+    return 1.0 -exp(-energy*energy / (100.0*N*N)); // reverse bell-curve
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
