@@ -290,7 +290,7 @@ class Constants {
         int user_charge=0; // molecular charge for single point calc's
 
         /* OPTIMIZATION OPTIONS */
-        double bondlength = 1.9; // for bonding MD, default
+        double bondlength = 1.5; // for bonding MD, default
         double opt_error = 0.00001; // error, in kcal/mol for convergence
         int opt_step_limit = 10000; // limit for convergence steps
         int opt_mode = OPTIMIZE_MC; // monte carlo style optimization as default
