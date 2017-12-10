@@ -342,16 +342,54 @@ double get_Vjk(double vj, double vk) {
     return sqrt(vj*vk);
 }
 
-double get_dihedral_angle(System &system, int i, int j, int k, int l, int m) {
+double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     // current dihedral angle for i--j--k--l atoms
-    return 0; 
+    /*
+     *          L    <- 0 degree dihedral (in plane of screen)..
+     *         /
+     *    J---K
+     *   /
+     *  I
+     *
+     * */
+    // 4 components of a plane are A,B,C,D in Ax + By + Cz + D = 0
+    // The D parameter is irrelevant here so we just need a vector holding A,B,C
+    double Plane1[3]; // build from atoms i,j,k
+    double Plane2[3]; // build from atoms j,k,l
+    double v1a[3], v1b[3]; // for plane 1
+    double v2a[3], v2b[3]; // for plane 2
+
+    for (int n=0; n<3; n++) {
+        v1a[n] = system.molecules[mol].atoms[j].pos[n] - system.molecules[mol].atoms[i].pos[n];
+        v1b[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[i].pos[n];
+        
+        v2a[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[j].pos[n];
+        v2b[n] = system.molecules[mol].atoms[l].pos[n] - system.molecules[mol].atoms[j].pos[n];
+    }
+
+    double* norm1 = crossprod(v1a, v1b);
+    double* norm2 = crossprod(v2a, v2b);
+    
+    for (int n=0;n<3;n++) {
+        Plane1[n] = norm1[n];
+        Plane2[n] = norm2[n];
+    }
+    //Plane1[3] = -dddotprod(norm1, system.molecules[mol].atoms[i].pos);
+    //Plane2[3] = -dddotprod(norm2, system.molecules[mol].atoms[j].pos);
+
+    // both planes done; now get angle
+    const double dotplanes = dddotprod(Plane1,Plane2);
+    const double mag1 = sqrt(dddotprod(Plane1,Plane1));
+    const double mag2 = sqrt(dddotprod(Plane2,Plane2));
+
+    return acos(dotplanes/(mag1*mag2)); 
 }
 
 // get the total potential from torsions
 // via simple Fourier small cosine expansion
 double torsions_energy(System &system) {
     double potential=0;
-    double vjk, vj, vk, n;
+    double vjk, vj, vk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
     const double deg2rad = M_PI/180.0;
     int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
@@ -364,8 +402,12 @@ double torsions_energy(System &system) {
         vj = system.constants.UFF_torsions[system.molecules[i].atoms[l].UFFlabel.c_str()];
         vk = system.constants.UFF_torsions[system.molecules[i].atoms[m].UFFlabel.c_str()];
         vjk = get_Vjk(vj, vk);
-   
-        potential += 0;//0.5*vjk;
+        dihedral = get_dihedral_angle(system, i, j,l,m,p);
+
+        phi_ijkl = 60.0*deg2rad; // ...
+        n = 3.0; // ..
+
+        potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
     }
 
     return potential; // in kcal/mol
