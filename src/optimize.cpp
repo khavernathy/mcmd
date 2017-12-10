@@ -40,9 +40,9 @@ void optimize(System &system) {
 
     int i;
     // print out all the bonds
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
     printf("Dynamically-found Bonds Summary:\n");
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
     printf("bond-id :: mol-id :: atom1 :: atom2 :: elements\n");
     for (int n=0; n<system.constants.uniqueBonds.size(); n++) {
         //printf("Atom %i (UFF: %s)\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
@@ -60,9 +60,9 @@ void optimize(System &system) {
                     );
     }
     // and angles
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
     printf("Dynamically-found Angles Summary:\n");
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
     printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 :: elements\n");
     for (int n=0;n<system.constants.uniqueAngles.size();n++) {
         int mol = system.constants.uniqueAngles[n].mol;
@@ -81,9 +81,9 @@ void optimize(System &system) {
                 system.molecules[mol].atoms[atom3].name.c_str());
     }
     // and Dihedrals
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
     printf("Dynamically-found Dihedrals Summary:\n");
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
     printf("dihedral-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 :: elements\n");
     for (int n=0; n<system.constants.uniqueDihedrals.size();n++) {
         int mol = system.constants.uniqueDihedrals[n].mol;
@@ -102,7 +102,20 @@ void optimize(System &system) {
             system.molecules[mol].atoms[atom4].name.c_str());
     }
 
-    printf("===============================================================================\n");
+    printf("================================================================================\n");
+    printf("Dynamically-found UFF atom-types:\n");
+    printf("================================================================================\n");
+    printf("mol-id :: atom-id :: element :: UFF-label\n");
+    for (int i=0; i<system.molecules.size(); i++) {
+        for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+            printf("%6i :: %7i :: %7s :: %9s\n",
+                    i, j,
+                    system.molecules[i].atoms[j].name.c_str(),
+                    system.molecules[i].atoms[j].UFFlabel.c_str());
+        }
+    }
+    printf("================================================================================\n");
+   
 
     /* START OPTIMIZATION */
     int converged = 0;
