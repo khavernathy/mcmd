@@ -56,11 +56,12 @@ string getUFFlabel(System &system, string name, int num_bonds) {
 // function to find all bonds (and angles) for all atoms.
 void findBonds(System &system) {
     
-    int i,j,l,m;
-    double r, ra; // bond r, angle bond r
+    int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
+    double r, ra, rh; // bond r, angle bond ra, dihedral bond rh
     int local_bonds=0;
     int duplicateFlag=0; //bond dupes
     int duplicateAngleFlag=0; // angle dupes
+    int duplicateDihFlag=0; // dihedral dupes
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
@@ -116,6 +117,34 @@ void findBonds(System &system) {
                                 // this angle is unique
                                 Constants::UniqueAngle tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l; tmp.atom3=m;
                                 system.constants.uniqueAngles.push_back(tmp);
+                            }
+
+                            // now loop for dihedrals
+                            for (p=0; p<system.molecules[i].atoms.size(); p++) {
+                                double * distancesh = getDistanceXYZ(system,i,m,i,p);
+                                rh = distancesh[3];
+
+                                if (rh < system.constants.bondlength) {
+                                    // check duplicate dihedral
+                                    duplicateDihFlag = 0;
+                                    for (int n=0;n<system.constants.uniqueDihedrals.size();n++) {
+                                        if (system.constants.uniqueDihedrals[n].mol==i &&
+                                            system.constants.uniqueDihedrals[n].atom1==p &&
+                                            system.constants.uniqueDihedrals[n].atom2==m &&
+                                            system.constants.uniqueDihedrals[n].atom3==l &&
+                                            system.constants.uniqueDihedrals[n].atom4==j) {
+
+                                                duplicateDihFlag = 1;break;
+                                        }
+                                    }
+                                    // this dihedral is unique
+                                    if (!duplicateDihFlag) {
+                                        Constants::UniqueDihedral tmp; tmp.mol=i; tmp.atom1=j;
+                                        tmp.atom2=l; tmp.atom3=m; tmp.atom4=p;
+                                        system.constants.uniqueDihedrals.push_back(tmp);
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -270,7 +299,7 @@ double torsions_energy(System &system) {
     const double deg2rad = M_PI/180.0;
     int i,j,l,m,n; // molecule i, atoms (j,l,m and n)
     
-
+    
 
 
     return potential; // in kcal/mol
@@ -401,7 +430,8 @@ double angle_bend_gradient(System &system) {
         cos2 = 2*(((xk-xj)/(djk*dij)) - (( (xi-xj)*(B + (xk-xj)*(xi-xj)))/(djk*dij*dij*dij))) * sin(2*acos((B + (xk-xj)*(xi-xj))/(djk*dij))) / sqrt(1 - pow((B + (xk-xj)*(xi-xj)),2)/(djk*djk*dij*dij));
 
         grad = K_ijk*(C1*cos1 + C2*cos2);
-        system.molecules[i].atoms[j].energy_grad[0] += 0; // grad;
+        system.molecules[i].atoms[j].energy_grad[0] += grad; // grad;
+        
 
         double POT=K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
             
