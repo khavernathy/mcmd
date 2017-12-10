@@ -21,13 +21,13 @@ double move_factor(double energy, int N) {
     // the move_factor scales down to 0 as energy approaches 0
     // thus we save some time optimizing by not trying dumb (big) moves 
     // when energy is very low.
-    // normalized by 250 kcal/mol per atom
-    return 1.0 -exp(-energy*energy / (100.0*N*N)); // reverse bell-curve
+    // normalized by 5 kcal/mol per atom
+    return 1.0 -exp(-energy*energy / (5.0*N)); // reverse bell-curve
 }
 
 void outputEnergies(System &system, int step, double Ef, double delta_E) {
     printf("==============================================================\n");
-    printf("Step %i\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n", step,Ef, delta_E);
+    printf("Step %i\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step,Ef, delta_E);
     printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\n",
           system.stats.Ustretch.value,
           system.stats.Uangles.value,
@@ -163,7 +163,6 @@ void optimize(System &system) {
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
             outputEnergies(system, step, Ef, delta_E);
             if (fabs(delta_E) < error_tolerance && delta_E!=0) {
-                outputEnergies(system, step, Ef, delta_E);
                 printf("Finished with energy = %f kcal/mol \n", Ef);
                 converged=1;
             }
@@ -174,7 +173,6 @@ void optimize(System &system) {
 
         // check max-steps convergence
         if (step >= step_limit) {
-            outputEnergies(system, step, Ef, delta_E);    
             printf("Finished with energy = %f kcal/mol \n", Ef); 
             converged=1;
         }
@@ -209,7 +207,6 @@ void optimize(System &system) {
             outputEnergies(system, step, Ef, delta_E);
 
             if ((fabs(delta_E) < error_tolerance && delta_E!=0) || step >= step_limit) {
-                 outputEnergies(system, step, Ef, delta_E);
                  printf("Finished with energy = %f kcal/mol \n", Ef);
                  converged=1;
             }

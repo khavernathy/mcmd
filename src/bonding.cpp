@@ -44,6 +44,8 @@ string getUFFlabel(System &system, string name, int num_bonds) {
         // weird geometries
     } else if (name == "Cl") {
         return "Cl";
+    } else if (name == "Co") {
+        return "Co6+3";
     } else if (name == "Br") {
         return "Br";
     } else if (name == "I") {
@@ -360,6 +362,7 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     double Plane2[3]; // build from atoms j,k,l
     double v1a[3], v1b[3]; // for plane 1
     double v2a[3], v2b[3]; // for plane 2
+    double norm1[3], norm2[3];
 
     for (int n=0; n<3; n++) {
         v1a[n] = system.molecules[mol].atoms[j].pos[n] - system.molecules[mol].atoms[i].pos[n];
@@ -369,15 +372,18 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
         v2b[n] = system.molecules[mol].atoms[l].pos[n] - system.molecules[mol].atoms[j].pos[n];
     }
 
-    double* norm1 = crossprod(v1a, v1b);
-    double* norm2 = crossprod(v2a, v2b);
-    
+    norm1[0] = v1a[1]*v1b[2] - v1a[2]*v1b[1];
+    norm1[1] = v1a[2]*v1b[0] - v1a[0]*v1b[2];
+    norm1[2] = v1a[0]*v1b[1] - v1a[1]*v1b[0];
+
+    norm2[0] = v2a[1]*v2b[2] - v2a[2]*v2b[1];
+    norm2[1] = v2a[2]*v2b[0] - v2a[0]*v2b[2];
+    norm2[2] = v2a[0]*v2b[1] - v2a[1]*v2b[0];
+   
     for (int n=0;n<3;n++) {
         Plane1[n] = norm1[n];
         Plane2[n] = norm2[n];
     }
-    //Plane1[3] = -dddotprod(norm1, system.molecules[mol].atoms[i].pos);
-    //Plane2[3] = -dddotprod(norm2, system.molecules[mol].atoms[j].pos);
 
     // both planes done; now get angle
     const double dotplanes = dddotprod(Plane1,Plane2);
@@ -405,6 +411,7 @@ double torsions_energy(System &system) {
         vk = system.constants.UFF_torsions[system.molecules[i].atoms[m].UFFlabel.c_str()];
         vjk = get_Vjk(vj, vk);
         dihedral = get_dihedral_angle(system, i, j,l,m,p);
+    //    printf("dihedral = %f\n", dihedral);
 
         phi_ijkl = 60.0*deg2rad; // ...
         n = 3.0; // ..
