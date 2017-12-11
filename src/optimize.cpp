@@ -105,13 +105,14 @@ void optimize(System &system) {
     printf("================================================================================\n");
     printf("Dynamically-found UFF atom-types:\n");
     printf("================================================================================\n");
-    printf("mol-id :: atom-id :: element :: UFF-label\n");
+    printf("mol-id :: atom-id :: element :: UFF-label :: num-bonds\n");
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-            printf("%6i :: %7i :: %7s :: %9s\n",
+            printf("%6i :: %7i :: %7s :: %9s :: %9i\n",
                     i, j,
                     system.molecules[i].atoms[j].name.c_str(),
-                    system.molecules[i].atoms[j].UFFlabel.c_str());
+                    system.molecules[i].atoms[j].UFFlabel.c_str(),
+                    (int)system.molecules[i].atoms[j].bonds.size());
         }
     }
     printf("================================================================================\n");
