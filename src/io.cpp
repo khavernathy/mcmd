@@ -1296,13 +1296,15 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "md_ft")) {
 			    
                 // default fs
-                if (lc.size() < 3) system.constants.md_ft = atof(lc[1].c_str());
+                if (lc.size() < 3 || lc[2] == "!") system.constants.md_ft = atof(lc[1].c_str());
                 else if (lc[2] == "s") system.constants.md_ft = atof(lc[1].c_str())*1e15;
                 else if (lc[2] == "ms") system.constants.md_ft = atof(lc[1].c_str())*1e12;
                 else if (lc[2] == "us") system.constants.md_ft = atof(lc[1].c_str())*1e9;
                 else if (lc[2] == "ns") system.constants.md_ft = atof(lc[1].c_str())*1e6;
                 else if (lc[2] == "ps") system.constants.md_ft = atof(lc[1].c_str())*1e3;
                 else if (lc[2] == "fs") system.constants.md_ft = atof(lc[1].c_str());
+                else system.constants.md_ft = atof(lc[1].c_str());
+
                 std::cout << "Got MD final step = " << system.constants.md_ft << " fs"; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_rotations")) {
