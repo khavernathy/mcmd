@@ -194,6 +194,7 @@ void optimize(System &system) {
             morse_gradient(system);
             angle_bend_gradient(system);
             torsions_gradient(system);
+            LJ_intramolec_gradient(system);
 
             // move the atoms by their (negative!) gradients
             for (int i=0; i<system.molecules[0].atoms.size(); i++) 
