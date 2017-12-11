@@ -183,7 +183,8 @@ void optimize(System &system) {
     
     // steepest desent (follow the negative gradient)
     else if (optmode == OPTIMIZE_SD) {
-        const double move_factor = 0.0005;
+        const double move_factor = 0.02;
+        double grad_mag=0;
         while (!converged) {
             Ei = totalBondedEnergy(system);
             // re-initialize gradient
@@ -197,10 +198,19 @@ void optimize(System &system) {
             torsions_gradient(system);
             LJ_intramolec_gradient(system);
 
+            grad_mag = 0;
+            // get gradient magnitude
+            for (int i=0; i<system.molecules[0].atoms.size(); i++) {
+                for (int n=0;n<3;n++)
+                    grad_mag += system.molecules[0].atoms[i].energy_grad[n]*system.molecules[0].atoms[i].energy_grad[n];
+            }
+            grad_mag = sqrt(grad_mag);
+
             // move the atoms by their (negative!) gradients
+            // normalized by the gradient magnitude
             for (int i=0; i<system.molecules[0].atoms.size(); i++) 
                 for (int n=0;n<3;n++)
-                    system.molecules[0].atoms[i].pos[n] -= move_factor * system.molecules[0].atoms[i].energy_grad[n];
+                    system.molecules[0].atoms[i].pos[n] -= move_factor/grad_mag * system.molecules[0].atoms[i].energy_grad[n];
 
             Ef = totalBondedEnergy(system);
             delta_E = Ef - Ei;
