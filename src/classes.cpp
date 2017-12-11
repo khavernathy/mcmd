@@ -1769,4 +1769,63 @@ UFF_electroneg["I"] = 6.822;
 UFF_electroneg["Cs"] = 2.183;
 UFF_electroneg["H"] = 4.528;
 
+// UFF4MOF additions
+// Heine et al. J. Chem. Theory Comput. 2014, 10, 880−891
+UFF_bonds["O_3_f"] = 0.634;
+UFF_bonds["O_2_z"] = 0.528;
+UFF_bonds["Al6+3"] = 1.22;
+UFF_bonds["Sc6+3"] = 1.44;
+UFF_bonds["Ti4+2"] = 1.38;
+UFF_bonds["V_4+2"] = 1.18;
+UFF_bonds["V_6+3"] = 1.3;
+UFF_bonds["Cr4+2"] = 1.1;
+UFF_bonds["Cr6f3"] = 1.28;
+UFF_bonds["Mn6+3"] = 1.34;
+UFF_bonds["Mn4+2"] = 1.26;
+UFF_bonds["Fe6+3"] = 1.32;
+UFF_bonds["Fe4+2"] = 1.1;
+UFF_bonds["Co3+2"] = 1.24;
+UFF_bonds["Co4+2"] = 1.16;
+UFF_bonds["Cu4+2"] = 1.28;
+UFF_bonds["Zn4+2"] = 1.34;
+UFF_bonds["Zn3f2"] = 1.24;
+
+UFF_angles["O_3_f"] = 109.47;
+UFF_angles["O_2_z"] = 120;
+UFF_angles["Al6+3"] = 90;
+UFF_angles["Sc6+3"] = 90;
+UFF_angles["Ti4+2"] = 90;
+UFF_angles["V_4+2"] = 90;
+UFF_angles["V_6+3"] = 90;
+UFF_angles["Cr4+2"] = 90;
+UFF_angles["Cr6f3"] = 90;
+UFF_angles["Mn6+3"] = 90;
+UFF_angles["Mn4+2"] = 90;
+UFF_angles["Fe6+3"] = 90;
+UFF_angles["Fe4+2"] = 90;
+UFF_angles["Co3+2"] = 109.47;
+UFF_angles["Co4+2"] = 90;
+UFF_angles["Cu4+2"] = 90;
+UFF_angles["Zn4+2"] = 90;
+UFF_angles["Zn3f2"] = 109.47;
+
+UFF_Z["O_3_f"] = 2.3;
+UFF_Z["O_2_z"] = 2.3;
+UFF_Z["Al6+3"] = 1.792;
+UFF_Z["Sc6+3"] = 2.595;
+UFF_Z["Ti4+2"] = 2.659;
+UFF_Z["V_4+2"] = 2.679;
+UFF_Z["V_6+3"] = 2.679;
+UFF_Z["Cr4+2"] = 2.463;
+UFF_Z["Cr6f3"] = 2.463;
+UFF_Z["Mn6+3"] = 2.43;
+UFF_Z["Mn4+2"] = 2.43;
+UFF_Z["Fe6+3"] = 2.43;
+UFF_Z["Fe4+2"] = 2.43;
+UFF_Z["Co3+2"] = 1.308;
+UFF_Z["Co4+2"] = 1.308;
+UFF_Z["Cu4+2"] = 2.43;
+UFF_Z["Zn4+2"] = 1.308;
+UFF_Z["Zn3f2"] = 1.308;
+
 }
