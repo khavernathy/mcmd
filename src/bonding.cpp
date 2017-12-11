@@ -38,14 +38,28 @@ string getUFFlabel(System &system, string name, int num_bonds) {
        // account for O_R...
     } else if (name == "F") {
         return "F_";
+    } else if (name == "Al") {
+        return "Al6+3"; // UFF4MOF
     } else if (name == "P") {
         // weird geometries
     } else if (name == "S") {
         // weird geometries
     } else if (name == "Cl") {
         return "Cl";
+    } else if (name == "Sc") {
+        return "Sc6+3"; // UFF4MOF
+    } else if (name == "Ti") {
+        return "Ti4+2"; // UFF4MOF
+    } else if (name == "V") {
+        return "V_4+2"; // UFF4MOF
+    } else if (name == "Cr") {
+        return "Cr4+2"; // UFF4MOF
     } else if (name == "Co") {
-        return "Co6+3";
+        return "Co6+3"; 
+    } else if (name == "Cu") {
+        return "Cu4+2"; // UFF4MOF default
+    } else if (name == "Zn") {
+        return "Zn4+2"; // UFF4MOF
     } else if (name == "Br") {
         return "Br";
     } else if (name == "I") {
