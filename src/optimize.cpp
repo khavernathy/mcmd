@@ -137,7 +137,7 @@ void optimize(System &system) {
     else if (optmode == OPTIMIZE_MC)
         printf("MONTE CARLO STRUCTURE OPTIMIZATION\n");
 
-    printf("Step %i :: Energy = %f; diff = %f kcal/mol; \n", 0, Ei, 0.0);
+    outputEnergies(system, 0, Ei, 0);
 
     // Monte Carlo sytle opt.
     if (optmode == OPTIMIZE_MC) {

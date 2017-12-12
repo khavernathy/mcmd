@@ -35,7 +35,8 @@ string getUFFlabel(System &system, string name, int num_bonds) {
        else if (num_bonds == 2) return "O_3";
        else if (num_bonds == 3) return "O_2";
        else if (num_bonds == 4) return "O_3";
-       // account for O_R...
+       else return "O_3_f"; // MOF-5 center of Zn cluster type
+        // account for O_R...
     } else if (name == "F") {
         return "F_";
     } else if (name == "Al") {
@@ -59,7 +60,8 @@ string getUFFlabel(System &system, string name, int num_bonds) {
     } else if (name == "Cu") {
         return "Cu4+2"; // UFF4MOF default
     } else if (name == "Zn") {
-        return "Zn4+2"; // UFF4MOF
+        //return "Zn4+2"; // UFF4MOF paddlewheel type
+        return "Zn3f2"; // this is the MOF-5 type of Zn
     } else if (name == "Br") {
         return "Br";
     } else if (name == "I") {
@@ -67,6 +69,25 @@ string getUFFlabel(System &system, string name, int num_bonds) {
     }
         
     return "NOTFOUND";
+}
+
+
+// return true if this should count as a bond.
+bool qualify_bond(System &system, double r, int mol, int i, int j) {
+    string a1 = system.molecules[mol].atoms[i].name;
+    string a2 = system.molecules[mol].atoms[j].name;
+    
+    double bondlength = system.constants.bondlength;
+
+    if (a1=="H" && a2=="H" && system.molecules[mol].atoms.size() != 2)
+        return false;
+    else if ((a1=="H" || a2=="H") && r > 1.3)
+        return false; 
+    else if ((a1=="Zn" || a2=="Zn") && r <= 2.0)
+        return true;
+    else if (r > bondlength)
+        return false;
+    else return true;
 }
 
 // function to find all bonds (and angles) for all atoms.
@@ -88,11 +109,7 @@ void findBonds(System &system) {
                double* distances = getDistanceXYZ(system, i,j,i,l);
                r = distances[3];
                
-               // avoid H-H bonds, except when H2 is the molecule.
-               if (r < system.constants.bondlength
-                    && (!((system.molecules[i].atoms[j].name == "H" &&
-                        system.molecules[i].atoms[l].name == "H") &&
-                        system.molecules[i].atoms.size() != 2))) {
+               if (qualify_bond(system, r, i, j, l)) {
                     local_bonds++;
 
                     system.molecules[i].atoms[j].bonds.push_back(l);
@@ -120,11 +137,7 @@ void findBonds(System &system) {
                         double* distancesa = getDistanceXYZ(system, i,l,i,m);
                         ra = distancesa[3];                
                     
-                        // avoid H-H bonds, except when H2 is the molecule.
-                        if (ra < system.constants.bondlength
-                            && (!((system.molecules[i].atoms[m].name == "H" &&
-                            system.molecules[i].atoms[l].name == "H") &&
-                            system.molecules[i].atoms.size() != 2))) {
+                        if (qualify_bond(system, ra, i, l, m)) {
 
                             // check for duplicate angles
                             duplicateAngleFlag = 0;
@@ -155,11 +168,7 @@ void findBonds(System &system) {
                                 if (j==m) continue; // don't do ABAC
                                 if (l==p) continue; // don't do ABCB
 
-                                // avoid H-H bonds, except when H2 is the molecule.
-                                if (rh < system.constants.bondlength
-                                    && (!((system.molecules[i].atoms[p].name == "H" &&
-                                    system.molecules[i].atoms[m].name == "H") &&
-                                    system.molecules[i].atoms.size() != 2))) {
+                                if (qualify_bond(system, rh, i, m, p)) {
                                     // check duplicate dihedral
                                     duplicateDihFlag = 0;
                                     for (int n=0;n<system.constants.uniqueDihedrals.size();n++) {
@@ -278,6 +287,7 @@ double stretch_energy(System &system) {
         r = distances[3];
         mainterm = exp(-alpha*(r-rij)) - 1.0; // unitless
         potential += Dij*(mainterm*mainterm); // in kcal/mol
+        //printf("%f\n", Dij*(mainterm*mainterm));
     }
 
     system.stats.Ustretch.value = potential;
@@ -399,7 +409,11 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     const double mag1 = sqrt(dddotprod(Plane1,Plane1));
     const double mag2 = sqrt(dddotprod(Plane2,Plane2));
 
-    return acos(dotplanes/(mag1*mag2)); 
+    double arg = dotplanes/(mag1*mag2);
+    if (arg > 1.0 && arg < 1.00000001) arg = 1.0;
+    else if (arg < -1.0 && arg > -1.00000001) arg = -1.0;
+
+    return acos(arg); 
 }
 
 double * get_torsion_params(System &system, string a1, string a2) {
@@ -460,6 +474,7 @@ double torsions_energy(System &system) {
         
         dihedral = get_dihedral_angle(system, i, j,l,m,p);
         potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
+        //printf("dihedral %i %i %i %i = %f; phi_goal = %f; actual_phi = %f\n", j,l,m,p, 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral)), phi_ijkl, dihedral);
     }
 
     system.stats.Udihedrals.value = potential;
