@@ -335,13 +335,19 @@ double * get_torsion_params(System &system, string a1, string a2) {
         o[2] = 3;
     }
     // sp3--sp2
-    else if ((a1.find("_3") != std::string::npos && a2.find("_2") != std::string::npos) || (a1.find("_2") != std::string::npos && a2.find("_3") != std::string::npos)) {
+    else if ((a1.find("_3") != std::string::npos && a2.find("_2") != std::string::npos) || 
+            (a1.find("_2") != std::string::npos && a2.find("_3") != std::string::npos) ||
+            (a1.find("_R") != std::string::npos && a2.find("_3") != std::string::npos) ||        
+            (a1.find("_3") != std::string::npos && a2.find("_R") != std::string::npos)     ) {
         o[0]=0;
         o[1]=1.0; 
         o[2] = 6;
     }
     // sp2--sp2
-    else if (a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos) {    
+    else if ((a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos) || 
+            (a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos) ||
+            (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos) || 
+            (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos) ) {    
         o[0]=180; // "or 60"
         const double BO = 1.5; // assume resonance bond order..
         double Uj=1.25,Uk=1.25; // assume second period...
@@ -800,12 +806,19 @@ void findBonds(System &system) {
                } // end if r < bond-length      
             } // end pair (i,j) -- (i,l)  
          
+        } // end j
+    } // end i
+
+
+    // get UFF atom labels for all atoms
+    for (i=0;i<system.molecules.size();i++) {
+        for (j=0;j<system.molecules[i].atoms.size();j++) {
             // based on the total number of bonds to this atom, 
             // determine the atom-type from UFF.
             system.molecules[i].atoms[j].UFFlabel = getUFFlabel(system, system.molecules[i].atoms[j].name, system.molecules[i].atoms[j].bonds.size(), i,j); 
+        }
+    }
 
-        } // end j
-    } // end i
 
     // get unique qualified LJ non-bond pairs (beyond 1,3)
     int mol,qualified, y,z;
