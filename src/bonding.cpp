@@ -83,7 +83,9 @@ bool qualify_bond(System &system, double r, int mol, int i, int j) {
         return false;
     else if ((a1=="H" || a2=="H") && r > 1.3)
         return false; 
-    else if ((a1=="Zn" || a2=="Zn") && r <= 2.0)
+    else if ((a1=="Zn" || a2=="Zn") && r <= 2.1) // Zn4O group
+        return true;
+    else if ((a1=="Cu" && a2=="Cu") && r <= 2.9) // Cu paddlewheel
         return true;
     else if (r > bondlength)
         return false;
