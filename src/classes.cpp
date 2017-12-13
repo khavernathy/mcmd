@@ -295,15 +295,15 @@ class Constants {
         int opt_step_limit = 10000; // limit for convergence steps
         int opt_mode = OPTIMIZE_MC; // monte carlo style optimization as default
         struct UniqueBond {
-            int mol, atom1, atom2; // indices of molecule + atoms of bond
+            int mol, atom1, atom2, value; // indices of molecule + atoms of bond
         };
         vector<UniqueBond> uniqueBonds; // holds all unique bonds
         struct UniqueAngle {
-            int mol, atom1, atom2, atom3;
+            int mol, atom1, atom2, atom3, value;
         };
         vector<UniqueAngle> uniqueAngles; // holds all unique 3-atom angles
         struct UniqueDihedral {
-            int mol, atom1, atom2, atom3, atom4;
+            int mol, atom1, atom2, atom3, atom4, value;
         };
         vector<UniqueDihedral> uniqueDihedrals; // holds all unique 4-atom dihedrals.
 };

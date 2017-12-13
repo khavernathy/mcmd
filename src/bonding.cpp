@@ -90,145 +90,6 @@ bool qualify_bond(System &system, double r, int mol, int i, int j) {
     else return true;
 }
 
-// function to find all bonds (and angles) for all atoms.
-void findBonds(System &system) {
-    
-    int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
-    double r, ra, rh; // bond r, angle bond ra, dihedral bond rh
-    int local_bonds=0;
-    int duplicateFlag=0; //bond dupes
-    int duplicateAngleFlag=0; // angle dupes
-    int duplicateDihFlag=0; // dihedral dupes
-    for (i=0; i<system.molecules.size(); i++) {
-        for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            local_bonds = 0;
-            // for each atom, we find its bonded neighbors by a distance search
-            // (by only searching atoms on this same molecule)
-            for (l=0; l<system.molecules[i].atoms.size(); l++) {
-               if (j==l) continue; // don't do self-atom
-               double* distances = getDistanceXYZ(system, i,j,i,l);
-               r = distances[3];
-               
-               if (qualify_bond(system, r, i, j, l)) {
-                    local_bonds++;
-
-                    system.molecules[i].atoms[j].bonds.push_back(l);
-
-                    // check for duplicate bond.
-                    duplicateFlag=0;
-                    for (int n=0;n<system.constants.uniqueBonds.size();n++) {
-                        if (system.constants.uniqueBonds[n].mol == i &&
-                            system.constants.uniqueBonds[n].atom1 == l &&
-                            system.constants.uniqueBonds[n].atom2 == j) {
-                            
-                            duplicateFlag=1; break;
-                        }
-                    }
-                    if (!duplicateFlag) {
-                        // this bond is unique
-                        Constants::UniqueBond tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l;         
-                        system.constants.uniqueBonds.push_back(tmp);
-                    }
-
-                    // now loop for angles
-                    for (m=0; m<system.molecules[i].atoms.size(); m++) {
-                        if (j==m) continue; // don't do ABA angles (0 degrees)
-                        if (l==m) continue; // don't do ABB angles (0 degrees)
-                        double* distancesa = getDistanceXYZ(system, i,l,i,m);
-                        ra = distancesa[3];                
-                    
-                        if (qualify_bond(system, ra, i, l, m)) {
-
-                            // check for duplicate angles
-                            duplicateAngleFlag = 0;
-                            for (int n=0;n<system.constants.uniqueAngles.size();n++) {
-                                if (system.constants.uniqueAngles[n].mol == i &&
-                                    system.constants.uniqueAngles[n].atom1 == m &&
-                                    system.constants.uniqueAngles[n].atom2 == l &&
-                                    system.constants.uniqueAngles[n].atom3 == j) {
-                                    
-                                    duplicateAngleFlag=1; break;
-
-                                }   
-                            }
-                            if (!duplicateAngleFlag) {
-                                // this angle is unique
-                                Constants::UniqueAngle tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l; tmp.atom3=m;
-                                system.constants.uniqueAngles.push_back(tmp);
-                            }
-
-                            // now loop for dihedrals
-                            for (p=0; p<system.molecules[i].atoms.size(); p++) {
-                                double * distancesh = getDistanceXYZ(system,i,m,i,p);
-                                rh = distancesh[3];
-                                if (j==l) continue; // don't do AABC
-                                if (j==p) continue; // don't do ABCA
-                                if (l==m) continue; // don't do ABBC
-                                if (m==p) continue; // don't do ABCC
-                                if (j==m) continue; // don't do ABAC
-                                if (l==p) continue; // don't do ABCB
-
-                                if (qualify_bond(system, rh, i, m, p)) {
-                                    // check duplicate dihedral
-                                    duplicateDihFlag = 0;
-                                    for (int n=0;n<system.constants.uniqueDihedrals.size();n++) {
-                                        if ((system.constants.uniqueDihedrals[n].mol==i &&
-                                            system.constants.uniqueDihedrals[n].atom1==p &&
-                                            system.constants.uniqueDihedrals[n].atom2==m &&
-                                            system.constants.uniqueDihedrals[n].atom3==l &&
-                                            system.constants.uniqueDihedrals[n].atom4==j) ||
-                                            (system.constants.uniqueDihedrals[n].mol==i &&
-                                            system.constants.uniqueDihedrals[n].atom1==p &&
-                                            system.constants.uniqueDihedrals[n].atom2==m &&
-                                            system.constants.uniqueDihedrals[n].atom3==l &&
-                                            system.constants.uniqueDihedrals[n].atom4==j )) {
-
-                                                duplicateDihFlag = 1;break;
-                                        }
-                                    }
-                                    // this dihedral is unique
-                                    if (!duplicateDihFlag) {
-                                        Constants::UniqueDihedral tmp; tmp.mol=i; tmp.atom1=j;
-                                        tmp.atom2=l; tmp.atom3=m; tmp.atom4=p;
-                                        system.constants.uniqueDihedrals.push_back(tmp);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    
-               } // end if r < bond-length      
-            } // end pair (i,j) -- (i,l)  
-         
-            // based on the total number of bonds to this atom, 
-            // determine the atom-type from UFF.
-            system.molecules[i].atoms[j].UFFlabel = getUFFlabel(system, system.molecules[i].atoms[j].name, system.molecules[i].atoms[j].bonds.size()); 
-
-        } // end j
-    } // end i
-
-    // check for unphysical H-H bonds
-        for (int n=0;n<system.constants.uniqueBonds.size();n++) {
-            int mol=system.constants.uniqueBonds[n].mol;
-            int a1=system.constants.uniqueBonds[n].atom1;
-            int a2=system.constants.uniqueBonds[n].atom2;
-            if (system.molecules[mol].atoms[a1].name == "H" &&
-                system.molecules[mol].atoms[a2].name == "H") {
-                
-                printf("H-H bond: %i %i (bondid %i)\n", a1,a2,n);
-                // see if this H-H is not H2 molecule.
-                if (system.molecules[mol].atoms[a1].bonds.size() > 1 ||
-                    system.molecules[mol].atoms[a2].bonds.size() > 1) {
-
-                }
-            }
-
-        }
-
-
-}
-
 /*
  * Essentially everything below comes from the parameters and
  * functional forms prescribed in UFF, via
@@ -845,6 +706,147 @@ double LJ_intramolec_gradient(System &system) {
     return 0;
 } // LJ intramolecular gradient function
 
+
+
+// function to find all bonds (and angles) for all atoms.
+void findBonds(System &system) {
+    
+    int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
+    double r, ra, rh; // bond r, angle bond ra, dihedral bond rh
+    int local_bonds=0;
+    int duplicateFlag=0; //bond dupes
+    int duplicateAngleFlag=0; // angle dupes
+    int duplicateDihFlag=0; // dihedral dupes
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            local_bonds = 0;
+            // for each atom, we find its bonded neighbors by a distance search
+            // (by only searching atoms on this same molecule)
+            for (l=0; l<system.molecules[i].atoms.size(); l++) {
+               if (j==l) continue; // don't do self-atom
+               double* distances = getDistanceXYZ(system, i,j,i,l);
+               r = distances[3];
+               
+               if (qualify_bond(system, r, i, j, l)) {
+                    local_bonds++;
+
+                    system.molecules[i].atoms[j].bonds.push_back(l);
+
+                    // check for duplicate bond.
+                    duplicateFlag=0;
+                    for (int n=0;n<system.constants.uniqueBonds.size();n++) {
+                        if (system.constants.uniqueBonds[n].mol == i &&
+                            system.constants.uniqueBonds[n].atom1 == l &&
+                            system.constants.uniqueBonds[n].atom2 == j) {
+                            
+                            duplicateFlag=1; break;
+                        }
+                    }
+                    if (!duplicateFlag) {
+                        // this bond is unique
+                        Constants::UniqueBond tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l;         
+                        tmp.value = r;
+                        system.constants.uniqueBonds.push_back(tmp);
+                    }
+
+                    // now loop for angles
+                    for (m=0; m<system.molecules[i].atoms.size(); m++) {
+                        if (j==m) continue; // don't do ABA angles (0 degrees)
+                        if (l==m) continue; // don't do ABB angles (0 degrees)
+                        double* distancesa = getDistanceXYZ(system, i,l,i,m);
+                        ra = distancesa[3];                
+                    
+                        if (qualify_bond(system, ra, i, l, m)) {
+
+                            // check for duplicate angles
+                            duplicateAngleFlag = 0;
+                            for (int n=0;n<system.constants.uniqueAngles.size();n++) {
+                                if (system.constants.uniqueAngles[n].mol == i &&
+                                    system.constants.uniqueAngles[n].atom1 == m &&
+                                    system.constants.uniqueAngles[n].atom2 == l &&
+                                    system.constants.uniqueAngles[n].atom3 == j) {
+                                    
+                                    duplicateAngleFlag=1; break;
+
+                                }   
+                            }
+                            if (!duplicateAngleFlag) {
+                                // this angle is unique
+                                Constants::UniqueAngle tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l; tmp.atom3=m;
+                                tmp.value = get_angle(system, i, j,l,m);
+                                system.constants.uniqueAngles.push_back(tmp);
+                            }
+
+                            // now loop for dihedrals
+                            for (p=0; p<system.molecules[i].atoms.size(); p++) {
+                                double * distancesh = getDistanceXYZ(system,i,m,i,p);
+                                rh = distancesh[3];
+                                if (j==l) continue; // don't do AABC
+                                if (j==p) continue; // don't do ABCA
+                                if (l==m) continue; // don't do ABBC
+                                if (m==p) continue; // don't do ABCC
+                                if (j==m) continue; // don't do ABAC
+                                if (l==p) continue; // don't do ABCB
+
+                                if (qualify_bond(system, rh, i, m, p)) {
+                                    // check duplicate dihedral
+                                    duplicateDihFlag = 0;
+                                    for (int n=0;n<system.constants.uniqueDihedrals.size();n++) {
+                                        if ((system.constants.uniqueDihedrals[n].mol==i &&
+                                            system.constants.uniqueDihedrals[n].atom1==p &&
+                                            system.constants.uniqueDihedrals[n].atom2==m &&
+                                            system.constants.uniqueDihedrals[n].atom3==l &&
+                                            system.constants.uniqueDihedrals[n].atom4==j) ||
+                                            (system.constants.uniqueDihedrals[n].mol==i &&
+                                            system.constants.uniqueDihedrals[n].atom1==p &&
+                                            system.constants.uniqueDihedrals[n].atom2==m &&
+                                            system.constants.uniqueDihedrals[n].atom3==l &&
+                                            system.constants.uniqueDihedrals[n].atom4==j )) {
+
+                                                duplicateDihFlag = 1;break;
+                                        }
+                                    }
+                                    // this dihedral is unique
+                                    if (!duplicateDihFlag) {
+                                        Constants::UniqueDihedral tmp; tmp.mol=i; tmp.atom1=j;
+                                        tmp.atom2=l; tmp.atom3=m; tmp.atom4=p;
+                                        tmp.value = get_dihedral_angle(system, i, j,l,m,p);
+                                        system.constants.uniqueDihedrals.push_back(tmp);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    
+               } // end if r < bond-length      
+            } // end pair (i,j) -- (i,l)  
+         
+            // based on the total number of bonds to this atom, 
+            // determine the atom-type from UFF.
+            system.molecules[i].atoms[j].UFFlabel = getUFFlabel(system, system.molecules[i].atoms[j].name, system.molecules[i].atoms[j].bonds.size()); 
+
+        } // end j
+    } // end i
+
+    // check for unphysical H-H bonds
+        for (int n=0;n<system.constants.uniqueBonds.size();n++) {
+            int mol=system.constants.uniqueBonds[n].mol;
+            int a1=system.constants.uniqueBonds[n].atom1;
+            int a2=system.constants.uniqueBonds[n].atom2;
+            if (system.molecules[mol].atoms[a1].name == "H" &&
+                system.molecules[mol].atoms[a2].name == "H") {
+                
+                printf("H-H bond: %i %i (bondid %i)\n", a1,a2,n);
+                // see if this H-H is not H2 molecule.
+                if (system.molecules[mol].atoms[a1].bonds.size() > 1 ||
+                    system.molecules[mol].atoms[a2].bonds.size() > 1) {
+
+                }
+            }
+
+        }
+}
 
 double totalBondedEnergy(System &system) {
     // each function here saves the component energies to Stats class. (system.stats)
