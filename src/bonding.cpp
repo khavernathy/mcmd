@@ -66,7 +66,10 @@ string getUFFlabel(System &system, string name, int num_bonds) {
         return "Br";
     } else if (name == "I") {
         return "I_";
+    } else if (name == "Ru") {
+        return "Ru6+2"; 
     }
+
         
     return "NOTFOUND";
 }
@@ -86,6 +89,8 @@ bool qualify_bond(System &system, double r, int mol, int i, int j) {
     else if ((a1=="Zn" || a2=="Zn") && r <= 2.1) // Zn4O group
         return true;
     else if ((a1=="Cu" && a2=="Cu") && r <= 2.9) // Cu paddlewheel
+        return true;
+    else if ((a1=="Ru" || a2=="Ru") && r <= 2.1) // Ru +2  complexes 
         return true;
     else if (r > bondlength)
         return false;
