@@ -1,0 +1,24 @@
+! Douglas Franz, Space group, 2017, USF
+! Optimization of the unit-cell of 
+! NOTT-112, a MOF with a very large
+! unit cell.
+
+
+mode opt
+name NOTT-112_periodic
+
+bondlength 1.9
+opt_error 0.0001
+opt_step_limit 10000
+opt_mode    sd
+
+
+! Things tend to go more smoothly when dihedrals are neglected...
+opt_dihedrals off
+opt_LJ off
+
+
+carbasis 47.005 47.005 47.005 90 90 90 
+
+
+input_atoms NOTT-112.pdb
