@@ -306,6 +306,11 @@ class Constants {
             int mol, atom1, atom2, atom3, atom4; double value;
         };
         vector<UniqueDihedral> uniqueDihedrals; // holds all unique 4-atom dihedrals.
+        struct UniqueLJNonBond {
+            int mol, atom1, atom2;         
+        };
+        vector<UniqueLJNonBond> uniqueLJNonBonds; // holds all unique non-bonded pair interactions (no cutoff)
+
 };
 
 class Pbc {

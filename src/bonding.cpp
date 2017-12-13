@@ -829,23 +829,49 @@ void findBonds(System &system) {
         } // end j
     } // end i
 
-    // check for unphysical H-H bonds
-        for (int n=0;n<system.constants.uniqueBonds.size();n++) {
-            int mol=system.constants.uniqueBonds[n].mol;
-            int a1=system.constants.uniqueBonds[n].atom1;
-            int a2=system.constants.uniqueBonds[n].atom2;
-            if (system.molecules[mol].atoms[a1].name == "H" &&
-                system.molecules[mol].atoms[a2].name == "H") {
-                
-                printf("H-H bond: %i %i (bondid %i)\n", a1,a2,n);
-                // see if this H-H is not H2 molecule.
-                if (system.molecules[mol].atoms[a1].bonds.size() > 1 ||
-                    system.molecules[mol].atoms[a2].bonds.size() > 1) {
-
+    // get unique qualified LJ non-bond pairs (beyond 1,3)
+    int mol,qualified, y,z;
+    for (mol=0; mol<system.molecules.size(); mol++) {
+        // all pairs inside the molecule
+        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
+            for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
+                // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
+                qualified = 1;
+                for (y=0; y<system.constants.uniqueBonds.size();y++) {
+                    if (system.constants.uniqueBonds[y].mol==mol &&
+                        ((
+                        system.constants.uniqueBonds[y].atom1==i &&
+                        system.constants.uniqueBonds[y].atom2==j
+                        ) || 
+                        (
+                        system.constants.uniqueBonds[y].atom1==j &&
+                        system.constants.uniqueBonds[y].atom2==i
+                        ))) {
+                        qualified=0;  break;
+                    } // end if bonded therefore unqualified
+                } // end bonds loop
+                for (z=0; z<system.constants.uniqueAngles.size();z++) {
+                    if (system.constants.uniqueAngles[z].mol==mol &&
+                       ((
+                        system.constants.uniqueAngles[z].atom1==i &&
+                        system.constants.uniqueAngles[z].atom3==j
+                       ) ||
+                       (
+                        system.constants.uniqueAngles[z].atom3==i &&
+                        system.constants.uniqueAngles[z].atom1==j
+                       ))) {
+                       qualified=0; break;
+                    } // end if 1--3 therefore unqualified
                 }
-            }
 
-        }
+                if (qualified) {
+                    Constants::UniqueLJNonBond tmp;
+                    tmp.mol = mol; tmp.atom1=i; tmp.atom2=j; 
+                }
+            } // end pair-atom j
+        } // end atom loop i
+    } // end molecule loop mol
+
 }
 
 double totalBondedEnergy(System &system) {
