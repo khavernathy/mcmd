@@ -65,7 +65,7 @@ void optimize(System &system) {
     printf("================================================================================\n");
     printf("Dynamically-found Angles Summary:\n");
     printf("================================================================================\n");
-    printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 ::   elements   :: value\n");
+    printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 ::    elements    :: value\n");
     for (int n=0;n<system.constants.uniqueAngles.size();n++) {
         int mol = system.constants.uniqueAngles[n].mol;
         int atom1= system.constants.uniqueAngles[n].atom1;
@@ -88,7 +88,7 @@ void optimize(System &system) {
     printf("================================================================================\n");
     printf("Dynamically-found Dihedrals Summary:\n");
     printf("================================================================================\n");
-    printf("dihedral-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 ::       elements       :: value\n");
+    printf("dihedral-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 ::       elements      :: value\n");
     for (int n=0; n<system.constants.uniqueDihedrals.size();n++) {
         int mol = system.constants.uniqueDihedrals[n].mol;
         int atom1 = system.constants.uniqueDihedrals[n].atom1;
