@@ -1752,6 +1752,9 @@ UFF_torsions["Pb3"] = 0.1;
 UFF_torsions["Bi3"] = 1;
 UFF_torsions["Po3"] = 0.3;
 
+// separate paper
+// http://pubs.acs.org/doi/pdf/10.1021/j100161a070
+// Rappe et al. The Journal of Physical Chemistry, Vol. 95, No. 8, 1991
 UFF_electroneg["Li"] = 3.006;
 UFF_electroneg["C"] = 5.343;
 UFF_electroneg["N"] = 6.899;
@@ -1768,6 +1771,24 @@ UFF_electroneg["Rb"] = 2.331;
 UFF_electroneg["I"] = 6.822;
 UFF_electroneg["Cs"] = 2.183;
 UFF_electroneg["H"] = 4.528;
+// extrapolated from ptable.com ratio with (F electroneg=3.98)
+// for MOFs and such.
+UFF_electroneg["Zn"] = 4.508065;
+UFF_electroneg["Co"] = 5.136462;
+UFF_electroneg["Fe"] = 4.999854;
+UFF_electroneg["Cu"] = 5.191106;
+UFF_electroneg["Ni"] = 5.218427;
+UFF_electroneg["Mg"] = 3.579131;
+UFF_electroneg["Mn"] = 4.234849;
+UFF_electroneg["Cr"] = 4.535387;
+UFF_electroneg["Ti"] = 4.207528;
+UFF_electroneg["Ca"] = 2.732161;
+UFF_electroneg["V"] = 4.453422;
+UFF_electroneg["Al"] = 4.398779;
+UFF_electroneg["In"] = 4.863246;
+UFF_electroneg["Ru"] = 6.010754;
+UFF_electroneg["Cd"] = 4.617352;
+
 
 // UFF4MOF additions
 // Heine et al. J. Chem. Theory Comput. 2014, 10, 880−891
