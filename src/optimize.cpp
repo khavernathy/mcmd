@@ -199,10 +199,14 @@ void optimize(System &system) {
                     system.molecules[0].atoms[i].energy_grad[n]=0;
             
             // compute the gradients
-            morse_gradient(system);
-            angle_bend_gradient(system);
-            torsions_gradient(system);
-            LJ_intramolec_gradient(system);
+            if (system.constants.opt_bonds)
+                morse_gradient(system);
+            if (system.constants.opt_angles)
+                angle_bend_gradient(system);
+            if (system.constants.opt_dihedrals)
+                torsions_gradient(system);
+            if (system.constants.opt_LJ)
+                LJ_intramolec_gradient(system);
 
             grad_mag = 0;
             // get gradient magnitude

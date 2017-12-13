@@ -294,6 +294,11 @@ class Constants {
         double opt_error = 0.0001; // error, in kcal/mol for convergence
         int opt_step_limit = 10000; // limit for convergence steps
         int opt_mode = OPTIMIZE_MC; // monte carlo style optimization as default
+        int opt_bonds = 1; // option to include bonding energy/gradients
+        int opt_angles = 1; // "" angles ""
+        int opt_dihedrals = 1; // "" dihedrals ""
+        int opt_LJ = 1; // "" non-bond LJ ""
+        
         struct UniqueBond {
             int mol, atom1, atom2; double  value; // indices of molecule + atoms of bond
         };

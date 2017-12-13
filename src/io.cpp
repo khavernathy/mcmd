@@ -1468,7 +1468,25 @@ void readInput(System &system, char* filename) {
                 else if (lc[1] == "sd")
                     system.constants.opt_mode = OPTIMIZE_SD;
                 std::cout << "Got optimization mode = " << lc[1].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "opt_bonds")) { 
+                if (lc[1] == "off")
+                    system.constants.opt_bonds = 0;
+                std::cout << "Got optimization bond contributions = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "opt_angles")) {
+                if (lc[1] == "off")
+                    system.constants.opt_angles = 0;
+                std::cout << "Got optimization angle contributions = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "opt_dihedrals")) {
+                if (lc[1] == "off") 
+                    system.constants.opt_dihedrals = 0;
+                std::cout << "Got optimization dihedral angle contributions = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "opt_LJ")) {
+                if (lc[1] == "off")
+                    system.constants.opt_LJ = 0;
+                std::cout << "Got optimization LJ non-bonding contributions = " << lc[1].c_str(); printf("\n");
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
 		} // end while reading lines
