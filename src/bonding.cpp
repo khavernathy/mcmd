@@ -178,7 +178,11 @@ double get_angle(System &system, int i, int A, int B, int C) {
     const double ABm = sqrt(dddotprod(AB,AB));
     const double BCm = sqrt(dddotprod(BC,BC));
     
-    return acos(dotprod/(ABm*BCm)); // returns in radians
+    double arg = dotprod/(ABm*BCm);
+    if (arg > 1.0) arg=1.0;
+    else if (arg < -1.0) arg=-1.0;
+
+    return acos(arg); // returns in radians
 }
 
 // get r_ik, a parameter for angle bends, ** different from r_ij (and r_jk) **
@@ -271,8 +275,8 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     const double mag2 = sqrt(dddotprod(Plane2,Plane2));
 
     double arg = dotplanes/(mag1*mag2);
-    if (arg > 1.0 && arg < 1.00000001) arg = 1.0;
-    else if (arg < -1.0 && arg > -1.00000001) arg = -1.0;
+    if (arg > 1.0) arg = 1.0;
+    else if (arg < -1.0) arg = -1.0;
 
     return acos(arg); 
 }
