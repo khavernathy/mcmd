@@ -10,9 +10,35 @@
 
 using namespace std;
 
+bool find_cycle(System &system, int mol, int i) {
+    // see if atom i on molecule mol is on a 6-membered ring
+    for (int b1=0; b1<system.molecules[mol].atoms[i].bonds.size(); b1++) {
+        int a2 = system.molecules[mol].atoms[i].bonds[b1];
+        for (int b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
+            int a3 = system.molecules[mol].atoms[a2].bonds[b2];
+            for (int b3=0; b3<system.molecules[mol].atoms[a3].bonds.size();b3++) {
+                int a4 = system.molecules[mol].atoms[a3].bonds[b3];
+                for (int b4=0; b4<system.molecules[mol].atoms[a4].bonds.size();b4++) {
+                    int a5 = system.molecules[mol].atoms[a4].bonds[b4];
+                    for (int b5=0; b5<system.molecules[mol].atoms[a5].bonds.size();b5++) {
+                        int a6 = system.molecules[mol].atoms[a5].bonds[b5];
+                        for (int b6=0; b6<system.molecules[mol].atoms[a6].bonds.size();b6++) {
+                            int a7 = system.molecules[mol].atoms[a6].bonds[b6];
+                            if (a7 == i)
+                                return true;
+                        }
+                    }
+                }   
+            }
+        }
+    }
+    return false;
+}
+
+
 // function to determine UFF atom-type based on
 // name of element and number of bonds
-string getUFFlabel(System &system, string name, int num_bonds) {
+string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
     // starting with just the organic-y atom-types.
     if (name == "H") {
         return "H_"; // assume it's never H_b (borane hydrogen)
@@ -20,31 +46,37 @@ string getUFFlabel(System &system, string name, int num_bonds) {
         if (num_bonds == 3) return "B_2";
         else if (num_bonds == 4) return "B_3";
     } else if (name == "C") {
-        if (num_bonds == 2) return "C_1";
+        if (find_cycle(system, mol, i)) return "C_R";
+        else if (num_bonds == 2) return "C_1";
         else if (num_bonds == 3) return "C_2";
         else if (num_bonds == 4) return "C_3";
         // need to dynamically account for resonant C_R too...
     } else if (name == "N") {
-        if (num_bonds == 1) return "N_1";
+        if (find_cycle(system,mol,i)) return "N_R";
+        else if (num_bonds == 1) return "N_1";
         else if (num_bonds == 2) return "N_3";
         else if (num_bonds == 3) return "N_2";
         else if (num_bonds == 4) return "N_3";
         // account for N_R...
     } else if (name == "O") {
-       if (num_bonds == 1) return "O_1";
-       else if (num_bonds == 2) return "O_3";
-       else if (num_bonds == 3) return "O_2";
-       else if (num_bonds == 4) return "O_3";
-       else return "O_3_f"; // MOF-5 center of Zn cluster type
+        if (find_cycle(system,mol,i)) return "O_R";
+        else if (num_bonds == 1) return "O_1";
+        else if (num_bonds == 2) return "O_3";
+        else if (num_bonds == 3) return "O_2";
+        else if (num_bonds == 4) return "O_3";
+        else return "O_3_f"; // MOF-5 center of Zn cluster type
         // account for O_R...
     } else if (name == "F") {
         return "F_";
     } else if (name == "Al") {
         return "Al6+3"; // UFF4MOF
     } else if (name == "P") {
-        // weird geometries
+        return "P_3+3";
+        // + other weird geometries
     } else if (name == "S") {
-        // weird geometries
+        if (find_cycle(system,mol,i)) return "S_R";
+        else return "S_2";
+        // + other weird geometries...
     } else if (name == "Cl") {
         return "Cl";
     } else if (name == "Sc") {
@@ -94,6 +126,7 @@ bool qualify_bond(System &system, double r, int mol, int i, int j) {
         return true;
     else if (r > bondlength)
         return false;
+    
     else return true;
 }
 
@@ -769,7 +802,7 @@ void findBonds(System &system) {
          
             // based on the total number of bonds to this atom, 
             // determine the atom-type from UFF.
-            system.molecules[i].atoms[j].UFFlabel = getUFFlabel(system, system.molecules[i].atoms[j].name, system.molecules[i].atoms[j].bonds.size()); 
+            system.molecules[i].atoms[j].UFFlabel = getUFFlabel(system, system.molecules[i].atoms[j].name, system.molecules[i].atoms[j].bonds.size(), i,j); 
 
         } // end j
     } // end i
