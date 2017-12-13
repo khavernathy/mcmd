@@ -293,7 +293,7 @@ class Constants {
         double bondlength = 1.9; // for bonding MD, default
         double opt_error = 0.0001; // error, in kcal/mol for convergence
         int opt_step_limit = 10000; // limit for convergence steps
-        int opt_mode = OPTIMIZE_MC; // monte carlo style optimization as default
+        int opt_mode = OPTIMIZE_SD; // steepest descent style optimization as default
         int opt_bonds = 1; // option to include bonding energy/gradients
         int opt_angles = 1; // "" angles ""
         int opt_dihedrals = 1; // "" dihedrals ""
