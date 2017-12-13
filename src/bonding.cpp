@@ -339,7 +339,7 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
 }
 
 double * get_torsion_params(System &system, string a1, string a2) {
-    static double o[3];
+    static double o[3] = {0,0,0};
     // output 0 -- equilibrium angle
     // output 1 -- V_jk (energy param)
     // output 2 -- n (periodicity)
@@ -347,9 +347,37 @@ double * get_torsion_params(System &system, string a1, string a2) {
     // based on the shared bond of the torsion
     // sp3--sp3
     if (a1.find("_3") != std::string::npos && a2.find("_3") != std::string::npos) {    
-        o[0] = 60; // "or 180" 
-        o[1] = sqrt(system.constants.UFF_torsions[a1] * system.constants.UFF_torsions[a2]); 
-        o[2] = 3;
+        if (a1.find("O") != std::string::npos && a2.find("O") != std::string::npos) {
+            o[0] = 90;
+            o[1] = 2.0; //sqrt(2.*2.);
+            o[2] = 2;
+        }
+        else if (a1.find("O") != std::string::npos && 
+            (a2.find("S_") != std::string::npos ||
+             a2.find("Se") != std::string::npos ||
+             a2.find("Te") != std::string::npos ||
+             a2.find("Po") != std::string::npos)  ) 
+        {
+            o[0] = 90;
+            o[1] = sqrt(2.0 * 6.8);
+            o[2] = 2;
+        
+        }
+        else if (a2.find("O") != std::string::npos &&
+            (a1.find("S_") != std::string::npos ||
+             a1.find("Se") != std::string::npos ||
+             a1.find("Te") != std::string::npos ||
+             a1.find("Po") != std::string::npos)  )
+        {
+            o[0] = 90;
+            o[1] = 6.8; // sqrt(6.8*6.8)
+            o[2] = 2;
+        }
+        else {
+            o[0] = 60; // "or 180" 
+            o[1] = sqrt(system.constants.UFF_torsions[a1] * system.constants.UFF_torsions[a2]); 
+            o[2] = 3;
+        }
     }
     // sp3--sp2
     else if ((a1.find("_3") != std::string::npos && a2.find("_2") != std::string::npos) || 
@@ -375,6 +403,12 @@ double * get_torsion_params(System &system, string a1, string a2) {
     else if (a1.find("_1") != std::string::npos && a2.find("_1") != std::string::npos) {    
         o[0]=180; 
         o[1]=0; 
+        o[2] = 0;
+    }
+    else {
+        // main group garbage
+        o[0] = 0;
+        o[1] = 0;
         o[2] = 0;
     }
 
