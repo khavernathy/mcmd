@@ -159,6 +159,17 @@ double get_kij(System &system, int i, int j, int k, int l, double rij) {
     return 664.12*Zi*Zj/(rij*rij*rij); // in kcal/molA^2, as-is
 }
 
+double get_BO(string a1, string a2) {
+    if (a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos)
+       return 1.5; 
+    else if (a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos)
+        return 2.0;
+    else if (a1.find("_1") != std::string::npos && a2.find("_1") != std::string::npos)
+        return 3.0;
+
+    else return 1.0; 
+}
+
 // get the total potential from bond stretches
 // via the Morse potential
 double stretch_energy(System &system) {
@@ -168,7 +179,7 @@ double stretch_energy(System &system) {
     int i,j,l; // atom indices
     double r; // actual, current distance for pair.
     /* ============================ */
-    double BO = 1.0; // assume single bonds for now!!!
+    double BO; 
     /* ============================ */
 
     // loop through bonds of this atom.
@@ -181,6 +192,7 @@ double stretch_energy(System &system) {
         kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
 //          printf("rij = %f; kij = %f\n", rij, kij);
 
+        BO = get_BO(system.molecules[i].atoms[j].UFFlabel, system.molecules[i].atoms[l].UFFlabel);
         Dij = BO*70.0; // in kcal/mol
         alpha = sqrt(0.5*kij/Dij); // in 1/A
 
