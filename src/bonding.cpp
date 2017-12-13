@@ -16,14 +16,19 @@ bool find_cycle(System &system, int mol, int i) {
         int a2 = system.molecules[mol].atoms[i].bonds[b1];
         for (int b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
             int a3 = system.molecules[mol].atoms[a2].bonds[b2];
+            if (a3 == i) continue; // don't go backwards..
             for (int b3=0; b3<system.molecules[mol].atoms[a3].bonds.size();b3++) {
                 int a4 = system.molecules[mol].atoms[a3].bonds[b3];
+                if (a4 == a2) continue;
                 for (int b4=0; b4<system.molecules[mol].atoms[a4].bonds.size();b4++) {
                     int a5 = system.molecules[mol].atoms[a4].bonds[b4];
+                    if (a5 == a3) continue;
                     for (int b5=0; b5<system.molecules[mol].atoms[a5].bonds.size();b5++) {
                         int a6 = system.molecules[mol].atoms[a5].bonds[b5];
+                        if (a6 == a4) continue;
                         for (int b6=0; b6<system.molecules[mol].atoms[a6].bonds.size();b6++) {
                             int a7 = system.molecules[mol].atoms[a6].bonds[b6];
+                            if (a7 == a5) continue;
                             if (a7 == i)
                                 return true;
                         }
@@ -46,20 +51,20 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         if (num_bonds == 3) return "B_2";
         else if (num_bonds == 4) return "B_3";
     } else if (name == "C") {
-        if (find_cycle(system, mol, i)) return "C_R";
+        if (find_cycle(system, mol, i) && num_bonds != 4) return "C_R";
         else if (num_bonds == 2) return "C_1";
         else if (num_bonds == 3) return "C_2";
         else if (num_bonds == 4) return "C_3";
         // need to dynamically account for resonant C_R too...
     } else if (name == "N") {
-        if (find_cycle(system,mol,i)) return "N_R";
+        if (find_cycle(system,mol,i) && num_bonds != 4) return "N_R";
         else if (num_bonds == 1) return "N_1";
         else if (num_bonds == 2) return "N_3";
         else if (num_bonds == 3) return "N_2";
         else if (num_bonds == 4) return "N_3";
         // account for N_R...
     } else if (name == "O") {
-        if (find_cycle(system,mol,i)) return "O_R";
+        if (find_cycle(system,mol,i) && num_bonds != 4) return "O_R";
         else if (num_bonds == 1) return "O_1";
         else if (num_bonds == 2) return "O_3";
         else if (num_bonds == 3) return "O_2";
