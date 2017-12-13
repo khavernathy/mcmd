@@ -588,55 +588,23 @@ double LJ_intramolec_energy(System &system) {
     // for optimizations, with unique units (kcal/mol) from the MC/MD lj.cpp (Kelvin)
     // the latter of which excludes all intramolecular contributions.
     double potential=0;
-    int mol,i,j, qualified, y,z;
+    int mol,i,j;
     double eps, sig, r, sr6;
-    for (mol=0; mol<system.molecules.size(); mol++) {
-        // all pairs inside the molecule
-        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
-            for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
-                // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
-                qualified = 1;
-                for (y=0; y<system.constants.uniqueBonds.size();y++) {
-                    if (system.constants.uniqueBonds[y].mol==mol &&
-                        ((
-                        system.constants.uniqueBonds[y].atom1==i &&
-                        system.constants.uniqueBonds[y].atom2==j
-                        ) || 
-                        (
-                        system.constants.uniqueBonds[y].atom1==j &&
-                        system.constants.uniqueBonds[y].atom2==i
-                        ))) {
-                        qualified=0;  break;
-                    } // end if bonded therefore unqualified
-                } // end bonds loop
-                for (z=0; z<system.constants.uniqueAngles.size();z++) {
-                    if (system.constants.uniqueAngles[z].mol==mol &&
-                       ((
-                        system.constants.uniqueAngles[z].atom1==i &&
-                        system.constants.uniqueAngles[z].atom3==j
-                       ) ||
-                       (
-                        system.constants.uniqueAngles[z].atom3==i &&
-                        system.constants.uniqueAngles[z].atom1==j
-                       ))) {
-                       qualified=0; break;
-                    } // end if 1--3 therefore unqualified
-                }
+    for (int it=0; it<system.constants.uniqueLJNonBonds.size(); it++) {    
+        mol = system.constants.uniqueLJNonBonds[it].mol;
+        i = system.constants.uniqueLJNonBonds[it].atom1;
+        j = system.constants.uniqueLJNonBonds[it].atom2;
+        eps = system.constants.uniqueLJNonBonds[it].eps;
+        sig = system.constants.uniqueLJNonBonds[it].sig;
 
-                if (qualified) {
-                    eps = sqrt(system.molecules[mol].atoms[i].eps * system.molecules[mol].atoms[j].eps);
-                    sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
                     sr6 = sig/r;
                     sr6 *= sr6;
                     sr6 *= sr6*sr6;
-                    potential += 4.0*eps*(sr6*sr6 - sr6);
-                           
-                }
-            } // end pair-atom j
-        } // end atom loop i
-    } // end molecule loop mol
+                    potential += 4.0*eps*(sr6*sr6 - sr6);    
+    }
+
     system.stats.UintraLJ.value = potential*system.constants.kbk;
     return potential*system.constants.kbk; // to kcal/mol
 } // LJ intramolecular potential function
@@ -646,44 +614,15 @@ double LJ_intramolec_gradient(System &system) {
     // this is a non-bonding potential, but I'm including it here as a separate function
     // for optimizations, with unique units (kcal/mol) from the MC/MD lj.cpp (Kelvin)
     // the latter of which excludes all intramolecular contributions.
-    int mol,i,j, qualified, y,z;
+    int mol,i,j;
     double eps, sig, r,rsq,r6,s6;
-    for (mol=0; mol<system.molecules.size(); mol++) {
-        // all pairs inside the molecule
-        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
-            for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
-                // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
-                qualified = 1;
-                for (y=0; y<system.constants.uniqueBonds.size();y++) {
-                    if (system.constants.uniqueBonds[y].mol==mol &&
-                        ((
-                        system.constants.uniqueBonds[y].atom1==i &&
-                        system.constants.uniqueBonds[y].atom2==j
-                        ) || 
-                        (
-                        system.constants.uniqueBonds[y].atom1==j &&
-                        system.constants.uniqueBonds[y].atom2==i
-                        ))) {
-                        qualified=0;  break;
-                    } // end if bonded therefore unqualified
-                } // end bonds loop
-                for (z=0; z<system.constants.uniqueAngles.size();z++) {
-                    if (system.constants.uniqueAngles[z].mol==mol &&
-                       ((
-                        system.constants.uniqueAngles[z].atom1==i &&
-                        system.constants.uniqueAngles[z].atom3==j
-                       ) ||
-                       (
-                        system.constants.uniqueAngles[z].atom3==i &&
-                        system.constants.uniqueAngles[z].atom1==j
-                       ))) {
-                       qualified=0; break;
-                    } // end if 1--3 therefore unqualified
-                }
+    for (int it=0; it<system.constants.uniqueLJNonBonds.size(); it++) {    
+        mol = system.constants.uniqueLJNonBonds[it].mol;
+        i = system.constants.uniqueLJNonBonds[it].atom1;
+        j = system.constants.uniqueLJNonBonds[it].atom2;
+        eps = system.constants.uniqueLJNonBonds[it].eps;
+        sig = system.constants.uniqueLJNonBonds[it].sig;
 
-                if (qualified) {
-                    eps = sqrt(system.molecules[mol].atoms[i].eps * system.molecules[mol].atoms[j].eps);
-                    sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
                     rsq= r*r;
@@ -696,13 +635,8 @@ double LJ_intramolec_gradient(System &system) {
                         system.molecules[mol].atoms[i].energy_grad[n] += -system.constants.kbk*24.0*distances[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                         system.molecules[mol].atoms[j].energy_grad[n] -= -system.constants.kbk*24.0*distances[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq)); // to kcal/molA
                     }
-
-                    //potential += 4.0*eps*(sr6*sr6 - sr6);
+    }
                            
-                }
-            } // end pair-atom j
-        } // end atom loop i
-    } // end molecule loop mol
     return 0;
 } // LJ intramolecular gradient function
 
@@ -831,6 +765,8 @@ void findBonds(System &system) {
 
     // get unique qualified LJ non-bond pairs (beyond 1,3)
     int mol,qualified, y,z;
+    double rlj;
+    const double r_c = system.pbc.cutoff;
     for (mol=0; mol<system.molecules.size(); mol++) {
         // all pairs inside the molecule
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
@@ -864,9 +800,20 @@ void findBonds(System &system) {
                     } // end if 1--3 therefore unqualified
                 }
 
+                double* distanceslj = getDistanceXYZ(system,mol,i,mol,j);
+                rlj = distanceslj[3];
+
+                // apply cutoff..
+                if (r > r_c) qualified=0;
+
+                
+
                 if (qualified) {
                     Constants::UniqueLJNonBond tmp;
                     tmp.mol = mol; tmp.atom1=i; tmp.atom2=j; 
+                    tmp.sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
+                    tmp.eps = sqrt(system.molecules[mol].atoms[i].eps * system.molecules[mol].atoms[j].eps);
+                    system.constants.uniqueLJNonBonds.push_back(tmp);
                 }
             } // end pair-atom j
         } // end atom loop i
