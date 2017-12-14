@@ -23,7 +23,7 @@ void readInAtomsXYZ(System &system, string filename) {
     // check if it exists
         struct stat buffer;
         if (stat (filename.c_str(), &buffer) != 0) {
-            std::cout << "ERROR: The input_atoms file " << filename.c_str() << " doesn't exist."; printf("\n");
+            std::cout << "ERROR: The input_atoms_xyz file " << filename.c_str() << " doesn't exist."; printf("\n");
             exit(EXIT_FAILURE);
         }
 
@@ -48,6 +48,10 @@ void readInAtomsXYZ(System &system, string filename) {
 			);
 
             line_count++;
+            if (line_count == 1 && myvector.size() > 1) {
+                std::cout << "ERROR: The input_atoms_xyz file (" << filename.c_str() << ") is not a properly formatted .xyz file. The first line should be the total atom count only. Did you mean to use `input_atoms [.pdb file]`?"; printf("\n");
+                exit(EXIT_FAILURE);
+            }       
             if (line_count < 3) continue; // for .xyz, skip first 2 lines
             // skip blank lines
             if (myvector.size() != 0) {
@@ -112,6 +116,7 @@ void readInAtoms(System &system, string filename) {
         int mol_counter=-1;
 		bool first_mover_passed = false;
 		int first_mover_id = -1;
+        int line_count=0;
         Molecule whatev;
         system.proto.push_back(whatev); // the first prototype.
 		Molecule current_molecule; // initializer. Will be overwritten
@@ -125,6 +130,13 @@ void readInAtoms(System &system, string filename) {
 				istream_iterator<string>(),
 				back_inserter(myvector) 
 			);
+
+            line_count++;
+            if (line_count == 1 && myvector.size() < 2) {
+                std::cout << "ERROR: The input_atoms file (" << filename.c_str() << ") is not a properly formatted .pdb file. All atom lines should contain ATOM in the first column. Did you mean to use `input_atoms_xyz [.xyz file]`?"; printf("\n");
+                exit(EXIT_FAILURE);
+
+            }
 
             // skip blank lines
             if (myvector.size() != 0) {
@@ -215,6 +227,7 @@ void readInAtoms(System &system, string filename) {
             } // end if vector size nonzero
 		}
 		myfile.close();
+
 
 	}
 	else {
