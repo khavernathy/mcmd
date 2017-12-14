@@ -21,4 +21,4 @@ opt_LJ off
 carbasis 47.005 47.005 47.005 90 90 90 
 
 
-input_atoms NOTT-112.pdb
+input_atoms ../../../atomfiles/NOTT-112_elements.pdb

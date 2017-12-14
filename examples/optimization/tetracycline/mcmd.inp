@@ -11,4 +11,4 @@ opt_step_limit 10000
 opt_mode    sd
 
 
-input_atoms_xyz tetracycline_wonky.xyz
+input_atoms_xyz  ../../../atomfiles/tetracycline_wonky.xyz

@@ -11,4 +11,4 @@ opt_mode    sd
 
 
 
-input_atoms RuBpy.pdb
+input_atoms ../../../atomfiles/RuBpy.pdb
