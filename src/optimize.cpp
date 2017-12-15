@@ -25,9 +25,9 @@ double move_factor(double energy, int N) {
     return 1.0 -exp(-energy*energy / (10.0*N*N)); // reverse bell-curve
 }
 
-void outputEnergies(System &system, int step, double Ef, double delta_E) {
+void outputEnergies(System &system, int step, double Ef, double delta_E, double sec_per_step) {
     printf("==============================================================\n");
-    printf("Step %i\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step,Ef, delta_E);
+    printf("Step %i (%.4f sec/step)\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step, sec_per_step,Ef, delta_E);
     printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\n",
           system.stats.Ustretch.value,
           system.stats.Uangles.value,
@@ -39,6 +39,8 @@ void outputEnergies(System &system, int step, double Ef, double delta_E) {
 void optimize(System &system) {
 
     int i;
+    std::chrono::steady_clock::time_point begin_opt = std::chrono::steady_clock::now();
+
     // print out all the bonds
     printf("================================================================================\n");
     printf("Dynamically-found Bonds Summary:\n");
@@ -143,7 +145,7 @@ void optimize(System &system) {
     else if (optmode == OPTIMIZE_MC)
         printf("MONTE CARLO STRUCTURE OPTIMIZATION\n");
 
-    outputEnergies(system, 0, Ei, 0);
+    outputEnergies(system, 0, Ei, 0, 0);
 
     // Monte Carlo sytle opt.
     if (optmode == OPTIMIZE_MC) {
@@ -168,7 +170,12 @@ void optimize(System &system) {
            // accept
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-            outputEnergies(system, step, Ef, delta_E);
+
+            std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+            double time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin_opt).count()) /1000000.0;
+            double sec_per_step = time_elapsed/step;
+
+            outputEnergies(system, step, Ef, delta_E, sec_per_step);
             if (fabs(delta_E) < error_tolerance && delta_E!=0) {
                 printf("Finished with energy = %f kcal/mol \n", Ef);
                 converged=1;
@@ -227,7 +234,10 @@ void optimize(System &system) {
 
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-            outputEnergies(system, step, Ef, delta_E);
+            std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+            double time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin_opt).count()) /1000000.0;
+            double sec_per_step = time_elapsed/step;
+            outputEnergies(system, step, Ef, delta_E, sec_per_step);
 
             if ((fabs(delta_E) < error_tolerance && delta_E!=0) || step >= step_limit) {
                  printf("Finished with energy = %f kcal/mol \n", Ef);
