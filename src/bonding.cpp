@@ -14,6 +14,7 @@ bool find_cycle(System &system, int mol, int i) {
     // see if atom i on molecule mol is on a 6-membered ring
     for (int b1=0; b1<system.molecules[mol].atoms[i].bonds.size(); b1++) {
         int a2 = system.molecules[mol].atoms[i].bonds[b1];
+        if (system.molecules[mol].atoms[a2].name == "Zn") continue; // avoid false ring in MOF-5 type
         for (int b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
             int a3 = system.molecules[mol].atoms[a2].bonds[b2];
             if (a3 == i) continue; // don't go backwards..
@@ -62,15 +63,22 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         else if (num_bonds == 2) return "N_3";
         else if (num_bonds == 3) return "N_2";
         else if (num_bonds == 4) return "N_3";
-        // account for N_R...
     } else if (name == "O") {
-        if (find_cycle(system,mol,i) && num_bonds != 4) return "O_R";
+        int ZnCount=0;
+        for (int z=0; z<system.molecules[mol].atoms[i].bonds.size(); z++) {
+            if (system.molecules[mol].atoms[system.molecules[mol].atoms[i].bonds[z]].name == "Zn") {
+                ZnCount++;
+            }
+        }
+        printf("ZnCount of oxygen id %i = %i\n", i, ZnCount);
+        if (ZnCount == 1) return "O_2";
+        else if (ZnCount == 4) return "O_3_f"; // MOF-5 Zn cluster center O
+        else if (find_cycle(system,mol,i) && num_bonds != 4) return "O_R";
         else if (num_bonds == 1) return "O_1";
         else if (num_bonds == 2) return "O_3";
         else if (num_bonds == 3) return "O_2";
         else if (num_bonds == 4) return "O_3";
-        else return "O_3_f"; // MOF-5 center of Zn cluster type
-        // account for O_R...
+        else return "O_3";
     } else if (name == "F") {
         return "F_";
     } else if (name == "Al") {

@@ -485,3 +485,22 @@ cuda garbage
         atom_list[i].eps=9000;
         
     } // end if i<n
+
+
+
+
+
+bool is_aro(string atom) {
+    // return true if this atom is a valid aromatic-ring maker
+    if (atom.find("C_") != std::string::npos ||
+        atom.find("O_") != std::string::npos ||
+        atom.find("N_") != std::string::npos ||
+        atom.find("S_") != std::string::npos ||
+        atom.find("P_") != std::string::npos ||
+        atom.find("B_") != std::string::npos)
+        return true;
+    else 
+        return false;
+
+}
+
