@@ -218,10 +218,13 @@ void optimize(System &system) {
             grad_mag = 0;
             // get gradient magnitude
             for (int i=0; i<system.molecules[0].atoms.size(); i++) {
-                for (int n=0;n<3;n++)
+                for (int n=0;n<3;n++) {
+                    //printf("gradient %i[%i] = %f\n", i,n, system.molecules[0].atoms[i].energy_grad[n]);
                     grad_mag += system.molecules[0].atoms[i].energy_grad[n]*system.molecules[0].atoms[i].energy_grad[n];
+                }
             }
             grad_mag = sqrt(grad_mag);
+            //printf("Gradient magnitude: %f\n", grad_mag);
 
             // move the atoms by their (negative!) gradients
             // normalized by the gradient magnitude
