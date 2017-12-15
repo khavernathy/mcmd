@@ -130,8 +130,8 @@ void optimize(System &system) {
     int converged = 0;
     double error_tolerance = system.constants.opt_error;
     int step_limit = system.constants.opt_step_limit; //100;
-    double Ei = totalBondedEnergy(system);
-    double Ef;
+    double Ef = totalBondedEnergy(system);
+    double Ei;
     double delta_E;
     double boltzmann;
     double tmp_pos[3] = {0,0,0};
@@ -145,13 +145,13 @@ void optimize(System &system) {
     else if (optmode == OPTIMIZE_MC)
         printf("MONTE CARLO STRUCTURE OPTIMIZATION\n");
 
-    outputEnergies(system, 0, Ei, 0, 0);
+    outputEnergies(system, 0, Ef, 0, 0);
 
     // Monte Carlo sytle opt.
     if (optmode == OPTIMIZE_MC) {
         int N = (int)system.molecules[0].atoms.size();
     while (!converged) {
-        Ei = totalBondedEnergy(system);
+        Ei = Ef;
 
         // select random atom and perturb it.
         randatom = pickRandomAtom(system);
@@ -199,7 +199,7 @@ void optimize(System &system) {
         const double move_factor = 0.02;
         double grad_mag=0;
         while (!converged) {
-            Ei = totalBondedEnergy(system);
+            Ei = Ef;
             // re-initialize gradient
             for (int i=0; i<system.molecules[0].atoms.size(); i++) 
                 for (int n=0;n<3;n++)

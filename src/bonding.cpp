@@ -218,7 +218,7 @@ double stretch_energy(System &system) {
         r = distances[3];
         mainterm = exp(-alpha*(r-rij)) - 1.0; // unitless
         potential += Dij*(mainterm*mainterm); // in kcal/mol
-        //printf("%f\n", Dij*(mainterm*mainterm));
+        //printf("bond %i %i energy = %f\n", j,l, Dij*(mainterm*mainterm));
     }
 
     system.stats.Ustretch.value = potential;
@@ -282,18 +282,14 @@ double angle_bend_energy(System &system) {
         C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
         C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
         C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
-        //printf("theta_0 = %f\n", theta_ijk/deg2rad);
             
         angle = get_angle(system, i, j, l, m);  
-        //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
         rjk = get_rij(system,i,l,i,m);
         rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
         K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
-        //printf("K_ijk = %f \n", K_ijk);
-        //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
         potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
-    
+        //printf("angle potential of %i %i %i = %f\n", j,l,m,K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)));    
     }
     system.stats.Uangles.value = potential;
     return potential; // in kcal/mol
@@ -715,6 +711,7 @@ double LJ_intramolec_energy(System &system) {
                     sr6 *= sr6;
                     sr6 *= sr6*sr6;
                     potential += 4.0*eps*(sr6*sr6 - sr6);    
+                    //printf("LJ %i %i = %f\n", i,j, 4.0*eps*(sr6*sr6 - sr6));
     }
 
     system.stats.UintraLJ.value = potential*system.constants.kbk;
@@ -923,9 +920,7 @@ void findBonds(System &system) {
                 rlj = distanceslj[3];
 
                 // apply cutoff..
-                if (r > r_c) qualified=0;
-
-                
+                if (rlj > r_c) qualified=0;
 
                 if (qualified) {
                     Constants::UniqueLJNonBond tmp;
