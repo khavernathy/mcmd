@@ -444,9 +444,6 @@ double torsions_energy(System &system) {
 }
 
 
-
-
-
 // Morse potential gradient for all bonded atoms, to minimize energy
 double morse_gradient(System &system) {
     // x,y,z is the point of interest for this gradient
@@ -455,7 +452,7 @@ double morse_gradient(System &system) {
     int i,j,l; // atom indices
     double r; // actual, current distance for pair.
     /* ============================ */
-    double BO = 1.0; // assume single bonds for now!!!
+    double BO;
     /* ============================ */
     double prefactor,grad,delta;
         // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
@@ -470,6 +467,7 @@ double morse_gradient(System &system) {
                 kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
       //          printf("rij = %f; kij = %f\n", rij, kij);
 
+                BO = get_BO(system.molecules[i].atoms[j].UFFlabel, system.molecules[i].atoms[l].UFFlabel);
                 Dij = BO*70.0; // in kcal/mol
                 alpha = sqrt(0.5*kij/Dij); // in 1/A
 

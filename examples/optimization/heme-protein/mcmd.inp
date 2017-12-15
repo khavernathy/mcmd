@@ -1,0 +1,15 @@
+! Douglas Franz, Space group, USF, 2017
+! Optimization of a Heme protein 1DVE
+! RAT HEME OXYGENASE-1
+
+
+mode opt
+name rat-protein
+
+bondlength 1.9
+opt_error 0.0001
+opt_step_limit 10000
+opt_mode    sd
+
+
+input_atoms_xyz  ../../../atomfiles/1dve.xyz
