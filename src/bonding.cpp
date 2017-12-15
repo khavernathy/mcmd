@@ -132,6 +132,8 @@ bool qualify_bond(System &system, double r, int mol, int i, int j) {
         return false; 
     else if ((a1=="Zn" || a2=="Zn") && r <= 2.1) // Zn4O group
         return true;
+    else if ((a1=="Cu" || a2=="Cu") && r <= 2.1) // Cu paddlewheel - O
+        return true;
     else if ((a1=="Cu" && a2=="Cu") && r <= 2.9) // Cu paddlewheel
         return true;
     else if ((a1=="Ru" || a2=="Ru") && r <= 2.1) // Ru +2  complexes 
@@ -175,17 +177,21 @@ double get_BO(string a1, string a2) {
     if ((a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos)
      || (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos)
      || (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos))
-       return 1.5; 
+       return 1.5; // resonant, carboxyl, etc.
     else if (a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos)
-        return 2.0;
+        return 2.0; // sp2
     else if (a1.find("_1") != std::string::npos && a2.find("_1") != std::string::npos)
-        return 3.0;
+        return 3.0; // sp
     else if ((a1.find("O_") != std::string::npos && a2.find("Zn") != std::string::npos)
-         || (a2.find("Zn") != std::string::npos && a2.find("O_") != std::string::npos))
-        return 0.5;
-    
+         || (a1.find("Zn") != std::string::npos && a2.find("O_") != std::string::npos))
+        return 0.5; // Zn--O cluster
+    else if ((a1.find("Cu") != std::string::npos && a2.find("O_") != std::string::npos)
+         ||  (a1.find("O_") != std::string::npos && a2.find("Cu") != std::string::npos))
+        return 0.5; // Cu--O paddlewheel
+    else if (a1.find("Cu") != std::string::npos && a2.find("Cu") != std::string::npos)
+        return 0.25; // Cu paddlewheel
 
-    else return 1.0; 
+    else return 1.0; // sp3, other single bonds.
 }
 
 // get the total potential from bond stretches
@@ -320,13 +326,30 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     double v2a[3], v2b[3]; // for plane 2
     double norm1[3], norm2[3];
 
-    for (int n=0; n<3; n++) {
+
+    double* distancesJI = getDistanceXYZ(system,mol,j,mol,i);
+    for (int n=0; n<3; n++)
+        v1a[n] = distancesJI[n];
+
+    double* distancesKI = getDistanceXYZ(system,mol,k,mol,i);
+    for (int n=0;n<3;n++)
+        v1b[n] = distancesKI[n];
+
+    double* distancesKJ = getDistanceXYZ(system,mol,k,mol,j);
+    for (int n=0;n<3;n++)
+        v2a[n] = distancesKJ[n];
+
+    double* distancesLJ = getDistanceXYZ(system,mol,l,mol,j);
+    for (int n=0;n<3;n++) 
+        v2b[n] = distancesLJ[n];
+
+/*
         v1a[n] = system.molecules[mol].atoms[j].pos[n] - system.molecules[mol].atoms[i].pos[n];
         v1b[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[i].pos[n];
         
         v2a[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[j].pos[n];
         v2b[n] = system.molecules[mol].atoms[l].pos[n] - system.molecules[mol].atoms[j].pos[n];
-    }
+    */
 
     norm1[0] = v1a[1]*v1b[2] - v1a[2]*v1b[1];
     norm1[1] = v1a[2]*v1b[0] - v1a[0]*v1b[2];
@@ -492,7 +515,7 @@ double morse_gradient(System &system) {
                 // gradient for a single bond is 6D (3D on each atom, 1 for each D.O.F.)
                 prefactor = 2*alpha*Dij*exp(alpha*(rij-r))/r;
                 for (int n=0;n<3;n++) {
-                    delta = system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
+                    delta = distances[n]; //system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
                     grad = prefactor * delta;
                     grad *= (1 - exp(alpha*(rij-r)));
                     system.molecules[i].atoms[j].energy_grad[n] += grad;
