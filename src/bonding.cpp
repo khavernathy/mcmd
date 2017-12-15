@@ -239,9 +239,15 @@ double get_angle(System &system, int i, int A, int B, int C) {
     double AB[3] = {0,0,0};
     double BC[3] = {0,0,0};
 
+    double* ABdistances = getDistanceXYZ(system, i, A, i, B);
     for (int n=0;n<3;n++) {
-        AB[n] = system.molecules[i].atoms[A].pos[n] - system.molecules[i].atoms[B].pos[n];
-        BC[n] = system.molecules[i].atoms[C].pos[n] - system.molecules[i].atoms[B].pos[n];
+   //     printf("ABdistances[%i] = %f\n", n, ABdistances[n]);
+        AB[n] = ABdistances[n];
+    }
+    double* BCdistances = getDistanceXYZ(system, i, C, i, B);
+    for (int n=0;n<3;n++) {
+  //      printf("BCdistances[%i] = %f\n", n, BCdistances[n]);
+        BC[n] = BCdistances[n];
     }
     
     const double dotprod = dddotprod(AB,BC);
