@@ -70,7 +70,6 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
                 ZnCount++;
             }
         }
-        printf("ZnCount of oxygen id %i = %i\n", i, ZnCount);
         if (ZnCount == 1) return "O_2";
         else if (ZnCount == 4) return "O_3_f"; // MOF-5 Zn cluster center O
         else if (find_cycle(system,mol,i) && num_bonds != 4) return "O_R";
@@ -179,6 +178,10 @@ double get_BO(string a1, string a2) {
         return 2.0;
     else if (a1.find("_1") != std::string::npos && a2.find("_1") != std::string::npos)
         return 3.0;
+    else if ((a1.find("O_") != std::string::npos && a2.find("Zn") != std::string::npos)
+         || (a2.find("Zn") != std::string::npos && a2.find("O_") != std::string::npos))
+        return 0.5;
+    
 
     else return 1.0; 
 }
