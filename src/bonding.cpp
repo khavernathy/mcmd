@@ -247,12 +247,10 @@ double get_angle(System &system, int i, int A, int B, int C) {
 
     double* ABdistances = getDistanceXYZ(system, i, A, i, B);
     for (int n=0;n<3;n++) {
-   //     printf("ABdistances[%i] = %f\n", n, ABdistances[n]);
         AB[n] = ABdistances[n];
     }
     double* BCdistances = getDistanceXYZ(system, i, C, i, B);
     for (int n=0;n<3;n++) {
-  //      printf("BCdistances[%i] = %f\n", n, BCdistances[n]);
         BC[n] = BCdistances[n];
     }
     
@@ -325,6 +323,10 @@ double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
     double v1a[3], v1b[3]; // for plane 1
     double v2a[3], v2b[3]; // for plane 2
     double norm1[3], norm2[3];
+
+    double xi,xj,xk,xl;
+    double yi,yj,yk,yl;
+    double zi,zj,zk,zl;
 
 
     double* distancesJI = getDistanceXYZ(system,mol,j,mol,i);
@@ -577,23 +579,30 @@ double angle_bend_gradient(System &system) {
         rjk = get_rij(system,i,l,i,m);
         rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
         K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
-        //printf("K_ijk = %f \n", K_ijk);
-        //printf("rij = %f; rjk = %f; rik = %f\n", rij, rjk, rik);
 
         // compute the gradient for all angle components (xyz for 3 atoms = 9)
         // gradient is [dE/dx_i...] which ends up as a sum of two cosine derivs (d/dx C0 term -> 0)
-        // this gets funky b/c gradient looks different for each direction x,y,z
-        // just do dE/dx_i now.
+
+        // based on atom i, we need to make periodic "ghosts" j and k.
+        // this is way easier than trying to deal with periodic distances 
+        // inside the derivative..
         xi = system.molecules[i].atoms[j].pos[0]; 
         yi = system.molecules[i].atoms[j].pos[1];
         zi = system.molecules[i].atoms[j].pos[2];
-        xj = system.molecules[i].atoms[l].pos[0];
-        yj = system.molecules[i].atoms[l].pos[1];
-        zj = system.molecules[i].atoms[l].pos[2];
-        xk = system.molecules[i].atoms[m].pos[0];
-        yk = system.molecules[i].atoms[m].pos[1];
-        zk = system.molecules[i].atoms[m].pos[2];
 
+        double* distances_ij = getDistanceXYZ(system,i,j,i,l);
+        xj = xi - distances_ij[0];
+        yj = yi - distances_ij[1];
+        zj = zi - distances_ij[2];
+
+        double* distances_ik = getDistanceXYZ(system,i,j,i,m);
+        xk = xi - distances_ik[0];
+        yk = yi - distances_ik[1];
+        zk = zi - distances_ik[2];
+        // done with ghosts
+
+        /*
+         * old manual crap
         B = (yi-yj)*(yk-yj) + (zi-zj)*(zk-zj);
         C = (yi-yj)*(yi-yj) + (zi-zj)*(zi-zj);
 
@@ -604,12 +613,11 @@ double angle_bend_gradient(System &system) {
         cos2 = 2*(((xk-xj)/(djk*dij)) - (( (xi-xj)*(B + (xk-xj)*(xi-xj)))/(djk*dij*dij*dij))) * sin(2*acos((B + (xk-xj)*(xi-xj))/(djk*dij))) / sqrt(1 - pow((B + (xk-xj)*(xi-xj)),2)/(djk*djk*dij*dij));
 
         grad = K_ijk*(C1*cos1 + C2*cos2);
-   
+  */ 
         // MATLAB GENERATED PARTIALS...
         // recall J,L,M are i,j,k
         // x_i
-        //printf("grad method 1 = %f method 2 = %f\n", grad, K_ijk*(C2*sin(acos(1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk)))*2.0)*((xj-xk)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))-(xi*2.0-xj*2.0)*1.0/pow(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0),3.0/2.0)*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0))*1.0/sqrt(-pow((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk),2.0)/((pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0)))+1.0)*2.0-C1*(xj-xk)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))+C1*(xi*2.0-xj*2.0)*1.0/pow(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0),3.0/2.0)*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0)));
-        system.molecules[i].atoms[j].energy_grad[0] += grad; // grad;
+        system.molecules[i].atoms[j].energy_grad[0] += K_ijk*(C2*sin(acos(1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk)))*2.0)*((xj-xk)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))-(xi*2.0-xj*2.0)*1.0/pow(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0),3.0/2.0)*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0))*1.0/sqrt(-pow((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk),2.0)/((pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0)))+1.0)*2.0-C1*(xj-xk)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))+C1*(xi*2.0-xj*2.0)*1.0/pow(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0),3.0/2.0)*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0));
      
         // y_i
         system.molecules[i].atoms[j].energy_grad[1] += K_ijk*(C2*sin(acos(1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk)))*2.0)*((yj-yk)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))-(yi*2.0-yj*2.0)*1.0/pow(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0),3.0/2.0)*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0))*1.0/sqrt(-pow((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk),2.0)/((pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0)))+1.0)*2.0-C1*(yj-yk)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))+C1*(yi*2.0-yj*2.0)*1.0/pow(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0),3.0/2.0)*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0));
@@ -635,7 +643,7 @@ double angle_bend_gradient(System &system) {
         // z_k
         system.molecules[i].atoms[m].energy_grad[2] += -K_ijk*(C2*sin(acos(1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk)))*2.0)*((zi-zj)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))-(zj*2.0-zk*2.0)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/pow(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0),3.0/2.0)*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0))*1.0/sqrt(-pow((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk),2.0)/((pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0)))+1.0)*2.0-C1*(zi-zj)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/sqrt(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0))+C1*(zj*2.0-zk*2.0)*1.0/sqrt(pow(xi-xj,2.0)+pow(yi-yj,2.0)+pow(zi-zj,2.0))*1.0/pow(pow(xj-xk,2.0)+pow(yj-yk,2.0)+pow(zj-zk,2.0),3.0/2.0)*((xi-xj)*(xj-xk)+(yi-yj)*(yj-yk)+(zi-zj)*(zj-zk))*(1.0/2.0));
 
-        double POT=K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
+        //double POT=K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
             
     }
 
@@ -664,18 +672,28 @@ double torsions_gradient(System &system) {
         // there are 12 gradients for each dihedral
         // 3 for each of the 4 atoms
         // recall that i,j,k,l (conventional atoms) --> j,l,m,p here
-        xi = system.molecules[i].atoms[j].pos[0];
+        // based on atom i, we need to make periodic "ghosts" j, k, l.
+        // this is way easier than trying to deal with periodic distances 
+        // inside the derivative..
+        xi = system.molecules[i].atoms[j].pos[0]; 
         yi = system.molecules[i].atoms[j].pos[1];
         zi = system.molecules[i].atoms[j].pos[2];
-        xj = system.molecules[i].atoms[l].pos[0];
-        yj = system.molecules[i].atoms[l].pos[1];
-        zj = system.molecules[i].atoms[l].pos[2];
-        xk = system.molecules[i].atoms[m].pos[0];
-        yk = system.molecules[i].atoms[m].pos[1];
-        zk = system.molecules[i].atoms[m].pos[2];
-        xl = system.molecules[i].atoms[p].pos[0];
-        yl = system.molecules[i].atoms[p].pos[1];
-        zl = system.molecules[i].atoms[p].pos[2];
+
+        double* distances_ij = getDistanceXYZ(system,i,j,i,l);
+        xj = xi - distances_ij[0];
+        yj = yi - distances_ij[1];
+        zj = zi - distances_ij[2];
+
+        double* distances_ik = getDistanceXYZ(system,i,j,i,m);
+        xk = xi - distances_ik[0];
+        yk = yi - distances_ik[1];
+        zk = zi - distances_ik[2];
+        
+        double* distances_il = getDistanceXYZ(system,i,j,i,p);
+        xl = xi - distances_il[0];
+        yl = yi - distances_il[1];
+        zl = zi - distances_il[2];
+        // done with ghosts
 
         // MATLAB GENERATED GRADIENTS
         // xi
