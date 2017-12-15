@@ -172,7 +172,9 @@ double get_kij(System &system, int i, int j, int k, int l, double rij) {
 }
 
 double get_BO(string a1, string a2) {
-    if (a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos)
+    if ((a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos)
+     || (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos)
+     || (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos))
        return 1.5; 
     else if (a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos)
         return 2.0;
