@@ -13,10 +13,6 @@ opt_step_limit 10000
 opt_mode    sd
 
 
-! Things tend to go more smoothly when dihedrals are neglected...
-opt_dihedrals off
-opt_LJ off
-
 
 carbasis 47.005 47.005 47.005 90 90 90 
 
