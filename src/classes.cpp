@@ -298,7 +298,8 @@ class Constants {
         int opt_angles = 1; // "" angles ""
         int opt_dihedrals = 1; // "" dihedrals ""
         int opt_LJ = 1; // "" non-bond LJ ""
-        
+        int opt_ES = 1; // "" non-bond electrostatics
+
         struct UniqueBond {
             int mol, atom1, atom2; double  value; // indices of molecule + atoms of bond
         };
@@ -316,6 +317,11 @@ class Constants {
             double sig, eps;
         };
         vector<UniqueLJNonBond> uniqueLJNonBonds; // holds all unique non-bonded pair interactions (no cutoff)
+        struct UniqueChargeNonBond {
+            int mol, atom1, atom2;
+            double chargeprod;
+        };  
+        vector <UniqueChargeNonBond> uniqueChargeNonBonds;
 
 };
 
@@ -639,7 +645,7 @@ class Stats {
           lj_lrc, lj_self_lrc, lj, // lj_self_lrc is really just "self" energy for LJ potential.
           es_self, es_real, es_recip,
           tt, tt_lrc, tt_self,
-          Ustretch, Uangles, Udihedrals, UintraLJ, Ubonded_tot, // bonded energies in kcal/mol
+          Ustretch, Uangles, Udihedrals, UintraLJ, UintraES, Ubonded_tot, // bonded energies in kcal/mol
           chempot,totalmass, frozenmass, 
           pressure,temperature, fdotrsum, 
           dist_within, diffusion, volume, z, // z = PV/nRT

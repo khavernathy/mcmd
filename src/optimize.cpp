@@ -28,11 +28,12 @@ double move_factor(double energy, int N) {
 void outputEnergies(System &system, int step, double Ef, double delta_E, double sec_per_step) {
     printf("==============================================================\n");
     printf("Optimization Step %i (%.4f sec/step) %s\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step, sec_per_step, system.constants.atom_file.c_str(),  Ef, delta_E);
-    printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\n",
+    printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\nIntramolec. ES = %f kcal/mol\n",
           system.stats.Ustretch.value,
           system.stats.Uangles.value,
           system.stats.Udihedrals.value,
-          system.stats.UintraLJ.value); 
+          system.stats.UintraLJ.value,
+          system.stats.UintraES.value); 
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
@@ -214,6 +215,8 @@ void optimize(System &system) {
                 torsions_gradient(system);
             if (system.constants.opt_LJ)
                 LJ_intramolec_gradient(system);
+            if (system.constants.opt_ES)
+                ES_intramolec_gradient(system);
 
             grad_mag = 0;
             // get gradient magnitude

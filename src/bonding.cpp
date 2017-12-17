@@ -832,6 +832,50 @@ double LJ_intramolec_gradient(System &system) {
     return 0;
 } // LJ intramolecular gradient function
 
+double ES_intramolec_energy(System &system) {
+    // this is a non-bonding potential, but I'm including it here as a separate function
+    double potential=0;
+    int mol,i,j;
+    double qq,r;
+    for (int it=0; it<system.constants.uniqueChargeNonBonds.size(); it++) {    
+        mol = system.constants.uniqueChargeNonBonds[it].mol;
+        i = system.constants.uniqueChargeNonBonds[it].atom1;
+        j = system.constants.uniqueChargeNonBonds[it].atom2;
+        qq = system.constants.uniqueChargeNonBonds[it].chargeprod;
+    
+        if (qq==0) continue; // skip 0-energy        
+
+                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
+                    r = distances[3];
+                    potential += qq/r;  
+    }
+
+    system.stats.UintraES.value = potential*system.constants.kbk;
+    return potential*system.constants.kbk; // to kcal/mol
+} // LJ intramolecular potential function
+
+double ES_intramolec_gradient(System &system) {
+    // this is a non-bonding potential, but I'm including it here as a separate function
+    int mol,i,j;
+    double qq,r;
+    for (int it=0; it<system.constants.uniqueChargeNonBonds.size(); it++) {
+        mol = system.constants.uniqueChargeNonBonds[it].mol;
+        i = system.constants.uniqueChargeNonBonds[it].atom1;
+        j = system.constants.uniqueChargeNonBonds[it].atom2;
+        qq = system.constants.uniqueChargeNonBonds[it].chargeprod;
+
+        if (qq==0) continue; // skip 0-force
+
+                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
+                    r = distances[3];
+                    for (int n=0;n<3;n++) {
+                        system.molecules[mol].atoms[i].energy_grad[n] -= distances[n]*qq/(r*r*r) * system.constants.kbk;
+                        system.molecules[mol].atoms[j].energy_grad[n] += distances[n]*qq/(r*r*r) * system.constants.kbk;
+                    }
+    }
+
+    return 0; //potential*system.constants.kbk; // to kcal/mol
+} // LJ intramolecular potential function
 
 
 // function to find all bonds (and angles) for all atoms.
@@ -962,7 +1006,7 @@ void findBonds(System &system) {
     }
 
 
-    // get unique qualified LJ non-bond pairs (beyond 1,3)
+    // get unique qualified LJ/ES non-bond pairs (beyond 1,3)
     int mol,qualified, y,z;
     double rlj;
     const double r_c = system.pbc.cutoff;
@@ -1011,6 +1055,12 @@ void findBonds(System &system) {
                     tmp.sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
                     tmp.eps = sqrt(system.molecules[mol].atoms[i].eps * system.molecules[mol].atoms[j].eps);
                     system.constants.uniqueLJNonBonds.push_back(tmp);
+
+                    //also coulombic pairs
+                    Constants::UniqueChargeNonBond tmp2;
+                    tmp2.mol = mol; tmp2.atom1 = i; tmp2.atom2 = j;
+                    tmp2.chargeprod = system.molecules[mol].atoms[i].C * system.molecules[mol].atoms[j].C;
+                    system.constants.uniqueChargeNonBonds.push_back(tmp2);
                 }
             } // end pair-atom j
         } // end atom loop i
@@ -1029,6 +1079,8 @@ double totalBondedEnergy(System &system) {
         system.stats.Ubonded_tot.value += torsions_energy(system);
     if (system.constants.opt_LJ)
         system.stats.Ubonded_tot.value += LJ_intramolec_energy(system);
+    if (system.constants.opt_ES)
+        system.stats.Ubonded_tot.value += ES_intramolec_energy(system);
 
     return system.stats.Ubonded_tot.value;
 }
