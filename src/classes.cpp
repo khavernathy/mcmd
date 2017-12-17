@@ -738,7 +738,7 @@ class Atom {
         double efield_self[3] = {0,0,0};
         double efield_induced[3] = {0,0,0};
         double efield_induced_change[3] = {0,0,0};
-        double energy_grad[3] = {0,0,0};
+        //double energy_grad[3] = {0,0,0};
         double dipole_rrms=0;
 		
         /*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
