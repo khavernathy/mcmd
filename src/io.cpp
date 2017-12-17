@@ -1500,6 +1500,11 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "off")
                     system.constants.opt_LJ = 0;
                 std::cout << "Got optimization LJ non-bonding contributions = " << lc[1].c_str(); printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "opt_ES")) {
+                if (lc[1] == "off")
+                    system.constants.opt_ES = 0;
+                std::cout << "Got optimization ES non-bonding contributions = " << lc[1].c_str(); printf("\n");
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
 		} // end while reading lines
