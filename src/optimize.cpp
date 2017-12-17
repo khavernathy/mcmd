@@ -203,7 +203,7 @@ void optimize(System &system) {
             // re-initialize gradient
             for (int i=0; i<system.molecules[0].atoms.size(); i++) 
                 for (int n=0;n<3;n++)
-                    system.molecules[0].atoms[i].force[n]=0;
+                    system.molecules[0].atoms[i].energy_grad[n]=0;
             
             // compute the gradients
             if (system.constants.opt_bonds)
@@ -220,7 +220,7 @@ void optimize(System &system) {
             for (int i=0; i<system.molecules[0].atoms.size(); i++) {
                 for (int n=0;n<3;n++) {
                     //printf("gradient %i[%i] = %f\n", i,n, system.molecules[0].atoms[i].energy_grad[n]);
-                    grad_mag += system.molecules[0].atoms[i].force[n]*system.molecules[0].atoms[i].force[n];
+                    grad_mag += system.molecules[0].atoms[i].energy_grad[n]*system.molecules[0].atoms[i].energy_grad[n];
                 }
             }
             grad_mag = sqrt(grad_mag);
@@ -230,7 +230,7 @@ void optimize(System &system) {
             // normalized by the gradient magnitude
             for (int i=0; i<system.molecules[0].atoms.size(); i++) 
                 for (int n=0;n<3;n++)
-                    system.molecules[0].atoms[i].pos[n] += move_factor/grad_mag * system.molecules[0].atoms[i].force[n];
+                    system.molecules[0].atoms[i].pos[n] -= move_factor/grad_mag * system.molecules[0].atoms[i].energy_grad[n];
 
             Ef = totalBondedEnergy(system);
             delta_E = Ef - Ei;
