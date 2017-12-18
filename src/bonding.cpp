@@ -212,13 +212,13 @@ double stretch_energy(System &system) {
         j = system.constants.uniqueBonds[it].atom1;
         l = system.constants.uniqueBonds[it].atom2;
 
-        rij = get_rij(system,i,j,i,l); // in Angstroms
-        kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
+        rij = system.constants.uniqueBonds[it].rij; // in A
+        kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
 //          printf("rij = %f; kij = %f\n", rij, kij);
 
-        BO = get_BO(system.molecules[i].atoms[j].UFFlabel, system.molecules[i].atoms[l].UFFlabel);
-        Dij = BO*70.0; // in kcal/mol
-        alpha = sqrt(0.5*kij/Dij); // in 1/A
+        BO = system.constants.uniqueBonds[it].BO;
+        Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
+        alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
 
         double* distances = getDistanceXYZ(system, i,j,i,l);
         r = distances[3];
@@ -502,17 +502,19 @@ double morse_gradient(System &system) {
 
 
             for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+
                 i = system.constants.uniqueBonds[it].mol;
                 j = system.constants.uniqueBonds[it].atom1;
                 l = system.constants.uniqueBonds[it].atom2;
 
-                rij = get_rij(system,i,j,i,l); // in Angstroms
-                kij = get_kij(system,i,j,i,l, rij); // in kcal mol^-1 A^-2
-      //          printf("rij = %f; kij = %f\n", rij, kij);
+                rij = system.constants.uniqueBonds[it].rij; // in A
+                kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
+//          printf("rij = %f; kij = %f\n", rij, kij);
 
-                BO = get_BO(system.molecules[i].atoms[j].UFFlabel, system.molecules[i].atoms[l].UFFlabel);
-                Dij = BO*70.0; // in kcal/mol
-                alpha = sqrt(0.5*kij/Dij); // in 1/A
+                BO = system.constants.uniqueBonds[it].BO;
+                Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
+                alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
+
 
                 double* distances = getDistanceXYZ(system, i,j,i,l);
                 r = distances[3];
@@ -1067,6 +1069,27 @@ void findBonds(System &system) {
     } // end molecule loop mol
 
 }
+
+
+void setBondingParameters(System &system) {
+    // save all bond/angle/torsion/non-bond parameters to memory
+    // (before running optimization)
+    // 1) bonds
+    for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+        int mol = system.constants.uniqueBonds[it].mol;
+        int atom1 = system.constants.uniqueBonds[it].atom1;
+        int atom2 = system.constants.uniqueBonds[it].atom2;
+
+        system.constants.uniqueBonds[it].BO = get_BO(system.molecules[mol].atoms[atom1].UFFlabel, system.molecules[mol].atoms[atom2].UFFlabel);
+        system.constants.uniqueBonds[it].rij = get_rij(system,mol,atom1,mol,atom2);
+        system.constants.uniqueBonds[it].kij = get_kij(system,mol,atom1,mol,atom2, system.constants.uniqueBonds[it].rij);
+        system.constants.uniqueBonds[it].Dij = system.constants.uniqueBonds[it].BO*70.0; // kcal/mol   
+        system.constants.uniqueBonds[it].alpha = sqrt(0.5*system.constants.uniqueBonds[it].kij/system.constants.uniqueBonds[it].Dij);  
+        
+    }    
+}
+
+
 
 double totalBondedEnergy(System &system) {
     // each function here saves the component energies to Stats class. (system.stats)

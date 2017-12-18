@@ -799,6 +799,7 @@ int main(int argc, char **argv) {
 
         printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
         findBonds(system);
+        setBondingParameters(system);
         optimize(system);
     } // end optimization mode
 

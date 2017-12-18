@@ -302,14 +302,17 @@ class Constants {
 
         struct UniqueBond {
             int mol, atom1, atom2; double  value; // indices of molecule + atoms of bond
+            double BO, rij, kij, alpha, Dij;
         };
         vector<UniqueBond> uniqueBonds; // holds all unique bonds
         struct UniqueAngle {
             int mol, atom1, atom2, atom3; double value;
+            double rij, rjk, rik, theta_ijk, C2, C1, C0, K_ijk;
         };
         vector<UniqueAngle> uniqueAngles; // holds all unique 3-atom angles
         struct UniqueDihedral {
             int mol, atom1, atom2, atom3, atom4; double value;
+            double phi_ijkl, vjk, n;
         };
         vector<UniqueDihedral> uniqueDihedrals; // holds all unique 4-atom dihedrals.
         struct UniqueLJNonBond {
