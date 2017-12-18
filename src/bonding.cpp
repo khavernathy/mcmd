@@ -1009,7 +1009,7 @@ void findBonds(System &system) {
     // get unique qualified LJ/ES non-bond pairs (beyond 1,3)
     int mol,qualified, y,z;
     double rlj;
-    const double r_c = system.pbc.cutoff;
+    const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
     for (mol=0; mol<system.molecules.size(); mol++) {
         // all pairs inside the molecule
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
