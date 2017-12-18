@@ -286,16 +286,14 @@ double angle_bend_energy(System &system) {
         j = system.constants.uniqueAngles[it].atom1;
         l = system.constants.uniqueAngles[it].atom2;
         m = system.constants.uniqueAngles[it].atom3;
-
-
-        rij = get_rij(system,i,j,i,l); // in Angstroms
-        theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
-        C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
-        C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
-        C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
-            
+        rij = system.constants.uniqueAngles[it].rij; // in Angstroms
+        rjk = system.constants.uniqueAngles[it].rjk;
+        theta_ijk = system.constants.uniqueAngles[it].theta_ijk; // in rads
+        C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
+        C1 = system.constants.uniqueAngles[it].C1; // 1/rad
+        C0 = system.constants.uniqueAngles[it].C0; // 1
+    
         angle = get_angle(system, i, j, l, m);  
-        rjk = get_rij(system,i,l,i,m);
         rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
         K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
         if (K_ijk==0) continue; // skip 0-energy
@@ -567,24 +565,19 @@ double angle_bend_gradient(System &system) {
 
 
     for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
-
         i = system.constants.uniqueAngles[it].mol;
         j = system.constants.uniqueAngles[it].atom1;
         l = system.constants.uniqueAngles[it].atom2;
         m = system.constants.uniqueAngles[it].atom3;
-        
-            
-        rij = get_rij(system,i,j,i,l); // in Angstroms
-        // force field theta is that of the middle atom "l" in j-l-m
-        theta_ijk = deg2rad*system.constants.UFF_angles[system.molecules[i].atoms[l].UFFlabel.c_str()]; // in rads
-        C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));      // 1/rad^2
-        C1 = -4.0*C2*cos(theta_ijk);                       // 1/rad
-        C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0); // 1
-        //printf("theta_0 = %f\n", theta_ijk/deg2rad);
-            
+        rij = system.constants.uniqueAngles[it].rij; // in Angstroms
+        rjk = system.constants.uniqueAngles[it].rjk;
+        theta_ijk = system.constants.uniqueAngles[it].theta_ijk; // in rads
+        C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
+        C1 = system.constants.uniqueAngles[it].C1; // 1/rad
+        C0 = system.constants.uniqueAngles[it].C0; // 1
+
         angle = get_angle(system, i, j, l, m);  
         //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
-        rjk = get_rij(system,i,l,i,m);
         rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
         K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
         if (K_ijk==0) continue; // skip 0-contrib
@@ -1087,6 +1080,24 @@ void setBondingParameters(System &system) {
         system.constants.uniqueBonds[it].alpha = sqrt(0.5*system.constants.uniqueBonds[it].kij/system.constants.uniqueBonds[it].Dij);  
         
     }    
+    
+    // 2) angles
+    for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
+        int mol = system.constants.uniqueAngles[it].mol;
+        int atom1 = system.constants.uniqueAngles[it].atom1;
+        int atom2 = system.constants.uniqueAngles[it].atom2;
+        int atom3 = system.constants.uniqueAngles[it].atom3;
+
+        system.constants.uniqueAngles[it].rij = get_rij(system,mol,atom1,mol,atom2);
+        system.constants.uniqueAngles[it].rjk = get_rij(system,mol,atom2,mol,atom3);
+        system.constants.uniqueAngles[it].theta_ijk = M_PI/180.0*system.constants.UFF_angles[system.molecules[mol].atoms[atom2].UFFlabel.c_str()];
+        double theta_ijk = system.constants.uniqueAngles[it].theta_ijk;
+        system.constants.uniqueAngles[it].C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));
+        double C2 = system.constants.uniqueAngles[it].C2;
+        system.constants.uniqueAngles[it].C1 = -4.0*C2*cos(theta_ijk);
+        system.constants.uniqueAngles[it].C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0);
+    }
+
 }
 
 
