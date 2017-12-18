@@ -85,6 +85,8 @@ Below is a list of scientific publications/presentations that have been facilita
 
 4. Pham, T., Forrest, K. A., Franz, D. M., & Space, B. (2017). Experimental and theoretical investigations of the gas adsorption sites in rht-metal-organic frameworks. CrystEngComm, 19, 4646-4665.
 
+5. Franz, D. M.; Dyott, Z.; Forrest, K. A.; Hogan, A.; Pham, T.; Space, B. Simulations of hydrogen, carbon dioxide, and small hydrocarbon sorption in a nitrogen-rich rht-metal–organic framework. Phys. Chem. Chem. Phys. 2017.
+
 <!--
 pending...
 SIFSIX-14-Cu-i paper  -- nope, they didn't add our work.
