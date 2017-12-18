@@ -1465,7 +1465,7 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "bondlength")) {
                 system.constants.bondlength = atof(lc[1].c_str());
-                std::cout << "Got max-bondlength parameter (for dynamic bond detection = " << lc[1].c_str() << " A."; printf("\n");
+                std::cout << "Got max-bondlength parameter (for dynamic bond detection) = " << lc[1].c_str() << " A."; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_convergence") || !strcasecmp(lc[0].c_str(), "opt_error")) {
                 system.constants.opt_error = atof(lc[1].c_str());
