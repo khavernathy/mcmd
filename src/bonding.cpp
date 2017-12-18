@@ -233,11 +233,8 @@ double stretch_energy(System &system) {
 }
 
 // get angle-force parameter for IJK triplet 
-double get_Kijk(System &system, double rij, double rjk, double rik, double Zi, double Zk, double angle) {
-    const double beta = 664.12/(rij*rjk);
-    //printf("angle = %f\n", angle*180.0/M_PI);
-    //printf("K_ijk = %f\n",  beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1-cos(angle)*cos(angle)) - rik*rik*cos(angle)));
-    return  beta*Zi*Zk/(rik*rik*rik*rik*rik) * rij*rjk*(3.0*rij*rjk*(1-cos(angle)*cos(angle)) - rik*rik*cos(angle));
+double get_Kijk(System &system, double rik, double t1, double t2, double t3) {
+    return  t1/(rik*rik*rik*rik*rik)*(3.0*t3*(1-t2*t2) - rik*rik*t2);
 }
 
 // get the angle ABC where B is center atom, on molecule i
@@ -267,9 +264,9 @@ double get_angle(System &system, int i, int A, int B, int C) {
 }
 
 // get r_ik, a parameter for angle bends, ** different from r_ij (and r_jk) **
-double get_rik(System &system, double rij, double rjk, double angle) {
+double get_rik(System &system, double rij, double rjk, double t3, double angle) {
     // angle is in radians
-    return sqrt(rij*rij + rjk*rjk - 2*rij*rjk*cos(angle));
+    return sqrt(rij*rij + rjk*rjk - 2*t3*cos(angle));
 }
 
 // get the total potential from angle bends
@@ -279,6 +276,7 @@ double angle_bend_energy(System &system) {
     const double deg2rad = M_PI/180.0;
     int i,j,l,m;
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
+    double t1,t2,t3;
     double angle; // the actual angle IJK
     
     for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
@@ -292,10 +290,14 @@ double angle_bend_energy(System &system) {
         C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
         C1 = system.constants.uniqueAngles[it].C1; // 1/rad
         C0 = system.constants.uniqueAngles[it].C0; // 1
-    
+        t1 = system.constants.uniqueAngles[it].t1;
+        t2 = system.constants.uniqueAngles[it].t2;
+        t3 = system.constants.uniqueAngles[it].t3;    
+
+
         angle = get_angle(system, i, j, l, m);  
-        rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
-        K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+        rik = get_rik(system, rij, rjk, t3, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
+        K_ijk = get_Kijk(system, rik, t1,t2,t3);      
         if (K_ijk==0) continue; // skip 0-energy
 
         potential += K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
@@ -561,7 +563,8 @@ double angle_bend_gradient(System &system) {
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
     double angle; // the actual angle IJK
     double grad;
-    double cos1, cos2, B, C, xi, yi, zi, xj, yj, zj, xk, yk, zk, dij, djk; 
+    double xi, yi, zi, xj, yj, zj, xk, yk, zk; 
+    double t1,t2,t3;
         // cos-derivative terms in the gradient, + other terms.
 
 
@@ -576,11 +579,15 @@ double angle_bend_gradient(System &system) {
         C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
         C1 = system.constants.uniqueAngles[it].C1; // 1/rad
         C0 = system.constants.uniqueAngles[it].C0; // 1
+        t1 = system.constants.uniqueAngles[it].t1;
+        t2 = system.constants.uniqueAngles[it].t2;
+        t3 = system.constants.uniqueAngles[it].t3;
+
 
         angle = get_angle(system, i, j, l, m);  
         //printf("Angle %i %i %i = %f; real angle = %f\n", j,l,m,theta_ijk/deg2rad, angle/deg2rad);
-        rik = get_rik(system, rij, rjk, angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
-        K_ijk = get_Kijk(system, rij, rjk, rik, system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()], system.constants.UFF_Z[system.molecules[i].atoms[m].UFFlabel.c_str()], theta_ijk);      
+        rik = get_rik(system, rij, rjk, t3,angle); // r_ik (A-C) is computed differently than r_ij (A-B) and r_jk (B-C)
+        K_ijk = get_Kijk(system, rik, t1,t2,t3);      
         if (K_ijk==0) continue; // skip 0-contrib
 
         // compute the gradient for all angle components (xyz for 3 atoms = 9)
@@ -1087,13 +1094,23 @@ void setBondingParameters(System &system) {
         int atom3 = system.constants.uniqueAngles[it].atom3;
 
         system.constants.uniqueAngles[it].rij = get_rij(system,mol,atom1,mol,atom2);
+        double rij = system.constants.uniqueAngles[it].rij;
         system.constants.uniqueAngles[it].rjk = get_rij(system,mol,atom2,mol,atom3);
+        double rjk = system.constants.uniqueAngles[it].rjk;
         system.constants.uniqueAngles[it].theta_ijk = M_PI/180.0*system.constants.UFF_angles[system.molecules[mol].atoms[atom2].UFFlabel.c_str()];
         double theta_ijk = system.constants.uniqueAngles[it].theta_ijk;
         system.constants.uniqueAngles[it].C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));
         double C2 = system.constants.uniqueAngles[it].C2;
         system.constants.uniqueAngles[it].C1 = -4.0*C2*cos(theta_ijk);
         system.constants.uniqueAngles[it].C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0);
+
+        double Zi = system.constants.UFF_Z[system.molecules[mol].atoms[atom1].UFFlabel.c_str()];
+        double Zk = system.constants.UFF_Z[system.molecules[mol].atoms[atom3].UFFlabel.c_str()];
+
+        // stuff for computing other terms (which have dihedral dependence)
+        system.constants.uniqueAngles[it].t1 = 664.12/(rij*rjk)*Zi*Zk*rij*rjk;
+        system.constants.uniqueAngles[it].t2 = cos(theta_ijk);
+        system.constants.uniqueAngles[it].t3 = rij*rjk;
     }
 
     // 3) dihedrals
