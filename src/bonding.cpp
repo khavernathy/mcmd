@@ -463,17 +463,18 @@ double torsions_energy(System &system) {
     const double deg2rad = M_PI/180.0;
     int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+                
+        vjk = system.constants.uniqueDihedrals[it].vjk; 
+        if (vjk==0) continue; // skip  0-energy 
         i = system.constants.uniqueDihedrals[it].mol;
         j = system.constants.uniqueDihedrals[it].atom1;
         l = system.constants.uniqueDihedrals[it].atom2;
         m = system.constants.uniqueDihedrals[it].atom3;
         p = system.constants.uniqueDihedrals[it].atom4;
 
-        double * params = get_torsion_params(system, system.molecules[i].atoms[l].UFFlabel, system.molecules[i].atoms[m].UFFlabel);
-        phi_ijkl = params[0]*deg2rad;
-        vjk = params[1];
-        if (vjk==0) continue; // skip  0-energy 
-        n = params[2];
+
+        phi_ijkl = system.constants.uniqueDihedrals[it].phi_ijkl; 
+        n = system.constants.uniqueDihedrals[it].n;
         
         dihedral = get_dihedral_angle(system, i, j,l,m,p);
         potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
@@ -662,26 +663,23 @@ double angle_bend_gradient(System &system) {
 } // end angle bend gradient
 
 double torsions_gradient(System &system) {
-    double vjk, vj, vk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
+    double vjk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
     const double deg2rad = M_PI/180.0;
     double xi,xj,xk,xl, yi,yj,yk,yl, zi,zj,zk,zl;
     int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     double grad;
     for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+        vjk = system.constants.uniqueDihedrals[it].vjk;
+        n = system.constants.uniqueDihedrals[it].n;
+        if (vjk==0 || n==0) continue; // skip  0-gradients
         i = system.constants.uniqueDihedrals[it].mol;
         j = system.constants.uniqueDihedrals[it].atom1;
         l = system.constants.uniqueDihedrals[it].atom2;
         m = system.constants.uniqueDihedrals[it].atom3;
         p = system.constants.uniqueDihedrals[it].atom4;
-
-        double * params = get_torsion_params(system, system.molecules[i].atoms[l].UFFlabel, system.molecules[i].atoms[m].UFFlabel);
-        phi_ijkl = params[0]*deg2rad;
-        vjk = params[1]; 
-        n = params[2];
-
-        if (n==0 || vjk==0) continue; // skip 0-gradients
-
+        phi_ijkl = system.constants.uniqueDihedrals[it].phi_ijkl;
         dihedral = get_dihedral_angle(system, i, j,l,m,p);
+        
         // there are 12 gradients for each dihedral
         // 3 for each of the 4 atoms
         // recall that i,j,k,l (conventional atoms) --> j,l,m,p here
@@ -1097,6 +1095,21 @@ void setBondingParameters(System &system) {
         system.constants.uniqueAngles[it].C1 = -4.0*C2*cos(theta_ijk);
         system.constants.uniqueAngles[it].C0 = C2*(2.0*cos(theta_ijk)*cos(theta_ijk) + 1.0);
     }
+
+    // 3) dihedrals
+    for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+        int mol = system.constants.uniqueDihedrals[it].mol;
+        int atom1 = system.constants.uniqueDihedrals[it].atom1;
+        int atom2 = system.constants.uniqueDihedrals[it].atom2;
+        int atom3 = system.constants.uniqueDihedrals[it].atom3;
+        int atom4 = system.constants.uniqueDihedrals[it].atom4;
+         
+        double * params = get_torsion_params(system, system.molecules[mol].atoms[atom2].UFFlabel, system.molecules[mol].atoms[atom3].UFFlabel);
+        system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
+        system.constants.uniqueDihedrals[it].vjk = params[1];
+        system.constants.uniqueDihedrals[it].n = params[2];
+    }
+
 
 }
 
