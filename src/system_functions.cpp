@@ -642,6 +642,14 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "H2O";
                 system.proto[i].dof = 6;
             }
+            // SULFUR DIOXIDE -- Peng et al. http://pubs.acs.org/doi/pdf/10.1021/acs.jpcc.7b01925 (Table 1)
+            else if (sorbmodel == "so2") {
+                addAtomToProto(system,i,"SUL", "SO2", "M", 0.00000, 0.00000, 0.0, 32.060, 0.4700, 2.4744476, 154.4, 3.585);
+                addAtomToProto(system,i,"OXY", "SO2", "M", -1.4321, 0.00000, 0.0, 15.999, -0.235, 0.852, 62.3, 2.993);
+                addAtomToProto(system,i,"OXY", "SO2", "M", 0.70520, 1.24636, 0.0, 15.999, -0.235, 0.852, 62.3, 2.993);
+                system.proto[i].name = "SO2";
+                system.proto[i].dof = 6;
+            }
             // METHANOL CH3OH -- my model: UFF sig/eps; charges from dft aug-cc-pvtz on CCSDT=FULL aug-cc-pvtz geometry (CCCBDB); van Deuynen polariz's
             else if (sorbmodel == "methanol" || sorbmodel == "ch3oh" || sorbmodel == "ch4o") {
                 addAtomToProto(system,i, "CME", "MET", "M", -0.046520, 0.662923, 0.0, 12.0107, 0.074830, 1.2886, 52.84, 3.431);
