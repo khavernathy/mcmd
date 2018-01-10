@@ -87,12 +87,12 @@ Below is a list of scientific publications/presentations that have been facilita
 
 5. Franz, D. M.; Dyott, Z.; Forrest, K. A.; Hogan, A.; Pham, T.; Space, B. Simulations of hydrogen, carbon dioxide, and small hydrocarbon sorption in a nitrogen-rich rht-metal–organic framework. Phys. Chem. Chem. Phys. 2017.
 
+6. Franz, D. M.; Djulbegovic, M.; Pham, T.; Space, B. Theoretical study of the effect of halogen substitution in molecular porous materials for CO2 and C2H2 sorption. AIMS Materials Science. 2017. (Submitted)
+
 <!--
 pending...
-SIFSIX-14-Cu-i paper  -- nope, they didn't add our work.
 MPM-1-TIFSIX paper
 Zn-datzbdc paper
-rht-MOF-9 paper
 -->
 
 <!--
