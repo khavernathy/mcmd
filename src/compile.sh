@@ -135,5 +135,6 @@ fi
 echo ""
 echo ""
 echo "... done. As long as you see no compilation errors above, you're good to go."
-echo "... If you did, check the contents of compile.sh for examples."
-echo "... Have a nice day. :-)"
+echo "... If you did, check the contents of compile.sh for examples"
+echo "... or contact us by making an Issue on GitHub: https://github.com/khavernathy/mcmd/issues"
+echo "... Stay awesome and have a nice day. :-)"
