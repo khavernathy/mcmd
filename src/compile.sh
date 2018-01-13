@@ -64,7 +64,7 @@ if [[ "$option" == "cpu" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
     elif [[ "$2" == "debug" ]]; then
         echo "... in debug mode (with errors/warnings";
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall;
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall -ggdb;
     elif [[ "$2" == "linux" ]]; then
         echo "... optimized for linux."
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
