@@ -154,11 +154,11 @@ class Constants {
         double sa_target = 0.0; // target temperature for annealing.
         double sa_schedule = 0.9999; // T-change factor for annealing.
         double free_volume=0; // for excess adsorption calculation, A^3. must be user-input
-        unsigned int fugacity_single=0; // set for single-sorbate fugacity calculation at startup.
+        int fugacity_single=0; // set for single-sorbate fugacity calculation at startup.
         string fugacity_single_sorbate; // the sorbate molecule to get fugacity of. h2/n2/co2/ch4
 
         int_fast8_t feynman_hibbs = 0;
-        unsigned int fh_order = 4;
+        int fh_order = 4;
 
         // DEFAULT ELEMENT/SITE PARAMETERS
         map <string,double> masses; // mass database for defaults.
@@ -175,8 +175,8 @@ class Constants {
         map <string,double> UFF_torsions; // UFF torsion angle barriers, kcal/mol
         map <string,double> UFF_electroneg; // UFF electronegativity, in eV
 
-        unsigned int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
-        unsigned int polars_vand=0; // 1 would defaul all atoms to van Duijnen polarizablitiy parameters
+        int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
+        int polars_vand=0; // 1 would defaul all atoms to van Duijnen polarizablitiy parameters
 
         double total_energy=0.0; // for MC NVE, in K, user defined
         double volume; // in A^3
@@ -192,21 +192,21 @@ class Constants {
         double bias_uptake =0; // to accelerate uVT MC. User-defined. This will be converted to N before running MC
         string bias_uptake_unit="N"; // units for bias. Default N_movables
         int_fast8_t bias_uptake_switcher=0;
-        unsigned int scale_charges=0; // option to scale charges
+        int scale_charges=0; // option to scale charges
         double scale_charges_factor; // multiply by this to get new charges for system. 
 
 
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
-		unsigned int stepsize=1; // obvi
-        unsigned int finalstep=-1; // user defined for MC. Will error-out if not given in MC
-        unsigned int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
+		int stepsize=1; // obvi
+        int finalstep=-1; // user defined for MC. Will error-out if not given in MC
+        int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
-        unsigned int currentprotoid=0; // for getting fugacity for the boltzmann factor.
-        unsigned int step_offset=0; // a parameter used to change the step output in the output files (e.g. after a restart) 
-        unsigned int readinxyz=0; // option to read an XYZ file for input instead of PDB
+        int currentprotoid=0; // for getting fugacity for the boltzmann factor.
+        int step_offset=0; // a parameter used to change the step output in the output files (e.g. after a restart) 
+        int readinxyz=0; // option to read an XYZ file for input instead of PDB
 
         // MD STUFF
-        unsigned int  md_corrtime=50; // user defined for MD
+        int  md_corrtime=50; // user defined for MD
         int_fast8_t md_pbc=1; // PBC in molecular dynamics. default on.
         int_fast8_t md_rotations=1; // MD only, rotational motion (of molecules) on
         int_fast8_t md_translations=1; // MD only, translation motion on
@@ -218,18 +218,18 @@ class Constants {
         double md_NVE_err = 0; // delta(total E) in kJ/mol
         double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
-        unsigned int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
-        unsigned int md_external_force = 0; // option for constant external force in MD
+        int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
+        int md_external_force = 0; // option for constant external force in MD
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
         double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat.
-        unsigned int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
+        int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
 
 
         map <string,double> sig_override;
         map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
 
-    	unsigned int total_atoms=0; // actual sites, not "atoms" persay
-                unsigned int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
+    	int total_atoms=0; // actual sites, not "atoms" persay
+                int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
         double initial_energy=0.0; // "" ""
 
         // Ewald (for ES)
@@ -238,91 +238,91 @@ class Constants {
         double ewald_kmax = 7; // suitable for most cases.
         //double** ewald_k; // holds 3D k-space vectors for Ewald summation in Force calc for MD.
         // actually its faster to make on-the-fly
-        unsigned int ewald_num_k; // number of Ewald k vectors stored in ewald_k
-        unsigned int kspace_option=1; // default on; option to include k-space contribution to FORCES in md
+        int ewald_num_k; // number of Ewald k vectors stored in ewald_k
+        int kspace_option=1; // default on; option to include k-space contribution to FORCES in md
 
         // Wolf (for polarization)
-        //unsigned int polar_iterative=1; // turn iterative on. If off, will just do one iteration of dipole calc and get polar energy
+        //int polar_iterative=1; // turn iterative on. If off, will just do one iteration of dipole calc and get polar energy
         double polar_wolf_alpha = 0.13;
         double polar_damp = 2.1304;
         double polar_gamma = 1.03;
-        unsigned int polar_max_iter = 4;
+        int polar_max_iter = 4;
         double polar_rmin = 0; // minimum polarizable distance between atoms, for ranking.
         double **B_matrix, C_matrix[3][3];
         double **A_matrix;
         double **A_matrix_full; // takes more memory but computations are faster
-        unsigned int full_A_matrix_option = 1; // option to enable the full A matrix for polarization
+        int full_A_matrix_option = 1; // option to enable the full A matrix for polarization
         double polar_precision=0; // dipole precision required during iterative routine
-        unsigned int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
+        int iter_success=0; // flag for polarization iteration failure (importance for acceptance of moves!)
         int_fast8_t polar_rrms =0;
         double dipole_rrms = 0.0;
         int_fast8_t polar_gs_ranked = 1;
         int_fast8_t polar_gs = 0;
         int_fast8_t polar_palmo = 1;
         int_fast8_t polar_pbc = 1; // default periodic polar
-        //unsigned int thole_total_atoms = 0;
+        //int thole_total_atoms = 0;
 
         int_fast8_t all_pbc=1;
         int_fast8_t auto_reject_option=1; // enables/disables
         double auto_reject_r=0.76; // Angstroms. If r < this value for any relevant pair, MC will auto-reject a move immediately
         int_fast8_t auto_reject=0; // on or off (for an individual step!). will go on if auto_reject_r is triggered
-        unsigned int rejects=0; // counter
+        int rejects=0; // counter
 
-        unsigned int manual_cutoff=0; // on/off for user-defined pair-interaction cutoff in A.
+        int manual_cutoff=0; // on/off for user-defined pair-interaction cutoff in A.
         double manual_cutoff_val=0; // in A
     
-        unsigned int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS (MD only)
-        unsigned int cuda_block_size = 256; // this was the best of a test of 32,64,128,256 on a project from class I took. Can play with this to see how it changes perf.
+        int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS (MD only)
+        int cuda_block_size = 256; // this was the best of a test of 32,64,128,256 on a project from class I took. Can play with this to see how it changes perf.
 
-        unsigned int crystalbuild=0; // option to dynamically build a crystal box to a supercell
-        unsigned int crystalbuild_x=1, crystalbuild_y=1, crystalbuild_z = 1; // duplication # in each dim. 
-        unsigned int crystalbuild_includemovers=0; // option to include movable molecules in the crystal builder. default off.
-        unsigned int charge_sum_check = 1; // option to check the total system charge before simulation. Default on.
+        int crystalbuild=0; // option to dynamically build a crystal box to a supercell
+        int crystalbuild_x=1, crystalbuild_y=1, crystalbuild_z = 1; // duplication # in each dim. 
+        int crystalbuild_includemovers=0; // option to include movable molecules in the crystal builder. default off.
+        int charge_sum_check = 1; // option to check the total system charge before simulation. Default on.
 
-        unsigned int fragmaker=0; // option to create fragments at startup.
-        unsigned int numfrags=0; // number of fragments to create in fragmentMaker function
+        int fragmaker=0; // option to create fragments at startup.
+        int numfrags=0; // number of fragments to create in fragmentMaker function
         vector<int> fragsize = {250}; // num. of atoms in a frag, default
         double frag_bondlength = 2.1; // Angstroms, default.
 
-        unsigned int write_lammps = 0; // option to write out LAMMPS input files 
+        int write_lammps = 0; // option to write out LAMMPS input files 
 
         /* SINGLE-POINT OPTIONS */
-        unsigned int user_charge=0; // molecular charge for single pounsigned int calc's
+        int user_charge=0; // molecular charge for single point calc's
 
         /* OPTIMIZATION OPTIONS */
         double bondlength = 1.9; // for bonding MD, default
         double opt_error = 0.0001; // error, in kcal/mol for convergence
-        unsigned int opt_step_limit = 10000; // limit for convergence steps
-        unsigned int opt_mode = OPTIMIZE_SD; // steepest descent style optimization as default
-        unsigned int opt_bonds = 1; // option to include bonding energy/gradients
-        unsigned int opt_angles = 1; // "" angles ""
-        unsigned int opt_dihedrals = 1; // "" dihedrals ""
-        unsigned int opt_LJ = 1; // "" non-bond LJ ""
-        unsigned int opt_ES = 1; // "" non-bond electrostatics
+        int opt_step_limit = 10000; // limit for convergence steps
+        int opt_mode = OPTIMIZE_SD; // steepest descent style optimization as default
+        int opt_bonds = 1; // option to include bonding energy/gradients
+        int opt_angles = 1; // "" angles ""
+        int opt_dihedrals = 1; // "" dihedrals ""
+        int opt_LJ = 1; // "" non-bond LJ ""
+        int opt_ES = 1; // "" non-bond electrostatics
 
         struct UniqueBond {
-            unsigned int mol, atom1, atom2; double  value; // indices of molecule + atoms of bond
+            int mol, atom1, atom2; double  value; // indices of molecule + atoms of bond
             double BO, rij, kij, alpha, Dij;
         };
         vector<UniqueBond> uniqueBonds; // holds all unique bonds
         struct UniqueAngle {
-            unsigned int mol, atom1, atom2, atom3; double value;
+            int mol, atom1, atom2, atom3; double value;
             double rij, rjk, theta_ijk, C2, C1, C0; // rik, K_ijk;
             double t1,t2,t3;
         };
         vector<UniqueAngle> uniqueAngles; // holds all unique 3-atom angles
         struct UniqueDihedral {
-            unsigned int mol, atom1, atom2, atom3, atom4; double value;
+            int mol, atom1, atom2, atom3, atom4; double value;
             double phi_ijkl, vjk, n;
         };
         vector<UniqueDihedral> uniqueDihedrals; // holds all unique 4-atom dihedrals.
         struct UniqueLJNonBond {
-            unsigned int mol, atom1, atom2;         
+            int mol, atom1, atom2;         
             double sig, eps;
         };
         vector<UniqueLJNonBond> uniqueLJNonBonds; // holds all unique non-bonded pair interactions (no cutoff)
         struct UniqueChargeNonBond {
-            unsigned int mol, atom1, atom2;
+            int mol, atom1, atom2;
             double chargeprod;
         };  
         vector <UniqueChargeNonBond> uniqueChargeNonBonds;
@@ -338,7 +338,7 @@ class Pbc {
         double basis[3][3];
         double reciprocal_basis[3][3];
 		double cutoff=0.; // to truncate long-range interactions
-        double mincutoff=2.55; // to neglect close-range interactions (in Single-Pounsigned int calc)
+        double mincutoff=2.55; // to neglect close-range interactions (in Single-Point calc)
         double volume, inverse_volume, old_volume;
         double a=0, b=0, c=0, alpha=0, beta=0, gamma=0;
         double box_vertices[8][3];
@@ -365,10 +365,10 @@ class Pbc {
             printf(":: Basis vectors: { a = %9.5f; b = %9.5f; c = %9.5f }\n", a, b,c);
             printf(":: Basis angles:  { α = %9.5f; β = %9.5f; γ = %9.5f }\n", alpha,beta,gamma);
             printf(":: Box vertices ::\n");
-            for (unsigned int n=0; n<8; n++)
+            for (int n=0; n<8; n++)
                 printf("   -> %i : %9.5f %9.5f %9.5f\n", n, box_vertices[n][0], box_vertices[n][1], box_vertices[n][2]);
             printf(":: PBC Cutoff = %.5f\n", cutoff);
-            for (unsigned int n=0; n<6; n++) {
+            for (int n=0; n<6; n++) {
                 printf(":: Plane %i equation :: %.5fx + %.5fy + %.5fz + %.5f = 0\n",
                     n, A[n], B[n], C[n], D[n]);
             }
@@ -380,12 +380,12 @@ class Pbc {
             printf(":: --- End box information --- ::\n\n");
         }
 
-        void calcPlane(unsigned int p1index, unsigned int p2index, unsigned int p3index, unsigned int planeIndex) { // 3 points define a plane.
+        void calcPlane(int p1index, int p2index, int p3index, int planeIndex) { // 3 points define a plane.
             double vector1[3], vector2[3];
 
             // 1) get 3 points (indexes for box vertices provided in arguments)
             // 2) make 2 planar vectors AB, AC
-            for (unsigned int n=0; n<3; n++) {
+            for (int n=0; n<3; n++) {
                 vector1[n] = box_vertices[p2index][n] - box_vertices[p1index][n];
                 vector2[n] = box_vertices[p3index][n] - box_vertices[p1index][n];
             }
@@ -439,8 +439,8 @@ class Pbc {
 
         void calcCutoff() {
             if (cutoff != 0.) return; // mpmc only changes the cutoff if it's nonzero
-            double MAXVALUE = 1e40; unsigned int MAX_VECT_COEF = 5;
-			unsigned int i, j, k, p;
+            double MAXVALUE = 1e40; int MAX_VECT_COEF = 5;
+			int i, j, k, p;
 			double curr_mag;
 			double short_mag = MAXVALUE;
 			double curr_vec[3];
@@ -525,8 +525,8 @@ class Pbc {
 
         void calcBoxVertices() {
 			// calculates the 3D points that encompass the crystalline simulation box.
-		    unsigned int i,j,k,p,q,count=0;
-		    //unsigned int box_labels[2][2][2];
+		    int i,j,k,p,q,count=0;
+		    //int box_labels[2][2][2];
 		    double box_occupancy[3];
 		    double box_pos[3];
 
@@ -546,7 +546,7 @@ class Pbc {
                             }
                         }
 
-                        for (unsigned int n=0; n<3; n++)
+                        for (int n=0; n<3; n++)
                             box_vertices[count][n] = box_pos[n]; // box_points[0 -> 7] will be defined.
 
                         count++;
@@ -562,16 +562,16 @@ class Pbc {
         void calcMaxMin() {
             // re-initialize maximums and minimums
             maxx=maxy=maxz=minx=miny=minz=0;
-            for (unsigned int n=4; n<=7; n++) if (box_vertices[n][0] > maxx) maxx = box_vertices[n][0];
-            for (unsigned int n=0; n<=3; n++) if (box_vertices[n][0] < minx) minx = box_vertices[n][0];
+            for (int n=4; n<=7; n++) if (box_vertices[n][0] > maxx) maxx = box_vertices[n][0];
+            for (int n=0; n<=3; n++) if (box_vertices[n][0] < minx) minx = box_vertices[n][0];
 
-            for (unsigned int n=2; n<=3; n++) if (box_vertices[n][1] > maxy) maxy=box_vertices[n][1];
-            for (unsigned int n=6; n<=7; n++) if (box_vertices[n][1] > maxy) maxy=box_vertices[n][1];
-            for (unsigned int n=0;n<=1; n++) if (box_vertices[n][1] < miny) miny = box_vertices[n][1];
-            for (unsigned int n=4;n<=5; n++) if (box_vertices[n][1] < miny) miny = box_vertices[n][1];
+            for (int n=2; n<=3; n++) if (box_vertices[n][1] > maxy) maxy=box_vertices[n][1];
+            for (int n=6; n<=7; n++) if (box_vertices[n][1] > maxy) maxy=box_vertices[n][1];
+            for (int n=0;n<=1; n++) if (box_vertices[n][1] < miny) miny = box_vertices[n][1];
+            for (int n=4;n<=5; n++) if (box_vertices[n][1] < miny) miny = box_vertices[n][1];
 
-            for (unsigned int n=1; n<=7; n+=2) if (box_vertices[n][2] > maxz) maxz = box_vertices[n][2];
-            for (unsigned int n=0; n<=6; n+=2) if (box_vertices[n][2] < minz) minz = box_vertices[n][2];
+            for (int n=1; n<=7; n+=2) if (box_vertices[n][2] > maxz) maxz = box_vertices[n][2];
+            for (int n=0; n<=6; n+=2) if (box_vertices[n][2] < minz) minz = box_vertices[n][2];
 
             lengthx = maxx-minx;
             lengthy = maxy-miny;
@@ -587,7 +587,7 @@ class Stats {
 	public:
 		Stats();
 
-        unsigned int MCstep=0, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
+        int MCstep=0, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
         double MDtime=0; // the time in fs of MD simulation
         bool MCmoveAccepted;
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
@@ -604,21 +604,21 @@ class Stats {
 		double displace_bf_sum = 0;
 		double volume_change_bf_sum = 0;
 
-		unsigned int insert_accepts = 0; unsigned int insert_attempts=0;// Counters for successful moves. uVT only
-		unsigned int remove_accepts = 0; unsigned int remove_attempts=0;// uVT only
-		unsigned int displace_accepts = 0; unsigned int displace_attempts=0;
-		unsigned int volume_change_accepts = 0; unsigned int volume_attempts=0;// NPT only
-		unsigned int total_accepts=0; unsigned int total_attempts=0;
+		int insert_accepts = 0; int insert_attempts=0;// Counters for successful moves. uVT only
+		int remove_accepts = 0; int remove_attempts=0;// uVT only
+		int displace_accepts = 0; int displace_attempts=0;
+		int volume_change_accepts = 0; int volume_attempts=0;// NPT only
+		int total_accepts=0; int total_attempts=0;
 
         double ar_tot=0, ar_ins=0, ar_rem=0, ar_dis=0, ar_vol=0; // BF acceptance ratios
         double ins_perc=0, rem_perc=0, dis_perc=0, vol_perc=0; // BF percentage of moves
 
         double bf_avg, ibf_avg, rbf_avg, dbf_avg, vbf_avg;
 
-        unsigned int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
+        int count_movables = 0; // this is the SORBATE MOLECULES, e.g. 2H2 means 2, not 4
         vector<int> movids; // holds the internal IDs of movable molecules (in system.molecules)
-        unsigned int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
-        unsigned int count_frozen_molecules=0; // frozen MOLECULES; normally 1
+        int count_frozens = 0; // frozen ATOMS, not molecules (which is normally just 1)
+        int count_frozen_molecules=0; // frozen MOLECULES; normally 1
 
         struct obs_t { // observable types
             string name;
@@ -655,7 +655,7 @@ class Stats {
           dist_within, diffusion, volume, z, // z = PV/nRT
           Q, polar_iterations, heat_capacity; // Q = partition func.
 
-        unsigned int max_sorbs=10;
+        int max_sorbs=10;
         vector<obs_t> msd = vector<obs_t>(max_sorbs); 
         vector<obs_t> wtp = vector<obs_t>(max_sorbs);
         vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
@@ -675,7 +675,7 @@ class Pair {
         Pair();
         double r; double prev_r;
         double d[3]; double prev_d[3];
-        unsigned int recalculate = 1; // a flag to queue recalculation of energies
+        int recalculate = 1; // a flag to queue recalculation of energies
         double eps = 0; // LJ param, mixing rule'd
         double sig = 0; // LJ param, mixing rule'd
         double rd_energy=0;
@@ -697,9 +697,9 @@ class Last {
             lj_lrc,lj_self_lrc,lj,es_self,es_real,es_recip,chempot,totalmass,
             frozenmass,pressure,temperature, fdotrsum, dist_within, csp, diffusion;
 
-        unsigned int total_atoms, thole_total_atoms;
+        int total_atoms, thole_total_atoms;
 
-        unsigned int max_sorbs = 10;
+        int max_sorbs = 10;
         vector<double> wtp = vector<double>(max_sorbs);
         vector<double> wtpME = vector<double>(max_sorbs);
         vector<double> Nmov = vector<double>(max_sorbs);
@@ -719,7 +719,7 @@ class Atom {
         string name; // element or label, e.g. H or H2G
         string mol_name; // molecule name that the atom belongs to
         int_fast8_t frozen; // movable/frozen (0 or 1)
-		unsigned int mol_PDBID; // the molecule's PDBID that this atom belongs to
+		int mol_PDBID; // the molecule's PDBID that this atom belongs to
 		double m=0.0; // mass, kg. This is the only one I'm keeping SI as of now.
         double eps=0.0; // LJ param in K
         double sig=0.0; // LJ param in A -- the real sigma, not r_m (as in UFF)
@@ -731,7 +731,7 @@ class Atom {
 		// Tang-Toennies params.
         double c6=0,c8=0,c10=0;
         
-        unsigned int PDBID; // the atom's PDBID (from input)
+        int PDBID; // the atom's PDBID (from input)
         double rank_metric;  // for polarization sorting
 
         double pos[3] = {0,0,0};
@@ -758,12 +758,12 @@ class Atom {
         
         double * get_acc() {
             static double output[3];
-            for (unsigned int n=0; n<3; n++) output[n] = acc[n];
+            for (int n=0; n<3; n++) output[n] = acc[n];
             return output;
         }
 
-        void calc_acc(unsigned int nh, double lm) {
-            for (unsigned int n=0; n<3; n++) {
+        void calc_acc(int nh, double lm) {
+            for (int n=0; n<3; n++) {
                 old_acc[n] = acc[n];
                 acc[n] = force[n]*1.3806488e-33 / m; // to A / fs^2
                 if (nh)
@@ -772,11 +772,11 @@ class Atom {
         }
 
         void calc_vel(double dt) {
-            for (unsigned int n=0; n<3; n++) vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // that's where VV comes into play. 1/2 * (a - prev_a)
+            for (int n=0; n<3; n++) vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // that's where VV comes into play. 1/2 * (a - prev_a)
         }
 
         void calc_pos(double dt) {
-            for (unsigned int n=0; n<3; n++) pos[n] = pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
+            for (int n=0; n<3; n++) pos[n] = pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
         }
 
         /* for debugging */
@@ -792,7 +792,7 @@ class Molecule {
 	public:
 		Molecule();
 		vector<Atom> atoms; // vector that holds this molecule's atoms
-		unsigned int PDBID; // the molecule's PDBID (from input)
+		int PDBID; // the molecule's PDBID (from input)
 		string name; // the molecule name/label (from input), e.g. H2 or MOF
         int_fast8_t frozen; //0 or 1
         // arrays are way faster than vectors.
@@ -813,7 +813,7 @@ class Molecule {
         double inertia_tensor[6] = {0,0,0,0,0,0}; // xx,yy,zz,xy,yz,xz
         double fugacity=0.0;
         double md_velx_goal = 0.0; // for Andersen thermostat, unique for unique molecules.
-        unsigned int dof=3; // degrees of freedom.
+        int dof=3; // degrees of freedom.
 
         void reInitialize() {
             // if there are no atoms, don't bother
@@ -821,7 +821,7 @@ class Molecule {
             while (!atoms.empty()) atoms.pop_back();
             mass=0;
             inertia=0;
-            for (unsigned int n=0; n<3; n++) {
+            for (int n=0; n<3; n++) {
                 com[n] = 0;
                 force[n]=0;
                 torque[n]=0;
@@ -846,7 +846,7 @@ class Molecule {
         }
 
         void calc_inertia() {
-            for (unsigned int i=0; i<atoms.size(); i++) {
+            for (int i=0; i<atoms.size(); i++) {
                 double rsq = (atoms[i].pos[0] - com[0])*(atoms[i].pos[0] - com[0]) + (atoms[i].pos[1] - com[1])*(atoms[i].pos[1] - com[1]) + (atoms[i].pos[2] - com[2])*(atoms[i].pos[2] - com[2]);
                 inertia += atoms[i].m * rsq; // kg * A^2
             }
@@ -855,8 +855,8 @@ class Molecule {
 
         void calc_inertia_tensor() {
             // xx,yy,zz,xy,yz,xz
-            for (unsigned int n=0;n<6;n++) inertia_tensor[n]=0; // reset to 0
-            for (unsigned int i=0; i<atoms.size(); i++) {
+            for (int n=0;n<6;n++) inertia_tensor[n]=0; // reset to 0
+            for (int i=0; i<atoms.size(); i++) {
                 double x = atoms[i].pos[0]-com[0];
                 double y = atoms[i].pos[1]-com[1];
                 double z = atoms[i].pos[2]-com[2];
@@ -870,20 +870,20 @@ class Molecule {
                 inertia_tensor[4] -= m*y*z;
                 inertia_tensor[5] -= m*x*z; // all in kg*A^2
             }
-            for (unsigned int n=0;n<6;n++) inertia_tensor[n] = inertia_tensor[n]/1.3806488e-23/1e20*1e30; // to K fs^2
+            for (int n=0;n<6;n++) inertia_tensor[n] = inertia_tensor[n]/1.3806488e-23/1e20*1e30; // to K fs^2
         }
 
         // angular acceleration
         void calc_ang_acc() {
-            for (unsigned int n=0; n<3; n++) {
+            for (int n=0; n<3; n++) {
                 old_ang_acc[n] = ang_acc[n];
                 ang_acc[n] = torque[n] / inertia; // in rad / fs^2
             }
         }
 
         // linear acceleration
-        void calc_acc(unsigned int nh, double lm) {
-            for (unsigned int n=0; n<3; n++) {
+        void calc_acc(int nh, double lm) {
+            for (int n=0; n<3; n++) {
                 old_acc[n] = acc[n];
                 acc[n] = force[n]*1.3806488e-33 / mass; // to A / fs^2
                 if (nh)
@@ -893,29 +893,29 @@ class Molecule {
 
         // angular velocity
         void calc_ang_vel(double dt) {
-            for (unsigned int n=0; n<3; n++) {
+            for (int n=0; n<3; n++) {
                 ang_vel[n] = ang_vel[n] + 0.5*(ang_acc[n] + old_ang_acc[n])*dt; // in rad/fs
             }
         }
 
         // linear velocity
         void calc_vel(double dt) {
-            for (unsigned int n=0; n<3; n++) {
+            for (int n=0; n<3; n++) {
                 vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
             }
         }
 
         // angular position // in rad
         void calc_ang_pos(double dt) {
-            for (unsigned int n=0; n<3; n++) {
+            for (int n=0; n<3; n++) {
                 ang_pos[n] = ang_pos[n] + ang_vel[n] * dt + 0.5*ang_acc[n] * dt * dt;
             }
         }
 
         // linear position
         void calc_pos(double dt) {
-            for (unsigned int i=0; i<atoms.size(); i++) {
-              for (unsigned int n=0; n<3; n++) atoms[i].pos[n] = atoms[i].pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
+            for (int i=0; i<atoms.size(); i++) {
+              for (int n=0; n<3; n++) atoms[i].pos[n] = atoms[i].pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
             }
         }
 
@@ -923,8 +923,8 @@ class Molecule {
             // A molecule's force IS the sum of its atoms' forces
             // this is external force on the molecule.
             force[0]=0; force[1]=0; force[2]=0;
-            for (unsigned int i=0; i<atoms.size(); i++) {
-                for (unsigned int n=0; n<3; n++) force[n] += atoms[i].force[n]; // in K/A
+            for (int i=0; i<atoms.size(); i++) {
+                for (int n=0; n<3; n++) force[n] += atoms[i].force[n]; // in K/A
             }
         }
 
@@ -932,7 +932,7 @@ class Molecule {
             // assigns the current center of mass of the molecule based on positions of atoms
             double x_mass_sum=0.0; double y_mass_sum=0.0; double z_mass_sum=0.0;// double mass_sum=0.0;
 
-            for (unsigned int i=0; i<atoms.size(); i++) {
+            for (int i=0; i<atoms.size(); i++) {
                 double atom_mass = atoms[i].m;
 
                 x_mass_sum += atoms[i].pos[0]*atom_mass;
@@ -947,14 +947,14 @@ class Molecule {
         }
 
         void calc_torque() {
-            for (unsigned int n=0; n<3; n++) torque[n] = 0.0;
+            for (int n=0; n<3; n++) torque[n] = 0.0;
             // torque is the cross product rxF NOT Fxr, the sum of all atoms relative to molecule's com.
-            for (unsigned int i=0; i<atoms.size(); i++) {
+            for (int i=0; i<atoms.size(); i++) {
                 atoms[i].torque[0] = (atoms[i].pos[1]-com[1]) * atoms[i].force[2] - (atoms[i].pos[2]-com[2]) * atoms[i].force[1];
                 atoms[i].torque[1] = (atoms[i].pos[2]-com[2]) * atoms[i].force[0] - (atoms[i].pos[0]-com[0]) * atoms[i].force[2];
                 atoms[i].torque[2] = (atoms[i].pos[0]-com[0]) * atoms[i].force[1] - (atoms[i].pos[1]-com[1]) * atoms[i].force[0];
                 // molecular torque = sum of atomic torques
-                for (unsigned int n=0; n<3; n++) torque[n] += atoms[i].torque[n]; // in K
+                for (int n=0; n<3; n++) torque[n] += atoms[i].torque[n]; // in K
             } // end atomic loop
         } // end calc_torque()
 
