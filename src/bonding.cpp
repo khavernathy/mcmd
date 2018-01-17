@@ -10,25 +10,29 @@
 
 using namespace std;
 
-bool find_cycle(System &system, int mol, int i) {
+bool find_cycle(System &system, unsigned int mol, unsigned int i) {
+
+    unsigned int b1,b2,b3,b4,b5,b6;
+    unsigned int a2,a3,a4,a5,a6,a7;
+
     // see if atom i on molecule mol is on a 6-membered ring
-    for (int b1=0; b1<system.molecules[mol].atoms[i].bonds.size(); b1++) {
-        int a2 = system.molecules[mol].atoms[i].bonds[b1];
+    for (b1=0; b1<system.molecules[mol].atoms[i].bonds.size(); b1++) {
+        a2 = system.molecules[mol].atoms[i].bonds[b1];
         if (system.molecules[mol].atoms[a2].name == "Zn") continue; // avoid false ring in MOF-5 type
-        for (int b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
-            int a3 = system.molecules[mol].atoms[a2].bonds[b2];
+        for (b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
+            a3 = system.molecules[mol].atoms[a2].bonds[b2];
             if (a3 == i) continue; // don't go backwards..
-            for (int b3=0; b3<system.molecules[mol].atoms[a3].bonds.size();b3++) {
-                int a4 = system.molecules[mol].atoms[a3].bonds[b3];
+            for (b3=0; b3<system.molecules[mol].atoms[a3].bonds.size();b3++) {
+                a4 = system.molecules[mol].atoms[a3].bonds[b3];
                 if (a4 == a2) continue;
-                for (int b4=0; b4<system.molecules[mol].atoms[a4].bonds.size();b4++) {
-                    int a5 = system.molecules[mol].atoms[a4].bonds[b4];
+                for (b4=0; b4<system.molecules[mol].atoms[a4].bonds.size();b4++) {
+                    a5 = system.molecules[mol].atoms[a4].bonds[b4];
                     if (a5 == a3) continue;
-                    for (int b5=0; b5<system.molecules[mol].atoms[a5].bonds.size();b5++) {
-                        int a6 = system.molecules[mol].atoms[a5].bonds[b5];
+                    for (b5=0; b5<system.molecules[mol].atoms[a5].bonds.size();b5++) {
+                        a6 = system.molecules[mol].atoms[a5].bonds[b5];
                         if (a6 == a4) continue;
-                        for (int b6=0; b6<system.molecules[mol].atoms[a6].bonds.size();b6++) {
-                            int a7 = system.molecules[mol].atoms[a6].bonds[b6];
+                        for (b6=0; b6<system.molecules[mol].atoms[a6].bonds.size();b6++) {
+                            a7 = system.molecules[mol].atoms[a6].bonds[b6];
                             if (a7 == a5) continue;
                             if (a7 == i)
                                 return true;
@@ -65,7 +69,7 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         else if (num_bonds == 4) return "N_3";
     } else if (name == "O") {
         int ZnCount=0;
-        for (int z=0; z<system.molecules[mol].atoms[i].bonds.size(); z++) {
+        for (unsigned int z=0; z<system.molecules[mol].atoms[i].bonds.size(); z++) {
             if (system.molecules[mol].atoms[system.molecules[mol].atoms[i].bonds[z]].name == "Zn") {
                 ZnCount++;
             }
@@ -120,7 +124,7 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
 
 
 // return true if this should count as a bond.
-bool qualify_bond(System &system, double r, int mol, int i, int j) {
+bool qualify_bond(System &system, double r, unsigned int mol, unsigned int i, unsigned int j) {
     string a1 = system.molecules[mol].atoms[i].name;
     string a2 = system.molecules[mol].atoms[j].name;
     
@@ -152,7 +156,7 @@ bool qualify_bond(System &system, double r, int mol, int i, int j) {
  * */
 
 // provide rij parameter given needed information (atom IDs)
-double get_rij(System &system, int i, int j, int k, int l) {
+double get_rij(System &system, unsigned int i, unsigned int j, unsigned int k, unsigned int l) {
     const double ri = system.constants.UFF_bonds[system.molecules[i].atoms[j].UFFlabel.c_str()];
     const double rj = system.constants.UFF_bonds[system.molecules[k].atoms[l].UFFlabel.c_str()];
     const double Xi = system.constants.UFF_electroneg[system.molecules[i].atoms[j].name.c_str()];
@@ -167,7 +171,7 @@ double get_rij(System &system, int i, int j, int k, int l) {
 }
 
 // get Force constant kij for a bond.
-double get_kij(System &system, int i, int j, int k, int l, double rij) {
+double get_kij(System &system, unsigned int i, unsigned int j, unsigned int k, unsigned int l, double rij) {
     const double Zi = system.constants.UFF_Z[system.molecules[i].atoms[j].UFFlabel.c_str()];
     const double Zj = system.constants.UFF_Z[system.molecules[k].atoms[l].UFFlabel.c_str()];
     return 664.12*Zi*Zj/(rij*rij*rij); // in kcal/molA^2, as-is
@@ -200,14 +204,14 @@ double stretch_energy(System &system) {
     double potential = 0;
     double alpha,Dij,kij,rij; // bond params
     double mainterm; // main chunk of potential, to be squared..
-    int i,j,l; // atom indices
+    unsigned int i,j,l; // atom indices
     double r; // actual, current distance for pair.
     /* ============================ */
     double BO; 
     /* ============================ */
 
     // loop through bonds of this atom.
-    for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+    for (unsigned int it=0; it<system.constants.uniqueBonds.size(); it++) {
         i = system.constants.uniqueBonds[it].mol;
         j = system.constants.uniqueBonds[it].atom1;
         l = system.constants.uniqueBonds[it].atom2;
@@ -238,17 +242,17 @@ double get_Kijk(System &system, double rik, double t1, double t2, double t3) {
 }
 
 // get the angle ABC where B is center atom, on molecule i
-double get_angle(System &system, int i, int A, int B, int C) {
+double get_angle(System &system, unsigned int i, unsigned int A, unsigned int B, unsigned int C) {
     // https://stackoverflow.com/questions/19729831/angle-between-3-points-in-3d-space
     double AB[3] = {0,0,0};
     double BC[3] = {0,0,0};
 
     double* ABdistances = getDistanceXYZ(system, i, A, i, B);
-    for (int n=0;n<3;n++) {
+    for (unsigned int n=0;n<3;n++) {
         AB[n] = ABdistances[n];
     }
     double* BCdistances = getDistanceXYZ(system, i, C, i, B);
-    for (int n=0;n<3;n++) {
+    for (unsigned int n=0;n<3;n++) {
         BC[n] = BCdistances[n];
     }
     
@@ -274,12 +278,12 @@ double get_rik(System &system, double rij, double rjk, double t3, double angle) 
 double angle_bend_energy(System &system) {
     double potential=0;
     const double deg2rad = M_PI/180.0;
-    int i,j,l,m;
+    unsigned int i,j,l,m;
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
     double t1,t2,t3;
     double angle; // the actual angle IJK
     
-    for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
+    for (unsigned int it=0; it<system.constants.uniqueAngles.size(); it++) {
         i = system.constants.uniqueAngles[it].mol;
         j = system.constants.uniqueAngles[it].atom1;
         l = system.constants.uniqueAngles[it].atom2;
@@ -308,7 +312,7 @@ double angle_bend_energy(System &system) {
 } // end angle bend energy
 
 
-double get_dihedral_angle(System &system, int mol, int i, int j, int k, int l) {
+double get_dihedral_angle(System &system, unsigned int mol, unsigned int i, unsigned int j, unsigned int k, unsigned int l) {
     // current dihedral angle for i--j--k--l atoms
     /*
      *          L    <- 0 degree dihedral (in plane of screen)..
@@ -463,8 +467,8 @@ double torsions_energy(System &system) {
     double potential=0;
     double vjk, vj, vk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
     const double deg2rad = M_PI/180.0;
-    int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
-    for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+    unsigned int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
+    for (unsigned int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
                 
         vjk = system.constants.uniqueDihedrals[it].vjk; 
         if (vjk==0) continue; // skip  0-energy 
@@ -493,7 +497,7 @@ double morse_gradient(System &system) {
     // x,y,z is the point of interest for this gradient
     // ij tells us whether it's the 1st atom or 2nd within definition of delta x (+1 or -1)
     double alpha,Dij,kij,rij; // bond params
-    int i,j,l; // atom indices
+    unsigned int i,j,l; // atom indices
     double r; // actual, current distance for pair.
     /* ============================ */
     double BO;
@@ -502,7 +506,7 @@ double morse_gradient(System &system) {
         // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
 
 
-            for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
+            for (unsigned int it=0; it<system.constants.uniqueBonds.size(); it++) {
 
                 i = system.constants.uniqueBonds[it].mol;
                 j = system.constants.uniqueBonds[it].atom1;
@@ -559,7 +563,7 @@ double simple_r(double xi, double xj, double yi, double yj, double zi, double zj
 // via simple Fourier small cosine expansion
 double angle_bend_gradient(System &system) {
     const double deg2rad = M_PI/180.0;
-    int i,j,l,m;
+    unsigned int i,j,l,m;
     double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
     double angle; // the actual angle IJK
     double grad;
@@ -568,7 +572,7 @@ double angle_bend_gradient(System &system) {
         // cos-derivative terms in the gradient, + other terms.
 
 
-    for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
+    for (unsigned int it=0; it<system.constants.uniqueAngles.size(); it++) {
         i = system.constants.uniqueAngles[it].mol;
         j = system.constants.uniqueAngles[it].atom1;
         l = system.constants.uniqueAngles[it].atom2;
@@ -673,9 +677,9 @@ double torsions_gradient(System &system) {
     double vjk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
     const double deg2rad = M_PI/180.0;
     double xi,xj,xk,xl, yi,yj,yk,yl, zi,zj,zk,zl;
-    int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
+    unsigned int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     double grad;
-    for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+    for (unsigned int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
         vjk = system.constants.uniqueDihedrals[it].vjk;
         n = system.constants.uniqueDihedrals[it].n;
         if (vjk==0 || n==0) continue; // skip  0-gradients
@@ -773,9 +777,9 @@ double LJ_intramolec_energy(System &system) {
     // for optimizations, with unique units (kcal/mol) from the MC/MD lj.cpp (Kelvin)
     // the latter of which excludes all intramolecular contributions.
     double potential=0;
-    int mol,i,j;
+    unsigned int mol,i,j;
     double eps, sig, r, sr6;
-    for (int it=0; it<system.constants.uniqueLJNonBonds.size(); it++) {    
+    for (unsigned int it=0; it<system.constants.uniqueLJNonBonds.size(); it++) {    
         mol = system.constants.uniqueLJNonBonds[it].mol;
         i = system.constants.uniqueLJNonBonds[it].atom1;
         j = system.constants.uniqueLJNonBonds[it].atom2;
@@ -801,10 +805,10 @@ double LJ_intramolec_gradient(System &system) {
     // this is a non-bonding potential, but I'm including it here as a separate function
     // for optimizations, with unique units (kcal/mol) from the MC/MD lj.cpp (Kelvin)
     // the latter of which excludes all intramolecular contributions.
-    int mol,i,j;
+    unsigned int mol,i,j;
     double eps, sig, r,rsq,r6,s6;
     double grad;
-    for (int it=0; it<system.constants.uniqueLJNonBonds.size(); it++) {    
+    for (unsigned int it=0; it<system.constants.uniqueLJNonBonds.size(); it++) {    
         mol = system.constants.uniqueLJNonBonds[it].mol;
         i = system.constants.uniqueLJNonBonds[it].atom1;
         j = system.constants.uniqueLJNonBonds[it].atom2;
@@ -835,9 +839,9 @@ double LJ_intramolec_gradient(System &system) {
 double ES_intramolec_energy(System &system) {
     // this is a non-bonding potential, but I'm including it here as a separate function
     double potential=0;
-    int mol,i,j;
+    unsigned int mol,i,j;
     double qq,r;
-    for (int it=0; it<system.constants.uniqueChargeNonBonds.size(); it++) {    
+    for (unsigned int it=0; it<system.constants.uniqueChargeNonBonds.size(); it++) {    
         mol = system.constants.uniqueChargeNonBonds[it].mol;
         i = system.constants.uniqueChargeNonBonds[it].atom1;
         j = system.constants.uniqueChargeNonBonds[it].atom2;
@@ -856,9 +860,9 @@ double ES_intramolec_energy(System &system) {
 
 double ES_intramolec_gradient(System &system) {
     // this is a non-bonding potential, but I'm including it here as a separate function
-    int mol,i,j;
+    unsigned int mol,i,j;
     double qq,r;
-    for (int it=0; it<system.constants.uniqueChargeNonBonds.size(); it++) {
+    for (unsigned int it=0; it<system.constants.uniqueChargeNonBonds.size(); it++) {
         mol = system.constants.uniqueChargeNonBonds[it].mol;
         i = system.constants.uniqueChargeNonBonds[it].atom1;
         j = system.constants.uniqueChargeNonBonds[it].atom2;
@@ -881,12 +885,12 @@ double ES_intramolec_gradient(System &system) {
 // function to find all bonds (and angles) for all atoms.
 void findBonds(System &system) {
     
-    int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
+    unsigned int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
     double r, ra, rh; // bond r, angle bond ra, dihedral bond rh
-    int local_bonds=0;
-    int duplicateFlag=0; //bond dupes
-    int duplicateAngleFlag=0; // angle dupes
-    int duplicateDihFlag=0; // dihedral dupes
+    unsigned int local_bonds=0;
+    unsigned int duplicateFlag=0; //bond dupes
+    unsigned int duplicateAngleFlag=0; // angle dupes
+    unsigned int duplicateDihFlag=0; // dihedral dupes
     for (i=0; i<system.molecules.size(); i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
@@ -904,7 +908,7 @@ void findBonds(System &system) {
 
                     // check for duplicate bond.
                     duplicateFlag=0;
-                    for (int n=0;n<system.constants.uniqueBonds.size();n++) {
+                    for (unsigned int n=0;n<system.constants.uniqueBonds.size();n++) {
                         if (system.constants.uniqueBonds[n].mol == i &&
                             system.constants.uniqueBonds[n].atom1 == l &&
                             system.constants.uniqueBonds[n].atom2 == j) {
@@ -930,7 +934,7 @@ void findBonds(System &system) {
 
                             // check for duplicate angles
                             duplicateAngleFlag = 0;
-                            for (int n=0;n<system.constants.uniqueAngles.size();n++) {
+                            for (unsigned int n=0;n<system.constants.uniqueAngles.size();n++) {
                                 if (system.constants.uniqueAngles[n].mol == i &&
                                     system.constants.uniqueAngles[n].atom1 == m &&
                                     system.constants.uniqueAngles[n].atom2 == l &&
@@ -961,7 +965,7 @@ void findBonds(System &system) {
                                 if (qualify_bond(system, rh, i, m, p)) {
                                     // check duplicate dihedral
                                     duplicateDihFlag = 0;
-                                    for (int n=0;n<system.constants.uniqueDihedrals.size();n++) {
+                                    for (unsigned int n=0;n<system.constants.uniqueDihedrals.size();n++) {
                                         if ((system.constants.uniqueDihedrals[n].mol==i &&
                                             system.constants.uniqueDihedrals[n].atom1==p &&
                                             system.constants.uniqueDihedrals[n].atom2==m &&
@@ -1007,7 +1011,7 @@ void findBonds(System &system) {
 
 
     // get unique qualified LJ/ES non-bond pairs (beyond 1,3)
-    int mol,qualified, y,z;
+    unsigned int mol,qualified, y,z;
     double rlj;
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
     for (mol=0; mol<system.molecules.size(); mol++) {
@@ -1072,11 +1076,13 @@ void findBonds(System &system) {
 void setBondingParameters(System &system) {
     // save all bond/angle/torsion/non-bond parameters to memory
     // (before running optimization)
+    unsigned int it, mol,atom1,atom2,atom3,atom4;
+
     // 1) bonds
-    for (int it=0; it<system.constants.uniqueBonds.size(); it++) {
-        int mol = system.constants.uniqueBonds[it].mol;
-        int atom1 = system.constants.uniqueBonds[it].atom1;
-        int atom2 = system.constants.uniqueBonds[it].atom2;
+    for (it=0; it<system.constants.uniqueBonds.size(); it++) {
+        mol = system.constants.uniqueBonds[it].mol;
+        atom1 = system.constants.uniqueBonds[it].atom1;
+        atom2 = system.constants.uniqueBonds[it].atom2;
 
         system.constants.uniqueBonds[it].BO = get_BO(system.molecules[mol].atoms[atom1].UFFlabel, system.molecules[mol].atoms[atom2].UFFlabel);
         system.constants.uniqueBonds[it].rij = get_rij(system,mol,atom1,mol,atom2);
@@ -1087,11 +1093,11 @@ void setBondingParameters(System &system) {
     }    
     
     // 2) angles
-    for (int it=0; it<system.constants.uniqueAngles.size(); it++) {
-        int mol = system.constants.uniqueAngles[it].mol;
-        int atom1 = system.constants.uniqueAngles[it].atom1;
-        int atom2 = system.constants.uniqueAngles[it].atom2;
-        int atom3 = system.constants.uniqueAngles[it].atom3;
+    for (it=0; it<system.constants.uniqueAngles.size(); it++) {
+        mol = system.constants.uniqueAngles[it].mol;
+        atom1 = system.constants.uniqueAngles[it].atom1;
+        atom2 = system.constants.uniqueAngles[it].atom2;
+        atom3 = system.constants.uniqueAngles[it].atom3;
 
         system.constants.uniqueAngles[it].rij = get_rij(system,mol,atom1,mol,atom2);
         double rij = system.constants.uniqueAngles[it].rij;
@@ -1114,12 +1120,12 @@ void setBondingParameters(System &system) {
     }
 
     // 3) dihedrals
-    for (int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
-        int mol = system.constants.uniqueDihedrals[it].mol;
-        int atom1 = system.constants.uniqueDihedrals[it].atom1;
-        int atom2 = system.constants.uniqueDihedrals[it].atom2;
-        int atom3 = system.constants.uniqueDihedrals[it].atom3;
-        int atom4 = system.constants.uniqueDihedrals[it].atom4;
+    for (it=0; it<system.constants.uniqueDihedrals.size(); it++) {
+        mol = system.constants.uniqueDihedrals[it].mol;
+        atom1 = system.constants.uniqueDihedrals[it].atom1;
+        atom2 = system.constants.uniqueDihedrals[it].atom2;
+        atom3 = system.constants.uniqueDihedrals[it].atom3;
+        atom4 = system.constants.uniqueDihedrals[it].atom4;
          
         double * params = get_torsion_params(system, system.molecules[mol].atoms[atom2].UFFlabel, system.molecules[mol].atoms[atom3].UFFlabel);
         system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
