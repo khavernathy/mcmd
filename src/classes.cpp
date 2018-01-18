@@ -174,6 +174,8 @@ class Constants {
         map <string,double> UFF_Z; // UFF Effective charge Z
         map <string,double> UFF_torsions; // UFF torsion angle barriers, kcal/mol
         map <string,double> UFF_electroneg; // UFF electronegativity, in eV
+        map <string,double> OPLS_sig; // OPLS sigma for LJ
+        map <string,double> OPLS_eps; // OPLS epsilons for LJ
 
         int lj_uff=0; // 1 would default all atoms to UFF LJ parameters (override the input)
         int polars_vand=0; // 1 would defaul all atoms to van Duijnen polarizablitiy parameters
@@ -1869,5 +1871,8 @@ UFF_Z["Co4+2"] = 1.308;
 UFF_Z["Cu4+2"] = 2.43;
 UFF_Z["Zn4+2"] = 1.308;
 UFF_Z["Zn3f2"] = 1.308;
+
+OPLS_sig["C_aro"] = 3.55; OPLS_sig["C_coo"] = 3.75; OPLS_sig["H_aro"] = 2.42;
+OPLS_eps["C_aro"] = 35.25; OPLS_eps["C_coo"] = 52.84; OPLS_eps["H_aro"] = 15.11;
 
 }
