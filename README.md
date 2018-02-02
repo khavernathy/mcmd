@@ -1,7 +1,7 @@
 # MCMD
 This is a Monte Carlo and Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials. It is a project that began as a re-write and expansion of <a href="https://github.com/mpmccode/mpmc">Massively Parallel Monte Carlo (MPMC)</a>, another code developed and maintained by our laboratory, led by <a href="http://chemistry.usf.edu/faculty/space/">Brian Space</a> at the University of South Florida, <a href="http://chemistry.usf.edu/">Dept. of Chemistry</a>, <a href="http://chemistry.usf.edu/smmartt/">Smart Metal-organic Materials Advanced Research and Technology Transfer (SMMARTT)</a>.
 
-[[https://github.com/khavernathy/mcmd/blob/master/src/gui/images/mof%2Bco2.png]]
+(MCMD simulation screenshot)[https://github.com/khavernathy/mcmd/blob/master/src/gui/images/mof%2Bco2.png]
 
 # Quick start:
 <!--
