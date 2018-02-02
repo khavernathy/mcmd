@@ -1,7 +1,7 @@
 # MCMD
 This is a Monte Carlo and Molecular Dynamics Simulation software used primarily for gas sorption in crystalline materials. It is a project that began as a re-write and expansion of <a href="https://github.com/mpmccode/mpmc">Massively Parallel Monte Carlo (MPMC)</a>, another code developed and maintained by our laboratory, led by <a href="http://chemistry.usf.edu/faculty/space/">Brian Space</a> at the University of South Florida, <a href="http://chemistry.usf.edu/">Dept. of Chemistry</a>, <a href="http://chemistry.usf.edu/smmartt/">Smart Metal-organic Materials Advanced Research and Technology Transfer (SMMARTT)</a>.
 
-[MCMD water box](https://raw.githubusercontent.com/khavernathy/mcmd/src/gui/images/water.png)
+![MCMD simulation screenshot](https://github.com/khavernathy/mcmd/blob/master/src/gui/images/mof%2Bco2.png)
 
 # Quick start:
 <!--
@@ -9,6 +9,7 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 &emsp;-> `module load compilers/gcc/6.2.0` (circe)  <br />
 &emsp;-> `module load gcc/6.3.0` (bridges) <br />
 -->
+Using a terminal,<br />
 1) Download: <br />
 `git clone https://github.com/khavernathy/mcmd` or <a href="https://github.com/khavernathy/mcmd/archive/master.zip">download .zip file</a><br />
 
@@ -48,12 +49,13 @@ Dept. of Chemistry
 &emsp;-> A LAMMPS input file exporter. <br />
 &emsp;-> Trajectories and restart files in various formats. <br />
 &emsp;-> Automatic radial distribution calculator<br />
-&emsp;-> Hard-coded molecular models for easy input, including multi-sorbate support<br />
-&emsp;-> Easy system basis parametrization via a, b, c, &alpha;, &beta;, &gamma; crystal values, or basis vectors<br />
+&emsp;-> Hard-coded molecular models for easy input, including multi-molecule support<br />
+&emsp;-> Easy system basis parametrization via a, b, c, &alpha;, &beta;, &gamma; crystal parameters, or basis vectors<br />
 &emsp;-> Quick routines for energy/force computation<br />
 &emsp;-> Simulated annealing<br />
 &emsp;-> Any periodic cell is supported for both MC and MD; non-periodic systems also supported.<br />
-&emsp;-> Force-fields available are Lennard-Jones (12-6), Ewald electrostatics, and Thole-Applequist polarization.<br />
+&emsp;-> Potentials available are Lennard-Jones (12-6), Tang-Toennies (6-8-10), Ewald electrostatics, and Thole-Applequist polarization.<br />
+&emsp;-> Built-in force fields from UFF, OPLS, and other sources<br />
 &emsp;-> Sample inputs are included. The program takes just one argument: the input file (which itself usually points to a file containing starting atoms).<br />
 
 # What can be obtained from this software
