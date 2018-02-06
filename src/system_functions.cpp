@@ -469,6 +469,16 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "CO2";
                 system.proto[i].dof = 5;
             }
+            else if (sorbmodel == "co2_epm2") {
+                // Harris and Yung, 1995, J. Phys. Chem.
+                // https://pubs.acs.org/doi/pdf/10.1021/j100031a034
+                addAtomToProto(system,i, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.01, 0.6512, 0.00, 28.129, 2.757);
+                addAtomToProto(system, i, "COE", "CO2", "M", 1.149, 0.0, 0.0, 16.0, -0.3256, 0.00, 80.507, 3.033);
+                addAtomToProto(system, i, "COE", "CO2", "M", -1.149, 0.0, 0.0, 16.0, -0.3256, 0.00, 80.507, 3.033);
+                system.proto[i].name = "CO2";
+                system.proto[i].dof = 5;
+            }
+
             // NITROGEN N2
             else if (sorbmodel == "n2_mcquarrie") {
                 addAtomToProto(system,i, "N2G", "N2", "M", 0.0, 0.0, 0.0, 28.01344, 0.0, 0.0, 95.1, 3.7);
