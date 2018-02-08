@@ -12,7 +12,7 @@ enum {
     POTENTIAL_LJES,
     POTENTIAL_LJPOLAR,
     POTENTIAL_LJESPOLAR,
-    POTENTIAL_COMMY, // the communist potential 
+    POTENTIAL_COMMY, // the communist potential
     POTENTIAL_COMMYES,
     POTENTIAL_COMMYESPOLAR,
     POTENTIAL_TT, // the tang-toennies potential
@@ -190,12 +190,12 @@ class Constants {
         double displace_factor=2.5; // up to +- this number in A
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
 // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
-        
+
         double bias_uptake =0; // to accelerate uVT MC. User-defined. This will be converted to N before running MC
         string bias_uptake_unit="N"; // units for bias. Default N_movables
         int_fast8_t bias_uptake_switcher=0;
         int scale_charges=0; // option to scale charges
-        double scale_charges_factor; // multiply by this to get new charges for system. 
+        double scale_charges_factor; // multiply by this to get new charges for system.
 
 
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
@@ -204,7 +204,7 @@ class Constants {
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
         int currentprotoid=0; // for getting fugacity for the boltzmann factor.
-        int step_offset=0; // a parameter used to change the step output in the output files (e.g. after a restart) 
+        int step_offset=0; // a parameter used to change the step output in the output files (e.g. after a restart)
         int readinxyz=0; // option to read an XYZ file for input instead of PDB
 
         // MD STUFF
@@ -272,12 +272,12 @@ class Constants {
 
         int manual_cutoff=0; // on/off for user-defined pair-interaction cutoff in A.
         double manual_cutoff_val=0; // in A
-    
+
         int cuda=0; // CUDA OPTION FOR GPU CALCULATIONS (MD only)
         int cuda_block_size = 256; // this was the best of a test of 32,64,128,256 on a project from class I took. Can play with this to see how it changes perf.
 
         int crystalbuild=0; // option to dynamically build a crystal box to a supercell
-        int crystalbuild_x=1, crystalbuild_y=1, crystalbuild_z = 1; // duplication # in each dim. 
+        int crystalbuild_x=1, crystalbuild_y=1, crystalbuild_z = 1; // duplication # in each dim.
         int crystalbuild_includemovers=0; // option to include movable molecules in the crystal builder. default off.
         int charge_sum_check = 1; // option to check the total system charge before simulation. Default on.
 
@@ -286,7 +286,7 @@ class Constants {
         vector<int> fragsize = {250}; // num. of atoms in a frag, default
         double frag_bondlength = 2.1; // Angstroms, default.
 
-        int write_lammps = 0; // option to write out LAMMPS input files 
+        int write_lammps = 0; // option to write out LAMMPS input files
 
         /* SINGLE-POINT OPTIONS */
         int user_charge=0; // molecular charge for single point calc's
@@ -319,14 +319,14 @@ class Constants {
         };
         vector<UniqueDihedral> uniqueDihedrals; // holds all unique 4-atom dihedrals.
         struct UniqueLJNonBond {
-            int mol, atom1, atom2;         
+            int mol, atom1, atom2;
             double sig, eps;
         };
         vector<UniqueLJNonBond> uniqueLJNonBonds; // holds all unique non-bonded pair interactions (no cutoff)
         struct UniqueChargeNonBond {
             int mol, atom1, atom2;
             double chargeprod;
-        };  
+        };
         vector <UniqueChargeNonBond> uniqueChargeNonBonds;
 
 };
@@ -360,7 +360,7 @@ class Pbc {
         double lengthx=0, lengthy=0, lengthz=0;
 
         void printBasis() {
-            printf("\n:: --- Box (basis) information --- ::\n"); 
+            printf("\n:: --- Box (basis) information --- ::\n");
             printf(":: basis1 %.5f %.5f %.5f\n", basis[0][0], basis[0][1], basis[0][2]);
             printf(":: basis2 %.5f %.5f %.5f\n", basis[1][0], basis[1][1], basis[1][2]);
             printf(":: basis3 %.5f %.5f %.5f\n", basis[2][0], basis[2][1], basis[2][2]);
@@ -642,7 +642,7 @@ class Stats {
 
         // these are the instances of the "observables type" obs_t.
         // i.e. all the quantities of interest which can be averaged and dealt with.
-        } Nsq,NU,qst,qst_nvt, 
+        } Nsq,NU,qst,qst_nvt,
           rd,es,polar, // all energies in K unless otherwise stated
           potential,potential_sq,
           kinetic, kinetic_sq,
@@ -652,18 +652,18 @@ class Stats {
           es_self, es_real, es_recip,
           tt, tt_lrc, tt_self,
           Ustretch, Uangles, Udihedrals, UintraLJ, UintraES, Ubonded_tot, // bonded energies in kcal/mol
-          chempot,totalmass, frozenmass, 
-          pressure,temperature, fdotrsum, 
+          chempot,totalmass, frozenmass,
+          pressure,temperature, fdotrsum,
           dist_within, diffusion, volume, z, // z = PV/nRT
           Q, polar_iterations, heat_capacity; // Q = partition func.
 
         int max_sorbs=10;
-        vector<obs_t> msd = vector<obs_t>(max_sorbs); 
+        vector<obs_t> msd = vector<obs_t>(max_sorbs);
         vector<obs_t> wtp = vector<obs_t>(max_sorbs);
         vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
         vector<obs_t> Nmov = vector<obs_t>(max_sorbs);
         vector<obs_t> movablemass = vector<obs_t>(max_sorbs);
-        vector<obs_t> density = vector<obs_t>(max_sorbs); 
+        vector<obs_t> density = vector<obs_t>(max_sorbs);
         vector<obs_t> selectivity = vector<obs_t>(max_sorbs);
         vector<obs_t> excess = vector<obs_t>(max_sorbs);
 
@@ -706,7 +706,7 @@ class Last {
         vector<double> wtpME = vector<double>(max_sorbs);
         vector<double> Nmov = vector<double>(max_sorbs);
         vector<double> movablemass = vector<double>(max_sorbs);
-        vector<double> density = vector<double>(max_sorbs); 
+        vector<double> density = vector<double>(max_sorbs);
         vector<double> selectivity = vector<double>(max_sorbs);
         vector<double> excess = vector<double>(max_sorbs);
 };
@@ -732,7 +732,7 @@ class Atom {
         //double E=0.0; // total energy in K
 		// Tang-Toennies params.
         double c6=0,c8=0,c10=0;
-        
+
         int PDBID; // the atom's PDBID (from input)
         double rank_metric;  // for polarization sorting
 
@@ -750,14 +750,14 @@ class Atom {
         double efield_self[3] = {0,0,0};
         double efield_induced[3] = {0,0,0};
         double efield_induced_change[3] = {0,0,0};
-        double energy_grad[3] = {0,0,0};
+        //double energy_grad[3] = {0,0,0};
         double dipole_rrms=0;
-		
+
         /*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
-       
-        string UFFlabel; // the UFF-style label for this atom. 
+
+        string UFFlabel; // the UFF-style label for this atom.
         vector<int> bonds; // <IDs of bonded atoms>
-        
+
         double * get_acc() {
             static double output[3];
             for (int n=0; n<3; n++) output[n] = acc[n];
@@ -1242,7 +1242,7 @@ sigs["Es"] = 3.299*uff2mpmc;
 sigs["Fm"] = 3.286*uff2mpmc;
 sigs["Md"] = 3.274*uff2mpmc;
 sigs["No"] = 3.248*uff2mpmc;
-sigs["Lr"] = 3.236*uff2mpmc; 
+sigs["Lr"] = 3.236*uff2mpmc;
 
     // UFF4MOF sigs
     // nevermind, they only give bonding parameters.
@@ -1374,10 +1374,10 @@ eps["Md"] = 0.011/kbk;
 eps["No"] = 0.011/kbk;
 eps["Lr"] = 0.011/kbk;
 
-	// POLARIZABILITIES  // in A^3 
+	// POLARIZABILITIES  // in A^3
     // these are VAN DUIJNEN EXPONENTIAL DAMPING POLARIZABILITIES
     // IT WOULD BE DIFFERENT FOR LINEAR DAMPING
-    polars["H"] = 2.7927*vand2mpmc;    
+    polars["H"] = 2.7927*vand2mpmc;
     polars["C"] = 8.6959*vand2mpmc;
     polars["N"] = 6.5565*vand2mpmc;
     polars["O"] = 5.7494*vand2mpmc;
@@ -1630,7 +1630,7 @@ radii["Am"] = 1.75;
 
 // =============
 // UFF BONDING PARAMETERS
-// bonds in Angstrom; Angles in degrees; Eff. Charge (Z) in e(lementary charge) 
+// bonds in Angstrom; Angles in degrees; Eff. Charge (Z) in e(lementary charge)
 UFF_bonds["H_"] = 0.354; UFF_angles["H_"] = 180; UFF_Z["H_"] = 0.712;
 UFF_bonds["H_b"] = 0.46; UFF_angles["H_b"] = 83.5; UFF_Z["H_b"] = 0.712;
 UFF_bonds["He4+4"] = 0.849; UFF_angles["He4+4"] = 90; UFF_Z["He4+4"] = 0.098;

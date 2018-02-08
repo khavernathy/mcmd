@@ -19,7 +19,7 @@ void perturbAtom(System &system, int i, double mf) {
 double move_factor(double energy, int N) {
     // a simple scalar modifier to the explorable volume for optimization
     // the move_factor scales down to 0 as energy approaches 0
-    // thus we save some time optimizing by not trying dumb (big) moves 
+    // thus we save some time optimizing by not trying dumb (big) moves
     // when energy is very low.
     // normalized by 10 kcal/mol per atom
     return 1.0 -exp(-energy*energy / (10.0*N*N)); // reverse bell-curve
@@ -33,7 +33,7 @@ void outputEnergies(System &system, int step, double Ef, double delta_E, double 
           system.stats.Uangles.value,
           system.stats.Udihedrals.value,
           system.stats.UintraLJ.value,
-          system.stats.UintraES.value); 
+          system.stats.UintraES.value);
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
@@ -75,7 +75,7 @@ void optimize(System &system) {
         int atom2 = system.constants.uniqueAngles[n].atom2;
         int atom3 = system.constants.uniqueAngles[n].atom3;
         double value = system.constants.uniqueAngles[n].value;
-        printf("%8i :: %6i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s :: %5f\n", n, 
+        printf("%8i :: %6i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s :: %5f\n", n,
                 mol,
                 atom1,
                 atom2,
@@ -125,7 +125,7 @@ void optimize(System &system) {
         }
     }
     printf("================================================================================\n");
-   
+
 
     /* START OPTIMIZATION */
     int converged = 0;
@@ -139,7 +139,7 @@ void optimize(System &system) {
     int randatom;
     int step=0;
     writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
-    
+
     int optmode = system.constants.opt_mode;
     if (optmode == OPTIMIZE_SD)
         printf("STEEPEST DESCENT STRUCTURE OPTIMIZATION\n");
@@ -167,7 +167,7 @@ void optimize(System &system) {
 
         //boltzmann = exp(-delta_E/0.00001); // just for now..
         //if (getrand() < boltzmann) {
-        if (delta_E < 0) { // allow some positives a la Monte Carlo 
+        if (delta_E < 0) { // allow some positives a la Monte Carlo
            // accept
             step++;
             writeXYZ(system, system.constants.output_traj, 0, step, 0, 0);
@@ -188,13 +188,13 @@ void optimize(System &system) {
 
         // check max-steps convergence
         if (step >= step_limit) {
-            printf("Finished with energy = %f kcal/mol \n", Ef); 
+            printf("Finished with energy = %f kcal/mol \n", Ef);
             converged=1;
         }
 
     } // end while loop for convergence
     } // end MC style opt
-    
+
     // steepest desent (follow the negative gradient)
     else if (optmode == OPTIMIZE_SD) {
         const double move_factor = 0.02;
@@ -202,10 +202,10 @@ void optimize(System &system) {
         while (!converged) {
             Ei = Ef;
             // re-initialize gradient
-            for (int i=0; i<system.molecules[0].atoms.size(); i++) 
+            for (int i=0; i<system.molecules[0].atoms.size(); i++)
                 for (int n=0;n<3;n++)
-                    system.molecules[0].atoms[i].energy_grad[n]=0;
-            
+                    system.molecules[0].atoms[i].force[n]=0;
+
             // compute the gradients
             if (system.constants.opt_bonds)
                 morse_gradient(system);
@@ -222,8 +222,8 @@ void optimize(System &system) {
             // get gradient magnitude
             for (int i=0; i<system.molecules[0].atoms.size(); i++) {
                 for (int n=0;n<3;n++) {
-                    //printf("gradient %i[%i] = %f\n", i,n, system.molecules[0].atoms[i].energy_grad[n]);
-                    grad_mag += system.molecules[0].atoms[i].energy_grad[n]*system.molecules[0].atoms[i].energy_grad[n];
+                    //printf("gradient %i[%i] = %f\n", i,n, system.molecules[0].atoms[i].force[n]);
+                    grad_mag += system.molecules[0].atoms[i].force[n]*system.molecules[0].atoms[i].force[n];
                 }
             }
             grad_mag = sqrt(grad_mag);
@@ -231,9 +231,9 @@ void optimize(System &system) {
 
             // move the atoms by their (negative!) gradients
             // normalized by the gradient magnitude
-            for (int i=0; i<system.molecules[0].atoms.size(); i++) 
+            for (int i=0; i<system.molecules[0].atoms.size(); i++)
                 for (int n=0;n<3;n++)
-                    system.molecules[0].atoms[i].pos[n] -= move_factor/grad_mag * system.molecules[0].atoms[i].energy_grad[n];
+                    system.molecules[0].atoms[i].pos[n] += move_factor/grad_mag * system.molecules[0].atoms[i].force[n];
 
             Ef = totalBondedEnergy(system);
             delta_E = Ef - Ei;
