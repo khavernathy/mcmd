@@ -44,7 +44,7 @@
 #include "system.cpp"
 #include "fugacity.cpp"
 #include "distance.cpp"
-#include "system_functions.cpp" 
+#include "system_functions.cpp"
 #include "bonding.cpp"
 #include "mc.cpp" // this will include potential.cpp, which includes lj, coulombic, polar
 #ifdef CUDA
@@ -61,12 +61,12 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-   
-        /*        
+
+        /*
         // MPI is on hold for now.
         // set the default MPI params
         int rank=0, size=1;
-    
+
        // MPI setup
         #ifdef MPI
          MPI_Init(&argc, &argv);
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         std::string corenum = std::string(5 - rankstring.length(), '0') + rankstring;
         char suffix[7] = "-";
         std::strcat(suffix,corenum.c_str());
-        //printf("suffix: %s\n", suffix); 
+        //printf("suffix: %s\n", suffix);
          */
 
     //output current date/time
@@ -159,17 +159,17 @@ int main(int argc, char **argv) {
     if (system.constants.manual_cutoff) system.pbc.cutoff = system.constants.manual_cutoff_val; // override the cutoff if user-defined.
     if (system.stats.radial_dist) {
         string command = "rm " + system.stats.radial_file + "*";
-        int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() ); 
+        int whatever=std::system(command.c_str()); //remove( system.stats.radial_file.c_str() );
         setupRadialDist(system);
     }
     if (system.constants.scale_charges)
         scaleCharges(system);
 
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
-    if (system.constants.write_lammps) 
+    if (system.constants.write_lammps)
         writeLAMMPSfiles(system);
 
-    
+
     if (system.constants.crystalbuild) {
         setupCrystalBuild(system);
         // write an XYZ of the built system by default
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
         if (system.pbc.volume > 100.*100.*100.) {
             std::cout << "ERROR: Histogram cannot be enabled for a box with volume > 10^6 cubic angstroms. Current volume is " << to_string(system.pbc.volume) << " A^3. Use `histogram off`, or use a different box size, e.g. `carbasis 99 99 99 90 90 90`." << endl;
             exit(EXIT_FAILURE);
-        }        
+        }
 
         system.grids.histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
         system.grids.avg_histogram = (histogram_t *) calloc(1,sizeof(histogram_t));
@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
     }
     setupFugacity(system);
     if (system.constants.bias_uptake != 0 && system.constants.ensemble == ENSEMBLE_UVT)
-        setupNBias(system); 
+        setupNBias(system);
     if (system.constants.fragmaker) {
         string del = "rm fragment-*.xyz";
         int whatev = std::system(del.c_str());
@@ -201,7 +201,7 @@ int main(int argc, char **argv) {
     system.pbc.printBasis();
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 796); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 965); // i.e. github commit
     inputValidation(system);
     printf("...input options validated.\n");
     system.checkpoint("...input options validated. Done with system setup functions.");
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
 	remove( system.constants.output_histogram.c_str() );
 	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
     remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
-        
+
     // *** done clobbering files.
 
     // INITIAL WRITEOUTS
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
             FILE *f = fopen(system.constants.output_traj_pdb.c_str(), "w");
             fclose(f);
         } else {
-            // also the movables traj (going to phase-out the old trajectory 
+            // also the movables traj (going to phase-out the old trajectory
             // which writes frozen atoms every time
             FILE *g = fopen(system.constants.restart_mov_pdb.c_str(), "w");
             fclose(g);
@@ -299,7 +299,7 @@ int main(int argc, char **argv) {
                 } // end for l[2], n
             } // end for l[1], m
         } // end for l[0], l
-        
+
         system.constants.ewald_num_k = count_ks;
     } // end MD Ewald k-space setup.
 
@@ -385,7 +385,7 @@ int main(int argc, char **argv) {
 			    printf("Ensemble: %s; T = %.3f K\n", system.constants.ensemble_str.c_str(), system.constants.temp);
 			else
                 printf("Ensemble: %s; T = %.3f K (Simulated annealing on)\n",system.constants.ensemble_str.c_str(), system.constants.temp);
-            
+
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
 			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep+system.constants.step_offset,finalstep,progress,efficiency);
 			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n",
@@ -394,7 +394,7 @@ int main(int argc, char **argv) {
                 system.stats.rem_perc,
                 system.stats.dis_perc,
                 system.stats.vol_perc);
-	
+
             printf("BF avg = %.4f       ( %.3f Ins / %.3f Rem / %.3f Dis / %.3f Vol ) \n",
 				system.stats.bf_avg,
 				system.stats.ibf_avg,
@@ -408,7 +408,7 @@ int main(int argc, char **argv) {
 				(system.stats.ar_rem),
 				(system.stats.ar_dis),
 				(system.stats.ar_vol));
-		    
+
             printf("RD avg =              %.5f +- %.5f K (%.2f %%)\n", // (LJ = %.4f, LRC = %.4f, LRC_self = %.4f)\n",
                 system.stats.rd.average, system.stats.rd.sd, system.stats.rd.average/system.stats.potential.average *100); //, system.stats.lj.average, system.stats.lj_lrc.average, system.stats.lj_self_lrc.average);
 			printf("ES avg =              %.5f +- %.5f K (%.2f %%)\n", //(real = %.4f, recip = %.4f, self = %.4f)\n",
@@ -455,7 +455,7 @@ int main(int argc, char **argv) {
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
             if (system.constants.ensemble != ENSEMBLE_NVE && system.proto.size() ==1)
                 printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
-                
+
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
             }
@@ -555,21 +555,21 @@ int main(int argc, char **argv) {
 
 	// begin timing for steps
 	std::chrono::steady_clock::time_point begin_steps = std::chrono::steady_clock::now();
-    
+
 
     computeInitialValues(system);
     // Main MD time loop
 	for (double t=dt; t <= tf; t=t+dt) {
         system.stats.MDtime = t;
-		
+
         // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
         if (system.stats.count_movables > 0)
             integrate(system,dt);
 
         if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
             // try a MC uVT insert/delete
-            getTotalPotential(system); // this is needed on-the-spot because of 
-                                       // time-evolution of the system. Otherwise, 
+            getTotalPotential(system); // this is needed on-the-spot because of
+                                       // time-evolution of the system. Otherwise,
                                        // potential is only re-calculated at corrtime.
             double ranf2 = getrand(); // 0->1
             // ADD A MOLECULE
@@ -583,10 +583,10 @@ int main(int argc, char **argv) {
                 removeMolecule(system);
                 system.checkpoint("done with molecule delete move.");
             } // end add vs. remove
-        }		
+        }
 
         if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
-        
+
             if (system.constants.ensemble == ENSEMBLE_UVT) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
             if (system.constants.histogram_option) {
 				zero_grid(system.grids.histogram->grid,system);
@@ -617,13 +617,13 @@ int main(int argc, char **argv) {
 
                 // re-initialize these vars for each sorbate
                 for (int h=0;h<3;h++) diffusion_d[h]=0.;
-                diffusion_sum=0.; 
+                diffusion_sum=0.;
                 for (i=0; i<system.molecules.size(); i++) {
                     // only consider molecules of this type (for multi-sorb)
                     if (system.molecules[i].name == system.proto[sorbid].name) {
                         for (n=0; n<3; n++)
                             diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
-                    
+
                         diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
                     }
                 } // end all molecules loop
@@ -642,7 +642,7 @@ int main(int argc, char **argv) {
 						double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
 						system.stats.pressure.value = nmol*system.constants.R*Temp/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
 						system.stats.pressure.calcNewStats();
-            } // end if N>0 (stats calculation) 
+            } // end if N>0 (stats calculation)
 
 			// PRINT OUTPUT
 			std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
@@ -661,14 +661,14 @@ int main(int argc, char **argv) {
             } else {
                 outputTime = t; timeunit="fs";
             }
-            
+
             if (system.constants.cuda) printf("MCMD (CUDA) Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             else printf("MCMD Molecular Dynamics: %s (%s)\n", system.constants.jobname.c_str(), argv[1]);
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("Ensemble: %s; N_movables = %i N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
             printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
-            if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp); 
+            if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp);
             printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", Temp);
             printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3f )\n",
@@ -691,7 +691,7 @@ int main(int argc, char **argv) {
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);
             // uptake data if uVT
-            if (system.constants.ensemble == ENSEMBLE_UVT) { 
+            if (system.constants.ensemble == ENSEMBLE_UVT) {
 			for (int i=0; i<system.proto.size(); i++) {
                 double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
@@ -716,7 +716,7 @@ int main(int argc, char **argv) {
                 if (system.proto.size() > 1)
                     printf("      Selectivity = %.3f +- %.3f\n",system.stats.selectivity[i].average, system.stats.selectivity[i].sd);
             } // end prototype molecules loop for uptake data
-            
+
                 if (system.proto.size() == 1) {
                     if (system.stats.qst.average > 0)
                         printf("Qst = %.5f kJ/mol\n", system.stats.qst.value); //, system.stats.qst.sd);
@@ -727,7 +727,7 @@ int main(int argc, char **argv) {
             if ((system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_NVE) && system.proto.size() == 1) {
                 if (system.stats.heat_capacity.value > 1e-5)
                     printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
-                else 
+                else
                     printf("Heat capacity = %.5e +- %.5e kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
             }
             if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR)
@@ -735,13 +735,13 @@ int main(int argc, char **argv) {
                 system.stats.polar_iterations.average, system.stats.polar_iterations.sd);
 
             printf("--------------------\n\n");
-            
+
             if (system.molecules.size() > 0) {
                 consolidatePDBIDs(system);
             } // end if  N>0
 
             // WRITE OUTPUT FILES
-            if (system.molecules.size() > 0) { 
+            if (system.molecules.size() > 0) {
             writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
             // restart file.
             writePDB(system, system.constants.restart_pdb); // containing all atoms
@@ -749,7 +749,7 @@ int main(int argc, char **argv) {
             // trajectory file
                 if (system.constants.xyz_traj_option)
 			        writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);
-                    
+
                 if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers restart frame
                 if (system.constants.pdb_traj_option) {
                     if (system.constants.pdb_bigtraj_option)
@@ -763,7 +763,7 @@ int main(int argc, char **argv) {
             }
             if (t != dt && system.constants.histogram_option)
 				write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
-		    
+
             } // end if N>0, write output files.
         } // end if corrtime (quite sure.)
 		count_md_steps++;
@@ -777,12 +777,12 @@ int main(int argc, char **argv) {
         printf("\n| ==================================== |\n");
 	    printf("|  BEGINNING SINGLE POINT CALCULATION  |\n");
 	    printf("| ==================================== |\n\n");
-        
+
         if (system.pbc.a==0 && system.pbc.b==0 && system.pbc.c==0 && system.pbc.alpha==0 && system.pbc.beta==0 && system.pbc.gamma==0)
             system.constants.all_pbc=0; // force no PBC if no box given
- 
-        singlePointEnergy(system); 
-        
+
+        singlePointEnergy(system);
+
 
     } // end if Single-Point mode (not md or mc)
 // ============================ END SINGLE POINT ENERGY =======================================
@@ -793,7 +793,7 @@ int main(int argc, char **argv) {
         printf("\n| ==================================== |\n");
         printf("|   BEGINNING STRUCTURE OPTIMIZATION   |\n");
         printf("| ==================================== |\n\n");
-        
+
         if (system.pbc.a==0 && system.pbc.b==0 && system.pbc.c==0 && system.pbc.alpha==0 && system.pbc.beta==0 && system.pbc.gamma==0)
             system.constants.all_pbc=0; // force no PBC if no box given
 
