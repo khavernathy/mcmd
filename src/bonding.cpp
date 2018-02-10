@@ -531,11 +531,8 @@ double morse_gradient(System &system) {
                     delta = distances[n]; //system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
                     grad = prefactor * delta;
                     grad *= (1 - exp(alpha*(rij-r)));
-                    //if (!isnan(grad)) {
                         system.molecules[i].atoms[j].force[n] -= grad;
                         system.molecules[i].atoms[l].force[n] += grad;
-                        if (isnan(grad)) printf("NAN found bonds atoms %i %i\n",j,l);
-                    //}
                 }
                 // xj, yj, zj
                 // since gradient of the other atom is just minus the other, we apply a Newton-pair style thing above
@@ -912,9 +909,6 @@ double LJ_intramolec_gradient(System &system) {
                         grad = -system.constants.kbk*24.0*distances[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                         system.molecules[mol].atoms[i].force[n] -= grad;
                         system.molecules[mol].atoms[j].force[n] += grad; // to kcal/molA
-                        if (isnan(grad)) printf("NAN found LJ atoms %i %i\n", i,j);
-                                //printf("LJ grad i %i j %i = %f \n", i,j,grad);
-
                     }
     }
 
@@ -958,11 +952,8 @@ double ES_intramolec_gradient(System &system) {
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
                     for (int n=0;n<3;n++) {
-                      //if (!isnan(distances[n]*qq/(r*r*r))) {
                         system.molecules[mol].atoms[i].force[n] += distances[n]*qq/(r*r*r) * system.constants.kbk;
                         system.molecules[mol].atoms[j].force[n] -= distances[n]*qq/(r*r*r) * system.constants.kbk;
-                        if (isnan(distances[n]*qq/(r*r*r))) printf("NAN found charges atoms %i %i\n",i,j);
-                      //}
                     }
     }
 
