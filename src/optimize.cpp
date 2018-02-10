@@ -206,6 +206,7 @@ void optimize(System &system) {
                 for (int n=0;n<3;n++)
                     system.molecules[0].atoms[i].force[n]=0;
 
+            //printf("COMPUTING GRADIENTS...\n");
             // compute the gradients
             if (system.constants.opt_bonds)
                 morse_gradient(system);
