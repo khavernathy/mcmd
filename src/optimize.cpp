@@ -27,13 +27,13 @@ double move_factor(double energy, int N) {
 
 void outputEnergies(System &system, int step, double Ef, double delta_E, double sec_per_step) {
     printf("==============================================================\n");
-    printf("Optimization Step %i (%.4f sec/step) %s\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step, sec_per_step, system.constants.atom_file.c_str(),  Ef, delta_E);
+    printf("Optimization Step %i (%.4f sec/step) %s\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step, sec_per_step, system.constants.atom_file.c_str(),  Ef * system.constants.kbk, delta_E * system.constants.kbk);
     printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\nIntramolec. ES = %f kcal/mol\n",
-          system.stats.Ustretch.value,
-          system.stats.Uangles.value,
-          system.stats.Udihedrals.value,
-          system.stats.UintraLJ.value,
-          system.stats.UintraES.value);
+          system.stats.Ustretch.value * system.constants.kbk,
+          system.stats.Uangles.value * system.constants.kbk,
+          system.stats.Udihedrals.value * system.constants.kbk,
+          system.stats.UintraLJ.value * system.constants.kbk,
+          system.stats.UintraES.value * system.constants.kbk);
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
@@ -178,7 +178,7 @@ void optimize(System &system) {
 
             outputEnergies(system, step, Ef, delta_E, sec_per_step);
             if (fabs(delta_E) < error_tolerance && delta_E!=0) {
-                printf("Finished with energy = %f kcal/mol \n", Ef);
+                printf("Finished with energy = %f kcal/mol \n", Ef * system.constants.kbk);
                 converged=1;
             }
         } else {
@@ -188,7 +188,7 @@ void optimize(System &system) {
 
         // check max-steps convergence
         if (step >= step_limit) {
-            printf("Finished with energy = %f kcal/mol \n", Ef);
+            printf("Finished with energy = %f kcal/mol \n", Ef * system.constants.kbk);
             converged=1;
         }
 
@@ -247,7 +247,7 @@ void optimize(System &system) {
             outputEnergies(system, step, Ef, delta_E, sec_per_step);
 
             if ((fabs(delta_E) < error_tolerance && delta_E!=0) || step >= step_limit) {
-                 printf("Finished with energy = %f kcal/mol \n", Ef);
+                 printf("Finished with energy = %f kcal/mol \n", Ef * system.constants.kbk);
                  converged=1;
             }
         }
