@@ -741,7 +741,7 @@ double torsions_gradient(System &system) {
     double xi,xj,xk,xl, yi,yj,yk,yl, zi,zj,zk,zl;
     unsigned int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     double grad;
-    double arg, dih_thing1, dih_thing2, dih_thing3, dih_thing4, dih_thing5;
+    double arg, dih_thing1, dih_thing2, dih_thing3, dih_thing4, dih_thing5, prefactor;
     for (unsigned int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
         vjk = system.constants.uniqueDihedrals[it].vjk;
         n = system.constants.uniqueDihedrals[it].n;
@@ -790,13 +790,14 @@ double torsions_gradient(System &system) {
           dih_thing3 = sqrt(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0));
           dih_thing4 = pow(pow((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj),2.0)+pow((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj),2.0)+pow((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj),2.0),3.0/2.0);
           dih_thing5 = (((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)));
+          prefactor = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg));
 
           arg = 1.0/dih_thing2*1.0/dih_thing3*dih_thing5;
           if (arg>1.0) arg=1.0;
           else if (arg<-1.0) arg=-1.0;
 
           // xi
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*
+          grad = prefactor*
           1.0/sqrt(dih_thing1)*(((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))*
           1.0/dih_thing2*
           1.0/dih_thing3-((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*
@@ -804,47 +805,47 @@ double torsions_gradient(System &system) {
            system.molecules[i].atoms[j].force[0] -= grad;
 
           // yi
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[j].force[1] -= grad;
 
           // zi
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[j].force[2] -= grad;
 
           // xj
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yk-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zk-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yk-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zk-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yk-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zk-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yk-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zk-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
            system.molecules[i].atoms[l].force[0] -= grad;
 
           // yj
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zk-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zk-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zk-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zk-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[l].force[1] -= grad;
 
           // zj
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yk-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yk-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yk-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yk-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[l].force[2] -= grad;
 
           // xk
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yj-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yj-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yj-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yj-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[m].force[0] -= grad;
 
           // yk
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
            system.molecules[i].atoms[m].force[1] -= grad;
 
           // zk
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
            system.molecules[i].atoms[m].force[2] -= grad;
 
           // xl
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
            system.molecules[i].atoms[p].force[0] -= grad;
 
           // yl
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[p].force[1] -= grad;
 
           // zl
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+          grad = prefactor*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
            system.molecules[i].atoms[p].force[2] -= grad;
 
           //potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
