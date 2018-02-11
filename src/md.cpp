@@ -48,7 +48,7 @@ void calculateForces(System &system, double dt) {
                 lj_force_nopbc(system);
             if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR)
                 coulombic_force_nopbc(system);
-        } 
+        }
         // pbc
         else {
             if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
@@ -59,12 +59,20 @@ void calculateForces(System &system, double dt) {
                 coulombic_real_force(system);
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
                 polarization_force(system);
+            if (system.constants.flexible_frozen) {
+                  morse_gradient(system);
+                  angle_bend_gradient(system);
+                  torsions_gradient(system);
+                  LJ_intramolec_gradient(system);
+                  if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) // only if electrostatics is on.
+                    ES_intramolec_gradient(system);
+            }
         } // end if PBC
     // GPU style
     } else {
         #ifdef CUDA
         // CUDA FORCES
-        // no pbc    
+        // no pbc
         if (!system.constants.md_pbc) {
             CUDA_force_nopbc(system);
         // pbc
@@ -97,7 +105,7 @@ void calculateForces(System &system, double dt) {
             for (int i=0; i<system.molecules.size(); i++) {
                 for (int j=0; j<system.molecules[i].atoms.size(); j++) {
                     if (!system.molecules[i].atoms[j].frozen) {
-                    for (int n=0;n<3;n++) 
+                    for (int n=0;n<3;n++)
                         system.molecules[i].atoms[j].force[n] += system.constants.external_force_vector[n];
                     }
                 }
@@ -124,6 +132,7 @@ void integrate(System &system, double dt) {
     }
     // END IF DEBUG
 
+    // 1) MOVE ATOMS FROM FORCES/TORQUES
     system.checkpoint("moving particles based on forces.");
     // if molecular motion
     if (system.constants.md_mode == MD_MOLECULAR) {
@@ -190,20 +199,28 @@ void integrate(System &system, double dt) {
             }
         }
     } // end if atomic motion
+    if (system.constants.flexible_frozen) {
+        // ASSUMES THERE IS ONLY ONE "FROZEN" (MOF) MOLECULE
+        for (j=0; j<system.molecules[0].atoms.size(); j++) {
+            system.molecules[0].atoms[j].calc_pos(dt);
+        }
+    }
+    // end if frozen (MOF) is flexible
     // END POSITION CHANGES
     system.checkpoint("done moving particles. Checking PBC for all particles");
 
-    // 1b) CHECK P.B.C. (move the molecule/atom back in the box if needed)
+    // TODO -- MOVE THE BOX PARAMS IF MOF FLEXES NEAR/OUTSIDE THE BOX?
+    // 2) CHECK P.B.C. (move the molecule/atom back in the box if needed)
     if (system.constants.md_pbc && system.constants.md_translations) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
-                checkInTheBox(system,j); // also computes COM 
+                checkInTheBox(system,j); // also computes COM
             } // end if movable
 	    } // end loop j molecules
     } // end if PBC
 
     // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
-	system.checkpoint("done checking PBC. Starting calculateForces()");
+	  system.checkpoint("done checking PBC. Starting calculateForces()");
     calculateForces(system, dt);
     system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
 
@@ -236,13 +253,21 @@ void integrate(System &system, double dt) {
             }
         } // end if movable
     } // end for j molecules
+    if (system.constants.flexible_frozen) {
+        for (j=0; j<system.molecules[0].atoms.size(); j++) {
+          int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
+          system.molecules[0].atoms[j].calc_acc(nh, system.constants.lagrange_multiplier);
+          system.molecules[0].atoms[j].calc_vel(dt);
+        }
+    } // end flexible MOF dynamics
     system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
 
+    // TODO -- flexible MOF thermostat?
     // 5) apply heat bath in constant-temp ensembles
     if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) {
         if (system.constants.thermostat_type == THERMOSTAT_ANDERSEN) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
-        // this process makes the NVT MD simulation stochastic/ Markov / MC-like, 
+        // this process makes the NVT MD simulation stochastic/ Markov / MC-like,
         // which is usually good for obtaining equilibrium quantities.
         double probab = system.constants.md_thermostat_probab;
         double ranf;
@@ -275,15 +300,15 @@ void integrate(System &system, double dt) {
                                 sigma = system.proto[z].md_velx_goal;
                                 break;
                             }
-                        }   
+                        }
                         for (n=0; n<3; n++) {
                             system.molecules[i].vel[n] = gaussian(sigma);
                         }
                     }
                 }
             }
-        }
-        }
+        } // end if atomic mode
+        } // end Andersen thermostat
         // Rapaport p158-159
         else if (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {
             double vdotF_sum = 0;
@@ -307,10 +332,8 @@ void integrate(System &system, double dt) {
                 system.constants.lagrange_multiplier = -vdotF_sum / (mv2_sum/system.constants.kb*1e10);
             }
             // the lagrange multiplier will be applied in the integration calc (for acceleration).
-        } 
+        }
     } // end if uVT or NVT (thermostat)
     system.checkpoint("Done with heatbath if NVT/uVT.");
     system.checkpoint("Done with integrate() function.");
 }// end integrate() function
-
-

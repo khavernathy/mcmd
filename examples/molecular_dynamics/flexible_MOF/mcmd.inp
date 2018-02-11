@@ -1,0 +1,37 @@
+! Douglas Franz, Space group, USF, 2017      
+! Molcular dynamics example with multiple gases
+! NVT MOF-5 with 5 gases
+
+name              md_multigas_NVT_example        
+mode              md ! mc or md       
+checkpoints_option  off       
+       
+input_atoms ../../../atomfiles/MOF-5+co2+h2+ch4+water+ethane_flex.pdb         
+
+potential_form        ljes       
+com_option            off     ! center of mass        
+ 
+sorbate_name co2_phast* h2_bssp ch4_9site* h2o ethane
+
+carbasis 25.669 25.669 25.669 90 90 90
+
+temperature 295.0   
+ensemble nvt
+
+ewald_kmax 3
+histogram off
+
+
+
+flexible_frozen on
+
+       
+ ! MOLECULAR DYNAMICS ONLY ===============================     
+md_pbc              on
+md_dt             0.2  ! fs       
+md_ft             200000  ! fs        
+md_corrtime       1    ! steps        
+md_mode             molecular          
+md_rotations        on    
+
+

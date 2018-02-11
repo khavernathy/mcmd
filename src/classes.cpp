@@ -151,6 +151,8 @@ class Constants {
         int_fast8_t restart_mode = 0; // option to restart job automatically (by searching for restart.pdb)
         int_fast8_t no_zero_option = 0; // option to disallow zero sorbates in the simulation. default off.
         int_fast8_t simulated_annealing = 0; // sim. ann.
+        int_fast8_t flexible_frozen = 0; // enable flexible frozen molecules (e.g. MOFs, porous crystals)
+        int_fast8_t flexible_movables = 0; // enable flexible movables (e.g. gases, guest molecules, liquids)
         double sa_target = 0.0; // target temperature for annealing.
         double sa_schedule = 0.9999; // T-change factor for annealing.
         double free_volume=0; // for excess adsorption calculation, A^3. must be user-input

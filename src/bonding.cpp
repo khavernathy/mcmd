@@ -975,7 +975,10 @@ void findBonds(System &system) {
     unsigned int duplicateFlag=0; //bond dupes
     unsigned int duplicateAngleFlag=0; // angle dupes
     unsigned int duplicateDihFlag=0; // dihedral dupes
-    for (i=0; i<system.molecules.size(); i++) {
+    unsigned int molecule_limit = 1;
+    if (system.constants.flexible_movables) molecule_limit = system.molecules.size();
+
+    for (i=0; i<molecule_limit; i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
             // for each atom, we find its bonded neighbors by a distance search
@@ -1085,7 +1088,7 @@ void findBonds(System &system) {
 
 
     // get UFF atom labels for all atoms
-    for (i=0;i<system.molecules.size();i++) {
+    for (i=0;i<molecule_limit;i++) {
         for (j=0;j<system.molecules[i].atoms.size();j++) {
             // based on the total number of bonds to this atom,
             // determine the atom-type from UFF.
@@ -1098,9 +1101,9 @@ void findBonds(System &system) {
     unsigned int mol,qualified, y,z;
     double rlj;
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
-    for (mol=0; mol<system.molecules.size(); mol++) {
+    for (mol=0; mol<molecule_limit; mol++) {
         // all pairs inside the molecule
-        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
+        for (i=0; i<molecule_limit; i++) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
                 // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
                 qualified = 1;

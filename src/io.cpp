@@ -19,7 +19,7 @@
 
 /* xyz read-in of atoms */
 void readInAtomsXYZ(System &system, string filename) {
-    // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY). 
+    // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY).
     // check if it exists
         struct stat buffer;
         if (stat (filename.c_str(), &buffer) != 0) {
@@ -28,12 +28,12 @@ void readInAtomsXYZ(System &system, string filename) {
         }
 
     string line;
-	ifstream myfile (filename); 
+	ifstream myfile (filename);
 	if (myfile.is_open())
 	{
 		Molecule whatev;
         system.proto.push_back(whatev); // the first prototype (movable molecule type).
-		Molecule current_molecule;  
+		Molecule current_molecule;
 		system.molecules.push_back(whatev);
         int line_count=0;
         // loop through each line
@@ -44,14 +44,14 @@ void readInAtomsXYZ(System &system, string filename) {
 			copy(
 				istream_iterator<string>(iss),
 				istream_iterator<string>(),
-				back_inserter(myvector) 
+				back_inserter(myvector)
 			);
 
             line_count++;
             if (line_count == 1 && myvector.size() > 1) {
                 std::cout << "ERROR: The input_atoms_xyz file (" << filename.c_str() << ") is not a properly formatted .xyz file. The first line should be the total atom count only. Did you mean to use `input_atoms [.pdb file]`?"; printf("\n");
                 exit(EXIT_FAILURE);
-            }       
+            }
             if (line_count < 3) continue; // for .xyz, skip first 2 lines
             // skip blank lines
             if (myvector.size() != 0) {
@@ -109,7 +109,7 @@ void readInAtoms(System &system, string filename) {
         }
 
 	string line;
-	ifstream myfile (filename); 
+	ifstream myfile (filename);
 	if (myfile.is_open())
 	{
 		int current_mol_id=-1; // Initializer. Will be changed.
@@ -128,7 +128,7 @@ void readInAtoms(System &system, string filename) {
 			copy(
 				istream_iterator<string>(iss),
 				istream_iterator<string>(),
-				back_inserter(myvector) 
+				back_inserter(myvector)
 			);
 
             line_count++;
@@ -159,12 +159,12 @@ void readInAtoms(System &system, string filename) {
 
             if (11 < myvector.size() && myvector[11] != "default") current_atom.polar = stod(myvector[11]);
             else current_atom.polar = system.constants.polars[current_atom.name];
-            
+
             // Tang Toennies params. If TT is active, LJ epsilon is used for B; LJ sigma for A...
             if (14 < myvector.size()) current_atom.c6 = stod(myvector[14]);
             if (15 < myvector.size()) current_atom.c8 = stod(myvector[15]);
             if (16 < myvector.size()) current_atom.c10 = stod(myvector[16]);
-            
+
 
             current_atom.V = 0.0;
 			current_atom.PDBID = stoi(myvector[1]); // pulled from input pdb column 2
@@ -250,23 +250,23 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
     else totalatoms = system.constants.total_atoms;
 
     if (system.constants.com_option) totalatoms++;
-        
+
         myfile << to_string(totalatoms) + "\nFrame " + to_string(frame) + "; Step count: " + to_string(step) + "; Realtime (MD) = " + to_string(realtime) + "fs\n";
 
 	for (int j = 0; j < system.molecules.size(); j++) {
 		for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
-        if ((mover_only_flag && !system.molecules[j].atoms[i].frozen) || !mover_only_flag) {
-		myfile << system.molecules[j].atoms[i].name;
-		myfile <<  "   ";
-        // each coordinate has 9 decimal places, fill with zeros where needed.
-		myfile << std::fixed << std::setprecision(9) << system.molecules[j].atoms[i].pos[0];
-		myfile <<  "   ";
-		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[1];
-		myfile <<  "   ";
-		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[2];
-		myfile << "\n";
-		}
-        }
+        if ((mover_only_flag && !system.molecules[j].atoms[i].frozen) || mover_only_flag==0) {
+      		myfile << system.molecules[j].atoms[i].name;
+      		myfile <<  "   ";
+              // each coordinate has 9 decimal places, fill with zeros where needed.
+      		myfile << std::fixed << std::setprecision(9) << system.molecules[j].atoms[i].pos[0];
+      		myfile <<  "   ";
+      		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[1];
+      		myfile <<  "   ";
+      		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[2];
+      		myfile << "\n";
+		    }
+    }
 	}
 
 	if (system.constants.com_option) {
@@ -649,7 +649,7 @@ void writeThermo(System &system, double TE, double LKE, double RKE, double PE, d
 }
 
 void writeLAMMPSfiles(System &system) {
-    
+
     printf("\n\nWriting LAMMPS input files...\n");
 
     // first write the input file
@@ -667,10 +667,10 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f, "variable temperature equal %f\n", system.constants.temp);
     fprintf(f, "variable freq equal %i\n", (system.constants.mode == "mc")?system.constants.mc_corrtime : system.constants.md_corrtime);
     fprintf(f, "variable nstep equal %i\n", (system.constants.mode == "mc")?system.constants.finalstep : (int)ceil(system.constants.md_ft/system.constants.md_dt));
-    
+
     fprintf(f, "\n# some global params\nunits real\nboundary p p p\natom_style full\n\n# the atoms file\nread_data lammps.data\n\n");
-    // we need unique atoms list. 
-    vector<string> atomlabels;    
+    // we need unique atoms list.
+    vector<string> atomlabels;
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
             string theatom = system.molecules[i].atoms[j].name;
@@ -696,7 +696,7 @@ void writeLAMMPSfiles(System &system) {
                 }
             }
         }
-        fprintf(f, "mass %i %.5f #%s\n", x+1, mass, atomlabels[x].c_str());    
+        fprintf(f, "mass %i %.5f #%s\n", x+1, mass, atomlabels[x].c_str());
     }
     fprintf(f,"\n");
 
@@ -751,7 +751,7 @@ void writeLAMMPSfiles(System &system) {
         } // end molecule i loop
     } // end unique atom names loop
     fprintf(f, "group show type %s\n", showAtoms.c_str());
-    fprintf(f, "group hide type %s\n", hideAtoms.c_str());   
+    fprintf(f, "group hide type %s\n", hideAtoms.c_str());
 
 
     fprintf(f, "\n# exclusions\n");
@@ -770,17 +770,17 @@ void writeLAMMPSfiles(System &system) {
         idSort = idSort + " " + atomlabels[x].c_str();
     }
     fprintf(f, "# write files (dumps)\ndump Dump all xyz ${freq} lammps_traj.xyz\ndump_modify Dump sort id\ndump_modify Dump element %s\n\n", idSort.c_str());
-    
+
     fprintf(f, "# set NVT\n");
     fprintf(f, "velocity all create ${temperature} 12345 rot yes mom yes dist gaussian\n");
     fprintf(f, "fix rigid_nvt moving rigid/nvt molecule temp ${temperature} ${temperature} 100\n");
-    
+
     fprintf(f, "\n# run\nrun ${nstep}");
-    fclose(f); 
+    fclose(f);
     // DONE WITH LAMMPS INPUT FILE FOR MD SIMULATION. NOW WRITE THE .data FILE which contains
     // atoms, coords, box details, molecule assignment and charges
-    
-    FILE *f2 = fopen("lammps.data", "w");  //FILE* 
+
+    FILE *f2 = fopen("lammps.data", "w");  //FILE*
     fprintf(f2, "%s\n\n", system.constants.jobname.c_str());
     fprintf(f2, "%i atoms\n", system.constants.total_atoms);
     fprintf(f2, "%i atom types\n\n", (int)atomlabels.size());
@@ -881,7 +881,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "charge")) {
                 system.constants.user_charge = atoi(lc[1].c_str());
                 std::cout << "Got user-input charge = " << lc[1].c_str() << " e"; printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
                 if (lc[1] == "nvt") {
                     system.constants.ensemble = ENSEMBLE_NVT;
@@ -900,7 +900,7 @@ void readInput(System &system, char* filename) {
                     system.constants.ensemble_str = "NPT";
                 }
 				std::cout << "Got ensemble = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "bias_uptake") || !strcasecmp(lc[0].c_str(), "uptake_bias")) {
                 system.constants.bias_uptake = atof(lc[1].c_str());
                 if (lc.size() > 2) {
@@ -949,7 +949,7 @@ void readInput(System &system, char* filename) {
                 system.constants.fugacity_single_sorbate = lc[1];
                 if (lc[1] != "h2" && lc[1] != "co2" && lc[1] != "ch4" && lc[1] != "n2" && lc[1] != "off") {
                     std::cout << "ERROR: fugacity_single input not recognized. Available options are h2, co2, ch4, and n2.";
-                    std::exit(0);                    
+                    std::exit(0);
                 } else {
                     std::cout << "Got fugacity_single sorbate selection = " << lc[1].c_str(); printf("\n");
                 }
@@ -962,7 +962,7 @@ void readInput(System &system, char* filename) {
 
                 if (system.constants.readinxyz == 1)
                     std::cout << "Got xyz input file = " << lc[1].c_str(); printf("\n");
-                
+
             // BASIS STUFF.
             // If user inputs x_length, y_length, z_length, assume 90deg. angles
             } else if (!strcasecmp(lc[0].c_str(), "x_length")) {
@@ -1036,7 +1036,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "feynman_hibbs") || !strcasecmp(lc[0].c_str(), "fh")) {
 			    if (lc[1] == "on") system.constants.feynman_hibbs = 1;
                 std::cout << "Got Feynman-Hibbs correction option = " << lc[1].c_str(); printf("\n");
-           
+
             } else if (!strcasecmp(lc[0].c_str(), "feynman_hibbs_order") || !strcasecmp(lc[0].c_str(), "fh_order")) {
                 system.constants.fh_order = atoi(lc[1].c_str());
                 std::cout << "Got Feynman-Hibbs order = " << lc[1].c_str(); printf("\n");
@@ -1074,17 +1074,17 @@ void readInput(System &system, char* filename) {
 	        } else if (!strcasecmp(lc[0].c_str(), "dist_within_radius")) {
                 system.constants.dist_within_radius = atof(lc[1].c_str());
                 std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
-        
+
             } else if (!strcasecmp(lc[0].c_str(), "full_A_matrix_option") || !strcasecmp(lc[0].c_str(), "full_A_matrix")) {
                 if (lc[1] == "on")
                     system.constants.full_A_matrix_option=1;
                 std::cout << "Got full polarization A matrix option = " << lc[1].c_str(); printf("\n");
-            } else if (!strcasecmp(lc[0].c_str(), "auto_reject_option") || !strcasecmp(lc[0].c_str(), "auto_reject")) {    
+            } else if (!strcasecmp(lc[0].c_str(), "auto_reject_option") || !strcasecmp(lc[0].c_str(), "auto_reject")) {
                 if (lc[1] == "off") system.constants.auto_reject_option=0;
                 std::cout << "Got auto_reject_option = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "auto_reject_r")) {
-                system.constants.auto_reject_r = atof(lc[1].c_str()); 
+                system.constants.auto_reject_r = atof(lc[1].c_str());
                 std::cout << "Got auto-reject distance = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
@@ -1095,10 +1095,10 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got auto-center-atoms-to-origin option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "no_zero_option")) {
-                if (lc[1] == "on") 
+                if (lc[1] == "on")
                     system.constants.no_zero_option = 1;
                 std::cout << "Got no-zero-molecules-option = " << lc[1].c_str(); printf("\n");
-                
+
             } else if (!strcasecmp(lc[0].c_str(), "md_corrtime")) {
 				system.constants.md_corrtime = atoi(lc[1].c_str());
 				std::cout << "Got MD corrtime = " << lc[1].c_str(); printf("\n");
@@ -1141,7 +1141,7 @@ void readInput(System &system, char* filename) {
                     system.constants.polar_pbc = 0;
                     system.constants.all_pbc = 0;
                 }
-            } else if (!strcasecmp(lc[0].c_str(), "external_force")) { 
+            } else if (!strcasecmp(lc[0].c_str(), "external_force")) {
                 system.constants.md_external_force = 1;
                 for (int n=0;n<3;n++)
                     system.constants.external_force_vector[n] = atof(lc[n+1].c_str())/system.constants.kb/1e10/1e9; // convert from nN (semi-intuitive force)   to   K/A (MCMD force)
@@ -1222,14 +1222,18 @@ void readInput(System &system, char* filename) {
 				system.constants.output_traj = lc[1].c_str();
 				std::cout << "Got output trajectory XYZ filename = " << lc[1].c_str(); printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "output_traj_pdb")) {
+      } else if (!strcasecmp(lc[0].c_str(), "output_traj_pdb")) {
                 system.constants.output_traj_pdb = lc[1].c_str();
                 std::cout << "Got output trajectory PDB filename = " << lc[1].c_str(); printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "xyz_traj_option")) {
+      } else if (!strcasecmp(lc[0].c_str(), "xyz_traj_option")) {
                 if (lc[1] == "on") system.constants.xyz_traj_option = 1;
                 else system.constants.xyz_traj_option = 0;
                 std::cout << "Got XYZ trajectory output option = " << lc[1].c_str(); printf("\n");
+                
+      } else if (!strcasecmp(lc[0].c_str(), "pdb_traj_option")) {
+          if (lc[1] == "on") system.constants.pdb_traj_option = 1;
+          std::cout << "Got PDB trajectory output option = " < lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "vcp_factor")) {
 				system.constants.vcp_factor = atof(lc[1].c_str());
@@ -1238,14 +1242,14 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "displace_factor")) {
 				system.constants.displace_factor = atof(lc[1].c_str());
 				std::cout << "Got displace factor = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "big_pdb_traj")) {
                 if (lc[1] == "on") system.constants.pdb_bigtraj_option = 1;
                 std::cout << "Got Big PDB trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "big_xyz_traj")) {
                 if (lc[1] == "on") system.constants.xyz_traj_movers_option=0;
                 std::cout << "Got Big XYZ trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
-    
+
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
 				if (lc[1] == "lj")
 					system.constants.potential_form = POTENTIAL_LJ;
@@ -1257,9 +1261,9 @@ void readInput(System &system, char* filename) {
 					system.constants.potential_form = POTENTIAL_LJESPOLAR;
                 else if (lc[1] == "commy")
                     system.constants.potential_form = POTENTIAL_COMMY;
-                else if (lc[1] == "commyes") 
+                else if (lc[1] == "commyes")
                     system.constants.potential_form = POTENTIAL_COMMYES;
-                else if (lc[1] == "commyespolar") 
+                else if (lc[1] == "commyespolar")
                     system.constants.potential_form = POTENTIAL_COMMYESPOLAR;
                 else if (lc[1] == "tt")
                     system.constants.potential_form = POTENTIAL_TT;
@@ -1273,7 +1277,7 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "polar_max_iter")) {
 				system.constants.polar_max_iter = atoi(lc[1].c_str());
 				std::cout << "Got polarization iterations = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "polar_palmo")) {
                 if (lc[1] == "off") system.constants.polar_palmo = 0;
                 std::cout << "Got Palmo Polarization = " << lc[1].c_str(); printf("\n");
@@ -1307,7 +1311,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "The MD thermostat heat-bath collision probability = " << system.constants.md_thermostat_probab; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_ft")) {
-			    
+
                 // default fs
                 if (lc.size() < 3 || lc[2] == "!") system.constants.md_ft = atof(lc[1].c_str());
                 else if (lc[2] == "s") system.constants.md_ft = atof(lc[1].c_str())*1e15;
@@ -1328,9 +1332,9 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "md_translations")) {
                 if (lc[1] == "off") system.constants.md_translations = 0;
                 std::cout << "Got MD translations option = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "thermostat")) {
-                if (lc[1] == "andersen") 
+                if (lc[1] == "andersen")
                     system.constants.thermostat_type = THERMOSTAT_ANDERSEN;
                 else if (lc[1] == "nose-hoover")
                     system.constants.thermostat_type = THERMOSTAT_NOSEHOOVER;
@@ -1413,7 +1417,7 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "on") system.constants.pdb_long =1;
                 else system.constants.pdb_long = 0;
                 std::cout << "Got option for PDB long float output = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "manual_cutoff")) {
                 system.constants.manual_cutoff = 1;
                 system.constants.manual_cutoff_val = atof(lc[1].c_str());
@@ -1433,14 +1437,14 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_y")) {
                 system.constants.crystalbuild_y = atoi(lc[1].c_str());
                 std::cout << "Got crystal-builder in y = " << lc[1].c_str(); printf("\n");
-    
+
             } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_z")) {
                 system.constants.crystalbuild_z = atoi(lc[1].c_str());
                 std::cout << "Got crystal-builder in z = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "scale_charges")) {
                 system.constants.scale_charges = 1;
-                system.constants.scale_charges_factor = atof(lc[1].c_str()); 
+                system.constants.scale_charges_factor = atof(lc[1].c_str());
                 std::cout << "Got scale-charges option = on; factor = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "makefrags")) {
@@ -1470,7 +1474,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "opt_convergence") || !strcasecmp(lc[0].c_str(), "opt_error")) {
                 system.constants.opt_error = atof(lc[1].c_str());
                 std::cout << "Got optimization convergence = " << lc[1].c_str() << " kcal/mol."; printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "opt_step_limit")) {
                 system.constants.opt_step_limit = atoi(lc[1].c_str());
                 std::cout << "Got optimization step limit = " << lc[1].c_str() << " steps."; printf("\n");
@@ -1481,7 +1485,7 @@ void readInput(System &system, char* filename) {
                 else if (lc[1] == "sd")
                     system.constants.opt_mode = OPTIMIZE_SD;
                 std::cout << "Got optimization mode = " << lc[1].c_str(); printf("\n");
-            } else if (!strcasecmp(lc[0].c_str(), "opt_bonds")) { 
+            } else if (!strcasecmp(lc[0].c_str(), "opt_bonds")) {
                 if (lc[1] == "off")
                     system.constants.opt_bonds = 0;
                 std::cout << "Got optimization bond contributions = " << lc[1].c_str(); printf("\n");
@@ -1492,7 +1496,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got optimization angle contributions = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_dihedrals")) {
-                if (lc[1] == "off") 
+                if (lc[1] == "off")
                     system.constants.opt_dihedrals = 0;
                 std::cout << "Got optimization dihedral angle contributions = " << lc[1].c_str(); printf("\n");
 
@@ -1500,11 +1504,26 @@ void readInput(System &system, char* filename) {
                 if (lc[1] == "off")
                     system.constants.opt_LJ = 0;
                 std::cout << "Got optimization LJ non-bonding contributions = " << lc[1].c_str(); printf("\n");
-            
+
             } else if (!strcasecmp(lc[0].c_str(), "opt_ES")) {
                 if (lc[1] == "off")
                     system.constants.opt_ES = 0;
                 std::cout << "Got optimization ES non-bonding contributions = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "flexible_frozen")) {
+                if (lc[1] == "on") {
+                  system.constants.flexible_frozen = 1;
+                  system.constants.xyz_traj_movers_option=0; // we have to do this so the trajectory (including MOF) gets written fully
+                  system.constants.pdb_bigtraj_option = 1;   // and this
+                }
+                std::cout << "Got flexible frozen molecule option = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "flexible_movables")) {
+                if (lc[1] == "on") {
+                  system.constants.flexible_movables = 1;
+                }
+                std::cout << "Got flexible movables option = " << lc[1].c_str(); printf("\n");
+
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
 		} // end while reading lines
@@ -1547,7 +1566,7 @@ void paramOverrideCheck(System &system) {
                 system.molecules[i].atoms[j].eps = system.constants.eps[system.molecules[i].atoms[j].name.c_str()];
             }
         }
-        
+
     }
 
     // universal van Duijnen polarizability parameters
@@ -1585,9 +1604,9 @@ void write_dipole(System &system) {
 }
 
 void inputValidation(System &system) {
-    // check all the input and atoms and stuff to make sure we don't 
+    // check all the input and atoms and stuff to make sure we don't
     // get errors because the user is a noob
-    
+
     int e = system.constants.ensemble;
     int mcmd_flag;
     if (system.constants.mode == "sp" || system.constants.mode == "opt") mcmd_flag=0;
@@ -1642,7 +1661,7 @@ void inputValidation(System &system) {
     if (system.constants.mode == "md" && system.constants.md_mode == MD_ATOMIC) {
         std::cout << "ERROR: Atomic mode for MD is no longer supported. You can get the same result by assigning unique molecule IDs to all atoms in your atoms-input file.";
         exit(EXIT_FAILURE);
-    }        
+    }
     #ifndef CUDA  // if no cuda compilation, error out if user is asking for CUDA features
     if (system.constants.cuda) {
         std::cout << "ERROR: You set CUDA feature on but did not compile with CUDA resources. Use `bash compile.sh gpu`, for example.";
@@ -1657,13 +1676,13 @@ void inputValidation(System &system) {
     if (system.constants.charge_sum_check && mcmd_flag) {
     double qsum=0;
     for (int i=0; i<system.molecules.size(); i++)
-        for (int j=0; j<system.molecules[i].atoms.size(); j++) 
+        for (int j=0; j<system.molecules[i].atoms.size(); j++)
             qsum += system.molecules[i].atoms[j].C;
 
     if (fabs(qsum/system.constants.E2REDUCED) > 0.005 && // a little bit of lee-way for charge sum.
-        (system.constants.mode == "md" || system.constants.mc_pbc) &&      
+        (system.constants.mode == "md" || system.constants.mc_pbc) &&
         (system.constants.potential_form != POTENTIAL_LJ && system.constants.potential_form != POTENTIAL_COMMY)
-       ) 
+       )
     {
         std::cout << "ERROR: The sum of charges (" << qsum/system.constants.E2REDUCED << " e) on atoms is not zero. The system must be neutral for ewald summation to be correct.";
         exit(EXIT_FAILURE);
@@ -1715,6 +1734,10 @@ void inputValidation(System &system) {
     }
     if (system.constants.histogram_option && system.proto.size() > 1) {
         std::cout << "ERROR: Histogram is currently only available for single-sorbate systems. Use `histogram off` to fix this error.";
+        exit(EXIT_FAILURE);
+    }
+    if (system.constants.flexible_frozen && system.constants.mode != "md") {
+        std::cout << "ERROR: flexible frozen option is only available for MD simulations.";
         exit(EXIT_FAILURE);
     }
 

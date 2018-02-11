@@ -531,8 +531,9 @@ int main(int argc, char **argv) {
 	else if (system.constants.mode == "md") {
 
         // write initial XYZ
-        if (system.constants.xyz_traj_option)
+        if (system.constants.xyz_traj_option) {
             writeXYZ(system,system.constants.output_traj, 1, 0, 0, system.constants.xyz_traj_movers_option);
+        }
         int frame = 2; // weird way to initialize but it works for the output file.
         // and initial PDB
         writePDB(system,system.constants.restart_pdb);
@@ -541,6 +542,13 @@ int main(int argc, char **argv) {
 
         initialVelMD(system);
 	      // end initial velocities
+
+        if (system.constants.flexible_frozen) {
+          printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
+          findBonds(system);
+          setBondingParameters(system);
+          printBondParameters(system);
+        }
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
