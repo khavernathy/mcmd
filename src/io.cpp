@@ -1233,7 +1233,7 @@ void readInput(System &system, char* filename) {
                 
       } else if (!strcasecmp(lc[0].c_str(), "pdb_traj_option")) {
           if (lc[1] == "on") system.constants.pdb_traj_option = 1;
-          std::cout << "Got PDB trajectory output option = " < lc[1].c_str(); printf("\n");
+                std::cout << "Got PDB trajectory output option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "vcp_factor")) {
 				system.constants.vcp_factor = atof(lc[1].c_str());
