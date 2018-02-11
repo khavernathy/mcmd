@@ -142,6 +142,8 @@ bool qualify_bond(System &system, double r, unsigned int mol, unsigned int i, un
         return true;
     else if ((a1=="Ru" || a2=="Ru") && r <= 2.1) // Ru +2  complexes
         return true;
+    else if ((a1=="Co" || a2=="Co") && r <= 2.25) // Co complexes
+        return true;
     else if (r > bondlength)
         return false;
 
