@@ -1,12 +1,14 @@
 ! Douglas Franz, Space group, USF, 2017      
-! Molcular dynamics example with multiple gases
-! NVT MOF-5 with 5 gases
+! Flexible MOF dynamics (NVT)
+! Note, this is the same as the multisorb example
+! Except the input MOF has just elemental labels ("C" instead of "C1", e.g.)
+
 
 name              md_multigas_NVT_example        
 mode              md ! mc or md       
 checkpoints_option  off       
        
-input_atoms ../../../atomfiles/MOF-5+co2+h2+ch4+water+ethane_flex.pdb         
+input_atoms    /Users/douglasfranz/mcmd/atomfiles/MOF-5+co2+h2+ch4+water+ethane_flex.pdb         
 
 potential_form        ljes       
 com_option            off     ! center of mass        
@@ -21,10 +23,10 @@ ensemble nvt
 ewald_kmax 3
 histogram off
 
-
-
+! ============================================
+!   Here we turn on flexibility for the crystal
 flexible_frozen on
-
+! =============================================
        
  ! MOLECULAR DYNAMICS ONLY ===============================     
 md_pbc              on
@@ -33,5 +35,6 @@ md_ft             200000  ! fs
 md_corrtime       1    ! steps        
 md_mode             molecular          
 md_rotations        on    
+
 
 
