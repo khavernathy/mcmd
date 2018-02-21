@@ -1086,7 +1086,7 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_reject_r")) {
                 system.constants.auto_reject_r = atof(lc[1].c_str());
-                std::cout << "Got auto-reject distance = " << lc[1].c_str(); printf("\n");
+                std::cout << "Got auto-reject distance = " << lc[1].c_str() << " Angstroms."; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
                 if (lc[1] == "on")
