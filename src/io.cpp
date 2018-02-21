@@ -292,7 +292,8 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 void writePDBtraj(System &system, string restartfile, string trajfile, int step) {
     std::ifstream ifile(restartfile.c_str(), std::ios::in);
     std::ofstream ofile(trajfile.c_str(), std::ios::out | std::ios::app);
-
+    
+    if (system.stats.count_movables < 1) return; // don't write empty trajectory
     ofile << "REMARK step=" << step << "\n";
     ofile << "REMARK total_molecules=" << system.molecules.size() << ", total_atoms=" << system.constants.total_atoms << "\n";
     ofile << "REMARK frozen_molecules=" << system.stats.count_frozen_molecules << ", movable_molecules=" << system.stats.count_movables << "\n";
