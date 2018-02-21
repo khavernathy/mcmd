@@ -415,7 +415,7 @@ int main(int argc, char **argv) {
                 system.stats.es.average, system.stats.es.sd, system.stats.es.average/system.stats.potential.average *100); //, system.stats.es_real.average, system.stats.es_recip.average, system.stats.es_self.average);
 			printf("Polar avg =           %.5f +- %.5f K (%.2f %%); iterations = %.3f +- %.3f\n",
                 system.stats.polar.average, system.stats.polar.sd, system.stats.polar.average/system.stats.potential.average*100, system.stats.polar_iterations.average, system.stats.polar_iterations.sd);
-			printf("Total potential avg = %.5f +- %.5f K\n",system.stats.potential.average, system.stats.potential.sd);
+			printf("Total potential avg = %.5f +- %.5f K ( %.3f +- %.3f kJ/mol )\n",system.stats.potential.average, system.stats.potential.sd, system.stats.potential.average*system.constants.kb/1000.0*system.constants.NA, system.stats.potential.sd*system.constants.kb/1000.0*system.constants.NA);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
                 double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
