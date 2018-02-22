@@ -16,6 +16,44 @@
 #include <chrono>
 #include <math.h>
 #include <iomanip>
+using namespace std;
+
+
+string convertElement(System &system, string label) {
+string mystring = label;
+string my_sub_string;
+
+printf("input %s\n",mystring.c_str());
+
+for(int n=0; n<10; n++) {
+        printf("searching for %i\n",n);
+        string my_sub_string = to_string(n);
+
+        std::size_t found = mystring.find(my_sub_string);
+
+        if(found != std::string::npos) {
+                std::cout << found << endl;
+	//	if((int)found == 1) mystring = mystring.substr(0,1);
+                mystring = mystring.substr(0,(int)found);
+		printf("mystring after cut %s\n",mystring.c_str());
+        }
+
+}
+
+printf("before check 2  %s\n",mystring.c_str());
+
+if((int)(mystring.length()) == 2) {
+        string first = mystring.substr(0,1);
+        string second = mystring.substr(1,1);
+        std::transform(second.begin(), second.end(), second.begin(), ::tolower);
+        mystring = first + second;
+}
+
+
+printf("final %s\n",mystring.c_str());
+
+return mystring;
+}
 
 /* xyz read-in of atoms */
 void readInAtomsXYZ(System &system, string filename) {
@@ -61,10 +99,10 @@ void readInAtomsXYZ(System &system, string filename) {
 			Atom current_atom;
 			current_atom.name = myvector[0];
             // I have a database of defaults in classes.cpp
-            current_atom.m = system.constants.masses[current_atom.name];
-            current_atom.eps = system.constants.eps[current_atom.name];
-            current_atom.sig = system.constants.sigs[current_atom.name];
-            current_atom.polar = system.constants.polars[current_atom.name];
+            current_atom.m = system.constants.masses[convertElement(system,current_atom.name)];
+            current_atom.eps = system.constants.eps[convertElement(system,current_atom.name)];
+            current_atom.sig = system.constants.sigs[convertElement(system,current_atom.name)];
+            current_atom.polar = system.constants.polars[convertElement(system,current_atom.name)];
             //==============================================================
             current_atom.V = 0.0;
 			current_atom.PDBID = line_count - 2; // skipping first 2 lines
@@ -149,16 +187,16 @@ void readInAtoms(System &system, string filename) {
             // I have a database of defaults in classes.cpp
             // Those defaults will load unless the input column is there
             if (9 < myvector.size() && myvector[9] != "default") current_atom.m = stod(myvector[9])*system.constants.cM;
-            else current_atom.m = system.constants.masses[current_atom.name];
+            else current_atom.m = system.constants.masses[convertElement(system,current_atom.name)];
 
             if (12 < myvector.size() && myvector[12] != "default") current_atom.eps = stod(myvector[12]);
-            else current_atom.eps = system.constants.eps[current_atom.name];
+            else current_atom.eps = system.constants.eps[convertElement(system,current_atom.name)];
 
             if (13 < myvector.size() && myvector[13] != "default") current_atom.sig = stod(myvector[13]);
-            else current_atom.sig = system.constants.sigs[current_atom.name];
+            else current_atom.sig = system.constants.sigs[convertElement(system,current_atom.name)];
 
             if (11 < myvector.size() && myvector[11] != "default") current_atom.polar = stod(myvector[11]);
-            else current_atom.polar = system.constants.polars[current_atom.name];
+            else current_atom.polar = system.constants.polars[convertElement(system,current_atom.name)];
 
             // Tang Toennies params. If TT is active, LJ epsilon is used for B; LJ sigma for A...
             if (14 < myvector.size()) current_atom.c6 = stod(myvector[14]);
