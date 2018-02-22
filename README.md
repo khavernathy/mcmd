@@ -76,6 +76,8 @@ MCMD works out-of-the-box on <br />
 &emsp;-> Mac (tested on OS X El Capitan v10.11.6)<br />
 &emsp;-> Windows (tested using Cygwin and Windows 7 with gcc 5.4.0 installed)<br />
 &emsp;-> Raspberry Pi (3, using Raspian OS).<br /><br />
+
+# Visualization
 We recommend Visual Molecular Dynamics (VMD) for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, Ovito, etc.<br />
 
 # Publications
