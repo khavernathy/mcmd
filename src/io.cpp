@@ -884,19 +884,19 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got user-input charge = " << lc[1].c_str() << " e"; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "ensemble")) {
-                if (lc[1] == "nvt") {
+                if (!strcasecmp(lc[1].c_str(),"nvt")) {
                     system.constants.ensemble = ENSEMBLE_NVT;
                     system.constants.ensemble_str = "NVT";
                 }
-                else if (lc[1] == "nve") {
+                else if (!strcasecmp(lc[1].c_str(),"nve")) {
                     system.constants.ensemble = ENSEMBLE_NVE;
                     system.constants.ensemble_str = "NVE";
                 }
-                else if (lc[1] == "uvt") {
+                else if (!strcasecmp(lc[1].c_str(),"uvt")) {
                     system.constants.ensemble = ENSEMBLE_UVT;
                     system.constants.ensemble_str = "uVT";
                 }
-                else if (lc[1] == "npt") {
+                else if (!strcasecmp(lc[1].c_str(),"npt")) {
                     system.constants.ensemble = ENSEMBLE_NPT;
                     system.constants.ensemble_str = "NPT";
                 }
