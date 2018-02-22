@@ -868,6 +868,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got restart option. Restarting previous job from this directory."; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "mode")) {
+        std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
 				system.constants.mode = lc[1].c_str();
 				std::cout << "Got mode = " << lc[1].c_str(); printf("\n");
 
@@ -905,6 +906,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "bias_uptake") || !strcasecmp(lc[0].c_str(), "uptake_bias")) {
                 system.constants.bias_uptake = atof(lc[1].c_str());
                 if (lc.size() > 2) {
+                    std::transform(lc[2].begin(), lc[2].end(), lc[2].begin(), ::tolower);
                     system.constants.bias_uptake_unit = lc[2];
                     system.constants.bias_uptake_switcher=1;
                     std::cout << "Got uptake bias = " << lc[1].c_str() << " " << lc[2].c_str(); printf("\n");
@@ -913,11 +915,13 @@ void readInput(System &system, char* filename) {
                     exit(EXIT_FAILURE);
                 }
             } else if (!strcasecmp(lc[0].c_str(), "sorbate_name")) {
+                std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
                 system.constants.sorbate_name.push_back(lc[1].c_str());
                 std::cout << "Got sorbate model name 1 = " << lc[1].c_str(); printf("\n");
 
                 for (int i=2; i<=10; i++) { // so max sorbates is 10.
                     if (lc.size() >= (i+1)) {
+                        std::transform(lc[i].begin(), lc[i].end(), lc[i].begin(), ::tolower);
                         system.constants.sorbate_name.push_back(lc[i].c_str());
                         std::cout << "Got sorbate model name " << i << " = " << lc[i].c_str(); printf("\n");
                     }
@@ -948,6 +952,7 @@ void readInput(System &system, char* filename) {
             } else if (!strcasecmp(lc[0].c_str(), "fugacity_single") || !strcasecmp(lc[0].c_str(), "fugacity")) {
                 system.constants.fugacity_single = 1;
                 system.constants.fugacity_single_sorbate = lc[1];
+                std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
                 if (lc[1] != "h2" && lc[1] != "co2" && lc[1] != "ch4" && lc[1] != "n2" && lc[1] != "off") {
                     std::cout << "ERROR: fugacity_single input not recognized. Available options are h2, co2, ch4, and n2.";
                     std::exit(0);
@@ -1256,6 +1261,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got Big XYZ trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
+        std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
 				if (lc[1] == "lj")
 					system.constants.potential_form = POTENTIAL_LJ;
 				else if (lc[1] == "ljes")
@@ -1318,15 +1324,18 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "md_ft")) {
 
                 // default fs
-                if (lc.size() < 3 || lc[2] == "!") system.constants.md_ft = atof(lc[1].c_str());
-                else if (lc[2] == "s") system.constants.md_ft = atof(lc[1].c_str())*1e15;
-                else if (lc[2] == "ms") system.constants.md_ft = atof(lc[1].c_str())*1e12;
-                else if (lc[2] == "us") system.constants.md_ft = atof(lc[1].c_str())*1e9;
-                else if (lc[2] == "ns") system.constants.md_ft = atof(lc[1].c_str())*1e6;
-                else if (lc[2] == "ps") system.constants.md_ft = atof(lc[1].c_str())*1e3;
-                else if (lc[2] == "fs") system.constants.md_ft = atof(lc[1].c_str());
-                else system.constants.md_ft = atof(lc[1].c_str());
 
+                if (lc.size() < 3 || lc[2] == "!") system.constants.md_ft = atof(lc[1].c_str());
+                else {
+                  std::transform(lc[2].begin(), lc[2].end(), lc[2].begin(), ::tolower);
+                  if (lc[2] == "s") system.constants.md_ft = atof(lc[1].c_str())*1e15;
+                  else if (lc[2] == "ms") system.constants.md_ft = atof(lc[1].c_str())*1e12;
+                  else if (lc[2] == "us") system.constants.md_ft = atof(lc[1].c_str())*1e9;
+                  else if (lc[2] == "ns") system.constants.md_ft = atof(lc[1].c_str())*1e6;
+                  else if (lc[2] == "ps") system.constants.md_ft = atof(lc[1].c_str())*1e3;
+                  else if (lc[2] == "fs") system.constants.md_ft = atof(lc[1].c_str());
+                  else system.constants.md_ft = atof(lc[1].c_str());
+                }
                 std::cout << "Got MD final step = " << system.constants.md_ft << " fs"; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_rotations")) {
@@ -1339,6 +1348,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD translations option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "thermostat")) {
+                std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
                 if (lc[1] == "andersen")
                     system.constants.thermostat_type = THERMOSTAT_ANDERSEN;
                 else if (lc[1] == "nose-hoover")
@@ -1485,6 +1495,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got optimization step limit = " << lc[1].c_str() << " steps."; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_mode")) {
+                std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
                 if (lc[1] == "mc")
                     system.constants.opt_mode = OPTIMIZE_MC;
                 else if (lc[1] == "sd")
