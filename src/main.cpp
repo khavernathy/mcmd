@@ -270,7 +270,7 @@ int main(int argc, char **argv) {
                 inc++;
                 if (inc%3==0) blocksize+=3;
             }
-            memreqA = (double)sizeof(double)*((3*system.constants.total_atoms*3*system.constants.total_atoms - 3*system.constants.total_atoms)/2.0)/(double)1e6;
+            memreqA = (double)sizeof(double)*((N*N - N)/2.0)/(double)1e6;
         // full matrix
         } else {
             system.constants.A_matrix_full = (double **) calloc(N, sizeof(double*));

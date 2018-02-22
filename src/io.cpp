@@ -292,7 +292,7 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
 void writePDBtraj(System &system, string restartfile, string trajfile, int step) {
     std::ifstream ifile(restartfile.c_str(), std::ios::in);
     std::ofstream ofile(trajfile.c_str(), std::ios::out | std::ios::app);
-    
+
     if (system.stats.count_movables < 1) return; // don't write empty trajectory
     ofile << "REMARK step=" << step << "\n";
     ofile << "REMARK total_molecules=" << system.molecules.size() << ", total_atoms=" << system.constants.total_atoms << "\n";
@@ -872,7 +872,7 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got mode = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "cuda")) {
-                if (lc[1] == "on")
+                if (!strcasecmp(lc[1].c_str(),"on"))
                     system.constants.cuda = 1;
                 std::cout << "Got CUDA option = " << lc[1].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "cuda_block_size")) {
@@ -1035,7 +1035,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "feynman_hibbs") || !strcasecmp(lc[0].c_str(), "fh")) {
-			    if (lc[1] == "on") system.constants.feynman_hibbs = 1;
+			    if (!strcasecmp(lc[1].c_str(),"on")) system.constants.feynman_hibbs = 1;
                 std::cout << "Got Feynman-Hibbs correction option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "feynman_hibbs_order") || !strcasecmp(lc[0].c_str(), "fh_order")) {
@@ -1063,7 +1063,7 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "dist_within")) {
-                if (lc[1] == "on")
+                if (!strcasecmp(lc[1].c_str(),"on"))
                     system.constants.dist_within_option = 1;
                 else system.constants.dist_within_option = 0;
                 std::cout << "Got dist_within option = " << lc[1].c_str(); printf("\n");
@@ -1077,11 +1077,15 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got dist_within_radius = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "full_A_matrix_option") || !strcasecmp(lc[0].c_str(), "full_A_matrix")) {
-                if (lc[1] == "on")
+                if (!strcasecmp(lc[1].c_str(),"on")) {
                     system.constants.full_A_matrix_option=1;
+                }
+                else if (!strcasecmp(lc[1].c_str(),"off")) {
+                    system.constants.full_A_matrix_option=0;
+                }
                 std::cout << "Got full polarization A matrix option = " << lc[1].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "auto_reject_option") || !strcasecmp(lc[0].c_str(), "auto_reject")) {
-                if (lc[1] == "off") system.constants.auto_reject_option=0;
+                if (!strcasecmp(lc[1].c_str(),"off")) system.constants.auto_reject_option=0;
                 std::cout << "Got auto_reject_option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_reject_r")) {
@@ -1089,14 +1093,14 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got auto-reject distance = " << lc[1].c_str() << " Angstroms."; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "auto_center")) {
-                if (lc[1] == "on")
+                if (!strcasecmp(lc[1].c_str(),"on"))
                     system.constants.autocenter = 1;
                 else
                     system.constants.autocenter = 0;
                 std::cout << "Got auto-center-atoms-to-origin option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "no_zero_option")) {
-                if (lc[1] == "on")
+                if (!strcasecmp(lc[1].c_str(),"on"))
                     system.constants.no_zero_option = 1;
                 std::cout << "Got no-zero-molecules-option = " << lc[1].c_str(); printf("\n");
 
@@ -1116,7 +1120,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD mode = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "md_pbc")) {
-                if (lc[1] == "on") {
+                if (!strcasecmp(lc[1].c_str(),"on")) {
                     system.constants.md_pbc = 1;
                     system.constants.all_pbc =1;
                 }
@@ -1127,7 +1131,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD PBC option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "mc_pbc")) {
-                if (lc[1] == "on") {
+                if (!strcasecmp(lc[1].c_str(),"on")) {
                     system.constants.mc_pbc = 1;
                     system.constants.all_pbc = 1;
                 }
@@ -1153,7 +1157,7 @@ void readInput(System &system, char* filename) {
                 system.constants.external_force_vector[2]);
 
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing")) {
-                if (lc[1] == "on") system.constants.simulated_annealing = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.simulated_annealing = 1;
                 else system.constants.simulated_annealing = 0;
                 std::cout << "Got simulated annealing option = " << lc[1].c_str(); printf("\n");
 
@@ -1174,12 +1178,12 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got step offset = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "draw_box_option")) {
-                if (lc[1] == "on") system.constants.draw_box_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.draw_box_option = 1;
                 else system.constants.draw_box_option = 0;
                 std::cout << "Got draw-box-option for PDB output = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "histogram")) {
-                if (lc[1] == "on") system.constants.histogram_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.histogram_option = 1;
                 else system.constants.histogram_option = 0;
                 std::cout << "Got histogram option = " << lc[1].c_str(); printf("\n");
 
@@ -1211,7 +1215,7 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got volume change factor = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "rotate_option")) {
-				if (lc[1] == "on") system.constants.rotate_option = 1;
+				if (!strcasecmp(lc[1].c_str(),"on")) system.constants.rotate_option = 1;
                 else system.constants.rotate_option = 0;
 				std::cout << "Got rotate option = " << lc[1].c_str(); printf("\n");
 
@@ -1228,12 +1232,12 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got output trajectory PDB filename = " << lc[1].c_str(); printf("\n");
 
       } else if (!strcasecmp(lc[0].c_str(), "xyz_traj_option")) {
-                if (lc[1] == "on") system.constants.xyz_traj_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.xyz_traj_option = 1;
                 else system.constants.xyz_traj_option = 0;
                 std::cout << "Got XYZ trajectory output option = " << lc[1].c_str(); printf("\n");
-                
+
       } else if (!strcasecmp(lc[0].c_str(), "pdb_traj_option")) {
-          if (lc[1] == "on") system.constants.pdb_traj_option = 1;
+          if (!strcasecmp(lc[1].c_str(),"on")) system.constants.pdb_traj_option = 1;
                 std::cout << "Got PDB trajectory output option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "vcp_factor")) {
@@ -1245,10 +1249,10 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got displace factor = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "big_pdb_traj")) {
-                if (lc[1] == "on") system.constants.pdb_bigtraj_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.pdb_bigtraj_option = 1;
                 std::cout << "Got Big PDB trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "big_xyz_traj")) {
-                if (lc[1] == "on") system.constants.xyz_traj_movers_option=0;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.xyz_traj_movers_option=0;
                 std::cout << "Got Big XYZ trajectory option (includes frozens every step) = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
@@ -1280,7 +1284,7 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got polarization iterations = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "polar_palmo")) {
-                if (lc[1] == "off") system.constants.polar_palmo = 0;
+                if (!strcasecmp(lc[1].c_str(),"off")) system.constants.polar_palmo = 0;
                 std::cout << "Got Palmo Polarization = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "polar_precision") || !strcasecmp(lc[0].c_str(), "dipole_precision")) {
@@ -1288,7 +1292,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got required dipole precision (for iterative routine) = " << lc[1].c_str() << " Debye."; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "com_option")) {
-				if (lc[1] == "on") system.constants.com_option = 1;
+				if (!strcasecmp(lc[1].c_str(),"on")) system.constants.com_option = 1;
                 else system.constants.com_option = 0;
 				std::cout << "Got center-of-mass option = " << lc[1].c_str(); printf("\n");
 
@@ -1297,7 +1301,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got free volume = " << lc[1].c_str() << " A^3."; printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "write_lammps") || !strcasecmp(lc[0].c_str(), "lammps_write")) {
-                if (lc[1] == "on") {
+                if (!strcasecmp(lc[1].c_str(),"on")) {
                     system.constants.write_lammps = 1;
                 }
                 std::cout << "Got LAMMPS input file write option = " << lc[1].c_str(); printf("\n");
@@ -1326,12 +1330,12 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got MD final step = " << system.constants.md_ft << " fs"; printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "md_rotations")) {
-                if (lc[1] == "on") system.constants.md_rotations = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.md_rotations = 1;
                 else system.constants.md_rotations = 0;
                 std::cout << "Got MD rotations option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "md_translations")) {
-                if (lc[1] == "off") system.constants.md_translations = 0;
+                if (!strcasecmp(lc[1].c_str(),"off")) system.constants.md_translations = 0;
                 std::cout << "Got MD translations option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "thermostat")) {
@@ -1349,15 +1353,15 @@ void readInput(System &system, char* filename) {
 				system.constants.eps_override[lc[1]] = atof(lc[2].c_str());
 				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str() << " K."; printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "lj_uff")) {
-                if (lc[1] == "on") system.constants.lj_uff = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.lj_uff = 1;
                 std::cout << "Got LJ UFF option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "vand_polar")) {
-                if (lc[1] == "on") system.constants.polars_vand = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.polars_vand = 1;
                 std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str();
 
 			} else if (!strcasecmp(lc[0].c_str(), "radial_dist")) {
-                if (lc[1] == "on") system.stats.radial_dist = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.stats.radial_dist = 1;
                 else system.stats.radial_dist = 0;
                 std::cout << "Got radial distribution option = " << lc[1].c_str(); printf("\n");
 
@@ -1388,7 +1392,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got radial dist. file = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "checkpoints_option") || !strcasecmp(lc[0].c_str(), "checkpoints")) {
-                if (lc[1] == "on") system.constants.checkpoints_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.checkpoints_option = 1;
                 else system.constants.checkpoints_option = 0;
                 std::cout << "Got checkpoints option = " << lc[1].c_str(); printf("\n");
 
@@ -1397,17 +1401,17 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got NVE total energy constant = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "rd_lrc")) {
-                if (lc[1] == "on") system.constants.rd_lrc = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.rd_lrc = 1;
                 else system.constants.rd_lrc = 0;
                 std::cout << "Got RD long range correction option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "ewald_es")) {
-                if (lc[1] == "on") system.constants.ewald_es = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.ewald_es = 1;
                 else system.constants.ewald_es = 0;
                 std::cout << "Got Ewald electrostatics option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "kspace_option")) {
-                if (lc[1] == "on") system.constants.kspace_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.kspace_option = 1;
                 std::cout << "Got Ewald Force k-space option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "ewald_kmax")) {
@@ -1415,7 +1419,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got Ewald kmax = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "pdb_long")) {
-                if (lc[1] == "on") system.constants.pdb_long =1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.pdb_long =1;
                 else system.constants.pdb_long = 0;
                 std::cout << "Got option for PDB long float output = " << lc[1].c_str(); printf("\n");
 
@@ -1424,11 +1428,11 @@ void readInput(System &system, char* filename) {
                 system.constants.manual_cutoff_val = atof(lc[1].c_str());
                 std::cout << "Got manual pair-interaction spherical cutoff = " << lc[1].c_str() << " A.";printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "crystalbuild")) {
-                if (lc[1] == "on") system.constants.crystalbuild = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.crystalbuild = 1;
                 std::cout << "Got crystal-builder option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_includemovers")) {
-                if (lc[1] == "on") system.constants.crystalbuild_includemovers = 1;
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.crystalbuild_includemovers = 1;
                 std::cout << "Got crystal-builder include movable molecules option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "crystalbuild_x")) {
@@ -1465,7 +1469,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got fragment (initial/default) bond-length = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "charge_sum_check")) {
-                if (lc[1] == "off") system.constants.charge_sum_check = 0;
+                if (!strcasecmp(lc[1].c_str(),"off")) system.constants.charge_sum_check = 0;
                 std::cout << "Got charge sum check option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "bondlength")) {
@@ -1487,32 +1491,32 @@ void readInput(System &system, char* filename) {
                     system.constants.opt_mode = OPTIMIZE_SD;
                 std::cout << "Got optimization mode = " << lc[1].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "opt_bonds")) {
-                if (lc[1] == "off")
+                if (!strcasecmp(lc[1].c_str(),"off"))
                     system.constants.opt_bonds = 0;
                 std::cout << "Got optimization bond contributions = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_angles")) {
-                if (lc[1] == "off")
+                if (!strcasecmp(lc[1].c_str(),"off"))
                     system.constants.opt_angles = 0;
                 std::cout << "Got optimization angle contributions = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_dihedrals")) {
-                if (lc[1] == "off")
+                if (!strcasecmp(lc[1].c_str(),"off"))
                     system.constants.opt_dihedrals = 0;
                 std::cout << "Got optimization dihedral angle contributions = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_LJ")) {
-                if (lc[1] == "off")
+                if (!strcasecmp(lc[1].c_str(),"off"))
                     system.constants.opt_LJ = 0;
                 std::cout << "Got optimization LJ non-bonding contributions = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "opt_ES")) {
-                if (lc[1] == "off")
+                if (!strcasecmp(lc[1].c_str(),"off"))
                     system.constants.opt_ES = 0;
                 std::cout << "Got optimization ES non-bonding contributions = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "flexible_frozen")) {
-                if (lc[1] == "on") {
+                if (!strcasecmp(lc[1].c_str(),"on")) {
                   system.constants.flexible_frozen = 1;
                   system.constants.xyz_traj_movers_option=0; // we have to do this so the trajectory (including MOF) gets written fully
                   system.constants.pdb_bigtraj_option = 1;   // and this
@@ -1520,7 +1524,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got flexible frozen molecule option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "flexible_movables")) {
-                if (lc[1] == "on") {
+                if (!strcasecmp(lc[1].c_str(),"on")) {
                   system.constants.flexible_movables = 1;
                 }
                 std::cout << "Got flexible movables option = " << lc[1].c_str(); printf("\n");
