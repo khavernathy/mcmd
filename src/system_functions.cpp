@@ -445,7 +445,7 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "CO2";
                 system.proto[i].dof = 5;
             }
-            else if (sorbmodel == "co2_phast*") {
+            else if (sorbmodel == "co2_phast*" || sorbmodel == "co2_phastp") {
                 addAtomToProto(system, i, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.77134, 1.22810, 19.61757, 3.03366);
                 addAtomToProto(system, i, "COE", "CO2", "M", 1.162, 0.0, 0.0, 15.9994, -0.38567, 0.73950, 0.0, 0.0);
                 addAtomToProto(system, i, "COE", "CO2", "M", -1.162, 0.0, 0.0, 15.9994, -0.38567, 0.73950, 0.0, 0.0);
