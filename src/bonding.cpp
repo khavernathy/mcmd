@@ -10,6 +10,35 @@
 
 using namespace std;
 
+string convertElement(System &system, string label) {
+    string mystring = label;
+    string my_sub_string;
+
+    //printf("input %s\n",mystring.c_str());
+    for(int n=0; n<10; n++) {
+            //printf("searching for %i\n",n);
+            string my_sub_string = to_string(n);
+
+            std::size_t found = mystring.find(my_sub_string);
+
+            if(found != std::string::npos) {
+                    std::cout << found << endl;
+    	//	if((int)found == 1) mystring = mystring.substr(0,1);
+                    mystring = mystring.substr(0,(int)found);
+    		//printf("mystring after cut %s\n",mystring.c_str());
+            }
+    }
+  //  printf("before check 2  %s\n",mystring.c_str());
+    if((int)(mystring.length()) == 2) {
+            string first = mystring.substr(0,1);
+            string second = mystring.substr(1,1);
+            std::transform(second.begin(), second.end(), second.begin(), ::tolower);
+            mystring = first + second;
+    }
+  //  printf("final %s\n",mystring.c_str());
+    return mystring;
+}
+
 bool find_cycle(System &system, unsigned int mol, unsigned int i) {
 
     unsigned int b1,b2,b3,b4,b5,b6;
@@ -49,6 +78,7 @@ bool find_cycle(System &system, unsigned int mol, unsigned int i) {
 // function to determine UFF atom-type based on
 // name of element and number of bonds
 string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
+    name = convertElement(system,name); // convert weird names like C12 to C
     // starting with just the organic-y atom-types.
     if (name == "H") {
         return "H_"; // assume it's never H_b (borane hydrogen)

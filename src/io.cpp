@@ -18,43 +18,6 @@
 #include <iomanip>
 using namespace std;
 
-
-string convertElement(System &system, string label) {
-string mystring = label;
-string my_sub_string;
-
-printf("input %s\n",mystring.c_str());
-
-for(int n=0; n<10; n++) {
-        printf("searching for %i\n",n);
-        string my_sub_string = to_string(n);
-
-        std::size_t found = mystring.find(my_sub_string);
-
-        if(found != std::string::npos) {
-                std::cout << found << endl;
-	//	if((int)found == 1) mystring = mystring.substr(0,1);
-                mystring = mystring.substr(0,(int)found);
-		printf("mystring after cut %s\n",mystring.c_str());
-        }
-
-}
-
-printf("before check 2  %s\n",mystring.c_str());
-
-if((int)(mystring.length()) == 2) {
-        string first = mystring.substr(0,1);
-        string second = mystring.substr(1,1);
-        std::transform(second.begin(), second.end(), second.begin(), ::tolower);
-        mystring = first + second;
-}
-
-
-printf("final %s\n",mystring.c_str());
-
-return mystring;
-}
-
 /* xyz read-in of atoms */
 void readInAtomsXYZ(System &system, string filename) {
     // FOR THIS WE ASSUME ALL ATOMS BELONG TO THE MOF (FROZEN ONLY).
