@@ -22,6 +22,7 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
 
     return sigma*SQRT2*erfInverse(ranf); //  + displacement;
     // my green notebook ("Space Group Research #2") has notes on this in 2nd divider.
+    // highlighted in yellow..
 }
 
 
