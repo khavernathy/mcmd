@@ -1371,7 +1371,7 @@ void readInput(System &system, char* filename) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.constants.polars_vand = 1;
                 std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str();
 
-			} else if (!strcasecmp(lc[0].c_str(), "radial_dist")) {
+			} else if (!strcasecmp(lc[0].c_str(), "radial_dist") || !strcasecmp(lc[0].c_str(), "radial_distribution")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.stats.radial_dist = 1;
                 else system.stats.radial_dist = 0;
                 std::cout << "Got radial distribution option = " << lc[1].c_str(); printf("\n");
