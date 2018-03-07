@@ -645,7 +645,7 @@ class Stats {
         // these are the instances of the "observables type" obs_t.
         // i.e. all the quantities of interest which can be averaged and dealt with.
         } Nsq,NU,qst,qst_nvt,
-          rd,es,polar, // all energies in K unless otherwise stated
+          rd,es,polar,bonded, // all energies in K unless otherwise stated
           potential,potential_sq,
           kinetic, kinetic_sq,
           totalE, totalE_sq,

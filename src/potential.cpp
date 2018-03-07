@@ -24,7 +24,11 @@ double getTotalPotential(System &system) {
 
     // initializers
     double total_potential=0;
-    double total_rd=0.0; double total_es = 0.0; double total_polar=0.0;
+    double total_rd=0.0; 
+    double total_es = 0.0; 
+    double total_polar=0.0;
+    double total_bonded=0.0;
+
     system.constants.auto_reject=0;
 
 // =========================================================================
@@ -59,15 +63,21 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
         }
 
     }
+
+    // BONDED TERMS
+    if (system.constants.flexible_frozen)
+        total_bonded = totalBondedEnergy(system);    
+
 }
 // ==========================================================================
 
-    total_potential = total_rd + total_es + total_polar;
+    total_potential = total_rd + total_es + total_polar + total_bonded;
 
     // save values to system vars
     system.stats.rd.value = total_rd;
     system.stats.es.value = total_es;
     system.stats.polar.value = total_polar;
+    system.stats.bonded.value = total_bonded;
     system.stats.potential.value = total_potential;
     system.stats.potential_sq.value = total_potential*total_potential;
 
