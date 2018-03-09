@@ -29,6 +29,7 @@ double gaussian(double sigma) { // sigma is SD of the gaussian curve
 void calculateForces(System &system, double dt) {
   int_fast8_t model = system.constants.potential_form;
 
+    //system.checkpoint("Calculating forces.");
     // loop through all atoms
 	for (int j=0; j <system.molecules.size(); j++) {
 	for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
@@ -60,13 +61,19 @@ void calculateForces(System &system, double dt) {
                 coulombic_real_force(system);
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
                 polarization_force(system);
-            if (system.constants.flexible_frozen) {
-                  morse_gradient(system);
-                  angle_bend_gradient(system);
-                  torsions_gradient(system);
-                  LJ_intramolec_gradient(system);
-                  if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) // only if electrostatics is on.
-                    ES_intramolec_gradient(system);
+            if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
+                  if (system.constants.opt_bonds)
+                    morse_gradient(system);
+                  if (system.constants.opt_angles)
+                    angle_bend_gradient(system);
+                  if (system.constants.opt_dihedrals)
+                    torsions_gradient(system);
+                  // TODO ---- HANDLE UNIQUELY IDENTIFIED (QUALIFIED) MOF PAIRS FOR THESE FORCES INSTEAD OF ABOVE^ FUNCTIONS
+                  
+                  //if (system.constants.opt_LJ)
+                  //  LJ_intramolec_gradient(system);
+                  //if ((model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) && system.constants.opt_ES) // only if electrostatics is on.
+                  //  ES_intramolec_gradient(system);
             }
         } // end if PBC
     // GPU style
@@ -113,6 +120,7 @@ void calculateForces(System &system, double dt) {
             }
         } // end if molecular else atomic
     } // end if EXTERNAL force
+    //system.checkpoint("Done calculating forces.");
 } // end force function.
 
 // ==================== MOVE ATOMS MD STYLE =========================
@@ -140,7 +148,6 @@ void integrate(System &system, double dt) {
         double prevangpos[3];
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
-
             // TRANSLATION
             if (system.constants.md_translations)
                 system.molecules[j].calc_pos(dt);
@@ -200,10 +207,20 @@ void integrate(System &system, double dt) {
             }
         }
     } // end if atomic motion
+    else if (system.constants.md_mode == MD_FLEXIBLE) {
+        for (i=0;i<system.molecules.size();i++) {
+            if (system.molecules[i].frozen) continue;
+            for (j=0;j<system.molecules[i].atoms.size();j++) {
+                system.molecules[i].atoms[j].calc_pos(dt);
+            }
+        }
+    }
+
+    // flexible "frozen" (MOF) atoms integration
     if (system.constants.flexible_frozen) {
         // ASSUMES THERE IS ONLY ONE "FROZEN" (MOF) MOLECULE
-        for (j=0; j<system.molecules[0].atoms.size(); j++) {
-            system.molecules[0].atoms[j].calc_pos(dt);
+        for (i=0; i<system.molecules[0].atoms.size(); i++) {
+            system.molecules[0].atoms[i].calc_pos(dt);
         }
     }
     // end if frozen (MOF) is flexible
@@ -221,11 +238,12 @@ void integrate(System &system, double dt) {
     } // end if PBC
 
     // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
-	  system.checkpoint("done checking PBC. Starting calculateForces()");
+	system.checkpoint("done checking PBC. Starting calculateForces()");
     calculateForces(system, dt);
     system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
 
     // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
+    // 4a) MOVABLES
     for (j=0; j<system.molecules.size(); j++) {
 		if (!system.molecules[j].frozen) { // only movable atoms should move.
 
@@ -252,11 +270,20 @@ void integrate(System &system, double dt) {
                     system.molecules[j].calc_ang_vel(dt);
                 }
             }
+            // or flexible molecules
+            else if (system.constants.md_mode == MD_FLEXIBLE) {
+                int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
+                    for (i=0;i<system.molecules[j].atoms.size();i++) {
+                        system.molecules[j].atoms[i].calc_acc(nh, system.constants.lagrange_multiplier);
+                        system.molecules[j].atoms[i].calc_vel(dt);
+                    }
+            }
         } // end if movable
     } // end for j molecules
+    // 4b) Flexible "frozen" (MOF) atoms
     if (system.constants.flexible_frozen) {
+        int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
         for (j=0; j<system.molecules[0].atoms.size(); j++) {
-          int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
           system.molecules[0].atoms[j].calc_acc(nh, system.constants.lagrange_multiplier);
           system.molecules[0].atoms[j].calc_vel(dt);
         }
@@ -275,7 +302,7 @@ void integrate(System &system, double dt) {
         double sigma;
         if (system.constants.md_mode == MD_MOLECULAR && system.constants.md_translations) {
         for (i=0; i<system.molecules.size(); i++) {
-            if (system.molecules[i].frozen) continue; // skip frozens
+            if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue; // skip frozens
             ranf = getrand(); // 0 -> 1
             if (ranf < probab) {
                 for (int z=0; z<system.proto.size(); z++) {
@@ -293,7 +320,7 @@ void integrate(System &system, double dt) {
         } else if (system.constants.md_mode == MD_ATOMIC) {
             for (i =0; i<system.molecules.size(); i++) {
                 for (j=0; j<system.molecules[i].atoms.size(); j++) {
-                    if (system.molecules[i].atoms[j].frozen) continue; // skip frozen atoms
+                    if (system.molecules[i].atoms[j].frozen && !system.constants.flexible_frozen) continue; // skip frozen atoms
                     ranf = getrand(); // 0 -> 1
                     if (ranf <probab) {
                         for (int z=0; z<system.proto.size(); z++) {
@@ -316,7 +343,7 @@ void integrate(System &system, double dt) {
             double mv2_sum = 0;
             if (system.constants.md_mode == MD_MOLECULAR) {
                 for (i=0; i<system.molecules.size(); i++) {
-                    if (system.molecules[i].frozen) continue;
+                    if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                     vdotF_sum += dddotprod(system.molecules[i].vel, system.molecules[i].force);
                     mv2_sum += system.molecules[i].mass * dddotprod(system.molecules[i].vel, system.molecules[i].vel);
                 }
@@ -324,7 +351,7 @@ void integrate(System &system, double dt) {
             }
             else if (system.constants.md_mode == MD_ATOMIC) {
                 for (i=0; i<system.molecules.size(); i++) {
-                    if (system.molecules[i].frozen) continue;
+                    if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                     for (j=0; j<system.molecules[i].atoms.size(); j++) {
                         vdotF_sum += dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].force);
                         mv2_sum += system.molecules[i].atoms[j].m * dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);

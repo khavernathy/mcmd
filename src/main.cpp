@@ -543,7 +543,7 @@ int main(int argc, char **argv) {
         initialVelMD(system);
 	      // end initial velocities
 
-        if (system.constants.flexible_frozen) {
+        if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
           printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
           findBonds(system);
           setBondingParameters(system);
@@ -571,7 +571,7 @@ int main(int argc, char **argv) {
         system.stats.MDtime = t;
 
         // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
-        if (system.stats.count_movables > 0)
+        if (system.stats.count_movables > 0 || system.constants.flexible_frozen)
             integrate(system,dt);
 
         if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
@@ -602,7 +602,7 @@ int main(int argc, char **argv) {
                 if (t != dt) update_root_histogram(system);
             }
 
-            if (system.stats.count_movables > 0) {
+            if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
             // get KE and PE and T at this step.
             double* ETarray = calculateObservablesMD(system);
             KE = ETarray[0] * system.constants.K2KJMOL;
@@ -685,7 +685,7 @@ int main(int argc, char **argv) {
                   PE
                   );
             if (system.constants.ensemble == ENSEMBLE_NVE)
-                printf("Total E = %.3f :: error = %.3f kJ/mol\n", TE, system.constants.md_NVE_err);
+                printf("Total E = %.3f :: error = %.3f kJ/mol ( %.3f %% )\n", TE, system.constants.md_NVE_err, system.constants.md_NVE_err/(fabs(system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL)*100.);
             else
                 printf("Total E = %.3f kJ/mol\n", TE);
             printf("Average v = %.2f m/s; v_init = %.2f m/s\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",

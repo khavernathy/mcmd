@@ -81,7 +81,7 @@ void computeInitialValues(System &system) {
 		system.stats.density[i].average = system.stats.density[i].value;
     }
 
-    // WT % 
+    // WT %
     for (i=0; i<system.proto.size(); i++) {
         system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
@@ -205,7 +205,7 @@ void computeAverages(System &system) {
     double tmp=0;
     if (system.constants.temp>0) tmp = -(system.stats.potential.value)/system.constants.temp; // K/K = unitless
     if (tmp < 10) system.stats.Q.value += exp(tmp);
-    
+
 system.stats.Q.value += exp(-system.stats.potential.value / system.constants.temp); // K/K = unitless
 
     // QST
@@ -253,10 +253,10 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
             system.stats.wtp[i].calcNewStats();
             system.stats.wtpME[i].calcNewStats();
-            
+
             double mm = system.proto[i].mass * 1000 * system.constants.NA; // molar mass
             double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
-            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) / 
+            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /
             frozmm;  // to mg/g
 
         system.stats.excess[i].calcNewStats();
@@ -383,10 +383,10 @@ void computeAveragesMDuVT(System &system) {
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
             system.stats.wtp[i].calcNewStats();
             system.stats.wtpME[i].calcNewStats();
-            
+
             double mm = system.proto[i].mass * 1000 * system.constants.NA; // molar mass
             double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
-            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) / 
+            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /
             frozmm;  // to mg/g
 
         system.stats.excess[i].calcNewStats();
@@ -409,7 +409,7 @@ void computeAveragesMDuVT(System &system) {
 double * calculateObservablesMD(System &system) { // the * is to return an array of doubles as a pointer, not just one double
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
-    
+
     double avg_v_ALL=0;
 	double T=0.0, pressure=0;
     double vsq=0., wsq=0.;
@@ -421,7 +421,7 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
     int N_local[(int)system.proto.size()];
 
 
-    if (system.stats.count_movables > 0) { // DON'T BOTHER FOR NO MOVERS
+    //if (system.stats.count_movables > 0) { // DON'T BOTHER FOR NO MOVERS
     // grab fixed potential energy of system
         // from PBC (same as Monte Carlo potential)
         if (system.constants.md_pbc) {
@@ -438,6 +438,7 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
         system.stats.Ulin.value = system.stats.potential.value;
 
     // KINETIC ENERGIES, VELOCITIES, ETC. BY MOLECULE TYPE
+    if(system.stats.count_movables > 0) {
     for (z = 0; z<system.proto.size(); z++) {
         v2_sum[z] = 0;
         v_sum[z] = 0;
@@ -478,10 +479,10 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
                         Krot += energy_holder;
                     } // end if rotations
                 } // end if molecular motion
-                else if (system.constants.md_mode == MD_ATOMIC) {
+                else if (system.constants.md_mode == MD_ATOMIC || system.constants.md_mode == MD_FLEXIBLE) {
                     for (j=0; j<system.molecules[i].atoms.size(); j++) {
                         vsq=0;
-                        for (n=0; n<3; n++) 
+                        for (n=0; n<3; n++)
                             vsq += system.molecules[i].atoms[j].vel[n] * system.molecules[i].atoms[j].vel[n];
                         v_sum[z] += sqrt(vsq); // sum velocities
                         v2_sum[z] += vsq;
@@ -491,29 +492,48 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
                     } // end for atoms j in molecule i
                 } // end if atomic motion
             } // end if prototype z
-        } // end molecule loop 
+        } // end molecule loop
     } // end prototype loop
+    } // end if > 0 movers
+    // flexible "frozen" MOF
+    if (system.constants.flexible_frozen) {
+       // printf("hi\n");
+      // ASSUME ONLY 1 FROZEN MOLECULE with ID 0
+      double vsq_tmp = 0;
+      for (j=0;j<system.molecules[0].atoms.size();j++) {
+        vsq_tmp = 0;
+        for (n=0;n<3;n++) vsq_tmp += system.molecules[0].atoms[j].vel[n] * system.molecules[0].atoms[j].vel[n];
+    //    printf("atom %i : vsq = %f m = %e\n", j, vsq_tmp, system.molecules[0].atoms[j].m);
+        energy_holder = 0.5*system.molecules[0].atoms[j].m * vsq_tmp;
+        K_total += energy_holder;
+        Klin += energy_holder;
+     //   printf("K tot = %e klin = %e \n", K_total,Klin);
+      }
+    } // end if flexible frozen.
 
-    // get Temperature. Frenkel p64 and p84 
+
+    // get Temperature. Frenkel p64 and p84
     // each sorbate has its own contribution to total T,
     // scaled by representation N_sorb/N_total
+    // TODO --- integrate the movable MOF temperature here by its D.O.F.
     for (int z=0; z<system.proto.size(); z++) {
         if (N_local[z] < 1) continue; // no contribution from N=0 sorbates
         double Tcontrib = 1e10*v2_sum[z]*system.proto[z].mass/N_local[z]/system.proto[z].dof/system.constants.kb;
         Tcontrib *= ((double)N_local[z]/system.stats.count_movables); // ratio of this type N to total N
         T += Tcontrib;
         //printf("Nlocal: %i, system N: %i, mass: %e, v2_sum: %f, dof: %i\n", N_local[z], system.stats.count_movables, system.proto[z].mass, v2_sum[z], system.proto[z].dof);
-        //printf("T from proto %i: %f K \n", z, Tcontrib); 
+        //printf("T from proto %i: %f K \n", z, Tcontrib);
     }
-    
+
     system.stats.temperature.value = T;
     system.stats.temperature.calcNewStats();
 
     for (int z=0; z<system.proto.size(); z++)
-        avg_v_ALL += (v_sum[z]/N_local[z])*(N_local[z]/(double)system.stats.count_movables);   
+        avg_v_ALL += (v_sum[z]/N_local[z])*(N_local[z]/(double)system.stats.count_movables);
 
 
     // fix units
+    //printf("k total = %f\n",K_total);
     K_total = K_total/system.constants.kb * 1e10; // convert to K
     system.stats.kinetic.value = K_total;
     system.stats.kinetic.calcNewStats();
@@ -544,7 +564,7 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
         double T = system.stats.temperature.value;
         double T2 = system.stats.temperature.value*T;
         double N = (double)system.stats.count_movables;
-        double Kflux = kb2*(system.stats.kinetic_sq.average - system.stats.kinetic.average*system.stats.kinetic.average);     
+        double Kflux = kb2*(system.stats.kinetic_sq.average - system.stats.kinetic.average*system.stats.kinetic.average);
 
         system.stats.heat_capacity.value = 4.*N/(9.*kb3*T2);
         system.stats.heat_capacity.value *= (Kflux - 3.*kb2*T2/(2.*N));
@@ -561,21 +581,21 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
     if (T>0) {
         tmp = -(K_total+V_total)/T; // K/K = unitless
         if (tmp < 10) system.stats.Q.value += exp(tmp);
-        //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T)); 
+        //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T));
     }
 
 
-    } // end skipping if N=0
+  //  } // end skipping if N=0
 	static double output[8];
-	output[0] = K_total; 
+	output[0] = K_total;
     output[1] = V_total;
 	output[2] = T;
     output[3] = avg_v_ALL;
     output[4] = Ek;
     output[5] = Klin;
-    output[6] = Krot; 
+    output[6] = Krot;
     output[7] = pressure;
-	
+
     // first step
     if (system.constants.ensemble == ENSEMBLE_NVE) {
         if (system.stats.MDtime == system.constants.md_dt) {
@@ -585,4 +605,3 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
     }
     return output;
 }
-

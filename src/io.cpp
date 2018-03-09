@@ -1123,6 +1123,9 @@ void readInput(System &system, char* filename) {
                     system.constants.md_mode = MD_ATOMIC;
                 else if (lc[1] == "molecular")
                     system.constants.md_mode = MD_MOLECULAR;
+                else if (lc[1] == "flexible") {
+                    system.constants.md_mode = MD_FLEXIBLE;
+                }
                 std::cout << "Got MD mode = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "md_pbc")) {
@@ -1535,12 +1538,6 @@ void readInput(System &system, char* filename) {
                 }
                 std::cout << "Got flexible frozen molecule option = " << lc[1].c_str(); printf("\n");
 
-            } else if (!strcasecmp(lc[0].c_str(), "flexible_movables")) {
-                if (!strcasecmp(lc[1].c_str(),"on")) {
-                  system.constants.flexible_movables = 1;
-                }
-                std::cout << "Got flexible movables option = " << lc[1].c_str(); printf("\n");
-
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
 			} // end if line not blank
 		} // end while reading lines
@@ -1675,10 +1672,10 @@ void inputValidation(System &system) {
         std::cout << "ERROR: You cannot use the Nose-Hoover (default) thermostat in NVT MD with a user-defined initial velocity (initial velocities must be determined automatically for this thermostat). Try deleting the line `md_init_vel XXXXX` in the input.";
         exit(EXIT_FAILURE);
     }
-    if (system.constants.mode == "md" && system.constants.md_mode == MD_ATOMIC) {
-        std::cout << "ERROR: Atomic mode for MD is no longer supported. You can get the same result by assigning unique molecule IDs to all atoms in your atoms-input file.";
-        exit(EXIT_FAILURE);
-    }
+    //if (system.constants.mode == "md" && system.constants.md_mode == MD_ATOMIC) {
+    //    std::cout << "ERROR: Atomic mode for MD is no longer supported. You can get the same result by assigning unique molecule IDs to all atoms in your atoms-input file.";
+    //    exit(EXIT_FAILURE);
+    //}
     #ifndef CUDA  // if no cuda compilation, error out if user is asking for CUDA features
     if (system.constants.cuda) {
         std::cout << "ERROR: You set CUDA feature on but did not compile with CUDA resources. Use `bash compile.sh gpu`, for example.";
@@ -1706,8 +1703,8 @@ void inputValidation(System &system) {
     }
     } // end q-check
 
-    if (system.constants.mode == "md" && system.constants.ensemble != ENSEMBLE_UVT && system.stats.count_movables <= 0) {
-        std::cout << "ERROR: MD is turned on but there are no movables molecules in the input (and ensemble is not uVT). (Use 'M' as opposed to 'F' to distinguish movers from frozens)";
+    if (system.constants.mode == "md" && system.constants.ensemble != ENSEMBLE_UVT && system.stats.count_movables <= 0 && !(system.constants.flexible_frozen && system.stats.count_frozens > 0)) {
+        std::cout << "ERROR: MD is turned on but there are no movable molecules in the input (and ensemble is not uVT). (Use 'M' as opposed to 'F' to distinguish movers from frozens)";
         exit(EXIT_FAILURE);
     }
     // single-atom movers-only check for MD rotation

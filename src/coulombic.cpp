@@ -65,7 +65,7 @@ double coulombic_self(System &system) {
     for (int i=0; i<system.molecules.size(); i++) {
         for (int j=0; j<system.molecules[i].atoms.size(); j++) {
 
-            if (!system.molecules[i].atoms[j].frozen &&
+            if ((!system.molecules[i].atoms[j].frozen) &&
                 system.molecules[i].atoms[j].C != 0) {
                 charge = system.molecules[i].atoms[j].C;
                 potential -= alpha* charge * charge / sqrtPI;
@@ -93,7 +93,7 @@ double coulombic_real(System &system) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i; k < system.molecules.size(); k++) {
     for (int l = 0; l < system.molecules[k].atoms.size(); l++) {
-        if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // skip frozens
+        if ((system.molecules[i].frozen && system.molecules[k].frozen)) continue; // skip frozens
         if (system.molecules[i].atoms[j].C == 0 || system.molecules[k].atoms[l].C == 0) continue; // skip 0-energy
 
         pair_potential = 0;
@@ -137,7 +137,7 @@ void coulombic_force_nopbc(System &system) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i+1; k < system.molecules.size(); k++) {
     for (int l = 0; l < system.molecules[k].atoms.size(); l++) {
-    if (!(system.molecules[i].frozen && system.molecules[k].frozen) &&
+    if ((!(system.molecules[i].frozen && system.molecules[k].frozen)) &&
         !(system.molecules[i].atoms[j].C == 0 || system.molecules[i].atoms[j].C == 0) ) { // don't do frozen-frozen or zero charge
 
         charge1 = system.molecules[i].atoms[j].C;
@@ -215,7 +215,7 @@ void coulombic_real_force(System &system) {  // units of K/A
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int ka = 0; ka < system.molecules.size(); ka++) {
     for (int la = 0; la < system.molecules[ka].atoms.size(); la++) {
-    if (!(system.molecules[i].frozen && system.molecules[ka].frozen) &&
+    if ((!(system.molecules[i].frozen && system.molecules[ka].frozen)) &&
         !(system.molecules[i].atoms[j].C == 0 || system.molecules[ka].atoms[la].C == 0) ) { // don't do frozen-frozen or zero charge
 
         charge1 = system.molecules[i].atoms[j].C;

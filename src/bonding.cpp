@@ -1008,7 +1008,7 @@ void findBonds(System &system) {
     unsigned int duplicateAngleFlag=0; // angle dupes
     unsigned int duplicateDihFlag=0; // dihedral dupes
     unsigned int molecule_limit = 1;
-    if (system.constants.flexible_movables) molecule_limit = system.molecules.size();
+    if (system.constants.md_mode == MD_FLEXIBLE) molecule_limit = system.molecules.size();
 
     for (i=0; i<molecule_limit; i++) {
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
@@ -1266,10 +1266,10 @@ double totalBondedEnergy(System &system) {
         system.stats.Ubonded_tot.value += angle_bend_energy(system);
     if (system.constants.opt_dihedrals)
         system.stats.Ubonded_tot.value += torsions_energy(system);
-    if (system.constants.opt_LJ)
-        system.stats.Ubonded_tot.value += LJ_intramolec_energy(system);
-    if (system.constants.opt_ES)
-        system.stats.Ubonded_tot.value += ES_intramolec_energy(system);
+    //if (system.constants.opt_LJ)
+    //    system.stats.Ubonded_tot.value += LJ_intramolec_energy(system);
+    //if (system.constants.opt_ES)
+    //    system.stats.Ubonded_tot.value += ES_intramolec_energy(system);
 
     return system.stats.Ubonded_tot.value;
 }

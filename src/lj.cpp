@@ -146,7 +146,7 @@ double lj(System &system) {
         for (k=0; k <system.molecules.size(); k++) {
         for (l=0; l <system.molecules[k].atoms.size(); l++) {
 
-        if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // skip frozens
+        if ((system.molecules[i].frozen && system.molecules[k].frozen)) continue; // skip frozens
         if (i<k || (i==k && j<l)) {
 
         // do mixing rules

@@ -652,6 +652,14 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "H2O";
                 system.proto[i].dof = 6;
             }
+            else if (sorbmodel == "h2o_franz") {
+                addAtomToProto(system,i,"OXY",  "H2O", "M", 0.000,   0.000,   0.000, 15.99900, -0.73000,  0.52800, 78.50225,  3.59600); 
+                addAtomToProto(system,i,"HYD","H2O", "M",-0.816 , -0.577,   0.000,  1.00790,  0.36500,  0.17000,  22.14, 2.571);
+                addAtomToProto(system,i,"HYD","H2O", "M",   0.816,  -0.577,   0.000,  1.00790,  0.36500,  0.17000,  22.14, 2.571);
+                system.proto[i].name = "H2O";
+                system.proto[i].dof = 6;
+            }
+
             // SULFUR DIOXIDE -- Peng et al. http://pubs.acs.org/doi/pdf/10.1021/acs.jpcc.7b01925 (Table 1)
             else if (sorbmodel == "so2") {
                 addAtomToProto(system,i,"SUL", "SO2", "M", 0.00000, 0.00000, 0.0, 32.060, 0.4700, 2.4744476, 154.4, 3.585);

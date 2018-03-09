@@ -111,7 +111,7 @@ void printBondParameters(System &system) {
   printf("================================================================================\n");
   printf("mol-id :: atom-id :: element :: UFF-label :: num-bonds\n");
   int molecule_limit = 1;
-  if (system.constants.flexible_movables) molecule_limit = system.molecules.size();
+  if (system.constants.md_mode == MD_FLEXIBLE) molecule_limit = system.molecules.size();
   for (int i=0; i<molecule_limit; i++) {
       for (int j=0; j<system.molecules[i].atoms.size(); j++) {
           printf("%6i :: %7i :: %7s :: %9s :: %9i\n",

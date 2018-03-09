@@ -65,7 +65,7 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     }
 
     // BONDED TERMS
-    if (system.constants.flexible_frozen)
+    if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE)
         total_bonded = totalBondedEnergy(system);    
 
 }
