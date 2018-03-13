@@ -1405,6 +1405,9 @@ void readInput(System &system, char* filename) {
                 system.stats.radial_file = lc[1].c_str();
                 std::cout << "Got radial dist. file = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "radial_exclude_molecules")) {
+                if (!strcasecmp(lc[1].c_str(),"off")) system.stats.radial_exclude_molecules = 0;
+                std::cout << "Got radial distribution exclusion of intramolecular pairs = " << lc[1].c_str(); printf("\n");
             } else if (!strcasecmp(lc[0].c_str(), "checkpoints_option") || !strcasecmp(lc[0].c_str(), "checkpoints")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.constants.checkpoints_option = 1;
                 else system.constants.checkpoints_option = 0;
