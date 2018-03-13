@@ -63,6 +63,7 @@ void radialDist(System &system) {
                      && ((system.molecules[i].atoms[j].name == centroid && system.molecules[k].atoms[l].name == counterpart)
                      || (system.molecules[i].atoms[j].name == counterpart && system.molecules[k].atoms[l].name == centroid))) 
                     {
+                        if (system.stats.radial_exclude_molecules && i==k) continue; // exclude self-molecule interactions
                         double* distances = getDistanceXYZ(system, i, j, k, l);
                         double r = distances[3];     
                         if (r < max_dist) {

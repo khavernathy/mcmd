@@ -906,6 +906,7 @@ double LJ_intramolec_energy(System &system) {
 
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
+                    if (r > system.pbc.cutoff) continue;
                     sr6 = sig/r;
                     sr6 *= sr6;
                     sr6 *= sr6*sr6;
@@ -934,6 +935,7 @@ double LJ_intramolec_gradient(System &system) {
         if (eps==0 || sig==0) continue; // skip 0-contributions
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
+                    if (r > system.pbc.cutoff) continue;
                     rsq= r*r;
                     r6 = rsq*rsq*rsq;
                     s6 = sig*sig;
@@ -967,7 +969,8 @@ double ES_intramolec_energy(System &system) {
 
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
-                    potential += qq/r;
+                    if (r > system.pbc.cutoff) continue;
+                        potential += qq/r;
     }
 
     system.stats.UintraES.value = potential;
@@ -988,6 +991,7 @@ double ES_intramolec_gradient(System &system) {
 
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
+                    if (r > system.pbc.cutoff) continue;
                     for (int n=0;n<3;n++) {
                         system.molecules[mol].atoms[i].force[n] += distances[n]*qq/(r*r*r);
                         system.molecules[mol].atoms[j].force[n] -= distances[n]*qq/(r*r*r);

@@ -55,6 +55,7 @@
 #include "io.cpp"
 #include "optimize.cpp"
 #include "radial_dist.cpp"
+#include "observables.cpp"
 #include "averages.cpp"
 #include "histogram.cpp"
 

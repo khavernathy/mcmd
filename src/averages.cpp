@@ -511,20 +511,7 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
       }
     } // end if flexible frozen.
 
-
-    // get Temperature. Frenkel p64 and p84
-    // each sorbate has its own contribution to total T,
-    // scaled by representation N_sorb/N_total
-    // TODO --- integrate the movable MOF temperature here by its D.O.F.
-    for (int z=0; z<system.proto.size(); z++) {
-        if (N_local[z] < 1) continue; // no contribution from N=0 sorbates
-        double Tcontrib = 1e10*v2_sum[z]*system.proto[z].mass/N_local[z]/system.proto[z].dof/system.constants.kb;
-        Tcontrib *= ((double)N_local[z]/system.stats.count_movables); // ratio of this type N to total N
-        T += Tcontrib;
-        //printf("Nlocal: %i, system N: %i, mass: %e, v2_sum: %f, dof: %i\n", N_local[z], system.stats.count_movables, system.proto[z].mass, v2_sum[z], system.proto[z].dof);
-        //printf("T from proto %i: %f K \n", z, Tcontrib);
-    }
-
+    T = calcTemperature(system, N_local, v2_sum);
     system.stats.temperature.value = T;
     system.stats.temperature.calcNewStats();
 

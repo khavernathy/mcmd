@@ -349,7 +349,7 @@ void integrate(System &system, double dt) {
                 }
                 system.constants.lagrange_multiplier = -vdotF_sum / (mv2_sum/system.constants.kb*1e10);
             }
-            else if (system.constants.md_mode == MD_ATOMIC) {
+            else if (system.constants.md_mode == MD_ATOMIC || system.constants.md_mode == MD_FLEXIBLE) {
                 for (i=0; i<system.molecules.size(); i++) {
                     if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                     for (j=0; j<system.molecules[i].atoms.size(); j++) {

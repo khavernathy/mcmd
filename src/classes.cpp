@@ -381,6 +381,7 @@ class Pbc {
               printf(":: x_max = %.5f; y_max = %.5f; z_max = %.5f\n", x_max, y_max, z_max);
               printf(":: x_min = %.5f; y_min = %.5f; z_min = %.5f\n", x_min, y_min, z_min);
             }
+            printf(":: Volume = %.5f A^3\n",volume);
             printf(":: --- End box information --- ::\n\n");
         }
 
@@ -436,7 +437,7 @@ class Pbc {
             double newvolume;
             newvolume =  basis[0][0]*(basis[1][1]*basis[2][2] - basis[1][2]*basis[2][1]);
             newvolume += basis[0][1]*(basis[1][2]*basis[2][0] - basis[1][0]*basis[2][2]);
-            newvolume += basis[0][2]*(basis[1][0]*basis[2][1] - basis[2][1]*basis[2][0]);
+            newvolume += basis[0][2]*(basis[1][0]*basis[2][1] - basis[1][1]*basis[2][0]);
             volume = newvolume;
             inverse_volume = 1.0/volume;
         }
@@ -597,6 +598,7 @@ class Stats {
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
 
         int_fast8_t radial_dist = 0; // default is no radial distribution
+        int_fast8_t radial_exclude_molecules = 1; // option to exclude intramolecular distances from g(r). default on
         string radial_file = "radial_distribution.dat"; // default filename for output.
         double radial_bin_size = 0.1; // bin counts will be considered for this range in A
         double radial_max_dist = 10.0; // maximum r to consider in rad. dist.
@@ -754,6 +756,7 @@ class Atom {
         double efield_induced_change[3] = {0,0,0};
         //double energy_grad[3] = {0,0,0};
         double dipole_rrms=0;
+        double md_velx_goal=0;
 
         /*vector<double> force = vector<double>(3); // force, K / A */ // old, slower way to store 3-value vectors.
 
