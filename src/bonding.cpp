@@ -1270,10 +1270,11 @@ double totalBondedEnergy(System &system) {
         system.stats.Ubonded_tot.value += angle_bend_energy(system);
     if (system.constants.opt_dihedrals)
         system.stats.Ubonded_tot.value += torsions_energy(system);
-    //if (system.constants.opt_LJ)
-    //    system.stats.Ubonded_tot.value += LJ_intramolec_energy(system);
-    //if (system.constants.opt_ES)
-    //    system.stats.Ubonded_tot.value += ES_intramolec_energy(system);
-
+    if (system.constants.mode == "opt") {
+        if (system.constants.opt_LJ)
+            system.stats.Ubonded_tot.value += LJ_intramolec_energy(system);
+        if (system.constants.opt_ES)
+            system.stats.Ubonded_tot.value += ES_intramolec_energy(system);
+    }
     return system.stats.Ubonded_tot.value;
 }

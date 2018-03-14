@@ -803,9 +803,10 @@ int main(int argc, char **argv) {
         printf("|   BEGINNING STRUCTURE OPTIMIZATION   |\n");
         printf("| ==================================== |\n\n");
 
-        if (system.pbc.a==0 && system.pbc.b==0 && system.pbc.c==0 && system.pbc.alpha==0 && system.pbc.beta==0 && system.pbc.gamma==0)
+        if (system.pbc.a==0 && system.pbc.b==0 && system.pbc.c==0 && system.pbc.alpha==0 && system.pbc.beta==0 && system.pbc.gamma==0) {
             system.constants.all_pbc=0; // force no PBC if no box given
-
+            system.pbc.cutoff = 25.0; // default cutoff
+        }
         printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
         findBonds(system);
         setBondingParameters(system);
