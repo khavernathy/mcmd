@@ -41,6 +41,8 @@ Douglas Franz: dfranz@mail.usf.edu
 University of South Florida
 Dept. of Chemistry
 
+[![MCMD](https://img.youtube.com/vi/rSj4Q_VtO-Y/0.jpg)](https://www.youtube.com/watch?v=rSj4Q_VtO-Y)
+
 # Features
 &emsp;-> Monte Carlo simulation in NPT, NVT, NVE, and &mu;VT ensembles.  <br />
 &emsp;-> Molecular Dynamics simulation in NVT, NVE, and &mu;VT ensembles.  <br />
