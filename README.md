@@ -10,17 +10,17 @@ On HPC clusters, you may need to load a compiler module first:  <br />
 &emsp;-> `module load gcc/6.3.0` (bridges) <br />
 -->
 Using a terminal,<br />
-0) (On Windows only) Get the <a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Linux Subsystem</a> (or equivalent software, e.g. CygWin): 
-1) Download: <br />
+0. (On Windows only) Get the <a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Linux Subsystem</a> (or equivalent software, e.g. CygWin): 
+1. Download: <br />
 `git clone https://github.com/khavernathy/mcmd` or <a href="https://github.com/khavernathy/mcmd/archive/master.zip">download .zip file</a><br />
 
-2) Compile: <br />
+2. Compile: <br />
 `cd mcmd` <br />
 `cd src` <br />
 `bash compile.sh   [ options ]` <br />
 `cd ..` <br />
 
-3) Run: <br />
+3. Run: <br />
 `./mcmd mcmd.inp`<br /><br />  
   
 # Update
