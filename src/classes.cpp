@@ -497,6 +497,8 @@ class Pbc {
         }
 
         void calcNormalBasis() {
+                // this was somewhat helpful..
+                // http://lammps.sandia.gov/doc/Section_howto.html
                 double b0[3] = {0,0,0};
                 double b1[3] = {0,0,0};
                 double b2[3] = {0,0,0};
@@ -507,7 +509,7 @@ class Pbc {
 
                 b1[0] = 0;
                 b1[1] = b*sin(M_PI/180.0 * gamma);
-                b1[2] = ( (0*0 + b*0 + 0*c) - (b0[1]*b0[2]) )/b1[1];
+                b1[2] = ( (b*c*cos(M_PI/180.0*alpha) ) - (b0[1]*b0[2]) )/b1[1];
 
                 b2[0] = 0;
                 b2[1] = 0;

@@ -1257,6 +1257,12 @@ void setupCrystalBuild(System &system) {
         double origb = system.pbc.b;
         double origc = system.pbc.c;
 
+        double orig_basis[3][3];
+        for (int i=0; i<3; i++)
+            for (int j=0; j<3; j++)
+                orig_basis[i][j] = system.pbc.basis[i][j];
+
+
         // assumes ONE frozen molecule!!
         int size = (int)system.molecules.size();
         int asize=0;
@@ -1276,11 +1282,15 @@ void setupCrystalBuild(System &system) {
             system.pbc.a += origa;
             system.pbc.calcNormalBasis(); 
             setupBox(system);
+            
             for (i =0; i <size; i++) {
                 if (system.molecules[i].frozen ) {
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        newatom.pos[0] += xlen*(iter+1);
+                        
+                        for (int n=0;n<3;n++)
+                            newatom.pos[n] += orig_basis[0][n]*(iter+1);
+
                         system.molecules[i].mass += newatom.m;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1290,7 +1300,8 @@ void setupCrystalBuild(System &system) {
                     Molecule newmolecule = system.molecules[i];
                     for (j=0; j<newmolecule.atoms.size(); j++) {
                         system.constants.total_atoms++;
-                        newmolecule.atoms[j].pos[0] += xlen*(iter+1);
+                        for (int n=0;n<3;n++)
+                            newmolecule.atoms[j].pos[n] += orig_basis[0][n]*(iter+1);
                     }
                     system.stats.count_movables++;
                     system.molecules.push_back(newmolecule);
@@ -1320,8 +1331,9 @@ void setupCrystalBuild(System &system) {
                 if (system.molecules[i].frozen) {
                     for (j=0; j< asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        newatom.pos[1] += ylen*(iter+1);
-                        if (system.pbc.gamma != 90.0) newatom.pos[0] -= (iter+1)*origb*sin((system.pbc.gamma-90.0)*M_PI/180.);
+                        for (int n=0;n<3;n++)
+                            newatom.pos[n] += orig_basis[1][n]*(iter+1);                    
+    
                         system.molecules[i].mass += newatom.m;                     
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1331,8 +1343,8 @@ void setupCrystalBuild(System &system) {
                     Molecule newmolecule = system.molecules[i];
                     for (j=0; j<newmolecule.atoms.size(); j++) {
                         system.constants.total_atoms++;
-                        newmolecule.atoms[j].pos[1] += ylen*(iter+1);
-                        if (system.pbc.gamma != 90.0) newmolecule.atoms[j].pos[0] -= (iter+1)*origb*sin((system.pbc.gamma-90.0)*M_PI/180.);
+                        for (int n=0;n<3;n++)
+                            newmolecule.atoms[j].pos[n] += orig_basis[1][n]*(iter+1);
                     }
                     system.stats.count_movables++;
                     system.molecules.push_back(newmolecule);
@@ -1361,8 +1373,9 @@ void setupCrystalBuild(System &system) {
                 if (system.molecules[i].frozen) {
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        newatom.pos[2] += zlen*(iter+1);
-                        if (system.pbc.beta != 90.0) newatom.pos[0] -= (iter+1)*origc*sin((system.pbc.beta-90.0)*M_PI/180.0);
+                        for (int n=0;n<3;n++)
+                            newatom.pos[n] += orig_basis[2][n]*(iter+1);                
+        
                         system.molecules[i].mass += newatom.m;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1372,8 +1385,8 @@ void setupCrystalBuild(System &system) {
                     Molecule newmolecule = system.molecules[i];
                     for (j=0; j<newmolecule.atoms.size(); j++) {
                         system.constants.total_atoms++;
-                        newmolecule.atoms[j].pos[2] += zlen*(iter+1);
-                        if (system.pbc.beta != 90.0) newmolecule.atoms[j].pos[0] -= (iter+1)*origc*sin((system.pbc.beta-90.0)*M_PI/180.0);
+                        for (int n=0;n<3;n++)
+                            newmolecule.atoms[j].pos[n] += orig_basis[2][n]*(iter+1);
                     }
                     system.stats.count_movables++;
                     system.molecules.push_back(newmolecule);
