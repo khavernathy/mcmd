@@ -1266,25 +1266,25 @@ void readInput(System &system, char* filename) {
 
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
         std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
-				if (lc[1] == "lj")
+				if (!strcasecmp(lc[1].c_str(),"lj"))
 					system.constants.potential_form = POTENTIAL_LJ;
-				else if (lc[1] == "ljes")
+				else if (!strcasecmp(lc[1].c_str(),"ljes"))
 					system.constants.potential_form = POTENTIAL_LJES;
-                else if (lc[1] == "ljpolar")
+                else if (!strcasecmp(lc[1].c_str(),"ljpolar"))
                     system.constants.potential_form = POTENTIAL_LJPOLAR;
-				else if (lc[1] == "ljespolar")
+				else if (!strcasecmp(lc[1].c_str(),"ljespolar"))
 					system.constants.potential_form = POTENTIAL_LJESPOLAR;
-                else if (lc[1] == "commy")
+                else if (!strcasecmp(lc[1].c_str(),"commy"))
                     system.constants.potential_form = POTENTIAL_COMMY;
-                else if (lc[1] == "commyes")
+                else if (!strcasecmp(lc[1].c_str(),"commyes"))
                     system.constants.potential_form = POTENTIAL_COMMYES;
-                else if (lc[1] == "commyespolar")
+                else if (!strcasecmp(lc[1].c_str(),"commyespolar"))
                     system.constants.potential_form = POTENTIAL_COMMYESPOLAR;
-                else if (lc[1] == "tt")
+                else if (!strcasecmp(lc[1].c_str(),"tt"))
                     system.constants.potential_form = POTENTIAL_TT;
-                else if (lc[1] == "ttes")
+                else if (!strcasecmp(lc[1].c_str(),"ttes"))
                     system.constants.potential_form = POTENTIAL_TTES;
-                else if (lc[1] == "ttespolar")
+                else if (!strcasecmp(lc[1].c_str(),"ttespolar"))
                     system.constants.potential_form = POTENTIAL_TTESPOLAR;
 
 				std::cout << "Got potential form = " << lc[1].c_str(); printf("\n");
