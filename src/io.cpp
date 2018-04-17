@@ -766,7 +766,11 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f, "\n# more variables etc. useful for MD");
     fprintf(f, "\nvariable step equal step\nvariable time equal step*2\nvariable timeNS equal time/1000000\nvariable diffusion_coeff equal c_themsd[4]/(6*time)*0.1 # cm^2/s\n");
     fprintf(f, "variable te equal c_pe+c+ke\n");
-    fprintf(f, "compute pe all pe\ncompute ke all ke\ncompute themsd moving msd com yes average yes\ncompute movingtemp moving temp\nthermo_style custom step etotal ke pe evdwl ecoul\nthermo ${freq}\n\n");
+    fprintf(f, "compute pe all pe\ncompute ke all ke\ncompute themsd moving msd com yes average yes\ncompute movingtemp moving temp\nthermo_style custom step etotal ke pe evdwl ecoul\nthermo ${freq}\n");
+    fprintf(f, "# dipoles computes\n");
+    fprintf(f, "compute cc1 all chunk/atom molecule\n");
+    fprintf(f, "compute myChunk all dipole/chunk cc1\n\n");
+
     string idSort = "";
     for (int x=0;x<atomlabels.size();x++) {
         idSort = idSort + " " + atomlabels[x].c_str();
@@ -776,7 +780,7 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f, "# set NVT\n");
     fprintf(f, "velocity all create ${temperature} 12345 rot yes mom yes dist gaussian\n");
     fprintf(f, "fix rigid_nvt moving rigid/nvt molecule temp ${temperature} ${temperature} 100\n");
-
+    fprintf(f, "fix 1 all ave/time 100 1 100 c_myChunk[*] file dipoles.out mode vector # to write the dipoles to file\n\n");
     fprintf(f, "\n# run\nrun ${nstep}");
     fclose(f);
     // DONE WITH LAMMPS INPUT FILE FOR MD SIMULATION. NOW WRITE THE .data FILE which contains
