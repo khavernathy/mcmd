@@ -146,6 +146,10 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         return "I_";
     } else if (name == "Ru") {
         return "Ru6+2";
+    } else if (name == "Cd") {
+        return "Cd1f1";
+    } else if (name == "Si") {
+        return "SiF6"; // default sifsix Si
     }
 
 
@@ -173,6 +177,8 @@ bool qualify_bond(System &system, double r, unsigned int mol, unsigned int i, un
     else if ((a1=="Ru" || a2=="Ru") && r <= 2.1) // Ru +2  complexes
         return true;
     else if ((a1=="Co" || a2=="Co") && r <= 2.25) // Co complexes
+        return true;
+    else if (((a1=="Cd" && a2=="F") || (a1=="F" && a2=="Cd")) && r <= 2.4) // Cd SIFSIX type
         return true;
     else if (r > bondlength)
         return false;
@@ -907,6 +913,7 @@ double LJ_intramolec_energy(System &system) {
                     double* distances = getDistanceXYZ(system, mol,i,mol,j);
                     r = distances[3];
                     if (r > system.pbc.cutoff) continue;
+                    //printf("pair %i %i LJ\n",i,j);
                     sr6 = sig/r;
                     sr6 *= sr6;
                     sr6 *= sr6*sr6;
@@ -1139,7 +1146,7 @@ void findBonds(System &system) {
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
     for (mol=0; mol<molecule_limit; mol++) {
         // all pairs inside the molecule
-        for (i=0; i<molecule_limit; i++) {
+        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
                 // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
                 qualified = 1;

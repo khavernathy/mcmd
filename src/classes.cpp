@@ -1664,6 +1664,7 @@ UFF_bonds["Na"] = 1.539; UFF_angles["Na"] = 180; UFF_Z["Na"] = 1.081;
 UFF_bonds["Mg3+2"] = 1.421; UFF_angles["Mg3+2"] = 109.47; UFF_Z["Mg3+2"] = 1.787;
 UFF_bonds["Al3"] = 1.244; UFF_angles["Al3"] = 109.47; UFF_Z["Al3"] = 1.792;
 UFF_bonds["Si3"] = 1.117; UFF_angles["Si3"] = 109.47; UFF_Z["Si3"] = 2.323;
+UFF_bonds["SiF6"] = 1.68; UFF_angles["SiF6"] = 90.0; UFF_Z["SiF6"] = 2.323; // I added this for sifsix
 UFF_bonds["P_3+3"] = 1.101; UFF_angles["P_3+3"] = 93.8; UFF_Z["P_3+3"] = 2.863;
 UFF_bonds["P_3+5"] = 1.056; UFF_angles["P_3+5"] = 109.47; UFF_Z["P_3+5"] = 2.863;
 UFF_bonds["P_3+q"] = 1.056; UFF_angles["P_3+q"] = 109.47; UFF_Z["P_3+q"] = 2.863;
@@ -1840,6 +1841,7 @@ UFF_bonds["Co4+2"] = 1.16;
 UFF_bonds["Cu4+2"] = 1.28;
 UFF_bonds["Zn4+2"] = 1.34;
 UFF_bonds["Zn3f2"] = 1.24;
+UFF_bonds["Cd1f1"] = 1.40;
 
 UFF_angles["O_3_f"] = 109.47;
 UFF_angles["O_2_z"] = 120;
@@ -1859,6 +1861,8 @@ UFF_angles["Co4+2"] = 90;
 UFF_angles["Cu4+2"] = 90;
 UFF_angles["Zn4+2"] = 90;
 UFF_angles["Zn3f2"] = 109.47;
+UFF_angles["Cd1f1"] = 180.0;
+
 
 UFF_Z["O_3_f"] = 2.3;
 UFF_Z["O_2_z"] = 2.3;
@@ -1878,6 +1882,7 @@ UFF_Z["Co4+2"] = 1.308;
 UFF_Z["Cu4+2"] = 2.43;
 UFF_Z["Zn4+2"] = 1.308;
 UFF_Z["Zn3f2"] = 1.308;
+//UFF_Z["Cd1f1"] = 
 
 OPLS_sig["C_aro"] = 3.55; OPLS_sig["C_coo"] = 3.75; OPLS_sig["H_aro"] = 2.42;
 OPLS_eps["C_aro"] = 35.25; OPLS_eps["C_coo"] = 52.84; OPLS_eps["H_aro"] = 15.11;
