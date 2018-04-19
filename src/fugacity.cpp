@@ -236,6 +236,42 @@ double ch4_comp_back(double temperature, double pressure) {
 }
 
 
+double ch4_fugacity_NIST(double temperature, double pressure) {
+        
+    // doug
+    // a fitted polynomial 5th-order (in x and y) function from NIST
+    // data scraped by Luci's thing 
+    // the actual paper
+        double p00 = 86.68 ;
+        double p10 = -1.994 ;
+        double p01 = -2.599 ;
+        double p20 = 0.01733 ;
+        double p11 = 0.0334 ;
+        double p02 = -6.624e-05 ;
+        double p30 = -7.144e-05 ;
+        double p21 = -0.0001066 ;
+        double p12 = 1.329e-06 ;
+        double p03 = -4.921e-06 ;
+        double p40 = 1.405e-07 ;
+        double p31 = 1.24e-07 ;
+        double p22 = -4.097e-09 ;
+        double p13 = -1.381e-08 ;
+        double p04 = 2.854e-07 ;
+        double p50 = -1.06e-10 ;
+        double p41 = -2.587e-11 ;
+        double p32 = 4.766e-12 ;
+        double p23 = 4.47e-12 ;
+        double p14 = 1.695e-10 ;
+        double p05 = -4.594e-09 ;
+        double x = temperature;
+        double y = pressure;
+        double fug = p00 + p10*x + p01*y + p20*x*x + p11*x*y + p02*y*y + p30*x*x*x
+                    + p21*x*x*y + p12*x*y*y + p03*y*y*y + p40*x*x*x*x + p31*x*x*x*y
+                    + p22*x*x*y*y + p13*x*y*y*y + p04*y*y*y*y + p50*x*x*x*x*x + p41*x*x*x*x*y
+                    + p32*x*x*x*y*y + p23*x*x*y*y*y + p14*x*y*y*y*y + p05*y*y*y*y*y;
+
+         return fug;
+}
 
 
 /* Incorporate BACK EOS */
@@ -337,9 +373,13 @@ double ch4_fugacity_PR(double temperature, double pressure) {
 
 
 /* ***************************** CH4 EQUATION OF STATE *************************************** */
-double ch4_fugacity(double temperature, double pressure) {
+double ch4_fugacity(System &system, double temperature, double pressure) {
 
-        if((temperature >= 298.0) && (temperature <= 300.0) && (pressure <= 500.0)) {
+        if (system.constants.methane_nist_fugacity) {
+                output("INPUT: CH4 fugacity calculation using NIST fitted function\n");
+                return(ch4_fugacity_NIST(temperature,pressure));
+
+        } else if((temperature >= 298.0) && (temperature <= 300.0) && (pressure <= 500.0)) {
 
                 output("INPUT: CH4 fugacity calculation using BACK EoS\n");
                 return(ch4_fugacity_back(temperature, pressure));
@@ -670,5 +710,4 @@ double co2_fugacity(double temperature, double pressure) {
 	return(fugacity);
 
 }
-
 

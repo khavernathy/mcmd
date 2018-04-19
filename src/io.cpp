@@ -1383,7 +1383,11 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "vand_polar")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.constants.polars_vand = 1;
-                std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str();
+                std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "methane_nist_fugacity")) {
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.methane_nist_fugacity = 1;
+                std::cout << "Got CH4 NIST Fugacity calculation option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "radial_dist") || !strcasecmp(lc[0].c_str(), "radial_distribution")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.stats.radial_dist = 1;
