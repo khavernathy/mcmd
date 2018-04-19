@@ -1043,6 +1043,13 @@ void readInput(System &system, char* filename) {
 
                 std::cout << "Got .car basis: a,b,c = " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str(); printf("\n");
                 std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "integrator")) { 
+                if (!strcasecmp(lc[1].c_str(), "rk4"))
+                    system.constants.integrator = INTEGRATOR_RK4;
+                else if (!strcasecmp(lc[1].c_str(), "vv"))
+                    system.constants.integrator = INTEGRATOR_VV;
+
+                std::cout << "Got integrator (for MD simulation) = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "feynman_hibbs") || !strcasecmp(lc[0].c_str(), "fh") || !strcasecmp(lc[0].c_str(), "feynmann_hibbs")) {  // allow for typo of R.F.'s name
 			    if (!strcasecmp(lc[1].c_str(),"on")) system.constants.feynman_hibbs = 1;

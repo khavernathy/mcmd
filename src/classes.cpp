@@ -44,6 +44,10 @@ enum {
     OPTIMIZE_MC,  // Monte Carlo sytle opt.
     OPTIMIZE_SD   // steepest descent opt.
 };
+enum {
+    INTEGRATOR_RK4, // Runge Kutte 4th order
+    INTEGRATOR_VV   // velocity verlet, default
+};
 
 /* the below stuff was more-or-less adopted from mpmc code */
 typedef struct _histogram {
@@ -218,7 +222,8 @@ class Constants {
         double md_init_vel=0.; //  A / fs. User can set.
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         int_fast8_t md_mode = MD_MOLECULAR; // default is to keep molecules rigid (bonded)
-		double md_initial_energy_NVE = 0; // NVE first Newtonian energy, for measuring integrator error over time; in K.
+		int_fast8_t integrator = INTEGRATOR_VV; // velocity verlet is default 
+        double md_initial_energy_NVE = 0; // NVE first Newtonian energy, for measuring integrator error over time; in K.
         double md_NVE_err = 0; // delta(total E) in kJ/mol
         double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
