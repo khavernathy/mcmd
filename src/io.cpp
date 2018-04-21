@@ -668,7 +668,7 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f, "# some variables for easy scripting later.\n");
     fprintf(f, "variable temperature equal %f\n", system.constants.temp);
     fprintf(f, "variable freq equal %i\n", (system.constants.mode == "mc")?system.constants.mc_corrtime : system.constants.md_corrtime);
-    fprintf(f, "variable nstep equal %i\n", (system.constants.mode == "mc")?system.constants.finalstep : (int)ceil(system.constants.md_ft/system.constants.md_dt));
+    fprintf(f, "variable nstep equal %li\n", (system.constants.mode == "mc")?system.constants.finalstep : (int)ceil(system.constants.md_ft/system.constants.md_dt));
 
     fprintf(f, "\n# some global params\nunits real\nboundary p p p\natom_style full\n\n# the atoms file\nread_data lammps.data\n\n");
     // we need unique atoms list.
@@ -1076,7 +1076,7 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got step size = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "finalstep") || !strcasecmp(lc[0].c_str(), "steps") || !strcasecmp(lc[0].c_str(), "numsteps")) {
-				system.constants.finalstep = atoi(lc[1].c_str());
+				system.constants.finalstep = atol(lc[1].c_str());
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "dist_within")) {

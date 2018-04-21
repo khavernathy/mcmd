@@ -207,7 +207,7 @@ class Constants {
 
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
 		int stepsize=1; // obvi
-        int finalstep=-1; // user defined for MC. Will error-out if not given in MC
+        long int finalstep=-1; // user defined for MC. Will error-out if not given in MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
         int currentprotoid=0; // for getting fugacity for the boltzmann factor.

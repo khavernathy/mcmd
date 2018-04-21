@@ -314,7 +314,7 @@ int main(int argc, char **argv) {
     //outputCorrtime(system, 0); // do initial output before starting mc
     int frame = 1;
     int stepsize = system.constants.stepsize;
-    int finalstep = system.constants.finalstep;
+    long int finalstep = system.constants.finalstep;
     int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
     // begin timing for steps "begin_steps"
@@ -388,7 +388,7 @@ int main(int argc, char **argv) {
                 printf("Ensemble: %s; T = %.3f K (Simulated annealing on)\n",system.constants.ensemble_str.c_str(), system.constants.temp);
 
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep+system.constants.step_offset,finalstep,progress,efficiency);
+			printf("Step: %i / %li; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep+system.constants.step_offset,finalstep,progress,efficiency);
 			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n",
 				(int)system.stats.total_accepts,
 			    system.stats.ins_perc,
