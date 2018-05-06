@@ -1,5 +1,9 @@
 #include <sys/types.h>
-#include <unistd.h>
+#ifdef WINDOWS
+	#include <io.h>
+#else
+	#include <unistd.h>
+#endif
 
 
 void output(char *msg) {
