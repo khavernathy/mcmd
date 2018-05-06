@@ -318,7 +318,7 @@ int main(int argc, char **argv) {
     //outputCorrtime(system, 0); // do initial output before starting mc
     int frame = 1;
     int stepsize = system.constants.stepsize;
-    int finalstep = system.constants.finalstep;
+    long int finalstep = system.constants.finalstep;
     int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
     // begin timing for steps "begin_steps"
@@ -392,7 +392,7 @@ int main(int argc, char **argv) {
                 printf("Ensemble: %s; T = %.3f K (Simulated annealing on)\n",system.constants.ensemble_str.c_str(), system.constants.temp);
 
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-			printf("Step: %i / %i; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep+system.constants.step_offset,finalstep,progress,efficiency);
+			printf("Step: %i / %li; Progress = %.3f%%; Efficiency = %.3f\n",system.stats.MCstep+system.constants.step_offset,finalstep,progress,efficiency);
 			printf("Total accepts: %i ( %.2f%% Ins / %.2f%% Rem / %.2f%% Dis / %.2f%% Vol )  \n",
 				(int)system.stats.total_accepts,
 			    system.stats.ins_perc,
@@ -557,7 +557,8 @@ int main(int argc, char **argv) {
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
-	int total_steps = floor(tf/dt);
+	double thing = floor(tf/dt);
+    long int total_steps = (long int)thing;
 	int count_md_steps = 1;
     double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D[(int)system.proto.size()];
 	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Klin=0., Krot=0., pressure=0.; //, Ek=0.;
@@ -680,7 +681,7 @@ int main(int argc, char **argv) {
             printf("Input atoms: %s\n",system.constants.atom_file.c_str());
             printf("Ensemble: %s; N_movables = %i N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
-            printf("Step: %i / %i; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
+            printf("Step: %i / %li; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
             if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp);
             printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", Temp);

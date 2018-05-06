@@ -44,6 +44,10 @@ enum {
     OPTIMIZE_MC,  // Monte Carlo sytle opt.
     OPTIMIZE_SD   // steepest descent opt.
 };
+enum {
+    INTEGRATOR_RK4, // Runge Kutte 4th order
+    INTEGRATOR_VV   // velocity verlet, default
+};
 
 /* the below stuff was more-or-less adopted from mpmc code */
 typedef struct _histogram {
@@ -133,6 +137,7 @@ class Constants {
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
         vector<int> sorbate_dof; // holds degrees of freedom for sorbates
+        int_fast8_t methane_nist_fugacity=0; // option for using fitted NIST data for Methane P -> f mapping
         int_fast8_t xyz_traj_option=1; // option for xyz trajectory, default off
         int_fast8_t xyz_traj_movers_option=1; // option for smaller xyz traj (with only movers)
         int_fast8_t pdb_traj_option=0; // option to write PDB trajectory . default on
@@ -202,7 +207,7 @@ class Constants {
 
         double rotate_angle_factor=360; // 0 -> this number to rotate if rotate selected
 		int stepsize=1; // obvi
-        int finalstep=-1; // user defined for MC. Will error-out if not given in MC
+        long int finalstep=-1; // user defined for MC. Will error-out if not given in MC
         int  mc_corrtime=1000; // default 1k cuz I used that a lot for mpmc research
         int_fast8_t mc_pbc=1; // PBC in monte carlo, default on
         int currentprotoid=0; // for getting fugacity for the boltzmann factor.
@@ -218,7 +223,8 @@ class Constants {
         double md_init_vel=0.; //  A / fs. User can set.
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         int_fast8_t md_mode = MD_MOLECULAR; // default is to keep molecules rigid (bonded)
-		double md_initial_energy_NVE = 0; // NVE first Newtonian energy, for measuring integrator error over time; in K.
+		int_fast8_t integrator = INTEGRATOR_VV; // velocity verlet is default 
+        double md_initial_energy_NVE = 0; // NVE first Newtonian energy, for measuring integrator error over time; in K.
         double md_NVE_err = 0; // delta(total E) in kJ/mol
         double md_thermostat_freq = 0.05; // a value used to calculate probability of a heat-bath collision with molecule i; Frenkel uses 0.01 and 0.001 as examples; but no matter what, a boltzmann distribution is generated
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
@@ -1391,6 +1397,7 @@ eps["Lr"] = 0.011/kbk;
     polars["F"] = 3.0013*vand2mpmc;
     polars["S"] = 16.6984*vand2mpmc;
     polars["Cl"] = 16.1979*vand2mpmc;
+    polars["Si"] = 2.133; // A^3 already, from Adam for SiF6 cluster.
     polars["Br"] = 23.5714*vand2mpmc;
     polars["I"] = 36.9880*vand2mpmc;
 	//polars["H"] = 0.41380;//*cV/ke;
@@ -1411,6 +1418,7 @@ eps["Lr"] = 0.011/kbk;
     polars["ArS"] = 1.63922; // Ar SAPT
 	polars["Co"] = 3.26440; // from Kay/Shannelle.
     polars["Cu"] = 2.19630;//*cV/ke;
+    polars["Cd"] = 0.953; // from Adam, KIKDOZ MOF fragments.
 	polars["Zn"] = 1.98870;//*cV/ke;
 	polars["Br"] = 3.49300; // used in MPM-1-Br work
 	polars["Ru"] = 5.191; // I calculated this by Adam's fitting method.
@@ -1664,6 +1672,7 @@ UFF_bonds["Na"] = 1.539; UFF_angles["Na"] = 180; UFF_Z["Na"] = 1.081;
 UFF_bonds["Mg3+2"] = 1.421; UFF_angles["Mg3+2"] = 109.47; UFF_Z["Mg3+2"] = 1.787;
 UFF_bonds["Al3"] = 1.244; UFF_angles["Al3"] = 109.47; UFF_Z["Al3"] = 1.792;
 UFF_bonds["Si3"] = 1.117; UFF_angles["Si3"] = 109.47; UFF_Z["Si3"] = 2.323;
+UFF_bonds["SiF6"] = 1.68; UFF_angles["SiF6"] = 90.0; UFF_Z["SiF6"] = 2.323; // I added this for sifsix
 UFF_bonds["P_3+3"] = 1.101; UFF_angles["P_3+3"] = 93.8; UFF_Z["P_3+3"] = 2.863;
 UFF_bonds["P_3+5"] = 1.056; UFF_angles["P_3+5"] = 109.47; UFF_Z["P_3+5"] = 2.863;
 UFF_bonds["P_3+q"] = 1.056; UFF_angles["P_3+q"] = 109.47; UFF_Z["P_3+q"] = 2.863;
@@ -1840,6 +1849,7 @@ UFF_bonds["Co4+2"] = 1.16;
 UFF_bonds["Cu4+2"] = 1.28;
 UFF_bonds["Zn4+2"] = 1.34;
 UFF_bonds["Zn3f2"] = 1.24;
+UFF_bonds["Cd1f1"] = 1.40;
 
 UFF_angles["O_3_f"] = 109.47;
 UFF_angles["O_2_z"] = 120;
@@ -1859,6 +1869,8 @@ UFF_angles["Co4+2"] = 90;
 UFF_angles["Cu4+2"] = 90;
 UFF_angles["Zn4+2"] = 90;
 UFF_angles["Zn3f2"] = 109.47;
+UFF_angles["Cd1f1"] = 180.0;
+
 
 UFF_Z["O_3_f"] = 2.3;
 UFF_Z["O_2_z"] = 2.3;
@@ -1878,6 +1890,7 @@ UFF_Z["Co4+2"] = 1.308;
 UFF_Z["Cu4+2"] = 2.43;
 UFF_Z["Zn4+2"] = 1.308;
 UFF_Z["Zn3f2"] = 1.308;
+//UFF_Z["Cd1f1"] = 
 
 OPLS_sig["C_aro"] = 3.55; OPLS_sig["C_coo"] = 3.75; OPLS_sig["H_aro"] = 2.42;
 OPLS_eps["C_aro"] = 35.25; OPLS_eps["C_coo"] = 52.84; OPLS_eps["H_aro"] = 15.11;

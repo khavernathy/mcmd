@@ -1,0 +1,19 @@
+mode md
+ensemble NVE
+temperature  100   ! (intial temp, not thermostatted. this is NVE)
+
+sorbate_name h2_bssp
+potential_form ljespolar
+
+carbasis 50 50 50 90 90 90
+
+md_dt  2   ! femptosec
+md_ft 20 ns
+
+md_mode molecular    ! i.e. rigid rotators
+md_rotations on
+md_translations on
+
+md_corrtime 1
+
+input_atoms input.pdb

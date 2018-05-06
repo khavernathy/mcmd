@@ -672,7 +672,7 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f, "# some variables for easy scripting later.\n");
     fprintf(f, "variable temperature equal %f\n", system.constants.temp);
     fprintf(f, "variable freq equal %i\n", (system.constants.mode == "mc")?system.constants.mc_corrtime : system.constants.md_corrtime);
-    fprintf(f, "variable nstep equal %i\n", (system.constants.mode == "mc")?system.constants.finalstep : (int)ceil(system.constants.md_ft/system.constants.md_dt));
+    fprintf(f, "variable nstep equal %li\n", (system.constants.mode == "mc")?system.constants.finalstep : (int)ceil(system.constants.md_ft/system.constants.md_dt));
 
     fprintf(f, "\n# some global params\nunits real\nboundary p p p\natom_style full\n\n# the atoms file\nread_data lammps.data\n\n");
     // we need unique atoms list.
@@ -769,8 +769,12 @@ void writeLAMMPSfiles(System &system) {
 
     fprintf(f, "\n# more variables etc. useful for MD");
     fprintf(f, "\nvariable step equal step\nvariable time equal step*2\nvariable timeNS equal time/1000000\nvariable diffusion_coeff equal c_themsd[4]/(6*time)*0.1 # cm^2/s\n");
-    fprintf(f, "variable te equal c_pe+c+ke\n");
-    fprintf(f, "compute pe all pe\ncompute ke all ke\ncompute themsd moving msd com yes average yes\ncompute movingtemp moving temp\nthermo_style custom step etotal ke pe evdwl ecoul\nthermo ${freq}\n\n");
+    fprintf(f, "variable te equal c_pe+c_ke\n");
+    fprintf(f, "compute pe all pe\ncompute ke all ke\ncompute themsd moving msd com yes average yes\ncompute movingtemp moving temp\nthermo_style custom step etotal ke pe evdwl ecoul\nthermo ${freq}\n");
+    fprintf(f, "# dipoles computes\n");
+    fprintf(f, "compute cc1 all chunk/atom molecule\n");
+    fprintf(f, "compute dipoles all dipole/chunk cc1\n\n");
+
     string idSort = "";
     for (int x=0;x<atomlabels.size();x++) {
         idSort = idSort + " " + atomlabels[x].c_str();
@@ -780,7 +784,7 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f, "# set NVT\n");
     fprintf(f, "velocity all create ${temperature} 12345 rot yes mom yes dist gaussian\n");
     fprintf(f, "fix rigid_nvt moving rigid/nvt molecule temp ${temperature} ${temperature} 100\n");
-
+    fprintf(f, "fix 1 all ave/time 100 1 100 c_dipoles[*] file dipoles.out mode vector # to write the dipoles to file\n\n");
     fprintf(f, "\n# run\nrun ${nstep}");
     fclose(f);
     // DONE WITH LAMMPS INPUT FILE FOR MD SIMULATION. NOW WRITE THE .data FILE which contains
@@ -1043,6 +1047,13 @@ void readInput(System &system, char* filename) {
 
                 std::cout << "Got .car basis: a,b,c = " << lc[1].c_str() << ", " << lc[2].c_str() << ", " << lc[3].c_str(); printf("\n");
                 std::cout << "Got .car basis alpha,beta,gamma = " << lc[4].c_str() << ", " << lc[5].c_str() << ", " << lc[6].c_str(); printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "integrator")) { 
+                if (!strcasecmp(lc[1].c_str(), "rk4"))
+                    system.constants.integrator = INTEGRATOR_RK4;
+                else if (!strcasecmp(lc[1].c_str(), "vv"))
+                    system.constants.integrator = INTEGRATOR_VV;
+
+                std::cout << "Got integrator (for MD simulation) = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "feynman_hibbs") || !strcasecmp(lc[0].c_str(), "fh") || !strcasecmp(lc[0].c_str(), "feynmann_hibbs")) {  // allow for typo of R.F.'s name
 			    if (!strcasecmp(lc[1].c_str(),"on")) system.constants.feynman_hibbs = 1;
@@ -1069,7 +1080,7 @@ void readInput(System &system, char* filename) {
 				std::cout << "Got step size = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "finalstep") || !strcasecmp(lc[0].c_str(), "steps") || !strcasecmp(lc[0].c_str(), "numsteps")) {
-				system.constants.finalstep = atoi(lc[1].c_str());
+				system.constants.finalstep = atol(lc[1].c_str());
 				std::cout << "Got total steps = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "dist_within")) {
@@ -1270,25 +1281,25 @@ void readInput(System &system, char* filename) {
 
 			} else if (!strcasecmp(lc[0].c_str(), "potential_form")) {
         std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
-				if (lc[1] == "lj")
+				if (!strcasecmp(lc[1].c_str(),"lj"))
 					system.constants.potential_form = POTENTIAL_LJ;
-				else if (lc[1] == "ljes")
+				else if (!strcasecmp(lc[1].c_str(),"ljes"))
 					system.constants.potential_form = POTENTIAL_LJES;
-                else if (lc[1] == "ljpolar")
+                else if (!strcasecmp(lc[1].c_str(),"ljpolar"))
                     system.constants.potential_form = POTENTIAL_LJPOLAR;
-				else if (lc[1] == "ljespolar")
+				else if (!strcasecmp(lc[1].c_str(),"ljespolar"))
 					system.constants.potential_form = POTENTIAL_LJESPOLAR;
-                else if (lc[1] == "commy")
+                else if (!strcasecmp(lc[1].c_str(),"commy"))
                     system.constants.potential_form = POTENTIAL_COMMY;
-                else if (lc[1] == "commyes")
+                else if (!strcasecmp(lc[1].c_str(),"commyes"))
                     system.constants.potential_form = POTENTIAL_COMMYES;
-                else if (lc[1] == "commyespolar")
+                else if (!strcasecmp(lc[1].c_str(),"commyespolar"))
                     system.constants.potential_form = POTENTIAL_COMMYESPOLAR;
-                else if (lc[1] == "tt")
+                else if (!strcasecmp(lc[1].c_str(),"tt"))
                     system.constants.potential_form = POTENTIAL_TT;
-                else if (lc[1] == "ttes")
+                else if (!strcasecmp(lc[1].c_str(),"ttes"))
                     system.constants.potential_form = POTENTIAL_TTES;
-                else if (lc[1] == "ttespolar")
+                else if (!strcasecmp(lc[1].c_str(),"ttespolar"))
                     system.constants.potential_form = POTENTIAL_TTESPOLAR;
 
 				std::cout << "Got potential form = " << lc[1].c_str(); printf("\n");
@@ -1376,7 +1387,11 @@ void readInput(System &system, char* filename) {
 
             } else if (!strcasecmp(lc[0].c_str(), "vand_polar")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.constants.polars_vand = 1;
-                std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str();
+                std::cout << "Got van Duijnen polarizability option = " << lc[1].c_str(); printf("\n");
+
+            } else if (!strcasecmp(lc[0].c_str(), "methane_nist_fugacity")) {
+                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.methane_nist_fugacity = 1;
+                std::cout << "Got CH4 NIST Fugacity calculation option = " << lc[1].c_str(); printf("\n");
 
 			} else if (!strcasecmp(lc[0].c_str(), "radial_dist") || !strcasecmp(lc[0].c_str(), "radial_distribution")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.stats.radial_dist = 1;

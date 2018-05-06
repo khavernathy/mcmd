@@ -286,3 +286,52 @@ void lj_force_nopbc(System &system) {
     } // loop i
     // DONE WITH PAIR INTERACTIONS
 }
+
+
+
+
+void singleAtomForceLJ(System &system, int mol, int atom) {   // units of K/A
+
+    // initialize
+    for (int n=0;n<3;n++)
+        system.molecules[mol].atoms[atom].force[n] = 0.0;
+    
+    const double cutoff = system.pbc.cutoff;
+    double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+
+        if (i==mol && j==atom) continue; // don't do self
+        // do mixing rules
+        eps = system.molecules[mol].atoms[atom].eps;
+        sig = system.molecules[mol].atoms[atom].sig;
+        eps = lj_lb_eps(eps, system.molecules[i].atoms[j].eps);
+        sig = lj_lb_sig(sig, system.molecules[i].atoms[j].sig);
+
+        if (!(sig == 0 || eps == 0)) {
+        // calculate distance between atoms
+        double* distances = getDistanceXYZ(system, mol, atom, i, j);
+        r = distances[3];    
+        rsq=r*r;
+        for (int n=0; n<3; n++) d[n] = distances[n];
+
+        r6 = rsq*rsq*rsq;
+        s2 = sig*sig;
+        s6 = s2*s2*s2;
+            
+        if ((!system.constants.rd_lrc || r <= cutoff)) {
+            for (int n=0; n<3; n++) {
+                f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                system.molecules[mol].atoms[atom].force[n] += f[n];
+                //system.molecules[k].atoms[l].force[n] -= f[n];
+            }
+        }
+
+        } // if nonzero sig/eps
+        //index++;
+    } //loop j
+    } // loop i
+    // DONE WITH PAIR INTERACTIONS
+}
+
+

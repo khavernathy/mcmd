@@ -149,8 +149,37 @@ void integrate(System &system, double dt) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
             // TRANSLATION
-            if (system.constants.md_translations)
-                system.molecules[j].calc_pos(dt);
+            if (system.constants.md_translations) {
+                if (system.constants.integrator == INTEGRATOR_VV)
+                    system.molecules[j].calc_pos(dt);
+                else if (system.constants.integrator == INTEGRATOR_RK4) {
+                    // GOOD FOR SINGLE-ATOM MOLECULES ONLY
+                    double k1,k2,k3,k4,dxt,tmp_pos[3];
+                    // tmp_pos stores the original position of atom
+                    for (int n=0;n<3;n++)
+                        tmp_pos[n] = system.molecules[j].atoms[0].pos[n];
+
+                    for (int n=0;n<3;n++) {
+                        k1 = dt*system.molecules[j].vel[n];
+                        system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + 0.5*k1;
+                        singleAtomForceLJ(system,j,0);
+                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*1.3806488e-33/system.molecules[j].atoms[0].m*(0.5*dt);
+                        
+                        k2 = dt*dxt;
+                        system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + 0.5*k2;
+                        singleAtomForceLJ(system,j,0);
+                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*1.3806488e-33/system.molecules[j].atoms[0].m*(0.5*dt);
+
+                        k3 = dt*dxt;
+                        system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + k3;
+                        singleAtomForceLJ(system,j,0);
+                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*1.3806488e-33/system.molecules[j].atoms[0].m*dt;
+
+                        k4 = dt*dxt;
+                        system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + (k1 + 2.0*(k2 + k3) + k4)/6.0;
+                    }
+                }
+            }
 
             // ROTATION
             // TESTING ROTATE-BY-DELTA-THETA INSTEAD OF ROTATE-BY-THETA
