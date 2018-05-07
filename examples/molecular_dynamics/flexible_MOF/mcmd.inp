@@ -8,7 +8,7 @@ name              md_multigas_NVT_example
 mode              md ! mc or md       
 checkpoints_option  off       
        
-input_atoms    /Users/douglasfranz/mcmd/atomfiles/MOF-5+co2+h2+ch4+water+ethane_flex.pdb         
+input_atoms    ../../../atomfiles/MOF-5+co2+h2+ch4+water+ethane_flex.pdb         
 
 potential_form        ljes       
 com_option            off     ! center of mass        

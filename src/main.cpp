@@ -10,7 +10,11 @@
 #include <iostream>
 #include <ctime>
 #include <string>
-#include <strings.h>
+#ifdef WINDOWS
+	#include <string.h>
+#else
+	#include <strings.h>
+#endif
 #include <sstream>
 #include <algorithm>
 #include <iterator>

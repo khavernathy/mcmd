@@ -1,6 +1,10 @@
 #include <iostream>
 #include <string>
-#include <strings.h>
+#ifdef WINDOWS
+	#include <string.h>
+#else
+	#include <strings.h>
+#endif
 #include <algorithm>
 #include <stdio.h>
 #define _USE_MATH_DEFINES
