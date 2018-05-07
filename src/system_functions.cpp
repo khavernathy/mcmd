@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #ifdef WINDOWS
-        #include <string.h>
+       #include <string.h>
 #else
-        #include <strings.h>
+       #include <strings.h>
 #endif
 #include <sstream>
 #include <algorithm>

@@ -90,10 +90,6 @@ elif [[ "$option" == "gpu" ]]; then
     elif [[ "$2" == "debug" ]]; then
         echo "... in debug mode (with errors/warnings)";
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -G -g -O3 -o ../mcmd
-    elif [[ "$2" == "win" ]]; then
-	echo "... for windows."
-	nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -D WINDOWS -O3 -o ../mcmd
-
     else
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     fi
