@@ -122,14 +122,14 @@ elif [[ "$option" == "mpi" ]]; then
 #######################################################################
 elif [[ "$option" == "omp" ]]; then 
     # OpenMP compilation
-    echo "OpenMP is not implemented in MCMD as of now."
-    #echo "Doing OpenMP compilation"
-    #if [[ "$2" == "linux" ]]; then
-    #    echo "... for linux."
-    #    g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
-    #else 
-    #    /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp
-    #fi
+    #echo "OpenMP is not implemented in MCMD as of now."
+    echo "Doing OpenMP compilation"
+    if [[ "$2" == "linux" ]]; then
+        echo "... for linux."
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
+    else 
+        /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp -D OMP
+    fi
 fi
 
 echo ""

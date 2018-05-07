@@ -304,6 +304,11 @@ int main(int argc, char **argv) {
         system.constants.ewald_num_k = count_ks;
     } // end MD Ewald k-space setup.
 
+    #ifdef OMP
+        printf("Running MCMD with OpenMP using %i threads.\n", system.constants.openmp_threads);
+    #endif
+    
+
     // BEGIN MC OR MD ===========================================================
 	// =========================== MONTE CARLO ===================================
 	if (system.constants.mode == "mc") {
@@ -556,7 +561,7 @@ int main(int argc, char **argv) {
 	double thing = floor(tf/dt);
     long int total_steps = (long int)thing;
 	int count_md_steps = 1;
-    double diffusion_d[3] = {0,0,0}, diffusion_sum=0., D[(int)system.proto.size()];
+    double diffusion_d[3] = {0,0,0}, r2_sum=0., D[(int)system.proto.size()];
 	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Klin=0., Krot=0., pressure=0.; //, Ek=0.;
     int i,n;
         printf("\n| ========================================= |\n");
@@ -621,27 +626,45 @@ int main(int argc, char **argv) {
 
             // calc diffusion
             // R^2 as a function of time should be linear according to physical theory.
+            // normalize by the center of mass of entire system if no frozens present.
+            /*
+            double system_COM[3], cx,cy,cz;
+            if (system.stats.count_frozens < 1) {
+                double* tmp = centerOfMass(system);
+                cx=tmp[0]; cy=tmp[1]; cz=tmp[2];
+            } else {
+                cx=cy=cz=0;
+            }   
+            system_COM[0] = cx; system_COM[1] = cy; system_COM[2] = cz;
+*/
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                 int localN = getNlocal(system, sorbid);
                 if (localN < 1) continue; // skip N=0 sorbates
 
                 // re-initialize these vars for each sorbate
                 for (int h=0;h<3;h++) diffusion_d[h]=0.;
-                diffusion_sum=0.;
+                r2_sum=0.;
                 for (i=0; i<system.molecules.size(); i++) {
                     // only consider molecules of this type (for multi-sorb)
                     if (system.molecules[i].name == system.proto[sorbid].name) {
-                        for (n=0; n<3; n++)
-                            diffusion_d[n] = system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n] - system.molecules[i].original_com[n];
+                        for (n=0; n<3; n++) {
+                            // first update the "original" center of mass "r(0)"
+                            // as the arithmetic running average of r(1), r(2) ... r(t) in time
+                            //system.molecules[i].original_com[n] = ((count_md_steps - 1)*system.molecules[i].original_com[n] + (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]))/count_md_steps; 
+                            // now take normalized atom position (by periodic box and by system C.O.M.)
+                            // and do r(t) - "r(0)"
+                            diffusion_d[n] = (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]) - system.molecules[i].original_com[n];
 
-                        diffusion_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
+                        }
+                
+                        r2_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
                     }
                 } // end all molecules loop
-                system.stats.msd[sorbid].value = diffusion_sum;
-                system.stats.msd[sorbid].calcNewStats(); // finds and stores average MSD sum
-                double avg_msd_sum = system.stats.msd[sorbid].average;
+                //system.stats.msd[sorbid].value = r2_sum;
+                //system.stats.msd[sorbid].calcNewStats(); // finds and stores average MSD sum
+                //double avg_msd_sum = system.stats.msd[sorbid].average;
 
-                D[sorbid] = (avg_msd_sum / (localN *6.0*t)); // 6 because 2*dimensionality = 2*3
+                D[sorbid] = (r2_sum / (localN *6.0*t)); // 6 because 2*dimensionality = 2*3
                 D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
             } // end sorbate types loop
             // we've calc'd diffusion coefficients for all sorbates now.
@@ -696,7 +719,7 @@ int main(int argc, char **argv) {
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
 			        if (system.proto.size() == 1)
-                        printf("Mean square displacement = %.5f A^2\n", diffusion_sum/system.stats.count_movables);
+                        printf("Mean square displacement = %.5f A^2\n", r2_sum/system.stats.count_movables);
                 }
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);

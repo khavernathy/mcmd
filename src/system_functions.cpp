@@ -1543,4 +1543,31 @@ int getNElectrons(System &system, int molid) {
     return numelec - system.constants.user_charge; // so if user says it's +2, we remove those.
 }
 
+int calcAtomPairs(System &system, int unique) {
+    int pairs = 0;
+    if (!unique) {
+    for (int i=0;i<system.molecules.size();i++) {
+        for (int j=0;j<system.molecules[i].atoms.size();j++) {
+            for (int k=0;k<system.molecules.size();k++) {
+                for (int l=0;l<system.molecules[k].atoms.size();l++) {
+                    pairs++;
+                }
+            }
+        }
+    }
+    } else { // unique pairs ((N^2 - N) / 2)
+    for (int i=0;i<system.molecules.size();i++) {
+        for (int j=0;j<system.molecules[i].atoms.size();j++) {
+            for (int k=i+1;k<system.molecules.size();k++) {
+                for (int l=0;l<system.molecules[k].atoms.size();l++) {
+                    pairs++;
+                }
+            }
+        }
+    }
+
+    }
+    return pairs;
+}
+
 

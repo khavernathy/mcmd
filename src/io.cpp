@@ -1166,6 +1166,9 @@ void readInput(System &system, char* filename) {
                     system.constants.polar_pbc = 0;
                     system.constants.all_pbc = 0;
                 }
+            } else if (!strcasecmp(lc[0].c_str(), "omp") || !strcasecmp(lc[0].c_str(), "openmp")) {
+                system.constants.openmp_threads = atoi(lc[1].c_str());
+                std::cout << "OpenMP activated. Threads requested = " << lc[1].c_str(); printf("\n");    
             } else if (!strcasecmp(lc[0].c_str(), "external_force")) {
                 system.constants.md_external_force = 1;
                 for (int n=0;n<3;n++)
@@ -1772,6 +1775,11 @@ void inputValidation(System &system) {
         std::cout << "ERROR: flexible frozen option is only available for MD simulations.";
         exit(EXIT_FAILURE);
     }
-
+    #ifndef OMP
+    if (system.constants.openmp_threads > 0) {
+        std:cout << "ERROR: You used the `omp` command but did not compile with OpenMP resources. Compile with, e.g. `bash compile.sh omp linux`."; 
+        exit(EXIT_FAILURE);
+    }
+    #endif
 }
 // end input validation function

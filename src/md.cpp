@@ -53,9 +53,14 @@ void calculateForces(System &system, double dt) {
         }
         // pbc
         else {
-            if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR)
+            if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR) {
+                #ifdef OMP
+                lj_force_omp(system);
+                #else
                 lj_force(system);
-            else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
+                #endif           
+ 
+            } else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
                 tt_forces(system);
             if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
                 coulombic_real_force(system);

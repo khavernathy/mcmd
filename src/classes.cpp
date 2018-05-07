@@ -337,6 +337,8 @@ class Constants {
         };
         vector <UniqueChargeNonBond> uniqueChargeNonBonds;
 
+        // OpenMP omp
+        int openmp_threads = 0; // parallel OpenMP feature. on if != 0.
 };
 
 class Pbc {
@@ -669,8 +671,8 @@ class Stats {
           dist_within, diffusion, volume, z, // z = PV/nRT
           Q, polar_iterations, heat_capacity; // Q = partition func.
 
-        int max_sorbs=10;
-        vector<obs_t> msd = vector<obs_t>(max_sorbs);
+        const int max_sorbs=10;
+        //vector<obs_t> msd = vector<obs_t>(max_sorbs);
         vector<obs_t> wtp = vector<obs_t>(max_sorbs);
         vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
         vector<obs_t> Nmov = vector<obs_t>(max_sorbs);
