@@ -1,0 +1,50 @@
+These are detailed instructions on how to install MCMD.
+
+Mac and Linux:
+===========================================================
+You can use the compile.sh to quickly install, by one of the following commands.
+
+# bash compile.sh               Defaults to cpu compilation
+# bash compile.sh cpu           (same result; for a single computer on Mac or Linux or RaspPi)
+# bash compile.sh cpu linux     (optimized for linux (ONLY))
+# bash compile.sh cpu windows   (for use on Windows ONLY -- you must have gcc installed, e.g. through Cygwin)
+        # note -- to install on windows through the command line,
+        # run the following commands:
+        #       "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\vsdevcmd"
+        #       cl /EHsc main.cpp /D "WINDOWS"
+        # this will write a windows executable called main.exe
+# bash compile.sh cpu debug     (same but with errors/warnings)
+# bash compile.sh cpu circe     (for CIRCE (HPC at USF))
+# bash compile.sh cpu bridges   (for bridges (HPC at UPitt)
+
+# bash compile.sh icpu bridges  (for bridges Intel compilation (seems slower than gcc))
+
+# bash compile.sh cmake         (compile serial version using cmake. Not recommended for best performance.)
+
+# bash compile.sh gpu           (for a single computer with CUDA compatible GPU installed).
+# bash compile.sh gpu debug     (for GPU compilation with errors)
+# bash compile.sh gpu circe     (CUDA GPU on circe HPC)
+
+# bash compile.sh omp           (for OpenMP implementation, not yet functional)
+# bash compile.sh omp linux     (same, optimized for Linux)
+
+# bash compile.sh mpi           (for MPI implementation, not yet functional)
+===========================================================
+
+Windows:
+===========================================================
+You can install MCMD on Windows through the Windows Subsystem For Linux using the above commands in a linux terminal ^
+
+Or, you can use the Visual Studio C++ compiler to install in the Windows command line with the following commands.
+The location (or name) of vsdevcmd may vary depending on your Visual Studio installation. The first command loads needed
+C/C++ libraries
+The second compiles the code for Windows and writes an executable called main.exe
+
+# "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\vsdevcmd"
+# cl /EHsc main.cpp /D "WINDOWS"
+===========================================================
+
+
+
+===========================================================
+
