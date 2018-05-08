@@ -1,3 +1,6 @@
+*.exe
+*.obj
+*.i
 #md_test
 *.agr
 frag*

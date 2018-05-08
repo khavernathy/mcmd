@@ -416,10 +416,15 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
     double energy_holder=0.;
 	unsigned int i,j,n,z;
 
+#ifndef WINDOWS
     double v_sum[(int)system.proto.size()];
     double v2_sum[(int)system.proto.size()];
     int N_local[(int)system.proto.size()];
-
+#else
+    double* v_sum = new double[(int)system.proto.size()];
+    double* v2_sum = new double[(int)system.proto.size()];
+    int* N_local = new int[(int)system.proto.size()];
+#endif
 
     //if (system.stats.count_movables > 0) { // DON'T BOTHER FOR NO MOVERS
     // grab fixed potential energy of system

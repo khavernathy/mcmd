@@ -27,7 +27,11 @@ double move_factor(double energy, int N) {
 
 void outputEnergies(System &system, int step, double Ef, double delta_E, double sec_per_step) {
     printf("==============================================================\n");
+#ifndef WINDOWS
     printf("Optimization Step %i (%.4f sec/step) %s\nEnergy =         %f kcal/mol; \u0394E = %f kcal/mol; \n\n", step, sec_per_step, system.constants.atom_file.c_str(),  Ef * system.constants.kbk, delta_E * system.constants.kbk);
+#else
+    printf("Optimization Step %i (%.4f sec/step) %s\nEnergy =         %f kcal/mol; dE = %f kcal/mol; \n\n", step, sec_per_step, system.constants.atom_file.c_str(),  Ef * system.constants.kbk, delta_E * system.constants.kbk);
+#endif
     printf("Bonds =          %f kcal/mol\nAngle-bends =    %f kcal/mol\nDihedrals =      %f kcal/mol\nIntramolec. LJ = %f kcal/mol\nIntramolec. ES = %f kcal/mol\n",
           system.stats.Ustretch.value * system.constants.kbk,
           system.stats.Uangles.value * system.constants.kbk,

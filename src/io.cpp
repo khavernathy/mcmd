@@ -853,8 +853,11 @@ void readInput(System &system, char* filename) {
 
 	string line;
 	ifstream myfile (filename);
-	if (myfile.is_open())
-	{
+	if (!myfile.is_open()) {
+	std::cout << "ERROR: failed to open input file " << filename << "."; printf("\n");
+	exit(EXIT_FAILURE);
+	}
+	
 		while ( getline (myfile,line) )
 		{
 			vector<string> lc;
@@ -865,12 +868,12 @@ void readInput(System &system, char* filename) {
 				back_inserter(lc)
 			);
 
-			if (!lc.empty()) { // ignore blank lines
+			if (lc.empty()) continue;  // ignore blank lines
 
-			if (!strncasecmp(lc[0].c_str(), "!", 1) || (!strncasecmp(lc[0].c_str(), "#", 1))) {
+			if (!strncasecmp(lc[0].c_str(), "!", 1) || (!strncasecmp(lc[0].c_str(), "#", 1))) 
 				continue; // treat ! and # as comments
 
-			} else if (!strcasecmp(lc[0].c_str(),"name")) {
+		if (!strcasecmp(lc[0].c_str(),"name")) {
 				system.constants.jobname = lc[1].c_str();
 				std::cout << "Got job name = " << lc[1].c_str(); printf("\n");
 
@@ -1566,9 +1569,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got flexible frozen molecule option = " << lc[1].c_str(); printf("\n");
 
             } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
-			} // end if line not blank
 		} // end while reading lines
-	} // end if file open
     printf("Done reading input parameters.\n\n");
 } // end read input function
 

@@ -12,6 +12,9 @@
 #include <string>
 #ifdef WINDOWS
        #include <string.h>
+	#ifndef S_ISDIR
+	#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+	#endif
 #else
        #include <strings.h>
 #endif
@@ -108,6 +111,7 @@ int main(int argc, char **argv) {
     string hostcom="hostname";
     int zzz=std::system(hostcom.c_str());
     string linuxcheck="/proc/cpuinfo";
+#ifndef WINDOWS
     //linux
     if (std::ifstream(linuxcheck.c_str())) {
         string cpucom="cat /proc/cpuinfo  | tail -25 | grep -i 'model name'";
@@ -119,7 +123,9 @@ int main(int argc, char **argv) {
         zzz=std::system(cpumac.c_str());
         zzz=std::system("echo $(mem=$(sysctl hw.memsize | awk {'print $2'}); echo $mem | awk {'print $1/1024/1024/1024.0'})' GB memory available on this node (Mac).'");
     }
-
+#else
+	printf("??? GB memory available on this node (Windows).\n");
+#endif
    	// start timing for checkpoints
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	double time_elapsed;
@@ -567,7 +573,12 @@ int main(int argc, char **argv) {
 	double thing = floor(tf/dt);
     long int total_steps = (long int)thing;
 	int count_md_steps = 1;
-    double diffusion_d[3] = {0,0,0}, r2_sum=0., D[(int)system.proto.size()];
+    double diffusion_d[3] = {0,0,0}, r2_sum=0.;
+#ifndef WINDOWS
+	double D[(int)system.proto.size()];
+#else
+	double* D = new double[(int)system.proto.size()];
+#endif
 	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Klin=0., Krot=0., pressure=0.; //, Ek=0.;
     int i,n;
         printf("\n| ========================================= |\n");

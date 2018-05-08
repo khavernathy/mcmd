@@ -10,6 +10,11 @@
 # bash compile.sh cpu           (same result; for a single computer on Mac or Linux or RaspPi)
 # bash compile.sh cpu linux     (optimized for linux (ONLY))
 # bash compile.sh cpu windows   (for use on Windows ONLY -- you must have gcc installed, e.g. through Cygwin)
+	# note -- to install on windows through the command line,
+	# run the following commands:
+	# 	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\vsdevcmd"
+	# 	cl /EHsc main.cpp /D "WINDOWS" /Fe..\mcmd
+	# this will write a windows executable called mcmd.exe in the main directory
 # bash compile.sh cpu debug     (same but with errors/warnings)
 # bash compile.sh cpu circe     (for CIRCE (HPC at USF))
 # bash compile.sh cpu bridges   (for bridges (HPC at UPitt)
@@ -75,7 +80,7 @@ if [[ "$option" == "cpu" ]]; then
         echo "... for Windows OS.";
 	echo "Note: to install in the Windows command line, use the following commands:"
 	echo "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\vsdevcmd"
-	echo "cl /EHsc main.cpp /D \"WINDOWS\""
+	echo "cl /EHsc main.cpp /D \"WINDOWS\" /Fe..\\mcmd"
         echo ""
 	echo "=================================================="
 	g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -D WINDOWS
