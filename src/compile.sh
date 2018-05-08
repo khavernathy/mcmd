@@ -128,7 +128,7 @@ elif [[ "$option" == "omp" ]]; then
         echo "... for linux."
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
     else 
-        /usr/bin/llvm-g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp -D OMP
+        /usr/local/bin/g++-4.9 main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp -D OMP
     fi
 fi
 

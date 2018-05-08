@@ -55,15 +55,18 @@ void calculateForces(System &system, double dt) {
         else {
             if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR) {
                 #ifdef OMP
-                lj_force_omp(system);
+                if (system.constants.openmp_threads > 0)
+                    lj_force_omp(system);
+                else
+                    lj_force(system);
                 #else
                 lj_force(system);
                 #endif           
- 
             } else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
                 tt_forces(system);
-            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
+            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
                 coulombic_real_force(system);
+            }    
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
                 polarization_force(system);
             if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
