@@ -73,7 +73,12 @@ if [[ "$option" == "cpu" ]]; then
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3
     elif [[ "$2" == "windows" ]]; then
         echo "... for Windows OS.";
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -D WINDOWS
+	echo "Note: to install in the Windows command line, use the following commands:"
+	echo "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\vsdevcmd"
+	echo "cl /EHsc main.cpp /D \"WINDOWS\""
+        echo ""
+	echo "=================================================="
+	g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -D WINDOWS
     else
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
     fi

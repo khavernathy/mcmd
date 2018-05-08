@@ -31,9 +31,9 @@
 //#include <float.h>
 
 // Windows compilation (c11 instead of c++) doesn't auto-define pi.
-#ifdef WINDOWS
-#define M_PI 3.14159265359
-#endif
+//#ifdef WINDOWS
+//#define M_PI 3.14159265359
+//#endif
 
 // c++ code files of this software
 // ORDER MATTERS HERE !!!!!!!!!!!!!
@@ -125,9 +125,11 @@ int main(int argc, char **argv) {
 	double time_elapsed;
 	double sec_per_step;
 
-	srand((unsigned)time(NULL)); // initiate random seed, old version
-    srand48((unsigned)time(NULL)); // initiate drand48 48-bit integer random seed.
-
+    	#ifndef WINDOWS
+		srand48((unsigned)time(NULL)); // initiate drand48 48-bit integer random seed.
+	#else
+		srand((unsigned)time(NULL)); // initiate random seed, old version
+	#endif
 	// disable output buffering (print everything immediately to output)
 	setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.
 

@@ -2,6 +2,8 @@
 #include <string>
 #ifdef WINDOWS
        #include <string.h>
+	#define strncasecmp _strnicmp
+	#define strcasecmp _stricmp
 #else
        #include <strings.h>
 #endif

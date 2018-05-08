@@ -20,7 +20,11 @@
 using namespace std;
 
 double getrand() {
+#ifndef WINDOWS
     return drand48();
+#else
+    return (std::rand()/(RAND_MAX+1));
+#endif
 }
 
 /* GET BOX LIMIT COORDINATE FOR PBC */
@@ -43,10 +47,16 @@ double getBoxLimit(System &system, int planeid, double x, double y, double z) {
 /* MOVE ALL ATOMS SUCH THAT THEY ARE CENTERED ABOUT 0,0,0 */
 void centerCoordinates(System &system) {
 	printf("Centering all coordinates...\n");
-    int size = system.constants.total_atoms;
+    	int size = system.constants.total_atoms;
+	#ifndef WINDOWS
 	double xtemp[size];
 	double ytemp[size];
 	double ztemp[size];
+	#else
+	double* xtemp = new double[size];
+	double* ytemp = new double[size];
+	double* ztemp = new double[size];
+	#endif
 	int temp_index=0;
 
 	for (int j=0; j<system.molecules.size(); j++) {
