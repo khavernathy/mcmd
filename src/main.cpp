@@ -222,7 +222,7 @@ int main(int argc, char **argv) {
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses //
     for (int i=0; i<system.molecules.size(); i++) {
-        system.molecules[i].calc_center_of_mass();
+        //system.molecules[i].calc_center_of_mass();
         if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
         for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
@@ -664,10 +664,11 @@ int main(int argc, char **argv) {
                 for (i=0; i<system.molecules.size(); i++) {
                     // only consider molecules of this type (for multi-sorb)
                     if (system.molecules[i].name == system.proto[sorbid].name) {
-                        for (n=0; n<3; n++) {
+                        system.molecules[i].calc_center_of_mass();
+			for (n=0; n<3; n++) {
                             // first update the "original" center of mass "r(0)"
                             // as the arithmetic running average of r(1), r(2) ... r(t) in time
-                            //system.molecules[i].original_com[n] = ((count_md_steps - 1)*system.molecules[i].original_com[n] + (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]))/count_md_steps; 
+                            system.molecules[i].original_com[n] = ((count_md_steps - 1)*system.molecules[i].original_com[n] + (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]))/count_md_steps; 
                             // now take normalized atom position (by periodic box and by system C.O.M.)
                             // and do r(t) - "r(0)"
                             diffusion_d[n] = (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]) - system.molecules[i].original_com[n];
@@ -737,7 +738,8 @@ int main(int argc, char **argv) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
 			        if (system.proto.size() == 1)
                         printf("Mean square displacement = %.5f A^2\n", r2_sum/system.stats.count_movables);
-                }
+                	//printf("r2_sum = %f\n",r2_sum);
+		}
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);
             // uptake data if uVT
