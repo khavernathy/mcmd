@@ -200,6 +200,7 @@ void lj_force(System &system) {   // units of K/A
 
     const double cutoff = system.pbc.cutoff;
     double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
+    double start = omp_get_wtime();
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i+1; k < system.molecules.size(); k++) {
@@ -236,13 +237,14 @@ void lj_force(System &system) {   // units of K/A
     } // loop k 
     } //loop j
     } // loop i
+    double end=omp_get_wtime();
+    printf("ljopenmp loop time = %f\n",end-start);
     // DONE WITH PAIR INTERACTIONS
 }
 
 #ifdef OMP
 void lj_force_omp(System &system) {   // units of K/A
 
-    const double cutoff = system.pbc.cutoff;
     omp_set_num_threads(system.constants.openmp_threads);
     int nthreads = omp_get_num_threads();
 
@@ -251,54 +253,47 @@ void lj_force_omp(System &system) {   // units of K/A
     {
         int thread_id = omp_get_thread_num();
         int nthreads_local = omp_get_num_threads();        
-
-        double d[3], eps, sig, r,rsq,r6,s2,s6, f[3], localf[3]; //, sr, sr2, sr6;
+        const double cutoff = system.pbc.cutoff;
+        const int rd_lrc = system.constants.rd_lrc;
+        double d[3], eps, sig, r,rsq,r6,s2,s6, localf[3]; //, sr, sr2, sr6;
         int i,j,k,l;        
         
-
         int counter=-1;
         for (i = 0; i < system.molecules.size(); i++) {
         for (j = 0; j < system.molecules[i].atoms.size(); j++) {
             for (int n=0;n<3;n++) localf[n] = 0;
-        for (k = i+1; k < system.molecules.size(); k++) {
-        for (l = 0; l < system.molecules[k].atoms.size(); l++) {
-            // first qualify the pair for this thread            
-            // shuffling method
-            //printf("counter=%i thread_id=%i nthreads_local=%i atoms %i %i %i %i\n", counter,thread_id,nthreads_local,i,j,k,l);
             counter++;
-            if ((counter + thread_id) % nthreads_local != 0) continue;
-            
+            if ((counter + thread_id) % nthreads_local != 0) continue; 
+            for (k = 0; k < system.molecules.size(); k++) {
+            if (i==k) continue;
+            for (l = 0; l < system.molecules[k].atoms.size(); l++) {
+           
+                // do mixing rules
+                eps = system.molecules[i].atoms[j].eps;
+                sig = system.molecules[i].atoms[j].sig;
+                eps = sqrt(eps*system.molecules[k].atoms[l].eps);
+                sig = 0.5*(sig + system.molecules[k].atoms[l].sig);
 
-            // do mixing rules
-            eps = system.molecules[i].atoms[j].eps;
-            sig = system.molecules[i].atoms[j].sig;
-            eps = lj_lb_eps(eps, system.molecules[k].atoms[l].eps);
-            sig = lj_lb_sig(sig, system.molecules[k].atoms[l].sig);
+                if ((sig == 0 || eps == 0)) continue; 
+                    // calculate distance between atoms
+                    double* distances = getDistanceXYZ(system, i, j, k, l);
+                    r = distances[3];
+                    rsq=r*r;
+                    for (int n=0; n<3; n++) d[n] = distances[n];
 
-            if (!(sig == 0 || eps == 0)) {
-            // calculate distance between atoms
-            double* distances = getDistanceXYZ(system, i, j, k, l);
-            r = distances[3];
-            rsq=r*r;
-            for (int n=0; n<3; n++) d[n] = distances[n];
+                    r6 = rsq*rsq*rsq;
+                    s2 = sig*sig;
+                    s6 = s2*s2*s2;
 
-            r6 = rsq*rsq*rsq;
-            s2 = sig*sig;
-            s6 = s2*s2*s2;
+                    if ((!rd_lrc || r <= cutoff)) {
+                        for (int n=0; n<3; n++) {
+                            //printf("thread %i adding force on counter = %i\n", thread_id,counter);
+                            localf[n] += 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                        }
+                    }
 
-            if ((!system.constants.rd_lrc || r <= cutoff)) {
-                for (int n=0; n<3; n++) {
-                    //printf("thread %i adding force on counter = %i\n", thread_id,counter);
-                    f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-                    localf[n] += f[n];
-                    system.molecules[k].atoms[l].force[n] -= f[n];
-                }
-            }
-            } // end sig/eps nonzero
-
-
-        } // end atom l
-        } // end mol k
+            } // end atom l
+            } // end mol k
             for (int n=0;n<3;n++)
                 system.molecules[i].atoms[j].force[n] += localf[n];
         } // end atom j
