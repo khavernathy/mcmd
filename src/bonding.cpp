@@ -240,12 +240,12 @@ double get_BO(string a1, string a2) {
 // via the Morse potential
 double stretch_energy(System &system) {
     double potential = 0;
-    double alpha,Dij,kij,rij; // bond params
+    double alpha,Dij,rij; // kij; bond params
     double mainterm; // main chunk of potential, to be squared..
     unsigned int i,j,l; // atom indices
     double r; // actual, current distance for pair.
     /* ============================ */
-    double BO;
+    //double BO;
     /* ============================ */
 
     // loop through bonds of this atom.
@@ -255,10 +255,10 @@ double stretch_energy(System &system) {
         l = system.constants.uniqueBonds[it].atom2;
 
         rij = system.constants.uniqueBonds[it].rij; // in A
-        kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
+        //kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
 //          printf("rij = %f; kij = %f\n", rij, kij);
 
-        BO = system.constants.uniqueBonds[it].BO;
+    //    BO = system.constants.uniqueBonds[it].BO;
         Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
         alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
 
@@ -316,9 +316,9 @@ double get_rik(System &system, double rij, double rjk, double t3, double angle) 
 // via simple Fourier small cosine expansion
 double angle_bend_energy(System &system) {
     double potential=0;
-    const double deg2rad = M_PI/180.0;
+    //const double deg2rad = M_PI/180.0;
     unsigned int i,j,l,m;
-    double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
+    double rij, rjk, rik, K_ijk, C0, C1, C2; //theta_ijk; // angle-bend params
     double t1,t2,t3;
     double angle; // the actual angle IJK
 
@@ -329,7 +329,7 @@ double angle_bend_energy(System &system) {
         m = system.constants.uniqueAngles[it].atom3;
         rij = system.constants.uniqueAngles[it].rij; // in Angstroms
         rjk = system.constants.uniqueAngles[it].rjk;
-        theta_ijk = system.constants.uniqueAngles[it].theta_ijk; // in rads
+        //theta_ijk = system.constants.uniqueAngles[it].theta_ijk; // in rads
         C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
         C1 = system.constants.uniqueAngles[it].C1; // 1/rad
         C0 = system.constants.uniqueAngles[it].C0; // 1
@@ -370,10 +370,11 @@ double get_dihedral_angle(System &system, unsigned int mol, unsigned int i, unsi
     double v2a[3], v2b[3]; // for plane 2
     double norm1[3], norm2[3];
 
+	/*
     double xi,xj,xk,xl;
     double yi,yj,yk,yl;
     double zi,zj,zk,zl;
-
+	*/
 
     double* distancesJI = getDistanceXYZ(system,mol,j,mol,i);
     for (int n=0; n<3; n++)
@@ -505,8 +506,8 @@ double * get_torsion_params(System &system, string a1, string a2) {
 // via simple Fourier small cosine expansion
 double torsions_energy(System &system) {
     double potential=0;
-    double vjk, vj, vk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
-    const double deg2rad = M_PI/180.0;
+    double vjk, n, dihedral, phi_ijkl; // vj,vk; // n is periodicity (integer quantity)
+    //const double deg2rad = M_PI/180.0;
     unsigned int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     for (unsigned int it=0; it<system.constants.uniqueDihedrals.size(); it++) {
 
@@ -537,11 +538,11 @@ double torsions_energy(System &system) {
 double morse_gradient(System &system) {
     // x,y,z is the point of interest for this gradient
     // ij tells us whether it's the 1st atom or 2nd within definition of delta x (+1 or -1)
-    double alpha,Dij,kij,rij; // bond params
+    double alpha,Dij,rij; //kij; // bond params
     unsigned int i,j,l; // atom indices
     double r; // actual, current distance for pair.
     /* ============================ */
-    double BO;
+    //double BO;
     /* ============================ */
     double prefactor,grad,delta;
         // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
@@ -554,10 +555,10 @@ double morse_gradient(System &system) {
                 l = system.constants.uniqueBonds[it].atom2;
 
                 rij = system.constants.uniqueBonds[it].rij; // in A
-                kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
+                //kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
 //          printf("rij = %f; kij = %f\n", rij, kij);
 
-                BO = system.constants.uniqueBonds[it].BO;
+                //BO = system.constants.uniqueBonds[it].BO;
                 Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
                 alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
 
@@ -601,9 +602,9 @@ double simple_r(double xi, double xj, double yi, double yj, double zi, double zj
 // get the total potential from angle bends
 // via simple Fourier small cosine expansion
 double angle_bend_gradient(System &system) {
-    const double deg2rad = M_PI/180.0;
+//    const double deg2rad = M_PI/180.0;
     unsigned int i,j,l,m;
-    double rij, rjk, rik, K_ijk, C0, C1, C2, theta_ijk; // angle-bend params
+    double rij, rjk, rik, K_ijk, C1, C2;// theta_ijk; // C0; angle-bend params
     double angle; // the actual angle IJK
     double grad;
     double xi, yi, zi, xj, yj, zj, xk, yk, zk;
@@ -618,10 +619,10 @@ double angle_bend_gradient(System &system) {
         m = system.constants.uniqueAngles[it].atom3;
         rij = system.constants.uniqueAngles[it].rij; // in Angstroms
         rjk = system.constants.uniqueAngles[it].rjk;
-        theta_ijk = system.constants.uniqueAngles[it].theta_ijk; // in rads
+        //theta_ijk = system.constants.uniqueAngles[it].theta_ijk; // in rads
         C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
         C1 = system.constants.uniqueAngles[it].C1; // 1/rad
-        C0 = system.constants.uniqueAngles[it].C0; // 1
+        //C0 = system.constants.uniqueAngles[it].C0; // 1
         t1 = system.constants.uniqueAngles[it].t1;
         t2 = system.constants.uniqueAngles[it].t2;
         t3 = system.constants.uniqueAngles[it].t3;
@@ -778,7 +779,7 @@ double angle_bend_gradient(System &system) {
 
 double torsions_gradient(System &system) {
     double vjk, n, dihedral, phi_ijkl; // n is periodicity (integer quantity)
-    const double deg2rad = M_PI/180.0;
+    //const double deg2rad = M_PI/180.0;
     double xi,xj,xk,xl, yi,yj,yk,yl, zi,zj,zk,zl;
     unsigned int i,j,l,m,p; // molecule i, atoms (j,l,m and p)
     double grad;
@@ -1206,7 +1207,7 @@ void findBonds(System &system) {
 void setBondingParameters(System &system) {
     // save all bond/angle/torsion/non-bond parameters to memory
     // (before running optimization)
-    unsigned int it, mol,atom1,atom2,atom3,atom4;
+    unsigned int it, mol,atom1,atom2,atom3;//,atom4;
 
     // 1) bonds
     for (it=0; it<system.constants.uniqueBonds.size(); it++) {
@@ -1255,7 +1256,7 @@ void setBondingParameters(System &system) {
         atom1 = system.constants.uniqueDihedrals[it].atom1;
         atom2 = system.constants.uniqueDihedrals[it].atom2;
         atom3 = system.constants.uniqueDihedrals[it].atom3;
-        atom4 = system.constants.uniqueDihedrals[it].atom4;
+        //atom4 = system.constants.uniqueDihedrals[it].atom4;
 
         double * params = get_torsion_params(system, system.molecules[mol].atoms[atom2].UFFlabel, system.molecules[mol].atoms[atom3].UFFlabel);
         system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;

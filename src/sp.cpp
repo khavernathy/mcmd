@@ -166,7 +166,7 @@ void singlePointEnergy(System &system) {
 
     // Nuclear repulsions
     double nucrepul=0;
-    double Zi, Zj, qi, qj; // atomic num's
+    double Zi, Zj; // atomic num's
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
             Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
@@ -182,8 +182,8 @@ void singlePointEnergy(System &system) {
     // Electron-nucleus attractions
     // THIS ASSUMES NEUTRALITY OF THE MOLECULE
     double elec=0, negi, posj;
-    double bohr = system.constants.bohr;
-    double reducefactor;
+    //double bohr = system.constants.bohr;
+    //double reducefactor;
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
         for (j=0; j<system.molecules[0].atoms.size(); j++) {
             Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
@@ -199,7 +199,7 @@ void singlePointEnergy(System &system) {
                 // for large elements, it is closer to zero.
                 // we use this to reduce the effective average distance between electrons within atoms.
                 double Ni = (double)system.constants.elements[system.molecules[0].atoms[i].name];
-                reducefactor = 1.0 - (Ni - 1.0)/Ni;
+                //reducefactor = 1.0 - (Ni - 1.0)/Ni;
                 double radius = system.constants.radii[system.molecules[0].atoms[i].name];
                 r = avgr(radius);//*reducefactor;
                 elec += (negi*posj/r); //  approx r as fraction of bohr radius

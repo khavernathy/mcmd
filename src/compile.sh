@@ -26,6 +26,7 @@
 # bash compile.sh gpu           (for a single computer with CUDA compatible GPU installed).
 # bash compile.sh gpu debug     (for GPU compilation with errors)
 # bash compile.sh gpu circe     (CUDA GPU on circe HPC)
+# bash compile.sh gpu windows   (CUDA GPU on Windows machine)
 
 # bash compile.sh omp           (for OpenMP implementation, not yet functional)
 # bash compile.sh omp linux     (same, optimized for Linux)
@@ -100,6 +101,9 @@ elif [[ "$option" == "gpu" ]]; then
     elif [[ "$2" == "debug" ]]; then
         echo "... in debug mode (with errors/warnings)";
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -G -g -O3 -o ../mcmd
+    elif [[ "$2" == "windows" ]]; then
+	echo "... for Windows OS."
+	nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -D WINDOWS -o ../mcmd
     else
         nvcc -x cu main.cpp -std=c++11 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -D CUDA -O3 -o ../mcmd
     fi

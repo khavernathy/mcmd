@@ -132,7 +132,7 @@ void printBondParameters(System &system) {
 // Optimize the molecule (ID=0) via MM forcefield(s)
 void optimize(System &system) {
 
-    int i;
+    //int i;
     std::chrono::steady_clock::time_point begin_opt = std::chrono::steady_clock::now();
 
     printBondParameters(system);
@@ -144,7 +144,6 @@ void optimize(System &system) {
     double Ef = totalBondedEnergy(system);
     double Ei;
     double delta_E;
-    double boltzmann;
     double tmp_pos[3] = {0,0,0};
     int randatom;
     int step=0;
@@ -173,10 +172,7 @@ void optimize(System &system) {
         Ef = totalBondedEnergy(system);
         delta_E = Ef - Ei;
 
-      //  printf("Ef after = %f\n", Ef);
 
-        //boltzmann = exp(-delta_E/0.00001); // just for now..
-        //if (getrand() < boltzmann) {
         if (delta_E < 0) { // allow some positives a la Monte Carlo
            // accept
             step++;

@@ -1784,7 +1784,7 @@ void inputValidation(System &system) {
     }
     #ifndef OMP
     if (system.constants.openmp_threads > 0) {
-        std:cout << "ERROR: You used the `omp` command but did not compile with OpenMP resources. Compile with, e.g. `bash compile.sh omp linux`."; 
+        std::cout << "ERROR: You used the `omp` command but did not compile with OpenMP resources. Compile with, e.g. `bash compile.sh omp linux`."; 
         exit(EXIT_FAILURE);
     }
     #endif
