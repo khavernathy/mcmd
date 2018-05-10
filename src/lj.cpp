@@ -238,7 +238,7 @@ void lj_force(System &system) {   // units of K/A
     } //loop j
     } // loop i
     double end=omp_get_wtime();
-    printf("ljopenmp loop time = %f\n",end-start);
+    //printf("ljopenmp loop time = %f\n",end-start);
     // DONE WITH PAIR INTERACTIONS
 }
 
@@ -348,7 +348,7 @@ void lj_force_omp(System &system) {   // units of K/A
         } // end atom pairs mol i
     } // end omp block
     double end  = omp_get_wtime();
-    printf("ljopenmp loop time = %f\n",end-start);
+    //printf("ljopenmp loop time = %f\n",end-start);
 
 }
 #endif

@@ -166,6 +166,179 @@ void coulombic_force_nopbc(System &system) {
     } // end i
 }
 
+#ifdef OMP
+// pbc force via ewald -dU/dx, -dU/dy, -dU/dz
+void coulombic_real_force_omp(System &system) {  // units of K/A
+
+    double invV = 1./system.pbc.volume;
+
+    if (system.constants.ensemble == ENSEMBLE_NPT) {
+        system.pbc.calcVolume();
+        system.pbc.calcRecip();
+        invV = 1./system.pbc.volume;
+    }
+
+    omp_set_num_threads(system.constants.openmp_threads);
+    int nthreads = omp_get_num_threads();
+
+    double start = omp_get_wtime();
+    #pragma omp parallel
+    {
+    int thread_id = omp_get_thread_num();
+    int nthreads_local = omp_get_num_threads();
+
+    const double alpha=system.constants.ewald_alpha;
+    double erfc_term; // = erfc(alpha*r);
+    double charge1, charge2, chargeprod, r,rsq;
+    double u[3]; double localf[3];
+    const double sqrtPI = sqrt(M_PI);
+    const double fourPI = M_PI*4;
+    int l[3]; int p,q; double k_sq;
+    const int kmax = system.constants.ewald_kmax;
+    const int numk = system.constants.ewald_num_k;
+    const int ko = system.constants.kspace_option;
+    double b[3][3], rb[3][3];
+    for (p=0;p<3;p++) {
+        for (q=0;q<3;q++) {
+            b[p][q] = system.pbc.basis[p][q];
+            rb[p][q] = system.pbc.reciprocal_basis[p][q];
+        }
+    }
+    double rimg;
+    double d[3],di[3],img[3],dimg[3];
+    double r2,ri,ri2,xtmp[3];
+
+    double** kvecs;
+    kvecs = (double **) calloc(numk, sizeof(double*));
+    for (int i=0; i<numk; i++) {
+        kvecs[i] = (double *) malloc(3*sizeof(double));
+        for (int n=0;n<3;n++)
+            kvecs[i][n] = 0; // copy the system array to local array.
+    }
+
+    // now define the k-vectors
+	int count_ks=0;
+    for (l[0] = 0; l[0] <= kmax; l[0]++) {
+        for (l[1] = (!l[0] ? 0 : -kmax); l[1] <= kmax; l[1]++) {
+            for (l[2] = ((!l[0] && !l[1]) ? 1 : -kmax); l[2] <= kmax; l[2]++) {
+                // skip if norm is out of sphere
+                if (l[0]*l[0] + l[1]*l[1] + l[2]*l[2] > kmax*kmax) continue;
+                /* get reciprocal lattice vectors */
+                for (p=0; p<3; p++) {
+                    for (q=0, kvecs[count_ks][p] = 0; q < 3; q++) {
+                        kvecs[count_ks][p] += 2.0*M_PI*rb[p][q] * l[q];
+                    }
+                }
+                count_ks++;
+            } // end for l[2], n
+        } // end for l[1], m
+    } // end for l[0], l
+	// done defining k-space vectors
+
+    int counter=-1;
+    for (int i = 0; i < system.molecules.size(); i++) {
+    for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+        counter++;
+        if ((counter + thread_id) % nthreads_local != 0) continue;
+        for (int n=0;n<3;n++) localf[n]=0;
+        for (int n=0;n<3;n++) xtmp[n] = system.molecules[i].atoms[j].pos[n];
+    for (int ka = 0; ka < system.molecules.size(); ka++) {
+        if (i==ka) continue;
+    for (int la = 0; la < system.molecules[ka].atoms.size(); la++) {
+    if ((!(system.molecules[i].frozen && system.molecules[ka].frozen)) &&
+        !(system.molecules[i].atoms[j].C == 0 || system.molecules[ka].atoms[la].C == 0) ) { // don't do frozen-frozen or zero charge
+
+        charge1 = system.molecules[i].atoms[j].C;
+        charge2 = system.molecules[ka].atoms[la].C;
+        chargeprod=charge1*charge2;
+
+        // calculate distance between atoms
+        for (int n=0;n<3;n++) d[n] = xtmp[n] - system.molecules[ka].atoms[la].pos[n]; 
+        // images from reciprocal basis.
+        for (p=0; p<3; p++) {
+            img[p] = 0;
+            for (q=0; q<3; q++) {
+                img[p] += rb[q][p]*d[q];
+            }
+            img[p] = rint(img[p]);
+        }
+        // get d_image
+        for (p=0; p<3; p++) {
+            di[p]=0;
+            for (q=0; q<3; q++) {
+                di[p] += b[q][p]*img[q];
+            }
+        }
+        // correct displacement
+        for (p=0; p<3; p++)
+            di[p] = d[p] - di[p];
+        // pythagorean terms
+        r2=0; ri2=0;
+        for (p=0; p<3; p++) {
+            r2 += d[p]*d[p];
+            ri2 += di[p]*di[p];
+        }
+        r = sqrt(r2);
+        ri = sqrt(ri2);
+        if (ri != ri) {
+            rimg = r;
+            for (p=0; p<3; p++)
+                dimg[p] = d[p];
+        } else {
+            rimg = ri;
+            for (p=0; p<3; p++)
+                dimg[p] = di[p];
+        }
+        r = rimg; 
+        rsq = r*r;
+        for (int n=0;n<3;n++) d[n] = dimg[n];
+        for (int n=0; n<3; n++) u[n] = d[n]/r;
+        if (r <= system.pbc.cutoff) { // non-duplicated pairs only, not intramolecular and not beyond cutoff
+            // real space. units are K/A. alpha is 1/A, charge is sqrt(KA)
+            erfc_term = erfc(alpha*r);
+            for (int n=0; n<3; n++) {
+                localf[n] += -((-2.0*chargeprod*alpha*exp(-alpha*alpha*rsq))/(sqrtPI*r) - (chargeprod*erfc_term/rsq))*u[n];
+                //system.molecules[i].atoms[j].force[n] += holder;
+                //system.molecules[ka].atoms[la].force[n] -= holder;
+
+            }
+        }
+        if (ko) { // k-space terms can be outside cutoff. Skip duplicates though.
+            // k-space. units are K/A, 
+            for (int n=0;n<3;n++) { //x,y,z
+              // loop k vectors
+                for (int ki=0; ki < numk; ki++) {
+                	k_sq = kvecs[ki][0]*kvecs[ki][0] + 
+                    kvecs[ki][1]*kvecs[ki][1] + 
+                    kvecs[ki][2]*kvecs[ki][2];
+                    
+                    localf[n] += chargeprod*invV*fourPI*kvecs[ki][n]* 
+              			exp(-k_sq/(4*alpha*alpha))* 
+                        sin(kvecs[ki][0]*d[0]+
+                        	kvecs[ki][1]*d[1]+
+                            kvecs[ki][2]*d[2])/k_sq   * 2; // times 2 because it's a half-Ewald sphere 
+                    //system.molecules[i].atoms[j].force[n] += holder;
+                    //system.molecules[ka].atoms[la].force[n] -= holder;
+                } // end k-vector loop
+            } // end 3D
+        } // end if condition k-space 
+    } // end if not frozen and not zero-charge
+    } // end l
+    } // end k
+        for (int n=0;n<3;n++) system.molecules[i].atoms[j].force[n] += localf[n];
+    } // end j
+    } // end i
+
+    if (ko) {
+        for (int i=0; i<numk; i++) free(kvecs[i]);
+        free(kvecs);
+    }
+    } // end OMP block
+    double end = omp_get_wtime();
+    //printf("esopenmp loop time = %f\n", end-start);
+}
+#endif
+
 // pbc force via ewald -dU/dx, -dU/dy, -dU/dz
 void coulombic_real_force(System &system) {  // units of K/A
     const double alpha=system.constants.ewald_alpha;
@@ -184,6 +357,9 @@ void coulombic_real_force(System &system) {  // units of K/A
         invV = 1./system.pbc.volume;
    }
 
+#ifdef OMP
+    double start = omp_get_wtime();
+#endif
     double** kvecs;
     kvecs = (double **) calloc(system.constants.ewald_num_k, sizeof(double*));
     for (int i=0; i<system.constants.ewald_num_k; i++) {
@@ -267,7 +443,10 @@ void coulombic_real_force(System &system) {  // units of K/A
         for (int i=0; i<system.constants.ewald_num_k; i++) free(kvecs[i]);
         free(kvecs);
     }
-
+#ifdef OMP
+    double end = omp_get_wtime();
+    //printf("esopenmp loop time = %f\n", end-start);
+#endif
 }
 
 // Coulombic reciprocal electrostatic energy from Ewald //
