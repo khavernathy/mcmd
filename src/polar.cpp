@@ -563,7 +563,7 @@ void polarization_force(System &system) {
     } // end loop i molecules
     #ifdef OMP
     double end=omp_get_wtime();
-    printf("polopenmp loop time = %f\n",end-start);
+    //printf("polopenmp loop time = %f\n",end-start);
     #endif
 } // end polarization forces function
 
@@ -743,7 +743,7 @@ void polarization_force_omp(System &system) {
         } // end loop i molecules
     } // end OMP
     double end=omp_get_wtime();
-    printf("polopenmp loop time = %f\n",end-start);
+    //printf("polopenmp loop time = %f\n",end-start);
 } // end polarization forces function
 #endif
 
