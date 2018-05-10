@@ -200,7 +200,9 @@ void lj_force(System &system) {   // units of K/A
 
     const double cutoff = system.pbc.cutoff;
     double d[3], eps, sig, r,rsq,r6,s2,s6, f[3]; //, sr, sr2, sr6;
+#ifdef OMP
     double start = omp_get_wtime();
+#endif
     for (int i = 0; i < system.molecules.size(); i++) {
     for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
     for (int k = i+1; k < system.molecules.size(); k++) {
@@ -237,8 +239,10 @@ void lj_force(System &system) {   // units of K/A
     } // loop k 
     } //loop j
     } // loop i
+#ifdef OMP
     double end=omp_get_wtime();
     //printf("ljopenmp loop time = %f\n",end-start);
+#endif
     // DONE WITH PAIR INTERACTIONS
 }
 

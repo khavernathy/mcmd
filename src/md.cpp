@@ -75,7 +75,14 @@ void calculateForces(System &system, double dt) {
                 #endif
             }    
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
+                #ifdef OMP
+                if (system.constants.openmp_threads > 0)
+                    polarization_force_omp(system);
+                else
+                    polarization_force(system);
+                #else
                 polarization_force(system);
+                #endif
             if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
                   if (system.constants.opt_bonds)
                     morse_gradient(system);
