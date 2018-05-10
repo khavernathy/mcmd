@@ -238,7 +238,7 @@ void lj_force(System &system) {   // units of K/A
     } //loop j
     } // loop i
     double end=omp_get_wtime();
-//    printf("ljopenmp loop time = %f\n",end-start);
+    printf("ljopenmp loop time = %f\n",end-start);
     // DONE WITH PAIR INTERACTIONS
 }
 
@@ -257,15 +257,28 @@ void lj_force_omp(System &system) {   // units of K/A
         const int rd_lrc = system.constants.rd_lrc;
         double d[3], eps, sig, r,rsq,r6,s2,s6, localf[3]; //, sr, sr2, sr6;
         int i,j,k,l;        
-        
+        double xtmp[3];
+        double rimg;
+        double di[3],img[3],dimg[3];
+        int p,q;
+        double r2,ri,ri2;
+        double b[3][3], rb[3][3];
+        for (p=0;p<3;p++) {
+            for (q=0;q<3;q++) {
+                b[p][q] = system.pbc.basis[p][q];
+                rb[p][q] = system.pbc.reciprocal_basis[p][q];
+            }
+        }
+
         int counter=-1;
         for (i = 0; i < system.molecules.size(); i++) {
         for (j = 0; j < system.molecules[i].atoms.size(); j++) {
             for (int n=0;n<3;n++) localf[n] = 0;
+            for (int n=0;n<3;n++) xtmp[n] = system.molecules[i].atoms[j].pos[n];
             counter++;
             if ((counter + thread_id) % nthreads_local != 0) continue; 
             for (k = 0; k < system.molecules.size(); k++) {
-            if (i==k) continue;
+            if (i==k) continue; // skip same-molecule
             for (l = 0; l < system.molecules[k].atoms.size(); l++) {
            
                 // do mixing rules
@@ -275,22 +288,57 @@ void lj_force_omp(System &system) {   // units of K/A
                 sig = 0.5*(sig + system.molecules[k].atoms[l].sig);
 
                 if ((sig == 0 || eps == 0)) continue; 
-                    // calculate distance between atoms
-                    double* distances = getDistanceXYZ(system, i, j, k, l);
-                    r = distances[3];
-                    rsq=r*r;
-                    for (int n=0; n<3; n++) d[n] = distances[n];
-
-                    r6 = rsq*rsq*rsq;
-                    s2 = sig*sig;
-                    s6 = s2*s2*s2;
-
-                    if ((!rd_lrc || r <= cutoff)) {
-                        for (int n=0; n<3; n++) {
-                            //printf("thread %i adding force on counter = %i\n", thread_id,counter);
-                            localf[n] += 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-                        }
+                // calculate distance between atoms
+                for (int n=0;n<3;n++) d[n] = xtmp[n] - system.molecules[k].atoms[l].pos[n];
+                // images from reciprocal basis.
+                for (p=0; p<3; p++) {
+                    img[p] = 0;
+                    for (q=0; q<3; q++) {
+                        img[p] += system.pbc.reciprocal_basis[q][p]*d[q];
                     }
+                    img[p] = rint(img[p]);
+                }
+                // get d_image
+                for (p=0; p<3; p++) {
+                    di[p]=0;
+                    for (q=0; q<3; q++) {
+                        di[p] += system.pbc.basis[q][p]*img[q];
+                    }
+                }
+                // correct displacement
+                for (p=0; p<3; p++)
+                    di[p] = d[p] - di[p];
+                // pythagorean terms
+                r2=0; ri2=0;
+                for (p=0; p<3; p++) {
+                    r2 += d[p]*d[p];
+                    ri2 += di[p]*di[p];
+                }
+                r = sqrt(r2);
+                ri = sqrt(ri2);
+                if (ri != ri) {
+                    rimg = r;
+                    for (p=0; p<3; p++)
+                        dimg[p] = d[p];
+                } else {
+                    rimg = ri;
+                    for (p=0; p<3; p++)
+                        dimg[p] = di[p];
+                }
+                r = rimg;
+                rsq=r*r;
+                for (int n=0; n<3; n++) d[n] = dimg[n];
+
+                r6 = rsq*rsq*rsq;
+                s2 = sig*sig;
+                s6 = s2*s2*s2;
+
+                if ((!rd_lrc || r <= cutoff)) {
+                    for (int n=0; n<3; n++) {
+                        //printf("thread %i adding force on counter = %i\n", thread_id,counter);
+                        localf[n] += 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+                    }
+                }
 
             } // end atom l
             } // end mol k
@@ -300,7 +348,7 @@ void lj_force_omp(System &system) {   // units of K/A
         } // end atom pairs mol i
     } // end omp block
     double end  = omp_get_wtime();
-//    printf("ljopenmp loop time = %f\n",end-start);
+    printf("ljopenmp loop time = %f\n",end-start);
 
 }
 #endif
