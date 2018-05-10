@@ -342,7 +342,7 @@ void coulombic_real_force_omp(System &system) {  // units of K/A
     }
     } // end OMP block
     double end = omp_get_wtime();
-    printf("esopenmp loop time = %f\n", end-start);
+    //printf("esopenmp loop time = %f\n", end-start);
 }
 #endif
 
