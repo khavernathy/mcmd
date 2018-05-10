@@ -602,6 +602,18 @@ void polarization_force_omp(System &system) {
         double u_i[3]={0,0,0}, u_j[3]={0,0,0}; // temp. dipoles
         double q_i,q_j; // temp. charges
         double t1, t2, t3, p1, p2, p3, p4, p5; // terms and prefactors
+        double b[3][3], rb[3][3], xtmp[3];
+        for (i=0;i<3;i++) {
+            for (j=0;j<3;j++) {
+                b[i][j] = system.pbc.basis[i][j];
+                rb[i][j] = system.pbc.reciprocal_basis[i][j];
+            }
+        }
+        double rimg;
+        double d[3],di[3],img[3],dimg[3];
+        int p,q;
+        double ri,ri2;
+        const double cutoff = system.pbc.cutoff;
 
         int counter=-1;
         // ready for forces; loop all atoms
@@ -610,6 +622,7 @@ void polarization_force_omp(System &system) {
             counter++;
             if ((counter + thread_id) % nthreads_local != 0) continue;
             for (n=0;n<3;n++) flocal[n] = 0;
+            for (n=0;n<3;n++) xtmp[n] = system.molecules[i].atoms[j].pos[n];
 
             // initializers for atom
             q_i = system.molecules[i].atoms[j].C;
@@ -623,11 +636,47 @@ void polarization_force_omp(System &system) {
                 // (1) u_i -- q_j  ||  (2) u_j -- q_i  ||  (3) u_i -- u_j
                 //for (n=0;n<3;n++) f_local[n]=0;
                 
-                double* distances = getDistanceXYZ(system,i,j,k,l);
-                system.checkpoint("got distance.");
-                r = distances[3];
-                if (r > system.pbc.cutoff) continue; // only within r_cc
-                x = distances[0]; y = distances[1]; z = distances[2];
+                // get r
+                for (n=0;n<3;n++) d[n] = xtmp[n] - system.molecules[k].atoms[l].pos[n];
+                // images from reciprocal basis.
+                for (p=0; p<3; p++) {
+                    img[p] = 0;
+                    for (q=0; q<3; q++) {
+                        img[p] += rb[q][p]*d[q];
+                    }
+                    img[p] = rint(img[p]);
+                }
+                // get d_image
+                for (p=0; p<3; p++) {
+                    di[p]=0;
+                    for (q=0; q<3; q++) {
+                        di[p] += b[q][p]*img[q];
+                    }
+                }
+                // correct displacement
+                for (p=0; p<3; p++)
+                    di[p] = d[p] - di[p];
+                // pythagorean terms
+                r2=0; ri2=0;
+                for (p=0; p<3; p++) {
+                    r2 += d[p]*d[p];
+                    ri2 += di[p]*di[p];
+                }
+                r = sqrt(r2);
+                ri = sqrt(ri2);
+                if (ri != ri) {
+                    rimg = r;
+                    for (p=0; p<3; p++)
+                        dimg[p] = d[p];
+                } else {
+                    rimg = ri;
+                    for (p=0; p<3; p++)
+                        dimg[p] = di[p];
+                }
+                r = rimg;
+                for (n=0;n<3;n++) d[n] = dimg[n];
+                if (r > cutoff) continue; // only within r_cc
+                x = d[0]; y = d[1]; z = d[2];
                 x2 = x*x;
                 y2 = y*y;
                 z2 = z*z;
@@ -666,8 +715,8 @@ void polarization_force_omp(System &system) {
                     r5inv = r2inv*r3inv;
                     r7inv = r5inv*r2inv;
                     udotu = dddotprod(u_i,u_j);
-                    uidotr = dddotprod(u_i,distances);
-                    ujdotr = dddotprod(u_j,distances);
+                    uidotr = dddotprod(u_i,d);
+                    ujdotr = dddotprod(u_j,d);
 
                     t1 = exp(-damp*r);
                     t2 = 1. + damp*r + 0.5*damp*damp*r2;
