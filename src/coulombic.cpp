@@ -209,7 +209,9 @@ void coulombic_real_force_omp(System &system) {  // units of K/A
     double r2,ri,ri2,xtmp[3];
     double tmpf;
 
+
     double** kvecs;
+    if (ko) {
     kvecs = (double **) calloc(numk, sizeof(double*));
     for (int i=0; i<numk; i++) {
         kvecs[i] = (double *) malloc(3*sizeof(double));
@@ -235,6 +237,7 @@ void coulombic_real_force_omp(System &system) {  // units of K/A
         } // end for l[1], m
     } // end for l[0], l
 	// done defining k-space vectors
+    }
 
     int counter=-1;
     for (int i = 0; i < system.molecules.size(); i++) {

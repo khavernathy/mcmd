@@ -1455,7 +1455,7 @@ void readInput(System &system, char* filename) {
                 std::cout << "Got Ewald electrostatics option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "kspace_option")) {
-                if (!strcasecmp(lc[1].c_str(),"on")) system.constants.kspace_option = 1;
+                if (!strcasecmp(lc[1].c_str(),"off")) system.constants.kspace_option = 0;
                 std::cout << "Got Ewald Force k-space option = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "ewald_kmax")) {
