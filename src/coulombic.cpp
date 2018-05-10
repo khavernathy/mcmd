@@ -207,6 +207,7 @@ void coulombic_real_force_omp(System &system) {  // units of K/A
     double rimg;
     double d[3],di[3],img[3],dimg[3];
     double r2,ri,ri2,xtmp[3];
+    double tmpf;
 
     double** kvecs;
     kvecs = (double **) calloc(numk, sizeof(double*));
@@ -304,22 +305,25 @@ void coulombic_real_force_omp(System &system) {  // units of K/A
             }
         }
         if (ko) { // k-space terms can be outside cutoff. Skip duplicates though.
+            const double ifouralpha2 = 1./(4.*alpha*alpha);
             // k-space. units are K/A, 
             for (int n=0;n<3;n++) { //x,y,z
-              // loop k vectors
+                tmpf=0;
+                // loop k vectors
                 for (int ki=0; ki < numk; ki++) {
                 	k_sq = kvecs[ki][0]*kvecs[ki][0] + 
                     kvecs[ki][1]*kvecs[ki][1] + 
                     kvecs[ki][2]*kvecs[ki][2];
                     
-                    localf[n] += chargeprod*invV*fourPI*kvecs[ki][n]* 
-              			exp(-k_sq/(4*alpha*alpha))* 
+                    tmpf += kvecs[ki][n]* 
+              			exp(-k_sq*(ifouralpha2))* 
                         sin(kvecs[ki][0]*d[0]+
                         	kvecs[ki][1]*d[1]+
-                            kvecs[ki][2]*d[2])/k_sq   * 2; // times 2 because it's a half-Ewald sphere 
+                            kvecs[ki][2]*d[2])/k_sq;
                     //system.molecules[i].atoms[j].force[n] += holder;
                     //system.molecules[ka].atoms[la].force[n] -= holder;
                 } // end k-vector loop
+                localf[n] += tmpf*chargeprod*invV*fourPI*2.; // times 2 because it's a half-Ewald sphere;
             } // end 3D
         } // end if condition k-space 
     } // end if not frozen and not zero-charge
@@ -335,7 +339,7 @@ void coulombic_real_force_omp(System &system) {  // units of K/A
     }
     } // end OMP block
     double end = omp_get_wtime();
-    //printf("esopenmp loop time = %f\n", end-start);
+    printf("esopenmp loop time = %f\n", end-start);
 }
 #endif
 
