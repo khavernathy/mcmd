@@ -17,9 +17,10 @@ void init_dipoles_omp (System &system) {
 			unsigned int i, j, p;
 				int counter=-1;
 		    for (i=0; i<system.molecules.size(); i++) {
+					counter++;
+					if ((counter + thread_id) % nthreads_local != 0) continue;
 		        for (j=0; j<system.molecules[i].atoms.size(); j++) {
-								counter++;
-								if ((counter + thread_id) % nthreads_local != 0) continue;
+
 		            for (p=0; p<3; p++) {
 		                system.molecules[i].atoms[j].dip[p] =
 		                system.molecules[i].atoms[j].polar *
@@ -105,9 +106,20 @@ void contract_dipoles_omp (System &system, int * ranked_array ) {
 }
 
 void calc_dipole_rrms_omp (System &system) {
+	omp_set_num_threads(system.constants.openmp_threads);
+	int nthreads = omp_get_num_threads();
+
+	#pragma omp parallel
+	{
+			int thread_id = omp_get_thread_num();
+			int nthreads_local = omp_get_num_threads();
     unsigned int i, j, p;
     double carry;
+		int counter=-1;
     for (i=0; i<system.molecules.size(); i++) {
+				counter++;
+				if ((counter + thread_id) % nthreads_local != 0) continue;
+
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             // mean square distance
             system.molecules[i].atoms[j].dipole_rrms=0;
@@ -123,6 +135,7 @@ void calc_dipole_rrms_omp (System &system) {
                     system.molecules[i].atoms[j].dipole_rrms=0;
         }
     }
+	} // end OMP block
     return;
 }
 
@@ -155,11 +168,22 @@ int are_we_done_yet_omp (System &system, int iteration_counter ) {
 }
 
 void palmo_contraction_omp (System &system, int * ranked_array ) {
+	omp_set_num_threads(system.constants.openmp_threads);
+	int nthreads = omp_get_num_threads();
+
+	#pragma omp parallel
+	{
+			int thread_id = omp_get_thread_num();
+			int nthreads_local = omp_get_num_threads();
     unsigned int i, j, ii, jj, index, p, q,ti,tj, tk, tl;
     int N = system.constants.total_atoms;
+		const int fao = system.constants.full_A_matrix_option;
 
     /* calculate change in induced field due to this iteration */
+		int counter=-1;
     for(i = 0; i < N; i++) {
+				counter++;
+				if ((counter + thread_id) % nthreads_local != 0) continue;
         index = ranked_array[i];
         ii = index*3;
 
@@ -175,7 +199,7 @@ void palmo_contraction_omp (System &system, int * ranked_array ) {
                 for(p = 0; p < 3; p++) {
                     for (q=0; q<3; q++) {
                         // account for the 1/2 matrix
-                        if (!system.constants.full_A_matrix_option) {
+                        if (!fao) {
                             if (j>index) {system.molecules[ti].atoms[tj].efield_induced_change[p] -=
                                 system.constants.A_matrix[jj+p][ii+q] * system.molecules[tk].atoms[tl].dip[q];
                             } else { system.molecules[ti].atoms[tj].efield_induced_change[p] -=
@@ -195,6 +219,7 @@ void palmo_contraction_omp (System &system, int * ranked_array ) {
             }
         }
     }
+	}// end OMP block
     return;
 }
 
@@ -342,7 +367,7 @@ int thole_iterative_omp(System &system) {
             calc_dipole_rrms_omp(system);
 
         /* determine if we are done... */
-        keep_iterating = are_we_done_yet(system, iteration_counter);
+        keep_iterating = are_we_done_yet_omp(system, iteration_counter);
 
        // if we would be finished, contract once more to get the next induced field for palmo
         if (system.constants.polar_palmo && !keep_iterating) {
@@ -360,6 +385,7 @@ int thole_iterative_omp(System &system) {
                     system.molecules[ti].atoms[tj].dip[p] = system.molecules[ti].atoms[tj].newdip[p];
             }
         }
+
 
     } //end iterate
     free(ranked_array);

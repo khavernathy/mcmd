@@ -271,6 +271,214 @@ void thole_amatrix(System &system) {
     return;
 }
 
+#ifdef OMP
+/* OMP version -- A matrix solver */
+void thole_amatrix_omp(System &system) {
+
+    omp_set_num_threads(system.constants.openmp_threads);
+    int nthreads = omp_get_num_threads();
+    double rmin_all = 1e40; // big, to start.
+    zero_out_amatrix(system,(int)system.constants.total_atoms);
+
+    double start = omp_get_wtime();
+    #pragma omp parallel
+    {
+      int thread_id = omp_get_thread_num();
+      int nthreads_local = omp_get_num_threads();
+      int i, j, ii, jj, N, p, q;
+      int w, x, y, z;
+      double damp1=0, damp2=0; //, wdamp1=0, wdamp2=0; // v, s; //, distancesp[3], rp;
+      double r, r2, ir3, ir5, ir=0;
+      const double rcut = system.pbc.cutoff;
+      //const double rcut2=rcut*rcut;
+      //const double rcut3=rcut2*rcut;
+      const double l=system.constants.polar_damp;
+      const double l2=l*l;
+      const double l3=l2*l;
+      double explr; //exp(-l*r)
+      const double explrcut = exp(-l*rcut);
+      const double MAXVALUE = 1.0e40;
+      N = (int)system.constants.total_atoms;
+      double rmin = 1.0e40;
+      const int fao = system.constants.full_A_matrix_option;
+
+
+      /* set the diagonal blocks */
+      int counter=-1;
+      for(i = 0; i < N; i++) {
+          counter++;
+          if ((counter + thread_id) % nthreads_local != 0) continue;
+          ii = i*3;
+          w = system.atommap[i][0];
+          x = system.atommap[i][1];
+
+          // 1/2 matrix
+          if (!fao) {
+              for (p=0; p<3; p++) {
+                  if (system.molecules[w].atoms[x].polar != 0.0)
+                      system.constants.A_matrix[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
+                  else
+                      system.constants.A_matrix[ii+p][ii+p] = MAXVALUE;
+              }
+          // full matrix
+          } else {
+              for (p=0;p<3;p++) {
+                  if (system.molecules[w].atoms[x].polar != 0.0)
+                      system.constants.A_matrix_full[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
+                  else
+                      system.constants.A_matrix_full[ii+p][ii+p] = MAXVALUE;
+              }
+          }
+
+      }
+
+      double rimg;
+      double d[3],di[3],img[3],dimg[3];
+      double ri,ri2;
+      double tmpx[3];
+      double b[3][3], rb[3][3];
+      for (p=0;p<3;p++) {
+          for (q=0;q<3;q++) {
+              b[p][q] = system.pbc.basis[p][q];
+              rb[p][q] = system.pbc.reciprocal_basis[p][q];
+          }
+      }
+
+      /* calculate each Tij tensor component for each dipole pair */
+      counter = -1;
+      for(i = 0; i < (N - 1); i++) {
+          counter++;
+          if ((counter + thread_id) % nthreads_local != 0) continue;
+          ii = i*3;
+          w = system.atommap[i][0]; x = system.atommap[i][1];
+          for (int n=0;n<3;n++) tmpx[n] = system.molecules[w].atoms[x].pos[n];
+
+          for(j = (i + 1);  j < N; j++) {
+              jj = j*3;
+              y = system.atommap[j][0]; z = system.atommap[j][1];
+
+              //printf("i %i j %i ======= w %i x %i y %i z %i \n",i,j,w,x,y,z);
+
+              for (int n=0;n<3;n++) d[n] = tmpx[n] - system.molecules[y].atoms[z].pos[n];
+              // images from reciprocal basis.
+              for (p=0; p<3; p++) {
+                  img[p] = 0;
+                  for (q=0; q<3; q++) {
+                      img[p] += rb[q][p]*d[q];
+                  }
+                  img[p] = rint(img[p]);
+              }
+              // get d_image
+              for (p=0; p<3; p++) {
+                  di[p]=0;
+                  for (q=0; q<3; q++) {
+                      di[p] += b[q][p]*img[q];
+                  }
+              }
+              // correct displacement
+              for (p=0; p<3; p++)
+                  di[p] = d[p] - di[p];
+              // pythagorean terms
+              r2=0; ri2=0;
+              for (p=0; p<3; p++) {
+                  r2 += d[p]*d[p];
+                  ri2 += di[p]*di[p];
+              }
+              r = sqrt(r2);
+              ri = sqrt(ri2);
+              if (ri != ri) {
+              //if (isnan(ri) != 0 ) {
+                  rimg = r;
+                  for (p=0; p<3; p++)
+                      dimg[p] = d[p];
+              } else {
+                  rimg = ri;
+                  for (p=0; p<3; p++)
+                      dimg[p] = di[p];
+              }
+              for (int n=0;n<3;n++) d[n] = dimg[n];
+              r = rimg;
+
+              if (r<rmin && (system.molecules[w].atoms[x].polar!=0 && system.molecules[y].atoms[z].polar!=0))
+                  rmin=r; // for ranking, later
+
+
+              // this on-the-spot distance calculator works, but the new method
+              // below does not work, even though everywhere else, it does...
+              //rp = system.pairs[w][x][y][z].r;
+              //for (int n=0;n<3;n++) distancesp[n] = system.pairs[w][x][y][z].d[n];
+              r2 = r*r;
+
+              //printf("r: %f; rp: %f\n", r, rp);
+
+              //printf("distances: x %f y %f z %f r %f\n", distances[0], distances[1], distances[2], r);
+
+              /* inverse displacements */
+              if(r == 0.)
+                  ir3 = ir5 = MAXVALUE;
+              else {
+                  ir = 1.0/r;
+                  ir3 = ir*ir*ir;
+                  ir5 = ir3*ir*ir;
+              }
+
+              //evaluate damping factors for tensor T
+              explr = exp(-l*r);
+              damp1 = 1.0 - explr*(0.5*l2*r2 + l*r + 1.0);
+              damp2 = damp1 - explr*(l3*r2*r/6.0);
+
+              /* Here, we can add the term for the dipole interaction tensor T,
+               * for long-range "Full Ewald Polarization" (FEP)
+               * given on pg 184112-4 of Keith: J. Chem. Phys. 139, 184112 (2013) */
+
+              /* build the tensor */
+              // 1/2 MATRIX
+              if (!fao) {
+                  for (p=0; p<3; p++) {
+                      for (q=0; q<3; q++) {
+                          system.constants.A_matrix[jj+p][ii+q] = -3.0*d[p]*d[q]*damp2*ir5;
+                          // additional diagonal term
+                          if (p==q)
+                              system.constants.A_matrix[jj+p][ii+q] += damp1*ir3;
+                      }
+                  }
+              // full matrix
+              } else {
+                  for (p=0; p<3; p++) {
+                      for (q=0; q<3; q++) {
+                          system.constants.A_matrix_full[ii+p][jj+q] = -3.0 * d[p]*d[q] * damp2 * ir5;
+                          // additional diagonal term
+                          if (p==q)
+                              system.constants.A_matrix_full[ii+p][jj+q] += damp1*ir3;
+                      }
+                  }
+              } // end full matrix
+
+              // fill in other half of full matrix if app.
+              if (fao) {
+                  for (p=0; p<3; p++) {
+                      for (q=0; q<3; q++) {
+                          system.constants.A_matrix_full[jj+p][ii+q] = system.constants.A_matrix_full[ii+p][jj+q];
+                      }
+                  }
+              } // end full matrix
+          } /* end j */
+      } /* end i */
+      if (rmin < rmin_all) {
+        //#pragma omp atomic
+        rmin_all = rmin;
+      }
+
+    } // end OMP block
+    double end=omp_get_wtime();
+    // printf("polar omp a matrix time = %f",end-start);
+    system.constants.polar_rmin = rmin_all;
+    return;
+}
+#endif
+
+
+
 /* Here we can add a standard method for calculating non-induced Electric field
  * in order to do FEP, Full Ewald Polarization (including long-range)
  * mentioned by Keith in J. Chem. Phys. 139, 184112 (2013) (pg 4)
@@ -517,9 +725,9 @@ void polarization_force_omp(System &system) {
         thole_resize_matrices(system);
     }
 
-    thole_amatrix(system); // fill in the A-matrix
+    thole_amatrix_omp(system); // fill in the A-matrix
     thole_field(system); // calculate electric field at each atom (assume PBC)
-    int num_iterations = thole_iterative(system); // iteratively solve the dipoles
+    int num_iterations = thole_iterative_omp(system); // iteratively solve the dipoles
        system.stats.polar_iterations.value = (double)num_iterations;
        system.stats.polar_iterations.calcNewStats();
        system.constants.dipole_rrms = get_dipole_rrms(system);
@@ -693,212 +901,6 @@ void get_long_range_polarization()
 {
 }
 
-
-#ifdef OMP
-/* OMP version -- A matrix solver */
-void thole_amatrix_omp(System &system) {
-
-    omp_set_num_threads(system.constants.openmp_threads);
-    int nthreads = omp_get_num_threads();
-    double rmin_all = 1e40; // big, to start.
-    zero_out_amatrix(system,(int)system.constants.total_atoms);
-
-    double start = omp_get_wtime();
-    #pragma omp parallel
-    {
-      int thread_id = omp_get_thread_num();
-      int nthreads_local = omp_get_num_threads();
-      int i, j, ii, jj, N, p, q;
-      int w, x, y, z;
-      double damp1=0, damp2=0; //, wdamp1=0, wdamp2=0; // v, s; //, distancesp[3], rp;
-      double r, r2, ir3, ir5, ir=0;
-      const double rcut = system.pbc.cutoff;
-      //const double rcut2=rcut*rcut;
-      //const double rcut3=rcut2*rcut;
-      const double l=system.constants.polar_damp;
-      const double l2=l*l;
-      const double l3=l2*l;
-      double explr; //exp(-l*r)
-      const double explrcut = exp(-l*rcut);
-      const double MAXVALUE = 1.0e40;
-      N = (int)system.constants.total_atoms;
-      double rmin = 1.0e40;
-      const int fao = system.constants.full_A_matrix_option;
-
-
-      /* set the diagonal blocks */
-      int counter=-1;
-      for(i = 0; i < N; i++) {
-          counter++;
-          if ((counter + thread_id) % nthreads_local != 0) continue;
-          ii = i*3;
-          w = system.atommap[i][0];
-          x = system.atommap[i][1];
-
-          // 1/2 matrix
-          if (!fao) {
-              for (p=0; p<3; p++) {
-                  if (system.molecules[w].atoms[x].polar != 0.0)
-                      system.constants.A_matrix[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
-                  else
-                      system.constants.A_matrix[ii+p][ii+p] = MAXVALUE;
-              }
-          // full matrix
-          } else {
-              for (p=0;p<3;p++) {
-                  if (system.molecules[w].atoms[x].polar != 0.0)
-                      system.constants.A_matrix_full[ii+p][ii+p] = 1.0/system.molecules[w].atoms[x].polar;
-                  else
-                      system.constants.A_matrix_full[ii+p][ii+p] = MAXVALUE;
-              }
-          }
-
-      }
-
-      double rimg;
-      double d[3],di[3],img[3],dimg[3];
-      double ri,ri2;
-      double tmpx[3];
-      double b[3][3], rb[3][3];
-      for (p=0;p<3;p++) {
-          for (q=0;q<3;q++) {
-              b[p][q] = system.pbc.basis[p][q];
-              rb[p][q] = system.pbc.reciprocal_basis[p][q];
-          }
-      }
-
-      /* calculate each Tij tensor component for each dipole pair */
-      counter = -1;
-      for(i = 0; i < (N - 1); i++) {
-          counter++;
-          if ((counter + thread_id) % nthreads_local != 0) continue;
-          ii = i*3;
-          w = system.atommap[i][0]; x = system.atommap[i][1];
-          for (int n=0;n<3;n++) tmpx[n] = system.molecules[w].atoms[x].pos[n];
-
-          for(j = (i + 1);  j < N; j++) {
-              jj = j*3;
-              y = system.atommap[j][0]; z = system.atommap[j][1];
-
-              //printf("i %i j %i ======= w %i x %i y %i z %i \n",i,j,w,x,y,z);
-
-              for (int n=0;n<3;n++) d[n] = tmpx[n] - system.molecules[y].atoms[z].pos[n];
-              // images from reciprocal basis.
-              for (p=0; p<3; p++) {
-                  img[p] = 0;
-                  for (q=0; q<3; q++) {
-                      img[p] += rb[q][p]*d[q];
-                  }
-                  img[p] = rint(img[p]);
-              }
-              // get d_image
-              for (p=0; p<3; p++) {
-                  di[p]=0;
-                  for (q=0; q<3; q++) {
-                      di[p] += b[q][p]*img[q];
-                  }
-              }
-              // correct displacement
-              for (p=0; p<3; p++)
-                  di[p] = d[p] - di[p];
-              // pythagorean terms
-              r2=0; ri2=0;
-              for (p=0; p<3; p++) {
-                  r2 += d[p]*d[p];
-                  ri2 += di[p]*di[p];
-              }
-              r = sqrt(r2);
-              ri = sqrt(ri2);
-              if (ri != ri) {
-              //if (isnan(ri) != 0 ) {
-                  rimg = r;
-                  for (p=0; p<3; p++)
-                      dimg[p] = d[p];
-              } else {
-                  rimg = ri;
-                  for (p=0; p<3; p++)
-                      dimg[p] = di[p];
-              }
-              for (int n=0;n<3;n++) d[n] = dimg[n];
-              r = rimg;
-
-              if (r<rmin && (system.molecules[w].atoms[x].polar!=0 && system.molecules[y].atoms[z].polar!=0))
-                  rmin=r; // for ranking, later
-
-
-              // this on-the-spot distance calculator works, but the new method
-              // below does not work, even though everywhere else, it does...
-              //rp = system.pairs[w][x][y][z].r;
-              //for (int n=0;n<3;n++) distancesp[n] = system.pairs[w][x][y][z].d[n];
-              r2 = r*r;
-
-              //printf("r: %f; rp: %f\n", r, rp);
-
-              //printf("distances: x %f y %f z %f r %f\n", distances[0], distances[1], distances[2], r);
-
-              /* inverse displacements */
-              if(r == 0.)
-                  ir3 = ir5 = MAXVALUE;
-              else {
-                  ir = 1.0/r;
-                  ir3 = ir*ir*ir;
-                  ir5 = ir3*ir*ir;
-              }
-
-              //evaluate damping factors for tensor T
-              explr = exp(-l*r);
-              damp1 = 1.0 - explr*(0.5*l2*r2 + l*r + 1.0);
-              damp2 = damp1 - explr*(l3*r2*r/6.0);
-
-              /* Here, we can add the term for the dipole interaction tensor T,
-               * for long-range "Full Ewald Polarization" (FEP)
-               * given on pg 184112-4 of Keith: J. Chem. Phys. 139, 184112 (2013) */
-
-              /* build the tensor */
-              // 1/2 MATRIX
-              if (!fao) {
-                  for (p=0; p<3; p++) {
-                      for (q=0; q<3; q++) {
-                          system.constants.A_matrix[jj+p][ii+q] = -3.0*d[p]*d[q]*damp2*ir5;
-                          // additional diagonal term
-                          if (p==q)
-                              system.constants.A_matrix[jj+p][ii+q] += damp1*ir3;
-                      }
-                  }
-              // full matrix
-              } else {
-                  for (p=0; p<3; p++) {
-                      for (q=0; q<3; q++) {
-                          system.constants.A_matrix_full[ii+p][jj+q] = -3.0 * d[p]*d[q] * damp2 * ir5;
-                          // additional diagonal term
-                          if (p==q)
-                              system.constants.A_matrix_full[ii+p][jj+q] += damp1*ir3;
-                      }
-                  }
-              } // end full matrix
-
-              // fill in other half of full matrix if app.
-              if (fao) {
-                  for (p=0; p<3; p++) {
-                      for (q=0; q<3; q++) {
-                          system.constants.A_matrix_full[jj+p][ii+q] = system.constants.A_matrix_full[ii+p][jj+q];
-                      }
-                  }
-              } // end full matrix
-          } /* end j */
-      } /* end i */
-      if (rmin < rmin_all) {
-        //#pragma omp atomic
-        rmin_all = rmin;
-      }
-
-    } // end OMP block
-    double end=omp_get_wtime();
-    // printf("polar omp a matrix time = %f",end-start);
-    system.constants.polar_rmin = rmin_all;
-    return;
-}
-#endif
 
 
 
