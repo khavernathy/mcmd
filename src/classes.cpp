@@ -1419,6 +1419,7 @@ eps["Lr"] = 0.011/kbk;
 	polars["Cl"] = 2.40028;//*cV/ke;
     polars["ArS"] = 1.63922; // Ar SAPT
 	polars["Co"] = 3.26440; // from Kay/Shannelle.
+    polars["Ni"] = 2.94650; // from Tony, from SIFSIX Ni compounds 
     polars["Cu"] = 2.19630;//*cV/ke;
     polars["Cd"] = 0.953; // from Adam, KIKDOZ MOF fragments.
 	polars["Zn"] = 1.98870;//*cV/ke;
