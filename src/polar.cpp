@@ -464,10 +464,12 @@ void thole_amatrix_omp(System &system) {
               } // end full matrix
           } /* end j */
       } /* end i */
-      if (rmin < rmin_all) {
-        //#pragma omp atomic
-        rmin_all = rmin;
-      }
+        #pragma omp critical
+        {
+            if (rmin < rmin_all) {
+                rmin_all = rmin;
+            }
+        }
 
     } // end OMP block
     double end=omp_get_wtime();
