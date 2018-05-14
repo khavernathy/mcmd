@@ -1009,19 +1009,19 @@ void readInput(System &system, char* filename) {
                 system.pbc.calcCarBasis();
 
             // OR EXACT BASIS INPUT (by vectors)
-            } else if (!strcasecmp(lc[0].c_str(), "basis1")) {
+            } else if (!strcasecmp(lc[0].c_str(), "basis1") || !strcasecmp(lc[0].c_str(), "a")) {
                 for (int n=0; n<3; n++)
                     system.pbc.basis[0][n] = atof(lc[n+1].c_str());
                 system.pbc.x_length = system.pbc.basis[0][0];
 
                 std::cout << "Got basis1 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
-            } else if (!strcasecmp(lc[0].c_str(), "basis2")) {
+            } else if (!strcasecmp(lc[0].c_str(), "basis2") || !strcasecmp(lc[0].c_str(), "b")) {
                 for (int n=0; n<3; n++)
                     system.pbc.basis[1][n] = atof(lc[n+1].c_str());
                 system.pbc.y_length = system.pbc.basis[1][1];
 
                 std:: cout << "Got basis2 = " << lc[1].c_str() << " " << lc[2].c_str() << " " << lc[3].c_str(); printf("\n");
-            } else if (!strcasecmp(lc[0].c_str(), "basis3")) {
+            } else if (!strcasecmp(lc[0].c_str(), "basis3") || !strcasecmp(lc[0].c_str(), "c")) {
                 for (int n=0; n<3; n++)
                     system.pbc.basis[2][n] = atof(lc[n+1].c_str());
                 system.pbc.z_length = system.pbc.basis[2][2];
