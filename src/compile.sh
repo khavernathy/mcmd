@@ -141,7 +141,7 @@ elif [[ "$option" == "omp" ]]; then
     if [[ "$2" == "linux" ]]; then
         echo "... for linux."
         g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
-    else if [[ "$2" == "circe" ]]; then
+    elif [[ "$2" == "circe" ]]; then
         echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/6.2.0
