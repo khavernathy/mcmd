@@ -316,6 +316,22 @@ void writePDBtraj(System &system, string restartfile, string trajfile, int step)
     ofile << "ENDMDL\n";
 }
 
+/* WRITE PDB RESTART BACKUP FILE */
+void writePDBrestartBak(System &system, string restartfile, string restartBakFile) {
+    std::ifstream ifile(restartfile.c_str(), std::ios::in);
+    std::ofstream ofile(restartBakFile.c_str(), std::ios::out);
+    if (system.stats.count_movables < 1) return; // don't write empty trajectory
+
+    if (!ifile.is_open()) {
+        printf("Error opening PDB restart file! (in restart.pdb.bak-writing function).\n");
+        exit(1);
+    } else {
+        ofile << ifile.rdbuf(); // append contents of restartfile into trajfile
+    }
+
+    ofile << "ENDMDL\n";
+}
+
 
 /* WRITE PDB RESTART FILE EVERY CORRTIME -- ONLY MOVABLES */
 void writePDBmovables(System &system, string filename) {

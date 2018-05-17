@@ -488,6 +488,7 @@ int main(int argc, char **argv) {
                 writeXYZ(system,system.constants.output_traj,frame,t,0,system.constants.xyz_traj_movers_option);
             frame++;
             writePDB(system, system.constants.restart_pdb); // all atoms
+            writePDBrestartBak(system, system.constants.restart_pdb, system.constants.restart_pdb_bak);
             if (!system.constants.pdb_bigtraj_option) writePDBmovables(system, system.constants.restart_mov_pdb); // only movers
             if (system.constants.pdb_traj_option) {
                 if (system.constants.pdb_bigtraj_option)
@@ -797,7 +798,7 @@ int main(int argc, char **argv) {
             writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
             // restart file.
             writePDB(system, system.constants.restart_pdb); // containing all atoms
-
+            writePDBrestartBak(system, system.constants.restart_pdb, system.constants.restart_pdb_bak);
             // trajectory file
                 if (system.constants.xyz_traj_option)
 			        writeXYZ(system,system.constants.output_traj,frame,count_md_steps,t, system.constants.xyz_traj_movers_option);

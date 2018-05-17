@@ -128,6 +128,7 @@ class Constants {
         string output_traj_pdb="traj.pdb"; // system trajectory in pdb
         string output_traj_movers_pdb="traj_movers.pdb"; // system traj (only movers) in pdb
         string restart_pdb="restart.pdb"; // a file to re-kick an unfinished run
+        string restart_pdb_bak="restart.pdb.bak"; // backup of restart file in case job halts while writing.
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
         string output_histogram="histogram.dx"; // histogram information, viewable in VMD
         string dipole_output="dipoles.dat"; // only used when polarization is on.
