@@ -1,0 +1,41 @@
+! Douglas Franz, Space group, USF, 2017
+! Identical to Monte Carlo NVT example,
+! Except OpenMP is used with 8 threads
+! To speed up simulation
+
+omp 8
+
+name			    mc_nvt_example 
+mode	 		    mc ! mc or md
+checkpoints_option  off
+
+input_atoms     ../../../atomfiles/NOTT-112+417H2_BSS.pdb
+
+potential_form 		ljes  
+com_option		    off  	! center of mass
+
+xyz_traj_option on
+
+sorbate_name h2_bss
+
+
+carbasis 47.005 47.005 47.005 90 90 90
+
+
+! MONTE CARLO ONLY ======================================
+ensemble		    nvt
+
+mc_pbc              on
+mc_corrtime	        1
+finalstep		    1000
+temperature 	    77.0   !77.0  ! K
+insert_factor		0.667     ! uVT: prob to insert/delete in uVT
+displace_factor     2.5
+rotate_angle_factor 360.0
+! =======================================================
+
+auto_reject_option on  ! saves time
+auto_reject_r 1.6      ! angstroms
+
+charge_sum_check off   
+
