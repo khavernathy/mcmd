@@ -1195,6 +1195,10 @@ void readInput(System &system, char* filename) {
                 system.constants.openmp_threads = atoi(lc[1].c_str());
                 std::cout << "OpenMP activated. Threads requested = " << lc[1].c_str(); printf("\n");    
             } else if (!strcasecmp(lc[0].c_str(), "external_force")) {
+                if ((int)lc.size() < 5) {
+                    printf("ERROR: The external_force command needs the following syntax:\nexternal_force [x] [y] [z] [step_count] e.g.   0.2 0 0 5.\n");
+                    exit(EXIT_FAILURE);
+                }
                 system.constants.md_external_force = 1;
                 for (int n=0;n<3;n++)
                     system.constants.external_force_vector[n] = atof(lc[n+1].c_str())/system.constants.kb/1e10/1e9; // convert from nN (semi-intuitive force)   to   K/A (MCMD force)
@@ -1204,6 +1208,11 @@ void readInput(System &system, char* filename) {
                 system.constants.external_force_vector[0],
                 system.constants.external_force_vector[1],
                 system.constants.external_force_vector[2]);
+
+                if (!(system.constants.md_external_force_freq > 0)) {
+                    printf("ERROR: The input value for external force step-frequency ( %s ) is not valid input. Must be an integer.\n",lc[4].c_str());
+                    exit(EXIT_FAILURE);
+                }
 
             } else if (!strcasecmp(lc[0].c_str(), "simulated_annealing")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.constants.simulated_annealing = 1;
