@@ -121,7 +121,7 @@ void calculateForces(System &system, double dt) {
     }
 
     // apply a constant external force if requested
-    if (system.constants.md_external_force) {
+    if (system.constants.md_external_force && system.stats.MDstep % system.constants.md_external_force_freq == 0) {
         // molecular motion
         if (system.constants.md_mode == MD_MOLECULAR) {
             for (int i=0; i<system.molecules.size(); i++) {

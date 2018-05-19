@@ -231,6 +231,7 @@ class Constants {
         double md_thermostat_probab = md_thermostat_freq * exp(-md_thermostat_freq * md_dt);
         int md_insert_attempt=20; // uVT MD. Number of timesteps to try insert/delete. Default every 20 steps.
         int md_external_force = 0; // option for constant external force in MD
+        int md_external_force_freq = 1; // apply external force every N steps
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
         double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat.
         int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
@@ -605,6 +606,7 @@ class Stats {
 
         int MCstep=0, MCcorrtime_iter; // keeps track of steps and coortimes for averages.
         double MDtime=0; // the time in fs of MD simulation
+        int MDstep; // time step (integer) in MD
         bool MCmoveAccepted;
         double MCeffRsq; // for calculating Monte Carlo efficiency, roughly, based on successful displaces
 

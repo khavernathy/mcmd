@@ -594,6 +594,7 @@ int main(int argc, char **argv) {
     // Main MD time loop
 	for (double t=dt; t <= tf; t=t+dt) {
         system.stats.MDtime = t;
+        system.stats.MDstep = count_md_steps;
 
         // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
         if (system.stats.count_movables > 0 || system.constants.flexible_frozen)
