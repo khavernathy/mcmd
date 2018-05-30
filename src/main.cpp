@@ -212,6 +212,7 @@ int main(int argc, char **argv) {
     }
 
     system.pbc.printBasis();
+    printf("%s\n",getFormulaUnit(system).c_str());
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
     printf("VERSION NUMBER: %i\n", 1057); // i.e. github commit
@@ -226,6 +227,7 @@ int main(int argc, char **argv) {
         if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
         for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
+
 
 	// *** clobber files
 	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );

@@ -14,29 +14,85 @@ string convertElement(System &system, string label) {
     string mystring = label;
     string my_sub_string;
 
-    //printf("input %s\n",mystring.c_str());
     for(int n=0; n<10; n++) {
-            //printf("searching for %i\n",n);
             string my_sub_string = to_string(n);
 
             std::size_t found = mystring.find(my_sub_string);
 
             if(found != std::string::npos) {
-                    std::cout << found << endl;
-    	//	if((int)found == 1) mystring = mystring.substr(0,1);
                     mystring = mystring.substr(0,(int)found);
-    		//printf("mystring after cut %s\n",mystring.c_str());
             }
     }
-  //  printf("before check 2  %s\n",mystring.c_str());
     if((int)(mystring.length()) == 2) {
             string first = mystring.substr(0,1);
             string second = mystring.substr(1,1);
             std::transform(second.begin(), second.end(), second.begin(), ::tolower);
             mystring = first + second;
     }
-  //  printf("final %s\n",mystring.c_str());
     return mystring;
+}
+
+string getFormulaUnit(System &system) {
+    vector <map<string,int>> atomlist;
+    string ele;
+    for (int i =0; i < system.molecules.size(); i++) {
+        if (!system.molecules[i].frozen) continue;
+        for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
+            ele = convertElement(system, system.molecules[i].atoms[j].name.c_str());
+
+            //printf("element %s\n", ele.c_str());
+
+            bool checkinmap = false;
+            for (int g=0; g < atomlist.size(); g++) {
+                std::map<string,int>::iterator it = atomlist[g].find(ele.c_str());
+
+                if (it != atomlist[g].end()) {
+                        checkinmap = true;
+                        atomlist[g].find(ele.c_str())->second++;
+                }
+            }
+            if (!checkinmap) {
+                map<string,int> tmp;
+                tmp[ele] = 1;
+                atomlist.push_back(tmp);
+            }
+        } // done with atoms j
+    } // done with molecules i
+
+    int divisor = 0;
+    for (int tmpdiv=1; tmpdiv < system.stats.count_frozens; tmpdiv++) {
+        bool success = true;
+        for (int x=0; x < atomlist.size(); x++) {
+            for (const auto &p : atomlist[x]) {
+                if (p.second % tmpdiv != 0) {
+                    success = false;
+                }
+            }
+        }
+        if (success) divisor = tmpdiv;
+    }
+    // found greatest common divisor, now divide all elements.
+    //printf("divisor = %i\n", divisor); 
+    for (int x=0; x < atomlist.size(); x++) {
+        for (const auto &p : atomlist[x]) {
+            string elem = p.first;
+            int count = p.second;
+            atomlist[x].find(elem.c_str())->second = count/divisor;
+        }
+    }
+    
+    // output the map element counts
+    string fu = "The formula unit is";
+    for (int x=0; x<atomlist.size(); x++) {
+        for (const auto &p : atomlist[x]) {
+            string s1 = p.first.c_str();
+            //string(1,s1);
+            fu = fu + " " + s1 + to_string(p.second);
+        } 
+    }
+    fu = fu+".";
+
+    return fu;
 }
 
 bool find_cycle(System &system, unsigned int mol, unsigned int i) {
