@@ -451,6 +451,7 @@ int main(int argc, char **argv) {
                 if (system.stats.count_frozens > 0) {
                     printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
                     system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                    printf("      avg N/f.u. =         %.5f\n", system.stats.Nmov[i].average / (double)system.constants.num_fu);
                 } else {
                     printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
@@ -762,6 +763,7 @@ int main(int argc, char **argv) {
                 if (system.stats.count_frozens > 0) {
                     printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
                     system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
+                    printf("      avg N/f.u. =         %.5f\n", system.stats.Nmov[i].average / (double)system.constants.num_fu);
                 } else {
                     printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);

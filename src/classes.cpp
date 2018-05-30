@@ -339,6 +339,8 @@ class Constants {
         };
         vector <UniqueChargeNonBond> uniqueChargeNonBonds;
 
+        int num_fu = 0; // number of formula units (e.g. of the MOF)
+
         // OpenMP omp
         int openmp_threads = 0; // parallel OpenMP feature. on if != 0.
 };

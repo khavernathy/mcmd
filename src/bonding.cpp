@@ -71,6 +71,8 @@ string getFormulaUnit(System &system) {
         }
         if (success) divisor = tmpdiv;
     }
+
+    system.constants.num_fu = divisor;
     // found greatest common divisor, now divide all elements.
     //printf("divisor = %i\n", divisor); 
     for (int x=0; x < atomlist.size(); x++) {
