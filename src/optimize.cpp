@@ -45,14 +45,15 @@ void printBondParameters(System &system) {
   printf("================================================================================\n");
   printf("Dynamically-found Bonds Summary:\n");
   printf("================================================================================\n");
-  printf("bond-id :: mol-id :: atom1 :: atom2 ::  elements :: value\n");
+  printf("bond-id :: mol-id :: atom1 :: atom2 ::  elements :: length   :: r_ij\n");
   for (int n=0; n<system.constants.uniqueBonds.size(); n++) {
       //printf("Atom %i (UFF: %s)\n", i, system.molecules[0].atoms[i].UFFlabel.c_str());
                   int mol=system.constants.uniqueBonds[n].mol;
                   int atom1=system.constants.uniqueBonds[n].atom1;
                   int atom2=system.constants.uniqueBonds[n].atom2;
                   double value = system.constants.uniqueBonds[n].value;
-          printf("%7i :: %6i :: %5i :: %5i :: %4s%1s%4s :: %5f\n",
+                  double rij = system.constants.uniqueBonds[n].rij;
+          printf("%7i :: %6i :: %5i :: %5i :: %4s%1s%4s :: %5f :: %5f\n",
                   n,
                   mol,
                   atom1,
@@ -60,21 +61,23 @@ void printBondParameters(System &system) {
                   system.molecules[mol].atoms[atom1].name.c_str(),
                   "-",
                   system.molecules[mol].atoms[atom2].name.c_str(),
-                  value
+                  value,
+                  rij
                   );
   }
   // and angles
   printf("================================================================================\n");
   printf("Dynamically-found Angles Summary:\n");
   printf("================================================================================\n");
-  printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 ::    elements    :: value\n");
+  printf("angle-id :: mol-id :: atom1 :: atom2 :: atom3 ::    elements    :: angle     :: theta_ijk\n");
   for (int n=0;n<system.constants.uniqueAngles.size();n++) {
       int mol = system.constants.uniqueAngles[n].mol;
       int atom1= system.constants.uniqueAngles[n].atom1;
       int atom2 = system.constants.uniqueAngles[n].atom2;
       int atom3 = system.constants.uniqueAngles[n].atom3;
       double value = system.constants.uniqueAngles[n].value;
-      printf("%8i :: %6i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s :: %5f\n", n,
+      double theta_ijk = system.constants.uniqueAngles[n].theta_ijk*180.0/M_PI;
+      printf("%8i :: %6i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s :: %3.5f :: %3.5f\n", n,
               mol,
               atom1,
               atom2,
@@ -84,13 +87,14 @@ void printBondParameters(System &system) {
               system.molecules[mol].atoms[atom2].name.c_str(),
               "-",
               system.molecules[mol].atoms[atom3].name.c_str(),
-              value*180./M_PI);
+              value*180./M_PI,
+              theta_ijk);
   }
   // and Dihedrals
   printf("================================================================================\n");
   printf("Dynamically-found Dihedrals Summary:\n");
   printf("================================================================================\n");
-  printf("dihedral-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 ::       elements      :: value\n");
+  printf("dihedral-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 ::       elements      :: angle     :: phi_ijkl\n");
   for (int n=0; n<system.constants.uniqueDihedrals.size();n++) {
       int mol = system.constants.uniqueDihedrals[n].mol;
       int atom1 = system.constants.uniqueDihedrals[n].atom1;
@@ -98,7 +102,8 @@ void printBondParameters(System &system) {
       int atom3 = system.constants.uniqueDihedrals[n].atom3;
       int atom4 = system.constants.uniqueDihedrals[n].atom4;
       double value = system.constants.uniqueDihedrals[n].value;
-      printf("%11i :: %6i :: %5i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s%1s%4s :: %5f\n", n,
+      double phi_ijkl = system.constants.uniqueDihedrals[n].phi_ijkl*180.0/M_PI;
+      printf("%11i :: %6i :: %5i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s%1s%4s :: %3.5f :: %3.5f\n", n,
           mol, atom1,atom2,atom3,atom4,
           system.molecules[mol].atoms[atom1].name.c_str(),
           "-",
@@ -107,7 +112,7 @@ void printBondParameters(System &system) {
           system.molecules[mol].atoms[atom3].name.c_str(),
           "-",
           system.molecules[mol].atoms[atom4].name.c_str(),
-          value*180./M_PI);
+          value*180./M_PI, phi_ijkl);
   }
 
   printf("================================================================================\n");
