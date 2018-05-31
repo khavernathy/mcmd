@@ -132,6 +132,7 @@ class Constants {
         string thermo_output="thermo.dat"; // a file for all thermodynamic info
         string output_histogram="histogram.dx"; // histogram information, viewable in VMD
         string dipole_output="dipoles.dat"; // only used when polarization is on.
+        string molec_dipole_output="molec_dipoles.dat"; // molecular dipole and system dipole list
         string restart_mov_pdb="restart_movables.pdb"; // a restart file with only movable molecules to save i/o
         string frozen_pdb="frozen.pdb"; // a pdb of frozen atoms that is made at startup
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
@@ -745,7 +746,7 @@ class Atom {
         double eps=0.0; // LJ param in K
         double sig=0.0; // LJ param in A -- the real sigma, not r_m (as in UFF)
         double polar=0.0; // polarizability in A^3
-        double C=0.0; // charge in e
+        double C=0.0; // charge stored in reduced units sqrt(KA), input as elementary charge
         double V=0.0; // potential energy in K
         //double K=0.0; // kinetic energy in K
         //double E=0.0; // total energy in K

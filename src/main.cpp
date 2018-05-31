@@ -234,8 +234,8 @@ int main(int argc, char **argv) {
 	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
 	remove( system.constants.output_histogram.c_str() );
 	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
+    remove( system.constants.molec_dipole_output.c_str() );
     remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
-
     // *** done clobbering files.
 
     // INITIAL WRITEOUTS
@@ -268,8 +268,11 @@ int main(int argc, char **argv) {
 
     // RESIZE A MATRIX IF POLAR IS ACTIVE (and initialize the dipole file)
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_COMMYESPOLAR) {
-				FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
-				fclose(fp);
+		FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
+		fclose(fp);
+
+        FILE * fp2 = fopen(system.constants.molec_dipole_output.c_str(), "w");
+        fclose(fp2);
 
         double memreqA;
         system.last.total_atoms = system.constants.total_atoms;
@@ -319,7 +322,8 @@ int main(int argc, char **argv) {
     } // end MD Ewald k-space setup.
 
     #ifdef OMP
-        printf("Running MCMD with OpenMP using %i threads.\n", system.constants.openmp_threads);
+        if (system.constants.openmp_threads > 0)
+            printf("Running MCMD with OpenMP using %i threads.\n", system.constants.openmp_threads);
     #endif
     
 
@@ -504,11 +508,13 @@ int main(int argc, char **argv) {
                 radialDist(system);
                 writeRadialDist(system);
             }
-						if (t != 0 && system.constants.histogram_option)
-							write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
+			if (t != 0 && system.constants.histogram_option)
+			    write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
 
-						if ((system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_LJESPOLAR) && system.constants.dipole_output_option)
-							write_dipole(system);
+			if ((system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_LJESPOLAR) && system.constants.dipole_output_option) {
+				write_dipole(system, t);
+                write_molec_dipole(system, t);
+            }
             } // end if N > 0
             // count the corrtime occurences.
             corrtime_iter++;
@@ -821,7 +827,10 @@ int main(int argc, char **argv) {
             }
             if (t != dt && system.constants.histogram_option)
 				write_histogram(system.file_pointers.fp_histogram, system.grids.avg_histogram->grid, system);
-
+            if ((system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_LJESPOLAR) && system.constants.dipole_output_option) {
+                write_dipole(system, count_md_steps);
+                write_molec_dipole(system, count_md_steps);
+            }
             } // end if N>0, write output files.
         } // end if corrtime (quite sure.)
 		count_md_steps++;

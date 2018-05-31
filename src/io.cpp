@@ -1648,27 +1648,62 @@ void paramOverrideCheck(System &system) {
     }
 }
 
-void write_dipole(System &system) {
+void write_dipole(System &system, int step) {
 
     int p,i,j;
     FILE * fp;
 		double DEBYE2SKA = system.constants.DEBYE2SKA;
 
     double dipole[3];
+    double mag;
 
     fp = fopen(system.constants.dipole_output.c_str(), "a");
 
+    fprintf(fp, "Step %i : Molecular induced dipoles (in Debye) as sum of atomic dipoles from Thole-Applequist Polarization\n",step);
+    fprintf(fp, "#id #name #ux #uy #uz #u_mag\n");
     for(i=0; i<system.molecules.size(); i++) {
+        if (system.molecules[i].frozen) continue;
         for(p = 0; p < 3; p++) dipole[p] = 0;
         for(j=0; j<system.molecules[i].atoms.size(); j++) {
             for(p = 0; p < 3; p++)
                 dipole[p] += system.molecules[i].atoms[j].dip[p];
         }
-        if(!system.molecules[i].frozen) fprintf(fp, "%f %f %f\n", dipole[0]/DEBYE2SKA, dipole[1]/DEBYE2SKA, dipole[2]/DEBYE2SKA);
+        mag = sqrt(dipole[0]*dipole[0] + dipole[1]*dipole[1] + dipole[2]*dipole[2])/DEBYE2SKA;
+        fprintf(fp, "%i %s %f %f %f %f\n", i, system.molecules[i].name.c_str(), dipole[0]/DEBYE2SKA, dipole[1]/DEBYE2SKA, dipole[2]/DEBYE2SKA, mag);
     }
     fflush(fp);
     fclose(fp);
     return;
+}
+
+void write_molec_dipole(System &system, int step) {
+    int p,i,j;
+    FILE * fp;
+    double DEBYE2SKA = system.constants.DEBYE2SKA;
+    double E2REDUCED = system.constants.E2REDUCED;
+    double eA2D = system.constants.eA2D;
+    double dipole[3];
+    double mag;
+    
+    fp = fopen(system.constants.molec_dipole_output.c_str(), "a");
+    fprintf(fp,"Step %i : Molecular instananeous dipoles (in Debye) by sum[(r-r_com)*q]\n",step);
+    fprintf(fp, "#id #name #ux #uy #uz #u_mag\n");
+
+    for (i=0; i<system.molecules.size(); i++) {
+        if (system.molecules[i].frozen) continue;
+        for (p=0;p<3;p++) dipole[p] = 0;
+        system.molecules[i].calc_center_of_mass();
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            for (p=0;p<3;p++)
+                dipole[p] += (system.molecules[i].atoms[j].C/E2REDUCED)*(system.molecules[i].atoms[j].pos[p] - system.molecules[i].com[p])*eA2D; // converted to D
+        }
+        mag = sqrt(dipole[0]*dipole[0] + dipole[1]*dipole[1] + dipole[2]*dipole[2]); 
+        fprintf(fp, "%i %s %f %f %f %f\n", i, system.molecules[i].name.c_str(), dipole[0], dipole[1], dipole[2], mag);
+    }
+    fflush(fp);
+    fclose(fp);
+    return;
+    
 }
 
 void inputValidation(System &system) {
