@@ -93,6 +93,7 @@ string getFormulaUnit(System &system) {
         } 
     }
     fu = fu+".";
+    fu = fu+" There are " + to_string(divisor) + " f.u.'s in this system.";
 
     return fu;
 }
