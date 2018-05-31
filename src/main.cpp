@@ -589,7 +589,6 @@ int main(int argc, char **argv) {
 #else
 	double* D = new double[(int)system.proto.size()];
 #endif
-	double KE=0., PE=0., TE=0., Temp=0., v_avg=0., Klin=0., Krot=0., pressure=0.; //, Ek=0.;
     int i,n;
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
@@ -638,33 +637,11 @@ int main(int argc, char **argv) {
             }
 
             if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
-            // get KE and PE and T at this step.
-            double* ETarray = calculateObservablesMD(system);
-            KE = ETarray[0] * system.constants.K2KJMOL;
-            PE = ETarray[1] * system.constants.K2KJMOL;
-            TE = KE+PE;
-            Temp = ETarray[2];
-            v_avg = ETarray[3];
-            //Ek = ETarray[4]; // Equipartition Kinetic energy (apparently). Not even using.
-            Klin = ETarray[5] * system.constants.K2KJMOL;
-            Krot = ETarray[6] * system.constants.K2KJMOL;
-            pressure = ETarray[7]; // not using this yet. NVT pressure derived from forces/stat mech stuff. Frenkel p84
-            system.stats.temperature.value = Temp;
-                system.stats.temperature.calcNewStats();
-
-            // calc diffusion
-            // R^2 as a function of time should be linear according to physical theory.
-            // normalize by the center of mass of entire system if no frozens present.
-            /*
-            double system_COM[3], cx,cy,cz;
-            if (system.stats.count_frozens < 1) {
-                double* tmp = centerOfMass(system);
-                cx=tmp[0]; cy=tmp[1]; cz=tmp[2];
-            } else {
-                cx=cy=cz=0;
-            }   
-            system_COM[0] = cx; system_COM[1] = cy; system_COM[2] = cz;
-*/
+            
+            /* ========================== */
+            calculateObservablesMD(system);
+            /* ========================== */
+            
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                 int localN = getNlocal(system, sorbid);
                 if (localN < 1) continue; // skip N=0 sorbates
@@ -676,7 +653,7 @@ int main(int argc, char **argv) {
                     // only consider molecules of this type (for multi-sorb)
                     if (system.molecules[i].name == system.proto[sorbid].name) {
                         system.molecules[i].calc_center_of_mass();
-			for (n=0; n<3; n++) {
+			            for (n=0; n<3; n++) {
                             // first update the "original" center of mass "r(0)"
                             // as the arithmetic running average of r(1), r(2) ... r(t) in time
                             system.molecules[i].original_com[n] = ((count_md_steps - 1)*system.molecules[i].original_com[n] + (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]))/count_md_steps; 
@@ -685,25 +662,14 @@ int main(int argc, char **argv) {
                             diffusion_d[n] = (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]) - system.molecules[i].original_com[n];
 
                         }
-                
                         r2_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
                     }
                 } // end all molecules loop
-                //system.stats.msd[sorbid].value = r2_sum;
-                //system.stats.msd[sorbid].calcNewStats(); // finds and stores average MSD sum
-                //double avg_msd_sum = system.stats.msd[sorbid].average;
-
                 D[sorbid] = (r2_sum / (localN *6.0*t)); // 6 because 2*dimensionality = 2*3
                 D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
             } // end sorbate types loop
             // we've calc'd diffusion coefficients for all sorbates now.
 
-            // PRESSURE (my pathetic nRT/V method)
-						// using this until i get a decent NVT frenkel method working.
-						// PE since it's I.G. approximation.
-						double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
-						system.stats.pressure.value = nmol*system.constants.R*Temp/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
-						system.stats.pressure.calcNewStats();
             } // end if N>0 (stats calculation)
 
 			// PRINT OUTPUT
@@ -732,18 +698,23 @@ int main(int argc, char **argv) {
             printf("Step: %i / %li; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
             if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp);
             printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
-            printf("Instantaneous T = %.4f K\n", Temp);
+            printf("Instantaneous T = %.4f K\n", system.stats.temperature.value);
             printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3f )\n",
-                  KE, Klin, Krot );
+                  system.stats.kinetic.value*system.constants.K2KJMOL, system.stats.Klin.value*system.constants.K2KJMOL, system.stats.Krot.value*system.constants.K2KJMOL );
             printf("     PE = %.3f kJ/mol\n",
-                  PE
+                  system.stats.potential.value*system.constants.K2KJMOL
                   );
+            printf("          RD = %.3f kJ/mol\n", system.stats.rd.value*system.constants.K2KJMOL);
+            printf("          ES = %.3f kJ/mol\n", system.stats.es.value*system.constants.K2KJMOL);
+            printf("         Pol = %.3f kJ/mol\n", system.stats.polar.value*system.constants.K2KJMOL);
+            printf("      Bonded = %.3f kJ/mol\n", system.stats.bonded.value*system.constants.K2KJMOL);
+        
             if (system.constants.ensemble == ENSEMBLE_NVE)
-                printf("Total E = %.3f :: error = %.3f kJ/mol ( %.3f %% )\n", TE, system.constants.md_NVE_err, system.constants.md_NVE_err/(fabs(system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL)*100.);
+                printf("Total E = %.3f :: error = %.3f kJ/mol ( %.3f %% )\n", system.stats.totalE.value*system.constants.K2KJMOL, system.constants.md_NVE_err, system.constants.md_NVE_err/(fabs(system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL)*100.);
             else
-                printf("Total E = %.3f kJ/mol\n", TE);
+                printf("Total E = %.3f kJ/mol\n", system.stats.totalE.value*system.constants.K2KJMOL);
             printf("Average v = %.2f m/s; v_init = %.2f m/s\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
-                v_avg*1e5, system.constants.md_init_vel*1e5, system.stats.pressure.average, system.stats.pressure.sd );
+                system.stats.avg_v.value*1e5, system.constants.md_init_vel*1e5, system.stats.pressure.average, system.stats.pressure.sd );
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
@@ -806,7 +777,7 @@ int main(int argc, char **argv) {
 
             // WRITE OUTPUT FILES
             if (system.molecules.size() > 0) {
-            writeThermo(system, TE, Klin, Krot, PE, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.average, pressure, count_md_steps, system.stats.Nmov[0].value);
+            writeThermo(system, system.stats.totalE.value, system.stats.Klin.value, system.stats.Krot.value, system.stats.potential.value, system.stats.rd.value, system.stats.es.value, system.stats.polar.value, 0.0, system.stats.temperature.value, system.stats.pressure.value, count_md_steps, system.stats.Nmov[0].value);
             // restart file.
             writePDB(system, system.constants.restart_pdb); // containing all atoms
             writePDBrestartBak(system, system.constants.restart_pdb, system.constants.restart_pdb_bak);

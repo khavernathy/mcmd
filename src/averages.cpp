@@ -406,7 +406,7 @@ void computeAveragesMDuVT(System &system) {
 
 
 // =================  MD statistics function to be called at corrtimes =================================
-double * calculateObservablesMD(System &system) { // the * is to return an array of doubles as a pointer, not just one double
+void calculateObservablesMD(System &system) { // the * is to return an array of doubles as a pointer, not just one double
 	double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
 
@@ -576,17 +576,24 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
         //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T));
     }
 
+            // PRESSURE (my pathetic nRT/V method)
+            // using this until i get a decent NVT frenkel method working.
+            // PE since it's I.G. approximation.
+            double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
+            pressure = nmol*system.constants.R*T/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
 
-  //  } // end skipping if N=0
-	static double output[8];
-	output[0] = K_total;
-    output[1] = V_total;
-	output[2] = T;
-    output[3] = avg_v_ALL;
-    output[4] = Ek;
-    output[5] = Klin;
-    output[6] = Krot;
-    output[7] = pressure;
+
+    system.stats.kinetic.value = K_total;
+    //system.stats.potential.value = V_total; // this is already done in getTotalPotential()
+    system.stats.totalE.value = K_total+V_total;
+    system.stats.temperature.value = T;
+        system.stats.temperature.calcNewStats();
+    system.stats.avg_v.value = avg_v_ALL;
+    system.stats.EquipartitionK.value = Ek;
+    system.stats.Klin.value = Klin;
+    system.stats.Krot.value = Krot;
+    system.stats.pressure.value = pressure;
+        system.stats.pressure.calcNewStats();
 
     // first step
     if (system.constants.ensemble == ENSEMBLE_NVE) {
@@ -595,5 +602,5 @@ double * calculateObservablesMD(System &system) { // the * is to return an array
         }
         system.constants.md_NVE_err = fabs((K_total+V_total)-system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL; // K to kJ/mol
     }
-    return output;
+    return;
 }

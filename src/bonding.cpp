@@ -1328,19 +1328,19 @@ void setBondingParameters(System &system) {
 
 
 double totalBondedEnergy(System &system) {
+    double total=0;
     // each function here saves the component energies to Stats class. (system.stats)
-    system.stats.Ubonded_tot.value = 0;
     if (system.constants.opt_bonds)
-        system.stats.Ubonded_tot.value += stretch_energy(system);
+        total += stretch_energy(system);
     if (system.constants.opt_angles)
-        system.stats.Ubonded_tot.value += angle_bend_energy(system);
+        total += angle_bend_energy(system);
     if (system.constants.opt_dihedrals)
-        system.stats.Ubonded_tot.value += torsions_energy(system);
+        total += torsions_energy(system);
     if (system.constants.mode == "opt") {
         if (system.constants.opt_LJ)
-            system.stats.Ubonded_tot.value += LJ_intramolec_energy(system);
+            total += LJ_intramolec_energy(system);
         if (system.constants.opt_ES)
-            system.stats.Ubonded_tot.value += ES_intramolec_energy(system);
+            total += ES_intramolec_energy(system);
     }
-    return system.stats.Ubonded_tot.value;
+    return total; // this is in K
 }
