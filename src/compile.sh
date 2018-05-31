@@ -62,7 +62,7 @@ if [[ "$option" == "cpu" ]]; then
         echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/6.2.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto  -frename-registers
     elif [[ "$2" == "bridges" ]]; then
         echo "... for Bridges cluster environment.";
         module purge
@@ -145,7 +145,7 @@ elif [[ "$option" == "omp" ]]; then
         echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/6.2.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -frename-registers -fopenmp -D OMP
     else 
         /usr/local/bin/g++-4.9 main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp -D OMP
     fi
