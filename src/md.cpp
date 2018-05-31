@@ -31,13 +31,13 @@ void calculateForces(System &system, double dt) {
 
     //system.checkpoint("Calculating forces.");
     // loop through all atoms
-	for (int j=0; j <system.molecules.size(); j++) {
-	for (int i = 0; i < system.molecules[j].atoms.size(); i++) {
+	for (int i=0; i <system.molecules.size(); i++) {
+	for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
 		// initialize stuff
-		system.molecules[j].atoms[i].force[0] = 0.0;
-		system.molecules[j].atoms[i].force[1] = 0.0;
-		system.molecules[j].atoms[i].force[2] = 0.0;
-		system.molecules[j].atoms[i].V = 0.0;
+		system.molecules[i].atoms[j].force[0] = 0.0;
+		system.molecules[i].atoms[j].force[1] = 0.0;
+		system.molecules[i].atoms[j].force[2] = 0.0;
+		system.molecules[i].atoms[j].V = 0.0;
 	}
 	}
 

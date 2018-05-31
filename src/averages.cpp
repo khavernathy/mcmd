@@ -583,15 +583,9 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
             pressure = nmol*system.constants.R*T/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
 
 
-    system.stats.kinetic.value = K_total;
     //system.stats.potential.value = V_total; // this is already done in getTotalPotential()
-    system.stats.totalE.value = K_total+V_total;
-    system.stats.temperature.value = T;
-        system.stats.temperature.calcNewStats();
     system.stats.avg_v.value = avg_v_ALL;
     system.stats.EquipartitionK.value = Ek;
-    system.stats.Klin.value = Klin;
-    system.stats.Krot.value = Krot;
     system.stats.pressure.value = pressure;
         system.stats.pressure.calcNewStats();
 
