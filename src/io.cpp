@@ -983,6 +983,7 @@ void readInput(System &system, char* filename) {
                 system.constants.fugacity_single = 1;
                 system.constants.fugacity_single_sorbate = lc[1];
                 std::transform(lc[1].begin(), lc[1].end(), lc[1].begin(), ::tolower);
+                if (lc[1] == "none") lc[1] = "off"; // allow "none" for "off"
                 if (lc[1] != "h2" && lc[1] != "co2" && lc[1] != "ch4" && lc[1] != "n2" && lc[1] != "off") {
                     std::cout << "ERROR: fugacity_single input not recognized. Available options are h2, co2, ch4, and n2.";
                     std::exit(0);
