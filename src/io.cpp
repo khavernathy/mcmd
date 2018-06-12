@@ -1632,7 +1632,6 @@ void paramOverrideCheck(System &system) {
     } // end if epsilon override
 
     if ((int)system.constants.charge_override.size() > 0) {
-        printf("HHEYYYYYYYYYY");
         map<string, double>::iterator it;
         for (it = system.constants.charge_override.begin(); it != system.constants.charge_override.end(); it++) {
             for (int i=0; i<system.molecules.size(); i++) {
