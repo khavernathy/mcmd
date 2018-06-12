@@ -1416,6 +1416,11 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "eps_override")) {
 				system.constants.eps_override[lc[1]] = atof(lc[2].c_str());
 				std::cout << "Got LJ epsilon override for " << lc[1].c_str() << " = " << lc[2].c_str() << " K."; printf("\n");
+            
+            } else if (!strcasecmp(lc[0].c_str(), "charge_override")) {
+                system.constants.charge_override[lc[1]] = atof(lc[2].c_str());
+                std::cout << "Got charge override for " << lc[1].c_str() << " = " << lc[2].c_str() << " e."; printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "lj_uff")) {
                 if (!strcasecmp(lc[1].c_str(),"on")) system.constants.lj_uff = 1;
                 std::cout << "Got LJ UFF option = " << lc[1].c_str(); printf("\n");
@@ -1626,6 +1631,18 @@ void paramOverrideCheck(System &system) {
         } // end map loop
     } // end if epsilon override
 
+    if ((int)system.constants.charge_override.size() > 0) {
+        printf("HHEYYYYYYYYYY");
+        map<string, double>::iterator it;
+        for (it = system.constants.charge_override.begin(); it != system.constants.charge_override.end(); it++) {
+            for (int i=0; i<system.molecules.size(); i++) {
+            for (int j=0; j<system.molecules[i].atoms.size(); j++) {
+                if (system.molecules[i].atoms[j].name == it->first)
+                    system.molecules[i].atoms[j].C = it->second*system.constants.E2REDUCED;
+            }
+            }
+        } // end map loop
+    } // end if charge override
 
     // universal UFF LJ parameters override
     if (system.constants.lj_uff == 1) {

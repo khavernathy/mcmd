@@ -238,8 +238,9 @@ class Constants {
         int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
 
 
+        map <string,double> charge_override;
         map <string,double> sig_override;
-        map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K
+        map <string,double> eps_override; // feature for overriding preset LJ params (for developing LJ models). 0.0 are defaults which will be overwritten if option is used. sig=A; eps=K; charge=e
 
     	int total_atoms=0; // actual sites, not "atoms" persay
                 int initial_sorbates=0.0; // for safekeeping to calculate chemical potential in uVT
