@@ -809,6 +809,23 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "OCT";
                 system.proto[i].dof = 6;
             }
+            else if (sorbmodel == "bf4" || sorbmodel=="bf4-") {
+                // boron tetrafluoride anion (-1)
+                // polarizability B alpha= 0.6634 from http://pubs.rsc.org/-/content/articlehtml/2017/cp/c7cp00924k#fn1
+                double qB = 0.785727, qF = -0.446432;
+                double sB = 4.083*system.constants.uff2mpmc, sF = 3.364*system.constants.uff2mpmc;
+                double eB = 0.180/system.constants.kbk, eF = 0.05/system.constants.kbk;
+                double aB = 0.6634, aF = 3.0013;
+                double mB = 10.81, mF = 18.998;
+                addAtomToProto(system,i,"B","BF4","M", 4.0557951459    ,   10.9438141063,       10.6815655407, mB, qB, aB, eB, sB);
+                addAtomToProto(system,i,"F","BF4","M", 4.4811413817    ,   12.1935648431,       11.2443468872, mF, qF, aF, eF, sF);
+ 
+                addAtomToProto(system,i,"F","BF4","M",  2.9022370967   ,    11.1553422360   ,     9.8652950248, mF, qF, aF, eF, sF);
+                addAtomToProto(system,i,"F","BF4","M",  3.7305284247     ,  10.0328608252     ,  11.7431569709, mF, qF, aF, eF, sF);
+                addAtomToProto(system,i,"F","BF4","M", 5.1075017722    ,   10.3969420588   ,     9.8785197493, mF, qF, aF, eF, sF);
+                system.proto[i].name = "BF4";
+                system.proto[i].dof = 6; 
+            }
             // USER SORBATE MODEL NOT FOUND; ERROR OUT
             else {
                 std::cout << "ERROR: The sorbate model name you supplied, " << sorbmodel.c_str() << ", was not found in the database. Check your spelling or use a manual model in your input atoms file."; printf("\n");
