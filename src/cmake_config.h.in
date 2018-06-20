@@ -1,0 +1,4 @@
+#cmakedefine OMP
+#cmakedefine MPI
+#cmakedefine CUDA
+#cmakedefine WINDOWS

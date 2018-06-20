@@ -124,7 +124,7 @@ elif [[ "$option" == "cmake" ]]; then
     # cmake serial compilation
     echo "Using cmake to compile MCMD."
     cd ..
-    cmake .
+    cmake -j4 .
     make
     cd src
 #######################################################################
