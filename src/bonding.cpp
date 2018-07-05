@@ -1275,7 +1275,10 @@ void setBondingParameters(System &system) {
         atom2 = system.constants.uniqueBonds[it].atom2;
 
         system.constants.uniqueBonds[it].BO = get_BO(system.molecules[mol].atoms[atom1].UFFlabel, system.molecules[mol].atoms[atom2].UFFlabel);
-        system.constants.uniqueBonds[it].rij = get_rij(system,mol,atom1,mol,atom2);
+        if (system.constants.input_structure_FF)
+            system.constants.uniqueBonds[it].rij = system.constants.uniqueBonds[it].value;
+        else
+            system.constants.uniqueBonds[it].rij = get_rij(system,mol,atom1,mol,atom2);
         system.constants.uniqueBonds[it].kij = get_kij(system,mol,atom1,mol,atom2, system.constants.uniqueBonds[it].rij);
         system.constants.uniqueBonds[it].Dij = system.constants.uniqueBonds[it].BO*70.0; // kcal/mol
         system.constants.uniqueBonds[it].alpha = sqrt(0.5*system.constants.uniqueBonds[it].kij/system.constants.uniqueBonds[it].Dij);
@@ -1293,7 +1296,11 @@ void setBondingParameters(System &system) {
         double rij = system.constants.uniqueAngles[it].rij;
         system.constants.uniqueAngles[it].rjk = get_rij(system,mol,atom2,mol,atom3);
         double rjk = system.constants.uniqueAngles[it].rjk;
-        system.constants.uniqueAngles[it].theta_ijk = M_PI/180.0*system.constants.UFF_angles[system.molecules[mol].atoms[atom2].UFFlabel.c_str()];
+        if (system.constants.input_structure_FF)
+            system.constants.uniqueAngles[it].theta_ijk = system.constants.uniqueAngles[it].value;
+        else
+            system.constants.uniqueAngles[it].theta_ijk = M_PI/180.0*system.constants.UFF_angles[system.molecules[mol].atoms[atom2].UFFlabel.c_str()];
+        
         double theta_ijk = system.constants.uniqueAngles[it].theta_ijk;
         system.constants.uniqueAngles[it].C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));
         double C2 = system.constants.uniqueAngles[it].C2;
@@ -1318,7 +1325,11 @@ void setBondingParameters(System &system) {
         //atom4 = system.constants.uniqueDihedrals[it].atom4;
 
         double * params = get_torsion_params(system, system.molecules[mol].atoms[atom2].UFFlabel, system.molecules[mol].atoms[atom3].UFFlabel);
-        system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
+        if (system.constants.input_structure_FF)
+            system.constants.uniqueDihedrals[it].phi_ijkl = system.constants.uniqueDihedrals[it].value;
+        else
+            system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
+        
         system.constants.uniqueDihedrals[it].vjk = params[1];
         system.constants.uniqueDihedrals[it].n = params[2];
     }
