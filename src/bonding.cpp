@@ -74,7 +74,7 @@ string getFormulaUnit(System &system) {
 
     system.constants.num_fu = divisor;
     // found greatest common divisor, now divide all elements.
-    //printf("divisor = %i\n", divisor); 
+    //printf("divisor = %i\n", divisor);
     for (int x=0; x < atomlist.size(); x++) {
         for (const auto &p : atomlist[x]) {
             string elem = p.first;
@@ -82,7 +82,7 @@ string getFormulaUnit(System &system) {
             atomlist[x].find(elem.c_str())->second = count/divisor;
         }
     }
-    
+
     // output the map element counts
     string fu = "The formula unit is";
     for (int x=0; x<atomlist.size(); x++) {
@@ -90,7 +90,7 @@ string getFormulaUnit(System &system) {
             string s1 = p.first.c_str();
             //string(1,s1);
             fu = fu + " " + s1 + to_string(p.second);
-        } 
+        }
     }
     fu = fu+".";
     fu = fu+" There are " + to_string(divisor) + " f.u.'s in this system.";
@@ -106,7 +106,7 @@ bool find_cycle(System &system, unsigned int mol, unsigned int i) {
     // see if atom i on molecule mol is on a 6-membered ring
     for (b1=0; b1<system.molecules[mol].atoms[i].bonds.size(); b1++) {
         a2 = system.molecules[mol].atoms[i].bonds[b1];
-        if (system.molecules[mol].atoms[a2].name == "Zn") continue; // avoid false ring in MOF-5 type
+        if (convertElement(system,system.molecules[mol].atoms[a2].name.c_str()) == "Zn") continue; // avoid false ring in MOF-5 type
         for (b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
             a3 = system.molecules[mol].atoms[a2].bonds[b2];
             if (a3 == i) continue; // don't go backwards..
@@ -159,7 +159,7 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
     } else if (name == "O") {
         int ZnCount=0;
         for (unsigned int z=0; z<system.molecules[mol].atoms[i].bonds.size(); z++) {
-            if (system.molecules[mol].atoms[system.molecules[mol].atoms[i].bonds[z]].name == "Zn") {
+            if (convertElement(system,system.molecules[mol].atoms[system.molecules[mol].atoms[i].bonds[z]].name.c_str()) == "Zn") {
                 ZnCount++;
             }
         }
@@ -260,8 +260,8 @@ bool qualify_bond(System &system, double r, unsigned int mol, unsigned int i, un
 double get_rij(System &system, unsigned int i, unsigned int j, unsigned int k, unsigned int l) {
     const double ri = system.constants.UFF_bonds[system.molecules[i].atoms[j].UFFlabel.c_str()];
     const double rj = system.constants.UFF_bonds[system.molecules[k].atoms[l].UFFlabel.c_str()];
-    const double Xi = system.constants.UFF_electroneg[system.molecules[i].atoms[j].name.c_str()];
-    const double Xj = system.constants.UFF_electroneg[system.molecules[k].atoms[l].name.c_str()];
+    const double Xi = system.constants.UFF_electroneg[convertElement(system,system.molecules[i].atoms[j].name.c_str())];
+    const double Xj = system.constants.UFF_electroneg[convertElement(system,system.molecules[k].atoms[l].name.c_str())];
     const double BO = 1.0; // assume all single bonds for now.
     const double lambda = 0.1332; // Bond-order correction parameter
 
@@ -1283,6 +1283,7 @@ void setBondingParameters(System &system) {
             system.constants.uniqueBonds[it].rij = system.constants.uniqueBonds[it].value;
         else
             system.constants.uniqueBonds[it].rij = get_rij(system,mol,atom1,mol,atom2);
+
         system.constants.uniqueBonds[it].kij = get_kij(system,mol,atom1,mol,atom2, system.constants.uniqueBonds[it].rij);
         system.constants.uniqueBonds[it].Dij = system.constants.uniqueBonds[it].BO*70.0; // kcal/mol
         system.constants.uniqueBonds[it].alpha = sqrt(0.5*system.constants.uniqueBonds[it].kij/system.constants.uniqueBonds[it].Dij);
@@ -1304,7 +1305,7 @@ void setBondingParameters(System &system) {
             system.constants.uniqueAngles[it].theta_ijk = system.constants.uniqueAngles[it].value;
         else
             system.constants.uniqueAngles[it].theta_ijk = M_PI/180.0*system.constants.UFF_angles[system.molecules[mol].atoms[atom2].UFFlabel.c_str()];
-        
+
         double theta_ijk = system.constants.uniqueAngles[it].theta_ijk;
         system.constants.uniqueAngles[it].C2 = 1.0/(4.0*sin(theta_ijk)*sin(theta_ijk));
         double C2 = system.constants.uniqueAngles[it].C2;
@@ -1333,7 +1334,7 @@ void setBondingParameters(System &system) {
             system.constants.uniqueDihedrals[it].phi_ijkl = system.constants.uniqueDihedrals[it].value;
         else
             system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
-        
+
         system.constants.uniqueDihedrals[it].vjk = params[1];
         system.constants.uniqueDihedrals[it].n = params[2];
     }
