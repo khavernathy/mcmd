@@ -194,6 +194,8 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         return "Cr4+2"; // UFF4MOF
     } else if (name == "Co") {
         return "Co6+3";
+    } else if (name == "Ni") {
+        return "Ni4+2";
     } else if (name == "Cu") {
         return "Cu4+2"; // UFF4MOF default
     } else if (name == "Zn") {
@@ -218,8 +220,8 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
 
 // return true if this should count as a bond.
 bool qualify_bond(System &system, double r, unsigned int mol, unsigned int i, unsigned int j) {
-    string a1 = system.molecules[mol].atoms[i].name;
-    string a2 = system.molecules[mol].atoms[j].name;
+    string a1 = convertElement(system,system.molecules[mol].atoms[i].name.c_str());
+    string a2 = convertElement(system,system.molecules[mol].atoms[j].name.c_str());
 
     double bondlength = system.constants.bondlength;
 
@@ -236,6 +238,8 @@ bool qualify_bond(System &system, double r, unsigned int mol, unsigned int i, un
     else if ((a1=="Ru" || a2=="Ru") && r <= 2.1) // Ru +2  complexes
         return true;
     else if ((a1=="Co" || a2=="Co") && r <= 2.25) // Co complexes
+        return true;
+    else if ((a1=="Ni" || a2=="Ni") && r <= 2.3) // Ni complexes, e.g. SIFSIX-Ni
         return true;
     else if (((a1=="Cd" && a2=="F") || (a1=="F" && a2=="Cd")) && r <= 2.4) // Cd SIFSIX type
         return true;
