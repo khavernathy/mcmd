@@ -461,7 +461,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
                     v_sum[z] += sqrt(vsq);
 
                     energy_holder = 0.5 * system.molecules[i].mass * vsq;
-                    K_total += energy_holder;
+                    K_total += energy_holder; // kg A^2/fs^2
                     Klin += energy_holder;
 
                     if (system.constants.md_rotations) {
@@ -472,7 +472,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
                         double wz = system.molecules[i].ang_vel[2];
 
                         energy_holder = 0.5 * (system.molecules[i].inertia_tensor[0]*wx*wx +
-                            system.molecules[i].inertia_tensor[1]*wy*wy +
+                            system.molecules[i].inertia_tensor[1]*wy*wy +  // in Kelvin*rad
                             system.molecules[i].inertia_tensor[2]*wz*wz +
                             2*system.molecules[i].inertia_tensor[3]*wx*wy +
                             2*system.molecules[i].inertia_tensor[4]*wy*wz +
@@ -535,7 +535,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     Klin = Klin/system.constants.kb * 1e10; // ""
     system.stats.Klin.value = Klin;
 
-    Krot = Krot/system.constants.kb * 1e10; // ""
+    Krot = Krot/system.constants.kb * 1e10; // convert to rad^2 K
     system.stats.Krot.value = Krot;
 
     system.stats.totalE.value = K_total + V_total;
