@@ -1061,7 +1061,7 @@ void setupNBias(System &system) {
     string unit = system.constants.bias_uptake_unit;
     double x = system.constants.bias_uptake;
     double thevalue=0; // converted to N for safekeeping
-    if (unit == "N" || unit == "") {
+    if (unit == "n" || unit == "") {
         thevalue = x;
     } else if (unit == "wt%") { 
         thevalue = (-x*system.stats.frozenmass.value/1000.) / system.proto[0].mass / (x/100. -1) / 100.;

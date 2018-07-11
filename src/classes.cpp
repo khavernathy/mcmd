@@ -201,7 +201,7 @@ class Constants {
 // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
 
         double bias_uptake =0; // to accelerate uVT MC. User-defined. This will be converted to N before running MC
-        string bias_uptake_unit="N"; // units for bias. Default N_movables
+        string bias_uptake_unit="n"; // units for bias. Default N_movables
         int_fast8_t bias_uptake_switcher=0;
         int scale_charges=0; // option to scale charges
         double scale_charges_factor; // multiply by this to get new charges for system.
