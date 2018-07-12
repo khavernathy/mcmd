@@ -201,6 +201,8 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
     } else if (name == "Zn") {
         //return "Zn4+2"; // UFF4MOF paddlewheel type
         return "Zn3f2"; // this is the MOF-5 type of Zn
+    } else if (name == "Zr") {
+        return "Zr3+4";  
     } else if (name == "Br") {
         return "Br";
     } else if (name == "I") {
@@ -211,10 +213,11 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         return "Cd1f1";
     } else if (name == "Si") {
         return "SiF6"; // default sifsix Si
+    } else {
+        printf("ERROR: ATOM UFF TYPE NOT FOUND FOR label '%s'.\n",name.c_str());
+        exit(EXIT_FAILURE);
+        return "NOTFOUND";
     }
-
-
-    return "NOTFOUND";
 }
 
 
