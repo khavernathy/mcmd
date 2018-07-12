@@ -145,16 +145,13 @@ void check_H_multi_bonds(System &system) {
     double smallest_r; // bond length
     double smallest_bi; // corresponding index
     int smallest_l; // index for atom
-    printf("running...\n");
     for (i=0;i<system.molecules.size();i++) {
         for (j=0;j<system.molecules[i].atoms.size();j++) {
             ul = system.molecules[i].atoms[j].UFFlabel;
             bonds = (int)system.molecules[i].atoms[j].bonds.size();   
-            printf("ul = %s; bonds = %i\n", ul.c_str(),bonds);
             // check for unrealistic H bonds and reduce to one bond
             // based on shortest one
             if (ul == "H_" && bonds > 1) {
-                printf("H detected with multi bonds..\n");
                 smallest_r=1e40; // big number to start
                 // loop through this H atom's bonds
                 for (bi=0; bi<system.molecules[i].atoms[j].bonds.size();bi++) {
@@ -1161,6 +1158,7 @@ void findBonds(System &system) {
     if (system.constants.md_mode == MD_FLEXIBLE) molecule_limit = system.molecules.size();
 
     for (i=0; i<molecule_limit; i++) {
+        if (system.molecules[i].frozen && system.constants.mode != "opt") continue;
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
             // for each atom, we find its bonded neighbors by a distance search
