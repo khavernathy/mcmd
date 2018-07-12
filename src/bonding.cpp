@@ -134,6 +134,79 @@ bool find_cycle(System &system, unsigned int mol, unsigned int i) {
 }
 
 
+void check_H_multi_bonds(System &system) {
+    int i; // molecule
+    int j; // atom
+    int l; // bonded atom index
+    int bi; // bond index
+    string ul; // uff label
+    int bonds;    // num bonds
+    double r;
+    double smallest_r; // bond length
+    double smallest_bi; // corresponding index
+    int smallest_l; // index for atom
+    printf("running...\n");
+    for (i=0;i<system.molecules.size();i++) {
+        for (j=0;j<system.molecules[i].atoms.size();j++) {
+            ul = system.molecules[i].atoms[j].UFFlabel;
+            bonds = (int)system.molecules[i].atoms[j].bonds.size();   
+            printf("ul = %s; bonds = %i\n", ul.c_str(),bonds);
+            // check for unrealistic H bonds and reduce to one bond
+            // based on shortest one
+            if (ul == "H_" && bonds > 1) {
+                printf("H detected with multi bonds..\n");
+                smallest_r=1e40; // big number to start
+                // loop through this H atom's bonds
+                for (bi=0; bi<system.molecules[i].atoms[j].bonds.size();bi++) {
+                    l = system.molecules[i].atoms[j].bonds[bi];
+                    double* distances = getDistanceXYZ(system,i,j,i,l);
+                    r = distances[3];
+                    if (r < smallest_r) {
+                        smallest_r = r;
+                        smallest_bi = bi;
+                        smallest_l = l;
+                    }
+                }
+
+                // now smallest bond is determined with index smallest_bi
+                // delete this atom's other local bonds
+                system.molecules[i].atoms[j].bonds.clear();
+                system.molecules[i].atoms[j].bonds.push_back(smallest_l);
+
+/*
+                for (bi = 0; bi<system.molecules[i].atoms[j].bonds.size();bi++) {
+                    l = system.molecules[i].atoms[j].bonds[bi];
+                    if (bi != smallest_bi) {
+                        system.molecules[i].atoms[j].bonds.erase(system.molecules[i].atoms[j].bonds.begin() + bi);
+                        int w;
+                        for (w=0;w<system.molecules[i].atoms[l].bonds.size();w++){
+                            if (system.molecules[i].atoms[l].bonds[w] == j)
+                                system.molecules[i].atoms[l].bonds.erase(system.molecules[i].atoms[l].bonds.begin() + w);
+                        }
+                    }
+
+                }
+*/
+                // delete the other ones in master list
+                l = smallest_l; // bonded atom id
+                int a;
+                for (a=0; a<system.constants.uniqueBonds.size(); a++) {
+                   if (system.constants.uniqueBonds[a].mol == i && system.constants.uniqueBonds[a].atom1 == j) {
+                        if (system.constants.uniqueBonds[a].atom2 != l)
+                            system.constants.uniqueBonds.erase( system.constants.uniqueBonds.begin()+a  );
+                    } 
+                    else if (system.constants.uniqueBonds[a].mol == i && system.constants.uniqueBonds[a].atom1 == l) {
+                        if (system.constants.uniqueBonds[a].atom2 != j)
+                            system.constants.uniqueBonds.erase( system.constants.uniqueBonds.begin()+a  );
+                    }
+                }
+            } // end if H_ and bonds > 1
+        } // end atom j
+    } // end molecule i   
+      
+}
+
+
 // function to determine UFF atom-type based on
 // name of element and number of bonds
 string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
@@ -149,7 +222,6 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         else if (num_bonds == 2) return "C_1";
         else if (num_bonds == 3) return "C_2";
         else if (num_bonds == 4) return "C_3";
-        // need to dynamically account for resonant C_R too...
     } else if (name == "N") {
         if (find_cycle(system,mol,i) && num_bonds != 4) return "N_R";
         else if (num_bonds == 1) return "N_1";
@@ -1196,7 +1268,7 @@ void findBonds(System &system) {
         } // end j
     } // end i
 
-
+    
     // get UFF atom labels for all atoms
     for (i=0;i<molecule_limit;i++) {
         for (j=0;j<system.molecules[i].atoms.size();j++) {
@@ -1206,6 +1278,7 @@ void findBonds(System &system) {
         }
     }
 
+    check_H_multi_bonds(system); // kill unrealistic H bonds
 
     // get unique qualified LJ/ES non-bond pairs (beyond 1,3)
     unsigned int mol,qualified, y,z;
@@ -1271,6 +1344,8 @@ void findBonds(System &system) {
 
 
 void setBondingParameters(System &system) {
+    
+
     // save all bond/angle/torsion/non-bond parameters to memory
     // (before running optimization)
     unsigned int it, mol,atom1,atom2,atom3;//,atom4;
