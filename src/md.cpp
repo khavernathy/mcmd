@@ -90,12 +90,10 @@ void calculateForces(System &system, double dt) {
                     angle_bend_gradient(system);
                   if (system.constants.opt_dihedrals)
                     torsions_gradient(system);
-                  // TODO ---- HANDLE UNIQUELY IDENTIFIED (QUALIFIED) MOF PAIRS FOR THESE FORCES INSTEAD OF ABOVE^ FUNCTIONS
-                  
-                  //if (system.constants.opt_LJ)
-                  //  LJ_intramolec_gradient(system);
-                  //if ((model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) && system.constants.opt_ES) // only if electrostatics is on.
-                  //  ES_intramolec_gradient(system);
+                  if (system.constants.opt_LJ)
+                    LJ_intramolec_gradient(system);
+                  if ((model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR) && system.constants.opt_ES) // only if electrostatics is on.
+                    ES_intramolec_gradient(system);
             }
         } // end if PBC
     // GPU style
