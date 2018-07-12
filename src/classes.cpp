@@ -305,7 +305,7 @@ class Constants {
 
         /* OPTIMIZATION OPTIONS */
         double bondlength = 1.9; // for bonding MD, default
-        double opt_error = 0.0001; // error, in kcal/mol for convergence
+        double opt_error = 0.005; // error, in kcal/mol for convergence
         int input_structure_FF = 0; // option to use the input atomic structure for equilibrium bondlength, angle and dihedral parameters. Default off (i.e. UFF/UFF4MOF is used)
         int opt_step_limit = 10000; // limit for convergence steps
         int opt_mode = OPTIMIZE_SD; // steepest descent style optimization as default
