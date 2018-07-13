@@ -1158,7 +1158,7 @@ void findBonds(System &system) {
     if (system.constants.md_mode == MD_FLEXIBLE) molecule_limit = system.molecules.size();
 
     for (i=0; i<molecule_limit; i++) {
-        if (system.molecules[i].frozen && system.constants.mode != "opt") continue;
+        if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue;
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
             // for each atom, we find its bonded neighbors by a distance search
