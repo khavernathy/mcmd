@@ -31,7 +31,7 @@ radial_file         radialdist.dat
 
 temperature 298.0
 ensemble nvt
-external_force  0.5 0 0   ! vector in nN
+external_force  0.5 0 0 1  ! vector in nN, then frequency of the force (every 1 step)
 
  ! MOLECULAR DYNAMICS ONLY ===============================
 md_pbc            on

@@ -384,7 +384,22 @@ void integrate(System &system, double dt) {
                     }
                 }
             }
-        } // end if atomic mode
+        // end if atomic mode
+        } else if (system.constants.md_mode == MD_FLEXIBLE) {
+            for (i=0; i<system.molecules.size(); i++) {
+                if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
+                for (j=0; j<system.molecules[i].atoms.size();j++) {
+                    ranf = getrand();
+                    if (ranf < probab) {
+                        sigma = system.molecules[i].atoms[j].md_velx_goal;
+                        break;
+                    } 
+                    for (n=0;n<3;n++) {
+                        system.molecules[i].atoms[j].vel[n] = gaussian(sigma);
+                    }
+                }
+            } 
+        }
         } // end Andersen thermostat
         // Rapaport p158-159
         else if (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) {

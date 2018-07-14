@@ -37,7 +37,7 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
                 mv2_sum += system.molecules[i].atoms[j].m*v2;
             }
         }
-        dof = system.constants.total_atoms*3.0 - 6.0 - (int)system.constants.uniqueBonds.size();
+        dof = (system.constants.total_atoms - system.stats.count_frozens)*3.0 - 3.0; // - (int)system.constants.uniqueBonds.size();
         T = 1e10*mv2_sum/(double)dof/system.constants.kb;
     }
     // temperature from the MOF itself (???)

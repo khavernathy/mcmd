@@ -122,7 +122,7 @@ void printBondParameters(System &system) {
   int molecule_limit = 1;
   if (system.constants.md_mode == MD_FLEXIBLE) molecule_limit = system.molecules.size();
   for (int i=0; i<molecule_limit; i++) {
-      if (system.molecules[i].frozen && system.constants.mode != "opt") continue; // skip frozens if not optimization mode
+      if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue; // skip frozens if not optimization mode
       for (int j=0; j<system.molecules[i].atoms.size(); j++) {
           printf("%6i :: %7i :: %7s :: %9s :: %9i\n",
                   i, j,

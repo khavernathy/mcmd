@@ -1527,12 +1527,13 @@ void initialVelMD(System &system) {
             // FLEXIBLE MODELING -- "FREE" BONDED ATOMS
             else if (system.constants.md_mode == MD_FLEXIBLE) {
                 v_init_AVG=0;
-                int N = system.constants.total_atoms;
-                unsigned int dof_total=3.*N - 6.0 - (int)system.constants.uniqueBonds.size();
+                int N = system.constants.total_atoms - system.stats.count_frozens;
+                unsigned int dof_total=3.*N - 3.0; // - (int)system.constants.uniqueBonds.size();
                 for (unsigned int i=0;i<system.molecules.size();i++) {
+                    if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                 for (unsigned int j=0;j<system.molecules[i].atoms.size();j++) {
                     // normalized atom velocity based on total DOF from bonds and such
-                    v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*(3.0*(dof_total/(3.0*N))) / system.molecules[i].atoms[j].m);
+                    v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*dof_total/N / system.molecules[i].atoms[j].m);
                     v_init_AVG += v_init;
                     system.molecules[i].atoms[j].md_velx_goal = sqrt(v_init*v_init/3.);
                     // apply velocities to atoms
