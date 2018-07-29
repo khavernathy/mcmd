@@ -30,14 +30,15 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
         double mv2_sum=0;
         double v2=0;
         unsigned int dof=0;
+        double N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
         for (unsigned int i=0;i<system.molecules.size();i++) {
-            if (system.molecules[i].frozen) continue;
+            if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
             for (unsigned int j=0;j<system.molecules[i].atoms.size();j++) {
                 v2 = dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
                 mv2_sum += system.molecules[i].atoms[j].m*v2;
             }
         }
-        dof = (system.constants.total_atoms - system.stats.count_frozens)*3.0 - 3.0; // - (int)system.constants.uniqueBonds.size();
+        dof = N*3.0 - 3.0; // - (int)system.constants.uniqueBonds.size();
         T = 1e10*mv2_sum/(double)dof/system.constants.kb;
     }
     // temperature from the MOF itself (???)
