@@ -1864,6 +1864,10 @@ void inputValidation(System &system) {
         std::cout << "ERROR: flexible frozen option is only available for MD simulations.";
         exit(EXIT_FAILURE);
     }
+    if (system.constants.mode=="md" && system.stats.count_movables == 0 && system.constants.md_mode == MD_MOLECULAR && system.constants.ensemble != ENSEMBLE_UVT) {
+        std::cout << "ERROR: `md_mode` is set to `molecular` but there are no movable molecules in the input atoms file. Did you mean to use `md_mode flexible` (e.g. to simulate a flexible MOF by itself), or `ensemble uvt` (e.g. to allow addition of movable molecules)?";
+        exit(EXIT_FAILURE); 
+    }
     #ifndef OMP
     if (system.constants.openmp_threads > 0) {
         std::cout << "ERROR: You used the `omp` command but did not compile with OpenMP resources. Compile with, e.g. `bash compile.sh omp linux`."; 
