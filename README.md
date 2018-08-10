@@ -98,6 +98,8 @@ Below is a list of scientific publications/presentations that have been facilita
 
 6. Franz, D. M.; Djulbegovic, M.; Pham, T.; Space, B. Theoretical study of the effect of halogen substitution in molecular porous materials for CO2 and C2H2 sorption. AIMS Materials Science. 2017.
 
+7. Forrest, K. A.; Franz, D. M.; Pham, T. ; Space, B. Investigating C2H2 sorption in a-[M3(O2CH)6] (M = Mg, Mn) Through Theoretical Studies. Cryst. Growth Des. 2018. DOI: 10.1021/acs.cgd.8b00770
+
 <!--
 pending...
 MPM-1-TIFSIX paper
