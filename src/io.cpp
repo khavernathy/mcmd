@@ -1246,9 +1246,10 @@ void readInput(System &system, char* filename) {
                 else system.constants.histogram_option = 0;
                 std::cout << "Got histogram option = " << lc[1].c_str(); printf("\n");
 
-						} else if (!strcasecmp(lc[0].c_str(), "histogram_output")) {
-								system.constants.output_histogram = lc[1].c_str();
-								std::cout << "Got histogram output file = " << lc[1].c_str(); printf("\n");
+			} else if (!strcasecmp(lc[0].c_str(), "histogram_output")) {
+				system.constants.output_histogram = lc[1].c_str();
+				std::cout << "Got histogram output file = " << lc[1].c_str(); printf("\n");
+            
             } else if (!strcasecmp(lc[0].c_str(), "histogram_resolution")) {
                 system.hist_resolution = atof(lc[1].c_str());
                 std::cout << "Got histogram resolution = " << lc[1].c_str() << " A"; printf("\n");
@@ -1856,7 +1857,7 @@ void inputValidation(System &system) {
         std::cout << "ERROR: No box information was supplied. Use `carbasis [a] [b] [c] [alpha] [beta] [gamma]`, for example.";
         exit(EXIT_FAILURE);
     }
-    if (system.constants.histogram_option && system.proto.size() > 1) {
+    if (system.constants.histogram_option==1 && (int)system.proto.size() > 1) {
         std::cout << "ERROR: Histogram is currently only available for single-sorbate systems. Use `histogram off` to fix this error.";
         exit(EXIT_FAILURE);
     }
