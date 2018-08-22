@@ -1158,7 +1158,7 @@ void readInput(System &system, char* filename) {
 			} else if (!strcasecmp(lc[0].c_str(), "md_mode")) {
                 if (lc[1] == "atomic")
                     system.constants.md_mode = MD_ATOMIC;
-                else if (lc[1] == "molecular")
+                else if (lc[1] == "molecular" || lc[1] == "rigid")
                     system.constants.md_mode = MD_MOLECULAR;
                 else if (lc[1] == "flexible") {
                     system.constants.md_mode = MD_FLEXIBLE;
