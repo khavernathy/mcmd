@@ -478,8 +478,8 @@ int main(int argc, char **argv) {
             }
             if (system.proto.size() == 1 && system.stats.count_frozen_molecules == 0)
                 printf("Compressibility factor Z avg = %.6f +- %.6f (for homogeneous gas %s) \n",system.stats.z.average, system.stats.z.sd, system.proto[0].name.c_str());
-            if (system.constants.ensemble != ENSEMBLE_NVE && system.proto.size() ==1)
-                printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
+            //if (system.constants.ensemble != ENSEMBLE_NVE && system.proto.size() ==1)
+            //    printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
 
             if (system.constants.dist_within_option) {
                 printf("N of %s within %.5f A of origin: %.5f +- %.3f (actual: %i)\n", system.constants.dist_within_target.c_str(), system.constants.dist_within_radius, system.stats.dist_within.average, system.stats.dist_within.sd, (int)system.stats.dist_within.value);
@@ -760,10 +760,10 @@ int main(int argc, char **argv) {
                 }
             } // end if uVT
             if ((system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_NVE) && system.proto.size() == 1) {
-                if (system.stats.heat_capacity.value > 1e-5)
-                    printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
-                else
-                    printf("Heat capacity = %.5e +- %.5e kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
+                //if (system.stats.heat_capacity.value > 1e-5)
+                //    printf("Heat capacity = %.5f +- %.5f kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
+                //else
+                //    printf("Heat capacity = %.5e +- %.5e kJ/molK\n", system.stats.heat_capacity.value, system.stats.heat_capacity.sd);
             }
             if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR)
                 printf("Polarization dipole iterations = %.3f +- %.3f\n",
