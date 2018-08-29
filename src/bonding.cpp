@@ -596,7 +596,7 @@ double * get_torsion_params(System &system, string a1, string a2) {
             o[2] = 2;
         }
         else {
-            o[0] = 60; // "or 180"
+            o[0] = 1; // "sp3 pair   60 or 180 case; we will handle this in setBondingParameters()"
             o[1] = sqrt(system.constants.UFF_torsions[a1] * system.constants.UFF_torsions[a2]);
             o[2] = 3;
         }
@@ -1406,10 +1406,24 @@ void setBondingParameters(System &system) {
         //atom4 = system.constants.uniqueDihedrals[it].atom4;
 
         double * params = get_torsion_params(system, system.molecules[mol].atoms[atom2].UFFlabel, system.molecules[mol].atoms[atom3].UFFlabel);
-        if (system.constants.input_structure_FF)
+        if (system.constants.input_structure_FF) {
             system.constants.uniqueDihedrals[it].phi_ijkl = system.constants.uniqueDihedrals[it].value;
-        else
+        }
+        else if (params[0]==1) { // the defaulted case in get_torsion_params, need to handle dynamically
+            printf("actual angle %f\n", system.constants.uniqueDihedrals[it].value);
+            if (fabs(system.constants.uniqueDihedrals[it].value*180./M_PI - 60.) < 10)
+                params[0] = 60.0;
+            else if (fabs(system.constants.uniqueDihedrals[it].value*180./M_PI - 180.)  < 10)
+                params[0] = 180.0;
+            else if (fabs(system.constants.uniqueDihedrals[it].value*180./M_PI - 0.) < 10)
+                params[0] = 0.0;
+            else
+                params[0] = 180.0; // default to 180
+
             system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
+        } else {
+            system.constants.uniqueDihedrals[it].phi_ijkl = params[0]*M_PI/180.0;
+        }
 
         system.constants.uniqueDihedrals[it].vjk = params[1];
         system.constants.uniqueDihedrals[it].n = params[2];
@@ -1429,11 +1443,11 @@ double totalBondedEnergy(System &system) {
         total += angle_bend_energy(system);
     if (system.constants.opt_dihedrals)
         total += torsions_energy(system);
-    if (system.constants.mode == "opt") {
+    //if (system.constants.mode == "opt") {
         if (system.constants.opt_LJ)
             total += LJ_intramolec_energy(system);
         if (system.constants.opt_ES)
             total += ES_intramolec_energy(system);
-    }
+    //}
     return total; // this is in K
 }
