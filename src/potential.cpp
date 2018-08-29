@@ -66,9 +66,14 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
 
     // BONDED TERMS
     if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
+        // bond stretches, angle-bends, torsion
         total_bonded = totalBondedEnergy(system); // in K  
-        total_rd += system.stats.UintraLJ.value; // in K 
-        total_es += system.stats.UintraES.value; // in K
+        // LJ intramolecular
+        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR)
+            total_rd += system.stats.UintraLJ.value; // in K 
+        // Coulombic intramolecular
+        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
+            total_es += system.stats.UintraES.value; // in K
     } 
 
 }
