@@ -568,8 +568,7 @@ int main(int argc, char **argv) {
             if (system.constants.pdb_traj_option && system.constants.pdb_bigtraj_option)
                 writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
 
-        initialVelMD(system);
-	      // end initial velocities
+        initialVelMD(system, 1);
 
         if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
           printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
@@ -637,7 +636,16 @@ int main(int argc, char **argv) {
             }
 
             if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
-            
+
+                if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
+                    system.constants.temp =
+                        system.constants.sa_target +
+                        (system.constants.temp - system.constants.sa_target) *
+                        system.constants.sa_schedule;
+
+                    initialVelMD(system, 0); // reset system temperature by velocities
+                }
+
             /* ========================== */
             calculateObservablesMD(system);
             /* ========================== */
@@ -696,7 +704,12 @@ int main(int argc, char **argv) {
             printf("Ensemble: %s; N_movables = %i N_atoms = %i\n",system.constants.ensemble_str.c_str(), system.stats.count_movables, system.constants.total_atoms);
             printf("Time elapsed = %.2f s = %.4f sec/step; ETA = %.3f min = %.3f hrs\n",time_elapsed,sec_per_step,ETA,ETA_hrs);
             printf("Step: %i / %li; Progress = %.3f%%; Realtime = %.5f %s\n",count_md_steps,total_steps,progress,outputTime, timeunit.c_str());
-            if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) printf("        Input T = %.4f K\n", system.constants.temp);
+            if (system.constants.ensemble == ENSEMBLE_NVT || system.constants.ensemble == ENSEMBLE_UVT) {
+                if (system.constants.simulated_annealing)
+                    printf("        Input T = %.4f K | simulated annealing (on)\n", system.constants.temp);
+                else 
+                    printf("        Input T = %.4f K | simulated annealing (off)\n", system.constants.temp);
+            }
             printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", system.stats.temperature.value);
             printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3f )\n",

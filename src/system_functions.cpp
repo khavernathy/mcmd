@@ -1483,13 +1483,13 @@ int getNlocal(System &system, int protoid) {
     return N;
 }
 
-void initialVelMD(System &system) {
+void initialVelMD(System &system, int startupflag) {
         double randv;
         int userflag=0, i, n, z;
         double v_init, v_init_AVG;
         
         // user-defined velocities
-        if (system.constants.md_manual_init_vel) {
+        if (startupflag && system.constants.md_manual_init_vel) {
             userflag=1;
             for (i=0; i<system.molecules.size(); i++) {
                 for (n=0; n<3; n++) {
@@ -1497,7 +1497,7 @@ void initialVelMD(System &system) {
                     system.molecules[i].vel[n] = randv; // that is, +- 0->1 * user param
                 }
             }
-            printf("Computed initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
+            printf("Assigned initial velocities via user-defined value: %f A/fs\n",system.constants.md_init_vel);
              
         // thermostat information (and apply init. vel if needed)
         }
