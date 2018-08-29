@@ -1284,6 +1284,7 @@ void findBonds(System &system) {
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
     for (mol=0; mol<molecule_limit; mol++) {
         if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
+        if (!system.constants.flexible_frozen && system.molecules[mol].frozen) continue; // skip frozen molecules if flexible_frozen is not on.
         // all pairs inside the molecule
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
@@ -1411,7 +1412,6 @@ void setBondingParameters(System &system) {
             system.constants.uniqueDihedrals[it].phi_ijkl = system.constants.uniqueDihedrals[it].value;
         }
         else if (params[0]==1) { // the defaulted case in get_torsion_params, need to handle dynamically
-            printf("actual angle %f\n", system.constants.uniqueDihedrals[it].value);
             if (fabs(system.constants.uniqueDihedrals[it].value*180./M_PI - 60.) < 10)
                 params[0] = 60.0;
             else if (fabs(system.constants.uniqueDihedrals[it].value*180./M_PI - 180.)  < 10)
