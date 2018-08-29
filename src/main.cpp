@@ -707,7 +707,7 @@ int main(int argc, char **argv) {
             printf("          RD = %.3f kJ/mol\n", system.stats.rd.value*system.constants.K2KJMOL);
             printf("          ES = %.3f kJ/mol\n", system.stats.es.value*system.constants.K2KJMOL);
             printf("         Pol = %.3f kJ/mol\n", system.stats.polar.value*system.constants.K2KJMOL);
-            printf("      Bonded = %.3f kJ/mol\n", system.stats.bonded.value*system.constants.K2KJMOL);
+            printf("      Bonded = %.3f kJ/mol (includes intramolecular energy)\n", system.stats.bonded.value*system.constants.K2KJMOL);
         
             if (system.constants.ensemble == ENSEMBLE_NVE)
                 printf("Total E = %.3f :: error = %.3f kJ/mol ( %.3f %% )\n", system.stats.totalE.value*system.constants.K2KJMOL, system.constants.md_NVE_err, system.constants.md_NVE_err/(fabs(system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL)*100.);
