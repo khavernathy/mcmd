@@ -1283,6 +1283,7 @@ void findBonds(System &system) {
     double rlj;
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
     for (mol=0; mol<molecule_limit; mol++) {
+        if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
         // all pairs inside the molecule
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
