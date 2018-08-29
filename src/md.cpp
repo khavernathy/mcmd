@@ -53,6 +53,7 @@ void calculateForces(System &system, double dt) {
         }
         // pbc
         else {
+            /* REPULSION -- DISPERSION */
             if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR) {
                 #ifdef OMP
                 if (system.constants.openmp_threads > 0)
@@ -61,9 +62,11 @@ void calculateForces(System &system, double dt) {
                     lj_force(system);
                 #else
                 lj_force(system);
-                #endif           
+                #endif  
             } else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
                 tt_forces(system);
+
+            /* ELECTROSTATICS */
             if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
                 #ifdef OMP
                 if (system.constants.openmp_threads > 0)
@@ -73,7 +76,9 @@ void calculateForces(System &system, double dt) {
                 #else
                 coulombic_real_force(system);
                 #endif
-            }    
+            }
+
+            /* POLARIZATION */    
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
                 #ifdef OMP
                 if (system.constants.openmp_threads > 0)
@@ -83,6 +88,8 @@ void calculateForces(System &system, double dt) {
                 #else
                 polarization_force(system);
                 #endif
+
+            /* BONDING */
             if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
                   if (system.constants.opt_bonds)
                     morse_gradient(system);

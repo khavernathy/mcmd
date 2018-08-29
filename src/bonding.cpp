@@ -1444,11 +1444,9 @@ double totalBondedEnergy(System &system) {
         total += angle_bend_energy(system);
     if (system.constants.opt_dihedrals)
         total += torsions_energy(system);
-    //if (system.constants.mode == "opt") {
-        if (system.constants.opt_LJ)
-            total += LJ_intramolec_energy(system);
-        if (system.constants.opt_ES)
-            total += ES_intramolec_energy(system);
-    //}
+    if (system.constants.opt_LJ)
+        LJ_intramolec_energy(system); // dont add this to bonded energy
+    if (system.constants.opt_ES)
+        ES_intramolec_energy(system); // dont add this to bonded energy
     return total; // this is in K
 }

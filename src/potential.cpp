@@ -65,8 +65,11 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     }
 
     // BONDED TERMS
-    if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE)
-        total_bonded = totalBondedEnergy(system); // in K   
+    if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
+        total_bonded = totalBondedEnergy(system); // in K  
+        total_rd += system.stats.UintraLJ.value; // in K 
+        total_es += system.stats.UintraES.value; // in K
+    } 
 
 }
 // ==========================================================================
