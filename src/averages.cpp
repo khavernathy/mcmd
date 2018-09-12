@@ -275,7 +275,14 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
 
     // HEAT CAPACITY, kJ/molK
     if (system.constants.ensemble != ENSEMBLE_NVE) {
-        system.stats.heat_capacity.value = (system.constants.kb*system.constants.NA*1e-3)*(system.stats.potential_sq.average - system.stats.potential.average*system.stats.potential.average)/(system.constants.temp*system.constants.temp);
+        double kb = system.constants.kb;
+        double T = system.constants.temp;
+        double NA = system.constants.NA;
+        double U2avg = system.stats.potential_sq.average;
+        double Uavg2 = system.stats.potential.average * system.stats.potential.average;
+        double N = (double)system.stats.count_movables;
+
+        system.stats.heat_capacity.value = (U2avg - Uavg2)*kb*kb/(kb*T*T)/1000.0/(N/NA);
         system.stats.heat_capacity.calcNewStats();
     }
 }
@@ -546,7 +553,16 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     // HEAT CAPACITY
     // Frenkel, p58
     if (system.constants.ensemble == ENSEMBLE_NVT && system.proto.size() == 1) { // kJ/molK
-        system.stats.heat_capacity.value = (system.constants.kb*system.constants.NA/1000.)*(system.stats.totalE_sq.average - system.stats.totalE.average*system.stats.totalE.average)/(system.constants.temp*system.constants.temp);
+        double kb = system.constants.kb;
+        double T = system.constants.temp;
+        double NA = system.constants.NA;
+        double U2avg = system.stats.potential_sq.average;
+        double Uavg2 = system.stats.potential.average * system.stats.potential.average;
+        double N = (double)system.stats.count_movables;
+
+        system.stats.heat_capacity.value = (U2avg - Uavg2)*kb*kb/(kb*T*T)/1000.0/(N/NA);
+        //    (system.constants.kb*system.constants.NA/1000.)*
+        //    (system.stats.totalE_sq.average - system.stats.totalE.average*system.stats.totalE.average)/(system.constants.temp*system.constants.temp);
         system.stats.heat_capacity.calcNewStats();
     // Frenkel, p85
     } else if (system.constants.ensemble == ENSEMBLE_NVE && system.proto.size() == 1) {
