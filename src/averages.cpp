@@ -551,7 +551,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     system.stats.totalE_sq.calcNewStats();
 
     // HEAT CAPACITY
-    // Frenkel, p58
+    // NVT: Frenkel, p58
     if (system.constants.ensemble == ENSEMBLE_NVT && system.proto.size() == 1) { // kJ/molK
         double kb = system.constants.kb;
         double T = system.constants.temp;
@@ -564,20 +564,17 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         //    (system.constants.kb*system.constants.NA/1000.)*
         //    (system.stats.totalE_sq.average - system.stats.totalE.average*system.stats.totalE.average)/(system.constants.temp*system.constants.temp);
         system.stats.heat_capacity.calcNewStats();
-    // Frenkel, p85
+    // NVE: Frenkel, p85
     } else if (system.constants.ensemble == ENSEMBLE_NVE && system.proto.size() == 1) {
-        double kb = system.constants.kb;
-        double kb2 = system.constants.kb*kb;
-        double kb3 = system.constants.kb*kb2;
-        double T = system.stats.temperature.value;
-        double T2 = system.stats.temperature.value*T;
+        double kb=system.constants.kb;
+        double T = system.constants.temp;
+        double NA = system.constants.NA;
+        double K2avg = system.stats.kinetic_sq.average;
+        double Kavg2 = system.stats.kinetic.average*system.stats.kinetic.average;
         double N = (double)system.stats.count_movables;
-        double Kflux = kb2*(system.stats.kinetic_sq.average - system.stats.kinetic.average*system.stats.kinetic.average);
-
-        system.stats.heat_capacity.value = 4.*N/(9.*kb3*T2);
-        system.stats.heat_capacity.value *= (Kflux - 3.*kb2*T2/(2.*N));
-        system.stats.heat_capacity.value = 1.0/system.stats.heat_capacity.value;
-        system.stats.heat_capacity.value *= system.constants.NA/1000.; // kJ/molK
+        
+        double bottom = -2.0/3.0*(2.0*N/(3.0*kb*kb*T*T)*((K2avg - Kavg2)*kb*kb)+1.0);
+        system.stats.heat_capacity.value = kb*NA*1e-3/bottom ; // kJ/molK
         system.stats.heat_capacity.calcNewStats();
     }
 
