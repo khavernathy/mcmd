@@ -411,7 +411,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
 
     double avg_v_ALL=0;
-	double T=0.0, pressure=0;
+	double T=0.0;
     double vsq=0., wsq=0.;
     double energy_holder=0.;
 	unsigned int i,j,n,z;
@@ -576,18 +576,21 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T));
     }
 
-            // PRESSURE (my pathetic nRT/V method)
-            // using this until i get a decent NVT frenkel method working.
-            // PE since it's I.G. approximation.
-            double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
-            pressure = nmol*system.constants.R*T/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
+    // PRESSURE (my pathetic nRT/V method)
+    // using this until i get a decent NVT frenkel method working.
+    // PE since it's I.G. approximation.
+    //double nmol = (system.proto[0].mass*system.stats.count_movables)/(system.proto[0].mass*system.constants.NA);
+    //pressure = nmol*system.constants.R*T/(system.pbc.volume*system.constants.A32L) * system.constants.JL2ATM;
+    if (system.constants.ensemble == ENSEMBLE_NVT) {
+        double P = calcPressureNVT(system); // in atm
+        system.stats.pressure.value = P;
+        system.stats.pressure.calcNewStats();
+    }
 
 
     //system.stats.potential.value = V_total; // this is already done in getTotalPotential()
     system.stats.avg_v.value = avg_v_ALL;
     system.stats.EquipartitionK.value = Ek;
-    system.stats.pressure.value = pressure;
-        system.stats.pressure.calcNewStats();
 
     // first step
     if (system.constants.ensemble == ENSEMBLE_NVE) {

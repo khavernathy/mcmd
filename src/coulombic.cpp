@@ -417,6 +417,9 @@ void coulombic_real_force(System &system) {  // units of K/A
                 system.molecules[i].atoms[j].force[n] += holder;
                 system.molecules[ka].atoms[la].force[n] -= holder;
 
+                if (system.constants.calc_pressure_option)
+                    system.constants.fdotr_sum += holder*u[n];
+
             }
         }
         if (system.constants.kspace_option && i < ka) { // k-space terms can be outside cutoff. Skip duplicates though.
@@ -435,6 +438,10 @@ void coulombic_real_force(System &system) {  // units of K/A
                         	kvecs[ki][2]*distances[2])/k_sq   * 2; // times 2 because it's a half-Ewald sphere
                     system.molecules[i].atoms[j].force[n] += holder;
                     system.molecules[ka].atoms[la].force[n] -= holder;
+
+                    if (system.constants.calc_pressure_option)
+                        system.constants.fdotr_sum += holder*u[n];
+    
                 } // end k-vector loop
             } // end 3D
         } // end if condition k-space

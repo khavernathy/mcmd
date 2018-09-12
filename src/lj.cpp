@@ -230,6 +230,9 @@ void lj_force(System &system) {   // units of K/A
                 f[n] = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
                 system.molecules[i].atoms[j].force[n] += f[n];
                 system.molecules[k].atoms[l].force[n] -= f[n];
+            
+                if (system.constants.calc_pressure_option)
+                    system.constants.fdotr_sum += f[n]*d[n];
             }
         }
 
@@ -256,7 +259,7 @@ void lj_force_omp(System &system) {   // units of K/A
     #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
-        int nthreads_local = omp_get_num_threads();        
+        int nthreads_local = omp_get_num_threads();
         const double cutoff = system.pbc.cutoff;
         const int rd_lrc = system.constants.rd_lrc;
         double d[3], eps, sig, r,rsq,r6,s2,s6, localf[3]; //, sr, sr2, sr6;

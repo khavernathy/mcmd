@@ -705,7 +705,10 @@ void polarization_force(System &system) {
             for (n=0;n<3;n++) {
                 system.molecules[i].atoms[j].force[n] += f_local[n];
                 system.molecules[k].atoms[l].force[n] -= f_local[n];
-            }
+
+                if (system.constants.calc_pressure_option)
+                    system.constants.fdotr_sum += f_local[n]*distances[n]; 
+           }
         } // end loop l atoms in k
         } // end loop k molecules
     } // end loop j atoms in i

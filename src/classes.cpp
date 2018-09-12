@@ -108,6 +108,7 @@ class Constants {
         const double DEBYE2SKA = 85.10597636; // debye to ? MPMC reduced
         const double JL2ATM = 0.00986923297; // J/L to atm
         const double A32L = 1e-27; // A^3 to liters.
+        const double KA32ATM = 136.2526912069476; // this times K/A^3 = atm
         const double K2KJMOL = kb*NA/1000; // K -> kJ/mol
         const double HBARC = 22898848.135746032; // in K*A
         const double vand2mpmc = 0.14818471127642288; // au^3 * this = A^3
@@ -275,6 +276,9 @@ class Constants {
         int_fast8_t polar_palmo = 1;
         int_fast8_t polar_pbc = 1; // default periodic polar
         //int thole_total_atoms = 0;
+
+        int calc_pressure_option=1; // default on for NVT (switches off if not NVT);  option in MD to calculation pressure via f.dot.r
+        double fdotr_sum=0;
 
         int_fast8_t all_pbc=1;
         int_fast8_t auto_reject_option=1; // enables/disables
@@ -676,7 +680,7 @@ class Stats {
           tt, tt_lrc, tt_self,
           Ustretch, Uangles, Udihedrals, UintraLJ, UintraES,  // bonded energies in K
           chempot,totalmass, frozenmass,
-          pressure,temperature, fdotrsum,
+          pressure,temperature,fdotr_sum, 
           dist_within, diffusion, volume, z, // z = PV/nRT
           Q, polar_iterations, heat_capacity; // Q = partition func.
 

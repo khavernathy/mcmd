@@ -40,6 +40,8 @@ void calculateForces(System &system, double dt) {
 		system.molecules[i].atoms[j].V = 0.0;
 	}
 	}
+    if (system.constants.calc_pressure_option)
+        system.constants.fdotr_sum = 0.0;
 
     // GET FORCES
     // CPU style

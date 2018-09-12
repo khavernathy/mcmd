@@ -1014,8 +1014,8 @@ void initialize(System &system) {
         system.stats.frozenmass.name = "frozenmass";
         system.stats.pressure.name = "pressure";
         system.stats.temperature.name= "temperature";
-
-        system.stats.fdotrsum.name="fdotrsum";
+        system.stats.fdotr_sum.name="fdotr_sum";
+        
         system.stats.dist_within.name="dist_within";
         system.stats.heat_capacity.name = "heat_capacity";
         system.stats.diffusion.name="diffusion";

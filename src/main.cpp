@@ -649,7 +649,7 @@ int main(int argc, char **argv) {
             /* ========================== */
             calculateObservablesMD(system);
             /* ========================== */
-            
+
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                 int localN = getNlocal(system, sorbid);
                 if (localN < 1) continue; // skip N=0 sorbates
@@ -710,8 +710,12 @@ int main(int argc, char **argv) {
                 else 
                     printf("        Input T = %.4f K | simulated annealing (off)\n", system.constants.temp);
             }
-            printf("     Emergent T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
+            printf("      Average T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", system.stats.temperature.value);
+            if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.calc_pressure_option) {
+                printf("      Average P = %.4f +- %.4f atm\n", system.stats.pressure.average, system.stats.pressure.sd);
+                printf("Instantaneous P = %.4f atm\n", system.stats.pressure.value);
+            }
             printf("     KE = %.3f kJ/mol (lin: %.3f , rot: %.3f )\n",
                   system.stats.kinetic.value*system.constants.K2KJMOL, system.stats.Klin.value*system.constants.K2KJMOL, system.stats.Krot.value*system.constants.K2KJMOL );
             printf("     PE = %.3f kJ/mol\n",
@@ -726,8 +730,8 @@ int main(int argc, char **argv) {
                 printf("Total E = %.3f :: error = %.3f kJ/mol ( %.3f %% )\n", system.stats.totalE.value*system.constants.K2KJMOL, system.constants.md_NVE_err, system.constants.md_NVE_err/(fabs(system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL)*100.);
             else
                 printf("Total E = %.3f kJ/mol\n", system.stats.totalE.value*system.constants.K2KJMOL);
-            printf("Average v = %.2f m/s; v_init = %.2f m/s\nEmergent Pressure = %.3f +- %.3f atm (I.G. approx)\n",
-                system.stats.avg_v.value*1e5, system.constants.md_init_vel*1e5, system.stats.pressure.average, system.stats.pressure.sd );
+            printf("Average v = %.2f m/s; v_init = %.2f m/s\n",
+                system.stats.avg_v.value*1e5, system.constants.md_init_vel*1e5);
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);

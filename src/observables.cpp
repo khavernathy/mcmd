@@ -59,3 +59,16 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
     return T;
 }
 
+double calcPressureNVT(System &system) {
+    double P=0;
+    system.stats.fdotr_sum.value = system.constants.fdotr_sum;
+    system.stats.fdotr_sum.calcNewStats(); 
+    double V = system.stats.volume.value;
+    int N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
+    double rho = N/V;
+    double T = system.constants.temp;
+
+    P = rho*T + 1./(3.0*V)*system.stats.fdotr_sum.average;  // in K/A^3
+    P *= system.constants.KA32ATM; // to atm
+    return P;    
+}

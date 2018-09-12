@@ -1545,6 +1545,10 @@ void readInput(System &system, char* filename) {
                 system.constants.frag_bondlength = atof(lc[1].c_str());
                 std::cout << "Got fragment (initial/default) bond-length = " << lc[1].c_str(); printf("\n");
 
+            } else if (!strcasecmp(lc[0].c_str(), "calc_pressure_option")) {
+                if (!strcasecmp(lc[1].c_str(),"off")) system.constants.calc_pressure_option = 0;
+                std::cout << "Got calculate pressure option = " << lc[1].c_str(); printf("\n");
+
             } else if (!strcasecmp(lc[0].c_str(), "charge_sum_check")) {
                 if (!strcasecmp(lc[1].c_str(),"off")) system.constants.charge_sum_check = 0;
                 std::cout << "Got charge sum check option = " << lc[1].c_str(); printf("\n");
@@ -1875,5 +1879,9 @@ void inputValidation(System &system) {
         exit(EXIT_FAILURE);
     }
     #endif
+    if (system.constants.mode=="md" && system.constants.ensemble != ENSEMBLE_NVT && system.constants.calc_pressure_option) {
+        system.constants.calc_pressure_option=0;
+        std::cout << "Turned off calculate-pressure option (only valid for NVT MD)."; printf("\n");
+    }
 }
 // end input validation function
