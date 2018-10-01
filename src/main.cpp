@@ -646,37 +646,9 @@ int main(int argc, char **argv) {
                     initialVelMD(system, 0); // reset system temperature by velocities
                 }
 
-            /* ========================== */
-            calculateObservablesMD(system);
-            /* ========================== */
-
-            for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
-                int localN = getNlocal(system, sorbid);
-                if (localN < 1) continue; // skip N=0 sorbates
-
-                // re-initialize these vars for each sorbate
-                for (int h=0;h<3;h++) diffusion_d[h]=0.;
-                r2_sum=0.;
-                for (i=0; i<system.molecules.size(); i++) {
-                    // only consider molecules of this type (for multi-sorb)
-                    if (system.molecules[i].name == system.proto[sorbid].name) {
-                        system.molecules[i].calc_center_of_mass();
-			            for (n=0; n<3; n++) {
-                            // first update the "original" center of mass "r(0)"
-                            // as the arithmetic running average of r(1), r(2) ... r(t) in time
-                            system.molecules[i].original_com[n] = ((count_md_steps - 1)*system.molecules[i].original_com[n] + (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]))/count_md_steps; 
-                            // now take normalized atom position (by periodic box and by system C.O.M.)
-                            // and do r(t) - "r(0)"
-                            diffusion_d[n] = (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]) - system.molecules[i].original_com[n];
-
-                        }
-                        r2_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
-                    }
-                } // end all molecules loop
-                D[sorbid] = (r2_sum / (localN *6.0*t)); // 6 because 2*dimensionality = 2*3
-                D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
-            } // end sorbate types loop
-            // we've calc'd diffusion coefficients for all sorbates now.
+                /* ========================== */
+                calculateObservablesMD(system);
+                /* ========================== */
 
             } // end if N>0 (stats calculation)
 
@@ -734,11 +706,9 @@ int main(int argc, char **argv) {
                 system.stats.avg_v.value*1e5, system.constants.md_init_vel*1e5);
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
-                    printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), D[sorbid]);
-			        if (system.proto.size() == 1)
-                        printf("Mean square displacement = %.5f A^2\n", r2_sum/system.stats.count_movables);
-                	//printf("r2_sum = %f\n",r2_sum);
-		}
+                    printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), system.stats.diffusion[sorbid].value);
+                    printf("    %s MSD = %.5f A^2\n", system.proto[sorbid].name.c_str(), system.stats.msd[sorbid].value);
+		        }
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);
             // uptake data if uVT

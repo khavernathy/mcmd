@@ -681,11 +681,10 @@ class Stats {
           Ustretch, Uangles, Udihedrals, UintraLJ, UintraES,  // bonded energies in K
           chempot,totalmass, frozenmass,
           pressure,temperature,fdotr_sum, 
-          dist_within, diffusion, volume, z, // z = PV/nRT
+          dist_within, volume, z, // z = PV/nRT
           Q, polar_iterations, heat_capacity; // Q = partition func.
 
         const int max_sorbs=10;
-        //vector<obs_t> msd = vector<obs_t>(max_sorbs);
         vector<obs_t> wtp = vector<obs_t>(max_sorbs);
         vector<obs_t> wtpME = vector<obs_t>(max_sorbs);
         vector<obs_t> Nmov = vector<obs_t>(max_sorbs);
@@ -693,6 +692,8 @@ class Stats {
         vector<obs_t> density = vector<obs_t>(max_sorbs);
         vector<obs_t> selectivity = vector<obs_t>(max_sorbs);
         vector<obs_t> excess = vector<obs_t>(max_sorbs);
+        vector<obs_t> diffusion = vector<obs_t>(max_sorbs);
+        vector<obs_t> msd = vector<obs_t>(max_sorbs);
 
 };
 

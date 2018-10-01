@@ -605,6 +605,42 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     system.stats.avg_v.value = avg_v_ALL;
     system.stats.EquipartitionK.value = Ek;
 
+
+    // DIFFUSION AND MSD
+    double diffusion_d[3] = {0,0,0};
+    double r2_sum = 0;
+    double D[(int)system.proto.size()];
+
+    for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
+    int localN = getNlocal(system, sorbid);
+        if (localN < 1) continue; // skip N=0 sorbates
+
+        // re-initialize these vars for each sorbate
+        for (int h=0;h<3;h++) diffusion_d[h]=0.;
+        r2_sum=0.;
+        for (i=0; i<system.molecules.size(); i++) {
+            // only consider molecules of this type (for multi-sorb)
+            if (system.molecules[i].name == system.proto[sorbid].name) {
+                system.molecules[i].calc_center_of_mass();
+                for (n=0; n<3; n++) {
+                    // first update the "original" center of mass "r(0)"
+                    // as the arithmetic running average of r(1), r(2) ... r(t) in time
+                    system.molecules[i].original_com[n] = ((system.stats.MDstep - 1)*system.molecules[i].original_com[n] + (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]))/system.stats.MDstep;
+                    // now take normalized atom position (by periodic box and by system C.O.M.)
+                    // and do r(t) - "r(0)"
+                    diffusion_d[n] = (system.molecules[i].com[n] + system.molecules[i].diffusion_corr[n]) - system.molecules[i].original_com[n];
+
+                }
+                r2_sum += dddotprod(diffusion_d, diffusion_d); // the net R^2 from start -> now (mean square displacement)
+            }
+        } // end all molecules loop
+        D[sorbid] = (r2_sum / (localN *6.0*system.stats.MDtime)); // 6 because 2*dimensionality = 2*3
+        D[sorbid] *= 0.1; // A^2 per fs -> cm^2 per sec (CGS units).
+        system.stats.diffusion[sorbid].value = D[sorbid];
+        system.stats.msd[sorbid].value = r2_sum / localN;
+    } // end sorbate types loop
+    // we've calc'd diffusion coefficients for all sorbates now.
+
     // first step
     if (system.constants.ensemble == ENSEMBLE_NVE) {
         if (system.stats.MDtime == system.constants.md_dt) {
