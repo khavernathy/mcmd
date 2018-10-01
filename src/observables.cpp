@@ -8,6 +8,11 @@
 
 using namespace std;
 
+/* these calculations are only a select few
+   most calculations are performed within averages.cpp
+   e.g. kinetic energy, diffusion, Cv, etc.
+*/
+
 double calcTemperature(System &system, int * N_local, double * v2_sum) {
     // returns the whole system temperature
     // get Temperature. Frenkel p64 and p84
