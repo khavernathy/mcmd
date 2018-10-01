@@ -1,0 +1,34 @@
+! MMPF-6, 2x2x2 with a single
+! Bivalirudin molecule in the 
+! main pore. NVT flexible MD
+! Douglas Franz
+! Space group, 2018
+
+ basis1 83.93600 0.00000 0.00000
+ basis2 -41.96800 72.69070 0.00000
+ basis3 0.00000 0.00000 34.28600
+
+! Uncomment this line to parallelize force calculations.
+! omp 16
+
+potential_form ljes
+ewald_kmax 2
+
+mode md
+ensemble nvt
+temperature 298
+md_dt 1
+md_ft 10 ns
+md_mode flexible
+md_corrtime 20
+
+thermostat nose-hoover
+
+
+xyz_traj_option on
+big_xyz_traj off
+
+
+auto_center on
+input_atoms    ../../../atomfiles/MMPF-6+Bivalirudin.pdb 
+
