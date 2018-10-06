@@ -62,21 +62,21 @@ if [[ "$option" == "cpu" ]]; then
         echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/6.2.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto  -frename-registers
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto  -frename-registers
     elif [[ "$2" == "bridges" ]]; then
         echo "... for Bridges cluster environment.";
         module purge
         module load gcc/6.3.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers
     elif [[ "$2" == "debug" ]]; then
         echo "... in debug mode (with errors/warnings";
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -Werror -Wall -ggdb;
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -Werror -Wall -ggdb;
     elif [[ "$2" == "linux" ]]; then
         echo "... optimized for linux."
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
-    elif [[ "$2" == "O3" ]]; then
-        echo "... optimized at -O3 (not fully)."
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers 
+    elif [[ "$2" == "Ofast" ]]; then
+        echo "... optimized at -Ofast (fully and dangerously)."
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast
     elif [[ "$2" == "windows" ]]; then
         echo "... for Windows OS.";
 	echo "Note: to install in the Windows command line, use the following commands:"
@@ -84,9 +84,9 @@ if [[ "$option" == "cpu" ]]; then
 	echo "cl /EHsc main.cpp /D \"WINDOWS\" /Fe..\\mcmd"
         echo ""
 	echo "=================================================="
-	g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -D WINDOWS
+	g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -D WINDOWS
     else
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast;
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3;
     fi
 ######################################################################
 elif [[ "$option" == "gpu" ]]; then
@@ -140,12 +140,12 @@ elif [[ "$option" == "omp" ]]; then
     echo "Doing OpenMP compilation"
     if [[ "$2" == "linux" ]]; then
         echo "... for linux."
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -march=native -frename-registers -fopenmp -D OMP
     elif [[ "$2" == "circe" ]]; then
         echo "... for CIRCE cluster environment.";
         module purge
         module load compilers/gcc/6.2.0
-        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -frename-registers -fopenmp -D OMP
+        g++ main.cpp -lm -o ../mcmd -I. -std=c++11 -O3 -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -frename-registers -fopenmp -D OMP
     else 
         /usr/local/bin/g++-4.9 main.cpp -lm -o ../mcmd -I. -std=c++11 -Ofast -fopenmp -D OMP
     fi

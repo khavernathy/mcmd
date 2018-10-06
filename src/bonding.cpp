@@ -282,11 +282,11 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         return "Cd1f1";
     } else if (name == "Si") {
         return "SiF6"; // default sifsix Si
-    } else {
-        printf("ERROR: ATOM UFF TYPE NOT FOUND FOR label '%s'.\n",name.c_str());
-        exit(EXIT_FAILURE);
-        return "NOTFOUND";
     }
+    printf("ERROR: ATOM UFF TYPE NOT FOUND FOR label '%s'.\n",name.c_str());
+    exit(EXIT_FAILURE);
+    return "NOTFOUND";
+    
 }
 
 
