@@ -708,7 +708,8 @@ int main(int argc, char **argv) {
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), system.stats.diffusion[sorbid].value);
                     printf("    %s MSD = %.5f A^2\n", system.proto[sorbid].name.c_str(), system.stats.msd[sorbid].value);
-		        }
+		            printf("VACF of %s = %f\n", system.proto[sorbid].name.c_str(), system.stats.vacf[sorbid].value);
+                }
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);
             // uptake data if uVT

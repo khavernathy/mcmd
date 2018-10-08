@@ -694,6 +694,7 @@ class Stats {
         vector<obs_t> excess = vector<obs_t>(max_sorbs);
         vector<obs_t> diffusion = vector<obs_t>(max_sorbs);
         vector<obs_t> msd = vector<obs_t>(max_sorbs);
+        vector<obs_t> vacf = vector<obs_t>(max_sorbs);
 
 };
 
@@ -832,6 +833,7 @@ class Molecule {
         double com[3] = {0,0,0};
         double original_com[3] = {0,0,0}; // for diffision calc
         double diffusion_corr[3] = {0,0,0}; // for diffusion calc (accounts for PBC)
+        double original_vel[3] = {0,0,0}; // for VACF
         double acc[3] = {0,0,0};
         double old_acc[3] = {0,0,0};
         double vel[3] = {0,0,0};

@@ -1548,6 +1548,13 @@ void initialVelMD(System &system, int startupflag) {
                 system.constants.md_init_vel = v_init_AVG;
             } // end if flexible MD
         } // end if thermostat
+
+    // write initial velocities to the saved array for each molecule
+    for (unsigned int i=0; i<system.molecules.size();i++) {
+        for (unsigned int n=0;n<3;n++)
+            system.molecules[i].original_vel[n] = system.molecules[i].vel[n];
+    }
+
 } // end initialVelMD()
 
 void consolidatePDBIDs(System &system) {

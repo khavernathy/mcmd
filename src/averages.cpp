@@ -641,7 +641,22 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     } // end sorbate types loop
     // we've calc'd diffusion coefficients for all sorbates now.
 
-    // first step
+    // VELOCITY AUTOCORRELATION FUNCTION VACF
+    for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
+        int localN = getNlocal(system, sorbid);
+        if (localN<1) continue;
+        system.stats.vacf[sorbid].value = 0;
+        for (i=0;i<system.molecules.size();i++) {
+            if (system.molecules[i].name==system.proto[sorbid].name) {
+                for (n=0;n<3;n++) {
+                    system.stats.vacf[sorbid].value += dddotprod(system.molecules[i].original_vel, system.molecules[i].vel);
+                }
+            }
+        } 
+    }
+
+
+    // FIRST STEP STUFF
     if (system.constants.ensemble == ENSEMBLE_NVE) {
         if (system.stats.MDtime == system.constants.md_dt) {
             system.constants.md_initial_energy_NVE = K_total+V_total; // in K
