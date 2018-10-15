@@ -284,6 +284,8 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         return "SiF6"; // default sifsix Si
     }
     printf("ERROR: ATOM UFF TYPE NOT FOUND FOR label '%s'.\n",name.c_str());
+    printf("Number of bonds = %i\n", num_bonds);
+    printf("Molecule %i atom %i\n", mol, i);
     exit(EXIT_FAILURE);
     return "NOTFOUND";
     
@@ -1269,6 +1271,7 @@ void findBonds(System &system) {
     
     // get UFF atom labels for all atoms
     for (i=0;i<molecule_limit;i++) {
+        if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue;
         for (j=0;j<system.molecules[i].atoms.size();j++) {
             // based on the total number of bonds to this atom,
             // determine the atom-type from UFF.
