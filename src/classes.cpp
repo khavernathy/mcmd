@@ -229,6 +229,7 @@ class Constants {
         int_fast8_t md_translations=1; // MD only, translation motion on
         int_fast8_t md_manual_init_vel=0; // flag for user-defined initial velocities; default off
         double md_init_vel=0.; //  A / fs. User can set.
+        int zero_init_vel_flag = 1; // for VACF calculation to be non-zero when v(0) = 0
         double md_dt=0.1, md_ft=10000; // MD timestep and final time, in fs
         int_fast8_t md_mode = MD_MOLECULAR; // default is to keep molecules rigid (bonded)
 		int_fast8_t integrator = INTEGRATOR_VV; // velocity verlet is default 
@@ -781,8 +782,7 @@ class Atom {
 		//double prevpos[3] = {0,0,0};
         double force[3] = {0,0,0};
         double vel[3] = {0,0,0};
-        double acc[3] = {0,0,0};
-        double old_acc[3] = {0,0,0};
+        double original_vel[3]= {0,0,0};
         double torque[3] = {0,0,0};
         double dip[3] = {0,0,0};
         double newdip[3] = {0,0,0};
@@ -800,27 +800,17 @@ class Atom {
         string UFFlabel; // the UFF-style label for this atom.
         vector<int> bonds; // <IDs of bonded atoms>
 
-        double * get_acc() {
-            static double output[3];
-            for (int n=0; n<3; n++) output[n] = acc[n];
-            return output;
-        }
-
-        void calc_acc(int nh, double lm) {
+        void calc_vel_verlet(double dt, int nh, double lm) {
+            double a;
             for (int n=0; n<3; n++) {
-                old_acc[n] = acc[n];
-                acc[n] = force[n]*1.3806488e-33 / m; // to A / fs^2
-                if (nh)
-                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier; Rapaport p158
+                a = force[n]*1.3806488e-33/m;
+                if (nh) a += lm*vel[n];
+                vel[n] += 0.5*dt*a; // that's where VV comes into play. 1/2 * (a - prev_a)
             }
         }
 
-        void calc_vel(double dt) {
-            for (int n=0; n<3; n++) vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // that's where VV comes into play. 1/2 * (a - prev_a)
-        }
-
-        void calc_pos(double dt) {
-            for (int n=0; n<3; n++) pos[n] = pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
+        void calc_pos(double dt) { // by velocity verlet
+            for (int n=0; n<3; n++) pos[n] +=  vel[n]*dt; // + 0.5*acc[n] * dt * dt;
         }
 
         /* for debugging */
@@ -846,8 +836,6 @@ class Molecule {
         double original_com[3] = {0,0,0}; // for diffision calc
         double diffusion_corr[3] = {0,0,0}; // for diffusion calc (accounts for PBC)
         double original_vel[3] = {0,0,0}; // for VACF
-        double acc[3] = {0,0,0};
-        double old_acc[3] = {0,0,0};
         double vel[3] = {0,0,0};
         double ang_vel[3] = {0,0,0};
         double ang_acc[3] = {0,0,0};
@@ -870,8 +858,6 @@ class Molecule {
                 com[n] = 0;
                 force[n]=0;
                 torque[n]=0;
-                acc[n]=0;
-                old_acc[n]=0;
                 vel[n]=0;
                 ang_vel[n]=0;
                 ang_acc[n]=0;
@@ -926,16 +912,6 @@ class Molecule {
             }
         }
 
-        // linear acceleration
-        void calc_acc(int nh, double lm) {
-            for (int n=0; n<3; n++) {
-                old_acc[n] = acc[n];
-                acc[n] = force[n]*1.3806488e-33 / mass; // to A / fs^2
-                if (nh)
-                    acc[n] += lm*vel[n]; // apply Nose-Hoover via Lagrange Multiplier; Rapaport p158
-            }
-        }
-
         // angular velocity
         void calc_ang_vel(double dt) {
             for (int n=0; n<3; n++) {
@@ -944,9 +920,12 @@ class Molecule {
         }
 
         // linear velocity
-        void calc_vel(double dt) {
+        void calc_vel_verlet(double dt, int nh, double lm) {
+            double a;
             for (int n=0; n<3; n++) {
-                vel[n] = vel[n] + 0.5*(acc[n] + old_acc[n])*dt; // in A/fs. vel. verlet
+                a = force[n]*1.3806488e-33/mass;
+                if (nh) a += lm*vel[n];
+                vel[n] += 0.5*dt*a; // in A/fs. vel. verlet
             }
         }
 
@@ -957,10 +936,10 @@ class Molecule {
             }
         }
 
-        // linear position
+        // linear position by velocity verlet
         void calc_pos(double dt) {
             for (int i=0; i<atoms.size(); i++) {
-              for (int n=0; n<3; n++) atoms[i].pos[n] = atoms[i].pos[n] + vel[n] * dt + 0.5*acc[n] * dt * dt;
+              for (int n=0; n<3; n++) atoms[i].pos[n] += vel[n]*dt; // + 0.5*acc[n] * dt * dt;
             }
         }
 
@@ -1005,10 +984,10 @@ class Molecule {
 
         // for debugging
         void printAll() {
-            printf("====================\nmolecule PDBID=%i :: mass: %f amu; inertia: %e; \nname = %s; frozen = %i; \nforce: %f %f %f; \nacc: %f %f %f; \nold_acc: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
+            printf("====================\nmolecule PDBID=%i :: mass: %f amu; inertia: %e; \nname = %s; frozen = %i; \nforce: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
             PDBID,mass/1.660578e-27,inertia,name.c_str(),frozen,
-            force[0], force[1], force[2], acc[0], acc[1], acc[2],
-            old_acc[0], old_acc[1], old_acc[2], vel[0], vel[1], vel[2], com[0], com[1], com[2],
+            force[0], force[1], force[2], 
+            vel[0], vel[1], vel[2], com[0], com[1], com[2],
             torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2],
             old_ang_acc[0], old_ang_acc[1], old_ang_acc[2], ang_vel[0], ang_vel[1], ang_vel[2],
             ang_pos[0]*180.0/M_PI, ang_pos[1]*180.0/M_PI, ang_pos[2]*180.0/M_PI); //com[0], com[1], com[2]);

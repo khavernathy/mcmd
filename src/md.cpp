@@ -25,13 +25,20 @@ void integrate(System &system) {
     }
     // END IF DEBUG
 
-    // 1) MOVE ATOMS FROM FORCES/TORQUES
-    system.checkpoint("moving particles based on forces.");
+    // 1) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES FROM FORCES: VERLET 1/2 STEP
+    acceleration_velocity(system); 
+    system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
+
+    // 2) apply heat bath in constant-temp ensembles
+    NVT_thermostat(system);
+    system.checkpoint("Done with heatbath if NVT/uVT.");
+
+    // 3) MOVE ATOMS FROM RESPECTIVE VELOCITIES
+    system.checkpoint("moving particles");
     position(system);
-    // END POSITION CHANGES
     system.checkpoint("done moving particles. Checking PBC for all particles");
 
-    // 2) CHECK P.B.C. (move the molecule/atom back in the box if needed)
+    // 4) CHECK P.B.C. (move the molecule/atom back in the box if needed)
     if (system.constants.md_pbc && system.constants.md_translations) {
         for (j=0; j<system.molecules.size(); j++) {
             if (!system.molecules[j].frozen) {
@@ -40,22 +47,13 @@ void integrate(System &system) {
 	    } // end loop j molecules
     } // end if PBC
 
-    // 3) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
+    // 5) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
 	system.checkpoint("done checking PBC. Starting calculateForces()");
     calculateForces(system);
     system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
 
-    // 4) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES
+    // 6) NEXT VERLET 1/2 STEP
     acceleration_velocity(system); 
-    system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
-
-    // TODO -- flexible MOF thermostat?
-    // 5) apply heat bath in constant-temp ensembles
-    NVT_thermostat(system);
-    system.checkpoint("Done with heatbath if NVT/uVT.");
-    
-
-
 
 
 

@@ -165,8 +165,7 @@ void acceleration_velocity(System &system) {
             if (system.constants.md_mode == MD_ATOMIC) {
                 for (i=0; i<system.molecules[j].atoms.size(); i++) {
                     int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
-                    system.molecules[j].atoms[i].calc_acc(nh, system.constants.lagrange_multiplier);
-                    system.molecules[j].atoms[i].calc_vel(dt);
+                    system.molecules[j].atoms[i].calc_vel_verlet(dt, nh, system.constants.lagrange_multiplier);
             } // end atomic loop i
             } // end if atomic
             // otherwise handle molecular movement with rigidity.
@@ -174,8 +173,7 @@ void acceleration_velocity(System &system) {
                 // translational
                 if (system.constants.md_translations) {
                     int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
-                    system.molecules[j].calc_acc(nh, system.constants.lagrange_multiplier);
-                    system.molecules[j].calc_vel(dt);
+                    system.molecules[j].calc_vel_verlet(dt, nh, system.constants.lagrange_multiplier);
                 }
 
                 // rotational
@@ -188,8 +186,7 @@ void acceleration_velocity(System &system) {
             else if (system.constants.md_mode == MD_FLEXIBLE) {
                 int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
                     for (i=0;i<system.molecules[j].atoms.size();i++) {
-                        system.molecules[j].atoms[i].calc_acc(nh, system.constants.lagrange_multiplier);
-                        system.molecules[j].atoms[i].calc_vel(dt);
+                        system.molecules[j].atoms[i].calc_vel_verlet(dt, nh, system.constants.lagrange_multiplier);
                     }
             }
         } // end if movable
@@ -198,8 +195,7 @@ void acceleration_velocity(System &system) {
     if (system.constants.flexible_frozen) {
         int nh = (system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER) ? 1 : 0;
         for (j=0; j<system.molecules[0].atoms.size(); j++) {
-          system.molecules[0].atoms[j].calc_acc(nh, system.constants.lagrange_multiplier);
-          system.molecules[0].atoms[j].calc_vel(dt);
+          system.molecules[0].atoms[j].calc_vel_verlet(dt, nh, system.constants.lagrange_multiplier);
         }
     } // end flexible MOF dynamics
 }

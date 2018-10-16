@@ -224,7 +224,7 @@ int main(int argc, char **argv) {
     // compute inital COM for all molecules, and moment of inertia
     // (io.cpp handles molecular masses //
     for (int i=0; i<system.molecules.size(); i++) {
-        //system.molecules[i].calc_center_of_mass();
+        system.molecules[i].calc_center_of_mass();
         if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
         for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
@@ -432,15 +432,7 @@ int main(int argc, char **argv) {
 	// ===================== MOLECULAR DYNAMICS ==============================================
 	else if (system.constants.mode == "md") {
 
-        // write initial XYZ
-        if (system.constants.xyz_traj_option) {
-            writeXYZ(system,system.constants.output_traj, 1, 0, 0, system.constants.xyz_traj_movers_option);
-        }
-        system.constants.frame = 2; // weird way to initialize but it works for the output file.
-        // and initial PDB
-        writePDB(system,system.constants.restart_pdb);
-            if (system.constants.pdb_traj_option && system.constants.pdb_bigtraj_option)
-                writePDBtraj(system,system.constants.restart_pdb, system.constants.output_traj_pdb, 0);
+        system.constants.frame = 1; 
 
         initialVelMD(system, 1);
 
@@ -455,8 +447,8 @@ int main(int argc, char **argv) {
 	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
 	double thing = floor(tf/dt);
     long int total_steps = (long int)thing;
-	int count_md_steps = 1;
-    int i,n;
+	int count_md_steps = 0;
+    int i,j,n;
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
         printf("| ========================================= |\n\n");
@@ -467,13 +459,27 @@ int main(int argc, char **argv) {
 
     computeInitialValues(system);
     // Main MD time loop
-	for (double t=dt; t <= tf; t=t+dt) {
+	for (double t=0; t <= tf; t=t+dt) {
         system.stats.MDtime = t;
         system.stats.MDstep = count_md_steps;
 
-        // Main Molecular Dynamics Loop function (contains forces, movements, etc.)
-        if (system.stats.count_movables > 0 || system.constants.flexible_frozen)
+        // MD integration. the workload is here. First step is unique. Just get F
+        if (t==0) {
+            calculateForces(system);
+        } else if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
             integrate(system);
+        }
+
+        // first step: update VACF original velocities according to step 1 if the orig's were all 0
+        if (t==dt && system.constants.zero_init_vel_flag) {
+            for (i=0;i<system.molecules.size();i++) {
+                for (n=0;n<3;n++) system.molecules[i].original_vel[n] = system.molecules[i].vel[n];
+                for (j=0;j<system.molecules[i].atoms.size();j++) {
+                    for (n=0;n<3;n++) system.molecules[i].atoms[j].original_vel[n] = system.molecules[i].atoms[j].vel[n];
+                }
+            }
+        }
+
 
         if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
             // try a MC uVT insert/delete
@@ -494,7 +500,7 @@ int main(int argc, char **argv) {
             } // end add vs. remove
         }
 
-        if (count_md_steps % system.constants.md_corrtime == 0 || t==dt || t==tf) {  // print every x steps and first and last.
+        if (count_md_steps % system.constants.md_corrtime == 0 || t==0 || t==tf) {  // print every x steps and first and last.
 
             if (system.constants.ensemble == ENSEMBLE_UVT) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
             if (system.constants.histogram_option) {
@@ -522,7 +528,7 @@ int main(int argc, char **argv) {
 		
             // MAIN OUTPUT
             md_main_output(system);
-        } // end if corrtime (quite sure.)
+        } // end if corrtime
 		count_md_steps++;
 	} // end MD timestep loop
 	} // end if MD

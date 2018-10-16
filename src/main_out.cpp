@@ -64,9 +64,9 @@ void md_main_output(System &system) {
                 system.stats.avg_v.value*1e5, system.constants.md_init_vel*1e5);
             if (system.constants.md_pbc || system.constants.ensemble != ENSEMBLE_UVT) { // for now, don't do diffusion unless PBC is on. (checkInTheBox assumes it)
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
-                    printf("Diffusion coefficient of %s = %.4e cm^2 / s\n", system.proto[sorbid].name.c_str(), system.stats.diffusion[sorbid].value);
-                    printf("    %s MSD = %.5f A^2\n", system.proto[sorbid].name.c_str(), system.stats.msd[sorbid].value);
-		            printf("VACF of %s = %f\n", system.proto[sorbid].name.c_str(), system.stats.vacf[sorbid].value);
+                    printf("Diffusion coefficient of %s = %.4e cm^2/s\n", system.proto[sorbid].name.c_str(), system.stats.diffusion[sorbid].value);
+                    printf("    %s MSD = %.5e A^2\n", system.proto[sorbid].name.c_str(), system.stats.msd[sorbid].value);
+		            printf("VACF of %s = %.5e A^2/fs^2\n", system.proto[sorbid].name.c_str(), system.stats.vacf[sorbid].value);
                 }
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);

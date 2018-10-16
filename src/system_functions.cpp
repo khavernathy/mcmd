@@ -1551,9 +1551,12 @@ void initialVelMD(System &system, int startupflag) {
 
     // write initial velocities to the saved array for each molecule
     for (unsigned int i=0; i<system.molecules.size();i++) {
-        for (unsigned int n=0;n<3;n++)
+        for (unsigned int n=0;n<3;n++) {
             system.molecules[i].original_vel[n] = system.molecules[i].vel[n];
+            if (system.molecules[i].vel[n] != 0) system.constants.zero_init_vel_flag = 0; // flag this so that we can change original_vel to make VACF nonzero on first step.
+        }
     }
+    
 
 } // end initialVelMD()
 
