@@ -4,6 +4,10 @@
 #include <map>
 #include <vector>
 #include <stdint.h>
+#include <time.h>
+#include <chrono>
+#include <sys/stat.h>
+
 
 using namespace std;
 
@@ -136,6 +140,7 @@ class Constants {
         string molec_dipole_output="molec_dipoles.dat"; // molecular dipole and system dipole list
         string restart_mov_pdb="restart_movables.pdb"; // a restart file with only movable molecules to save i/o
         string frozen_pdb="frozen.pdb"; // a pdb of frozen atoms that is made at startup
+        string inputfile = ""; // the input file the user used.
         int_fast8_t potential_form = POTENTIAL_LJ; // "lj", "ljes", "ljespolar", "phast2" models for potential
         vector<string> sorbate_name; // e.g. h2_bssp, h2_bss, co2*, co2, co2_trappe, c2h2, etc.
         vector<double> sorbate_fugacity; // holds the fugacities for multi-sorbate gases.
@@ -237,6 +242,7 @@ class Constants {
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
         double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat.
         int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
+        int frame = 0; // frame for writing trajectory
 
 
         map <string,double> charge_override;
@@ -350,6 +356,12 @@ class Constants {
 
         // OpenMP omp
         int openmp_threads = 0; // parallel OpenMP feature. on if != 0.
+
+        // TIMING
+        double time_elapsed=0;
+        double sec_per_step=0;
+        std::chrono::steady_clock::time_point begin_steps;
+        std::chrono::steady_clock::time_point end;
 };
 
 class Pbc {
