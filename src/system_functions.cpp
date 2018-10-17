@@ -99,7 +99,7 @@ double * centerOfMass(System &system) {
 
 	for (int j=0; j<system.molecules.size(); j++) {
         for (int i=0; i<system.molecules[j].atoms.size(); i++) {
-                double atom_mass = system.molecules[j].atoms[i].m;
+                double atom_mass = system.molecules[j].atoms[i].mass;
                 mass_sum += atom_mass;
 
                 x_mass_sum += system.molecules[j].atoms[i].pos[0]*atom_mass;
@@ -331,13 +331,13 @@ void addAtomToProto(System &system, int protoid, string name, string molname, st
     atom.pos[0] = x;
     atom.pos[1] = y;
     atom.pos[2] = z;
-    atom.m = mass * system.constants.cM;
+    atom.mass = mass;// * system.constants.cM;
     atom.C = charge * system.constants.E2REDUCED;
     atom.polar = polarizability;
     atom.eps = epsilon;
     atom.sig = sigma;
 
-    system.proto[protoid].mass += atom.m;
+    system.proto[protoid].mass += atom.mass;
     // push the atom into the protoype molecule
     system.proto[protoid].atoms.push_back(atom);
 
@@ -1051,7 +1051,7 @@ void setupNBias(System &system) {
     // frozen atoms total mass
     for (int c=0; c<system.molecules.size();c++) {
         for (int d=0; d<system.molecules[c].atoms.size(); d++) {
-            double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
+            double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
             if (system.molecules[c].frozen) system.stats.frozenmass.value += thismass;
         }
     }
@@ -1063,17 +1063,17 @@ void setupNBias(System &system) {
     if (unit == "n" || unit == "") {
         thevalue = x;
     } else if (unit == "wt%") { 
-        thevalue = (-x*system.stats.frozenmass.value/1000.) / system.proto[0].mass / (x/100. -1) / 100.;
+        thevalue = (-x*system.stats.frozenmass.value/1000.) / system.proto[0].mass*system.constants.amu2kg / (x/100. -1) / 100.;
     } else if (unit == "wt%ME") {
-        thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000/10*100;
+        thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*system.constants.amu2kg*1000*system.constants.NA)/1000/10*100;
     } else if (unit == "cm^3/g") {
         thevalue = x * system.stats.frozenmass.value * system.constants.NA / 1000. / 22.4;
     } else if (unit == "mmol/g") {
         thevalue = x*system.stats.frozenmass.value*system.constants.NA/1000;
     } else if (unit == "mg/g") {
-        thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*1000*system.constants.NA)/1000;
+        thevalue = x * (system.stats.frozenmass.value*1000)*system.constants.NA/1000/(system.proto[0].mass*system.constants.amu2kg*1000*system.constants.NA)/1000;
     } else if (unit == "g/mL" || unit == "g/cm^3") {
-        thevalue = x * 1e6 / 1e30 * (system.pbc.volume) * system.constants.NA / (system.proto[0].mass*1000*system.constants.NA);
+        thevalue = x * 1e6 / 1e30 * (system.pbc.volume) * system.constants.NA / (system.proto[0].mass*system.constants.amu2kg*1000*system.constants.NA);
     }
 
     system.constants.bias_uptake = thevalue;
@@ -1321,7 +1321,7 @@ void setupCrystalBuild(System &system) {
                         for (int n=0;n<3;n++)
                             newatom.pos[n] += orig_basis[0][n]*(iter+1);
 
-                        system.molecules[i].mass += newatom.m;
+                        system.molecules[i].mass += newatom.mass;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
                         system.stats.count_frozens++; 
@@ -1364,7 +1364,7 @@ void setupCrystalBuild(System &system) {
                         for (int n=0;n<3;n++)
                             newatom.pos[n] += orig_basis[1][n]*(iter+1);                    
     
-                        system.molecules[i].mass += newatom.m;                     
+                        system.molecules[i].mass += newatom.mass;                     
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
                         system.stats.count_frozens++;
@@ -1406,7 +1406,7 @@ void setupCrystalBuild(System &system) {
                         for (int n=0;n<3;n++)
                             newatom.pos[n] += orig_basis[2][n]*(iter+1);                
         
-                        system.molecules[i].mass += newatom.m;
+                        system.molecules[i].mass += newatom.mass;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
                         system.stats.count_frozens++;
@@ -1505,7 +1505,7 @@ void initialVelMD(System &system, int startupflag) {
             v_init_AVG=0;
             for (z=0; z<system.proto.size(); z++) {   
 
-                v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*system.proto[z].dof / system.proto[z].mass);
+                v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*system.proto[z].dof / (system.proto[z].mass*system.constants.amu2kg));
                 system.proto[z].md_velx_goal = sqrt(v_init*v_init/3.);
 
                 // apply thermostat velocities if user did not specify an init. vel.
@@ -1532,7 +1532,7 @@ void initialVelMD(System &system, int startupflag) {
                     if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                 for (unsigned int j=0;j<system.molecules[i].atoms.size();j++) {
                     // normalized atom velocity based on total DOF from bonds and such
-                    v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*dof_total/N / system.molecules[i].atoms[j].m);
+                    v_init = 1e-5*sqrt(system.constants.kb*system.constants.temp*dof_total/N / (system.molecules[i].atoms[j].mass*system.constants.amu2kg));
                     v_init_AVG += v_init;
                     system.molecules[i].atoms[j].md_velx_goal = sqrt(v_init*v_init/3.);
                     // apply velocities to atoms

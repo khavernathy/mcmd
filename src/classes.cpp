@@ -8,6 +8,8 @@
 #include <chrono>
 #include <sys/stat.h>
 
+#define KA2AFS2 8.314471183073395e-07
+#define AMU2KG 1.660539040427164e-27
 
 using namespace std;
 
@@ -88,17 +90,19 @@ class Constants {
 	public:
 		Constants();
         const double e = 2.71828183; // ya boi Euler
-        const double kb = 1.3806488e-23; // Boltzmann's in J/K
-        const double kbk = 0.0019872041; // Boltzmann's in kcal/(mol K)
+        const double kb = 1.3806504e-23; // Boltzmann's in J/K (match lammps)
+        const double kbk = 0.0019872067; // Boltzmann's in kcal/(mol K) (match lammps)
         const double fs = 1.0e-15; // fs -> second
         const double cC = 1.60217662e-19; //  e -> coulombs
         const double keSI = 8.9875517873681764e9; // ke, Coulomb's constant, Nm^2/C^2 or Jm/C^2.
         const double ke = keSI/kb*1e10*cC*cC; // ke in KA / e^2
         const double eV = 6.242e18; // 1J = eV electron volts
-        const double cM = 1.660578e-27; // kg / particle from g/mol
+        const double cM = 1.0; // this is now one to keep default mass in amu. 
+        const double amu2kg = 1.660539040427164e-27; // amu times this -> kg/particle
         const double cA = 1.0e-10; // 1 angstroem = cA meters
         const double cJ = 6.94786e-21; // 1 kcal/mol = cJ Joules
         const double NA = 6.022140857e23; //  particles per mol
+        const double KA2Afs2 = 8.314471183073395e-07; // F (K/A) times this over mass (amu) = accel (A/fs^2)
         const double kek = keSI * cC*cC * 0.00239006 * 1e10 * NA; // ke in kcalA / mol e^2
         const double cV = 10.0e-30; // alpha * cV = alpha in m^3
         const double R = 8.3144598; // J / mol K
@@ -764,7 +768,7 @@ class Atom {
         string mol_name; // molecule name that the atom belongs to
         int_fast8_t frozen; // movable/frozen (0 or 1)
 		int mol_PDBID; // the molecule's PDBID that this atom belongs to
-		double m=0.0; // mass, kg. This is the only one I'm keeping SI as of now.
+		double mass=0.0; // mass, amu
         double eps=0.0; // LJ param in K
         double sig=0.0; // LJ param in A -- the real sigma, not r_m (as in UFF)
         double polar=0.0; // polarizability in A^3
@@ -803,7 +807,7 @@ class Atom {
         void calc_vel_verlet(double dt, int nh, double lm) {
             double a;
             for (int n=0; n<3; n++) {
-                a = force[n]*1.3806488e-33/m;
+                a = force[n]*KA2AFS2/mass;
                 if (nh) a += lm*vel[n];
                 vel[n] += 0.5*dt*a; // that's where VV comes into play. 1/2 * (a - prev_a)
             }
@@ -815,7 +819,7 @@ class Atom {
 
         /* for debugging */
         void printAll() {
-            printf("atom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %f amu; eps = %f K; sig = %f A; alpha = %f A^3; q = %f e\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, m/(1.660578e-27), eps, sig, polar, C/408.7816);
+            printf("atom (PDBID %i) %s on molecule %s (PBDID %i) frozen= %i \n -----> m = %f amu; eps = %f K; sig = %f A; alpha = %f A^3; q = %f e\n", PDBID, name.c_str(), mol_name.c_str(), mol_PDBID, frozen, mass, eps, sig, polar, C/408.7816);
         }
 };
 
@@ -879,7 +883,7 @@ class Molecule {
         void calc_inertia() {
             for (int i=0; i<atoms.size(); i++) {
                 double rsq = (atoms[i].pos[0] - com[0])*(atoms[i].pos[0] - com[0]) + (atoms[i].pos[1] - com[1])*(atoms[i].pos[1] - com[1]) + (atoms[i].pos[2] - com[2])*(atoms[i].pos[2] - com[2]);
-                inertia += atoms[i].m * rsq; // kg * A^2
+                inertia += atoms[i].mass*AMU2KG * rsq; // kg * A^2
             }
             inertia = inertia/1.3806488e-23/1e20*1e30; // to K fs^2
         }
@@ -892,7 +896,7 @@ class Molecule {
                 double y = atoms[i].pos[1]-com[1];
                 double z = atoms[i].pos[2]-com[2];
                 double x2 = x*x, y2=y*y, z2=z*z;
-                double m = atoms[i].m;
+                double m = atoms[i].mass*AMU2KG;
 
                 inertia_tensor[0] += m*(y2+z2);
                 inertia_tensor[1] += m*(x2+z2);
@@ -923,11 +927,12 @@ class Molecule {
         void calc_vel_verlet(double dt, int nh, double lm) {
             double a;
             for (int n=0; n<3; n++) {
-                a = force[n]*1.3806488e-33/mass;
+                a = force[n]*KA2AFS2/mass;
                 if (nh) a += lm*vel[n];
                 vel[n] += 0.5*dt*a; // in A/fs. vel. verlet
             }
         }
+        
 
         // angular position // in rad
         void calc_ang_pos(double dt) {
@@ -957,7 +962,7 @@ class Molecule {
             double x_mass_sum=0.0; double y_mass_sum=0.0; double z_mass_sum=0.0;// double mass_sum=0.0;
 
             for (int i=0; i<atoms.size(); i++) {
-                double atom_mass = atoms[i].m;
+                double atom_mass = atoms[i].mass;
 
                 x_mass_sum += atoms[i].pos[0]*atom_mass;
                 y_mass_sum += atoms[i].pos[1]*atom_mass;
@@ -984,8 +989,8 @@ class Molecule {
 
         // for debugging
         void printAll() {
-            printf("====================\nmolecule PDBID=%i :: mass: %f amu; inertia: %e; \nname = %s; frozen = %i; \nforce: %f %f %f; \nvel: %f %f %f; \ncom: %f %f %f; \ntorque: %f %f %f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
-            PDBID,mass/1.660578e-27,inertia,name.c_str(),frozen,
+            printf("====================\nmolecule PDBID=%i :: mass: %.14f amu; inertia: %.14e; \nname = %s; frozen = %i; \nforce: %.14f %.14f %.14f; \nvel: %.14f %.14f %.14f; \ncom: %.14f %.14f %.14f; \ntorque: %.14f %.14f %.14f \nang_acc: %f %f %f \nold_ang_acc: %f %f %f \nang_vel: %f %f %f; \nang_pos: %f %f %f (in degrees) \n",
+            PDBID,mass,inertia,name.c_str(),frozen,
             force[0], force[1], force[2], 
             vel[0], vel[1], vel[2], com[0], com[1], com[2],
             torque[0], torque[1], torque[2], ang_acc[0], ang_acc[1], ang_acc[2],

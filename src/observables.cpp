@@ -24,11 +24,9 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
     if (system.constants.md_mode == MD_MOLECULAR) {
             for (unsigned int z=0; z<system.proto.size(); z++) {
                 if (N_local[z] < 1) continue; // no contribution from N=0 sorbates
-            double Tcontrib = 1e10*v2_sum[z]*system.proto[z].mass/N_local[z]/system.proto[z].dof/system.constants.kb;
+            double Tcontrib = 1e10*v2_sum[z]*system.proto[z].mass*system.constants.amu2kg/N_local[z]/system.proto[z].dof/system.constants.kb;
             Tcontrib *= ((double)N_local[z]/system.stats.count_movables); // ratio of this type N to total N
             T += Tcontrib;
-            //printf("Nlocal: %i, system N: %i, mass: %e, v2_sum: %f, dof: %i\n", N_local[z], system.stats.count_movables, system.proto[z].mass, v2_sum[z], system.proto[z].dof);
-            //printf("T from proto %i: %f K \n", z, Tcontrib);
             }
     }
     else if (system.constants.md_mode == MD_FLEXIBLE) {
@@ -40,7 +38,7 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
             if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
             for (unsigned int j=0;j<system.molecules[i].atoms.size();j++) {
                 v2 = dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
-                mv2_sum += system.molecules[i].atoms[j].m*v2;
+                mv2_sum += system.molecules[i].atoms[j].mass*system.constants.amu2kg*v2;
             }
         }
         dof = N*3.0 - 3.0; // - (int)system.constants.uniqueBonds.size();

@@ -29,7 +29,7 @@ double es_fh_corr(System &system, int i, int k, double r, double gaussian_term, 
     const double a2 = alpha*alpha;
     const double a3 = a2*alpha;
     const double a4 = a3*alpha;
-    double reduced_mass = (system.molecules[i].mass * system.molecules[k].mass)/(system.molecules[i].mass + system.molecules[k].mass);
+    double reduced_mass = system.constants.amu2kg*(system.molecules[i].mass * system.molecules[k].mass)/(system.molecules[i].mass + system.molecules[k].mass);
 
     if (order != 2 && order != 4) return NAN;
 

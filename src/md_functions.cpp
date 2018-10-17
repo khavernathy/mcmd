@@ -271,7 +271,7 @@ void NVT_thermostat(System &system) {
                 for (i=0; i<system.molecules.size(); i++) {
                     if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                     vdotF_sum += dddotprod(system.molecules[i].vel, system.molecules[i].force);
-                    mv2_sum += system.molecules[i].mass * dddotprod(system.molecules[i].vel, system.molecules[i].vel);
+                    mv2_sum += system.molecules[i].mass*system.constants.amu2kg * dddotprod(system.molecules[i].vel, system.molecules[i].vel);
                 }
                 system.constants.lagrange_multiplier = -vdotF_sum / (mv2_sum/system.constants.kb*1e10);
             }
@@ -280,7 +280,7 @@ void NVT_thermostat(System &system) {
                     if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
                     for (j=0; j<system.molecules[i].atoms.size(); j++) {
                         vdotF_sum += dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].force);
-                        mv2_sum += system.molecules[i].atoms[j].m * dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
+                        mv2_sum += system.molecules[i].atoms[j].mass*system.constants.amu2kg * dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
                     }
                 }
                 system.constants.lagrange_multiplier = -vdotF_sum / (mv2_sum/system.constants.kb*1e10);
@@ -315,17 +315,17 @@ void position(System &system) {
                         k1 = dt*system.molecules[j].vel[n];
                         system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + 0.5*k1;
                         singleAtomForceLJ(system,j,0);
-                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*1.3806488e-33/system.molecules[j].atoms[0].m*(0.5*dt);
+                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*system.constants.KA2Afs2/system.molecules[j].atoms[0].mass*(0.5*dt);
                         
                         k2 = dt*dxt;
                         system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + 0.5*k2;
                         singleAtomForceLJ(system,j,0);
-                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*1.3806488e-33/system.molecules[j].atoms[0].m*(0.5*dt);
+                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*system.constants.KA2Afs2/system.molecules[j].atoms[0].mass*(0.5*dt);
 
                         k3 = dt*dxt;
                         system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + k3;
                         singleAtomForceLJ(system,j,0);
-                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*1.3806488e-33/system.molecules[j].atoms[0].m*dt;
+                        dxt = system.molecules[j].vel[n] + system.molecules[j].atoms[0].force[n]*system.constants.KA2Afs2/system.molecules[j].atoms[0].mass*dt;
 
                         k4 = dt*dxt;
                         system.molecules[j].atoms[0].pos[n] = tmp_pos[n] + (k1 + 2.0*(k2 + k3) + k4)/6.0;

@@ -53,7 +53,8 @@ void integrate(System &system) {
     system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
 
     // 6) NEXT VERLET 1/2 STEP
-    acceleration_velocity(system); 
+    if (system.constants.integrator == INTEGRATOR_VV)
+        acceleration_velocity(system); 
 
 
 

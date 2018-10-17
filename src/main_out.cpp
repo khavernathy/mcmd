@@ -73,9 +73,9 @@ void md_main_output(System &system) {
             // uptake data if uVT
             if (system.constants.ensemble == ENSEMBLE_UVT) {
 			for (int i=0; i<system.proto.size(); i++) {
-                double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
+                double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
-                double mgg = mmolg * (system.proto[i].mass*1000*system.constants.NA);
+                double mgg = mmolg * (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 string flspacing = "";
                 if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
                 else flspacing="            "; // stuff like H2, O2 (2 chars)
@@ -206,9 +206,9 @@ void mc_main_output(System &system) {
 			printf("Total potential avg = %.5f +- %.5f K ( %.3f +- %.3f kJ/mol )\n",system.stats.potential.average, system.stats.potential.sd, system.stats.potential.average*system.constants.kb/1000.0*system.constants.NA, system.stats.potential.sd*system.constants.kb/1000.0*system.constants.NA);
 			printf("Volume avg  = %.2f +- %.2f A^3 = %.2f nm^3\n",system.stats.volume.average, system.stats.volume.sd, system.stats.volume.average/1000.0);
 			for (int i=0; i<system.proto.size(); i++) {
-                double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*1000*system.constants.NA);
+                double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
-                double mgg = mmolg * (system.proto[i].mass*1000*system.constants.NA);
+                double mgg = mmolg * (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 string flspacing = "";
                 if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
                 else flspacing="            "; // stuff like H2, O2 (2 chars)

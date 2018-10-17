@@ -68,7 +68,7 @@ void readInAtomsXYZ(System &system, string filename) {
 			Atom current_atom;
 			current_atom.name = myvector[0];
             // I have a database of defaults in classes.cpp
-            current_atom.m = system.constants.masses[convertElement(system,current_atom.name)];
+            current_atom.mass = system.constants.masses[convertElement(system,current_atom.name)];
             current_atom.eps = system.constants.eps[convertElement(system,current_atom.name)];
             current_atom.sig = system.constants.sigs[convertElement(system,current_atom.name)];
             current_atom.polar = system.constants.polars[convertElement(system,current_atom.name)];
@@ -84,7 +84,7 @@ void readInAtomsXYZ(System &system, string filename) {
             if (myvector.size() > 4) current_atom.C = stod(myvector[4]) * system.constants.E2REDUCED;
             else current_atom.C = 0.; // default to zero charge unless the column is there
             system.molecules[0].atoms.push_back(current_atom);
-            system.molecules[0].mass += current_atom.m;
+            system.molecules[0].mass += current_atom.mass;
 			system.constants.total_atoms++;	// add +1 to master atoms count
             system.stats.count_frozens++; // add +1 to frozen atoms count
             } // end if vector size nonzero
@@ -155,8 +155,8 @@ void readInAtoms(System &system, string filename) {
 			current_atom.name = myvector[2];
             // I have a database of defaults in classes.cpp
             // Those defaults will load unless the input column is there
-            if (9 < myvector.size() && myvector[9] != "default") current_atom.m = stod(myvector[9])*system.constants.cM;
-            else current_atom.m = system.constants.masses[convertElement(system,current_atom.name)];
+            if (9 < myvector.size() && myvector[9] != "default") current_atom.mass = stod(myvector[9]);
+            else current_atom.mass = system.constants.masses[convertElement(system,current_atom.name)];
 
             if (12 < myvector.size() && myvector[12] != "default") current_atom.eps = stod(myvector[12]);
             else current_atom.eps = system.constants.eps[convertElement(system,current_atom.name)];
@@ -220,12 +220,12 @@ void readInAtoms(System &system, string filename) {
 
 			// add atom to current molecule by default
 			system.molecules[mol_counter].atoms.push_back(current_atom);
-            system.molecules[mol_counter].mass += current_atom.m;
+            system.molecules[mol_counter].mass += current_atom.mass;
 
 			// and add current atom to prototype only if its in the first mover
 			if (current_mol_id == first_mover_id) {
 				system.proto[0].atoms.push_back(current_atom);
-                system.proto[0].mass += current_atom.m;
+                system.proto[0].mass += current_atom.mass;
 			}
 			system.constants.total_atoms++;	// add +1 to master atoms count
 
@@ -359,7 +359,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].mass, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -375,7 +375,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].mass, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -415,7 +415,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].mass, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -431,7 +431,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].mass, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -551,7 +551,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].mass, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -567,7 +567,7 @@ if (f == NULL)
             system.molecules[j].atoms[i].pos[0], // 7
             system.molecules[j].atoms[i].pos[1],  // 8
             system.molecules[j].atoms[i].pos[2], //9
-            system.molecules[j].atoms[i].m/system.constants.cM, // 10
+            system.molecules[j].atoms[i].mass, // 10
             system.molecules[j].atoms[i].C/system.constants.E2REDUCED,  // 11
             system.molecules[j].atoms[i].polar, // 12
             system.molecules[j].atoms[i].eps,  //13
@@ -713,7 +713,7 @@ void writeLAMMPSfiles(System &system) {
         for (int i=0; i<system.molecules.size(); i++) {
             for (int j=0; j<system.molecules[i].atoms.size(); j++) {
                 if (system.molecules[i].atoms[j].name == atomlabels[x]) {
-                    mass = system.molecules[i].atoms[j].m / system.constants.cM; // in amu
+                    mass = system.molecules[i].atoms[j].mass;// / system.constants.cM; // in amu
                     // LAMMPS doesn't accept 0-mass atoms so we need to contrive this
                     if (mass == 0) mass = 0.00001;
                     break;
@@ -760,7 +760,7 @@ void writeLAMMPSfiles(System &system) {
         for (int i=0; i<system.molecules.size(); i++) {
             for (int j=0; j<system.molecules[i].atoms.size(); j++) {
                 if (system.molecules[i].atoms[j].name == atomlabels[x]) {
-                    if (system.molecules[i].atoms[j].m != 0) {
+                    if (system.molecules[i].atoms[j].mass != 0) {
                         showAtoms = showAtoms + " " + to_string(x+1);
                         found = true;
                         break;

@@ -21,7 +21,7 @@ void computeInitialValues(System &system) {
 	for (c=0; c<system.molecules.size();c++) {
         string thismolname = system.molecules[c].name;
 		for (d=0; d<system.molecules[c].atoms.size(); d++) {
-            double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
+            double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
 		    if (!system.molecules[c].frozen) {
                 for (i=0; i<system.proto.size(); i++) {
@@ -77,7 +77,7 @@ void computeInitialValues(System &system) {
 
 	// DENSITY
     for (i=0; i<system.proto.size(); i++) {
-	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24); // that's mass in g /mL
+	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
 		system.stats.density[i].average = system.stats.density[i].value;
     }
 
@@ -92,9 +92,9 @@ void computeInitialValues(System &system) {
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*1000*system.constants.NA);
+    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*system.constants.amu2kg*1000*system.constants.NA);
 	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
-            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
+            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
 		system.stats.z.average = system.stats.z.value;
 
 
@@ -143,7 +143,7 @@ void computeAverages(System &system) {
 	for (c=0; c<system.molecules.size();c++) {
         string thismolname = system.molecules[c].name;
 		for (d=0; d<system.molecules[c].atoms.size(); d++) {
-            double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
+            double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
 		    if (!system.molecules[c].frozen) {
                 for (i=0; i<system.proto.size(); i++) {
@@ -243,7 +243,7 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
 
 	// DENSITY
     for (i=0; i<system.proto.size(); i++) {
-	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24); // that's mass in g /mL
+	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
         system.stats.density[i].calcNewStats();
     }
 
@@ -254,10 +254,9 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
             system.stats.wtp[i].calcNewStats();
             system.stats.wtpME[i].calcNewStats();
 
-            double mm = system.proto[i].mass * 1000 * system.constants.NA; // molar mass
+            double mm = system.proto[i].mass; // molar mass
             double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
-            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /
-            frozmm;  // to mg/g
+            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /frozmm * system.constants.amu2kg;  // to mg/g
 
         system.stats.excess[i].calcNewStats();
 
@@ -266,9 +265,9 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*1000*system.constants.NA);
+    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*system.constants.amu2kg*1000*system.constants.NA);
 	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
-            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
+            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
         system.stats.z.calcNewStats();
 
     system.checkpoint("finished computeAverages()");
@@ -300,7 +299,7 @@ void computeAveragesMDuVT(System &system) {
 	for (c=0; c<system.molecules.size();c++) {
         string thismolname = system.molecules[c].name;
 		for (d=0; d<system.molecules[c].atoms.size(); d++) {
-            double thismass = system.molecules[c].atoms[d].m/system.constants.cM/system.constants.NA;
+            double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
 			system.stats.totalmass.value += thismass; // total mass in g
 		    if (!system.molecules[c].frozen) {
                 for (i=0; i<system.proto.size(); i++) {
@@ -391,10 +390,9 @@ void computeAveragesMDuVT(System &system) {
             system.stats.wtp[i].calcNewStats();
             system.stats.wtpME[i].calcNewStats();
 
-            double mm = system.proto[i].mass * 1000 * system.constants.NA; // molar mass
+            double mm = system.proto[i].mass; // molar mass
             double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
-            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /
-            frozmm;  // to mg/g
+            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) / frozmm * system.constants.amu2kg;  // to mg/g
 
         system.stats.excess[i].calcNewStats();
 
@@ -402,9 +400,9 @@ void computeAveragesMDuVT(System &system) {
 
 	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
 	// GOOD FOR HOMOGENOUS GASES ONLY!!
-    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*1000*system.constants.NA);
+    double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*system.constants.amu2kg*1000*system.constants.NA);
 	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
-            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp ); // over nRT
+            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
         system.stats.z.calcNewStats();
 
     system.checkpoint("finished computeAveragesMDuVT()");
@@ -467,7 +465,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
                     v2_sum[z] += vsq;
                     v_sum[z] += sqrt(vsq);
 
-                    energy_holder = 0.5 * system.molecules[i].mass * vsq;
+                    energy_holder = 0.5 * system.molecules[i].mass*system.constants.amu2kg * vsq;
                     K_total += energy_holder; // kg A^2/fs^2
                     Klin += energy_holder;
 
@@ -498,7 +496,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
                             vsq += system.molecules[i].atoms[j].vel[n] * system.molecules[i].atoms[j].vel[n];
                         v_sum[z] += sqrt(vsq); // sum velocities
                         v2_sum[z] += vsq;
-                        energy_holder = 0.5*system.molecules[i].atoms[j].m * vsq;
+                        energy_holder = 0.5*system.molecules[i].atoms[j].mass*system.constants.amu2kg * vsq;
                         K_total += energy_holder;
                         Klin += energy_holder;
                     } // end for atoms j in molecule i
@@ -516,7 +514,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         vsq_tmp = 0;
         for (n=0;n<3;n++) vsq_tmp += system.molecules[0].atoms[j].vel[n] * system.molecules[0].atoms[j].vel[n];
     //    printf("atom %i : vsq = %f m = %e\n", j, vsq_tmp, system.molecules[0].atoms[j].m);
-        energy_holder = 0.5*system.molecules[0].atoms[j].m * vsq_tmp;
+        energy_holder = 0.5*system.molecules[0].atoms[j].mass*system.constants.amu2kg * vsq_tmp;
         K_total += energy_holder;
         Klin += energy_holder;
      //   printf("K tot = %e klin = %e \n", K_total,Klin);
