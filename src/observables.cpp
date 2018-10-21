@@ -22,14 +22,18 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
     double T=0;
 
     if (system.constants.md_mode == MD_MOLECULAR) {
-            for (unsigned int z=0; z<system.proto.size(); z++) {
-                if (N_local[z] < 1) continue; // no contribution from N=0 sorbates
+        double dof_total = 0;
+        for (unsigned int z=0; z<system.proto.size(); z++) {
+            if (N_local[z] < 1) continue; // no contribution from N=0 sorbates
             double Tcontrib = 1e10*v2_sum[z]*system.proto[z].mass*system.constants.amu2kg/N_local[z]/system.proto[z].dof/system.constants.kb;
             Tcontrib *= ((double)N_local[z]/system.stats.count_movables); // ratio of this type N to total N
             T += Tcontrib;
-            }
+            dof_total += system.proto[z].dof * N_local[z];
+        }
+        if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER)
+            T *= (dof_total)/(dof_total+1.); // there is 1 extra DOF for NH thermostat.
     }
-    else if (system.constants.md_mode == MD_FLEXIBLE) {
+    else if (system.constants.md_mode == MD_FLEXIBLE || system.constants.md_mode == MD_ATOMIC) {
         double mv2_sum=0;
         double v2=0;
         unsigned int dof=0;
@@ -43,6 +47,8 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
         }
         dof = N*3.0 - 3.0; // - (int)system.constants.uniqueBonds.size();
         T = 1e10*mv2_sum/(double)dof/system.constants.kb;
+        if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER)
+            T *= dof/(dof+1.0); // there is 1 extra DOF for NH thermostat.
     }
     // temperature from the MOF itself (???)
     /*
@@ -74,4 +80,25 @@ double calcPressureNVT(System &system) {
     P = rho*T + 1./(3.0*V)*system.stats.fdotr_sum.average;  // in K/A^3
     P *= system.constants.KA32ATM; // to atm
     return P;    
+}
+
+double calcDOF(System &system) {
+    int i;
+    double dof=0;
+    // molecular/rigid
+    if (system.constants.md_mode == MD_MOLECULAR) {
+        for (i=0;i<system.molecules.size();i++) {
+            dof += system.molecules[i].dof;
+        }
+        if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER)
+            dof += 1.0;
+    // atomic/flexible
+    } else {
+        double N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
+        dof = 3.0*N - 3.0;
+        if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER)
+            dof += 1.0;
+    }
+    system.constants.DOF = dof;
+    return dof;
 }

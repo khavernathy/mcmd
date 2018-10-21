@@ -42,7 +42,7 @@ void md_main_output(System &system) {
             }
             printf("      Average T = %.4f +- %.4f K\n", system.stats.temperature.average, system.stats.temperature.sd);
             printf("Instantaneous T = %.4f K\n", system.stats.temperature.value);
-            if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.calc_pressure_option) {
+            if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.calc_pressure_option && system.constants.openmp_threads > 0) {
                 printf("      Average P = %.4f +- %.4f atm\n", system.stats.pressure.average, system.stats.pressure.sd);
                 printf("Instantaneous P = %.4f atm\n", system.stats.pressure.value);
             }

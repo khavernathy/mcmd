@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
     if (system.stats.count_frozens > 0) printf("%s\n",getFormulaUnit(system).c_str());
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 1124); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 1126); // i.e. github commit
     inputValidation(system);
     printf("...input options validated.\n");
     system.checkpoint("...input options validated. Done with system setup functions.");
@@ -321,6 +321,8 @@ int main(int argc, char **argv) {
 
         system.constants.ewald_num_k = count_ks;
     } // end MD Ewald k-space setup.
+
+    calcDOF(system); // used only for NVT Nose-Hoover thermostat (other functions calculate it on-the-fly)
 
     #ifdef OMP
         if (system.constants.openmp_threads > 0)
@@ -466,6 +468,10 @@ int main(int argc, char **argv) {
         // MD integration. the workload is here. First step is unique. Just get F
         if (t==0) {
             calculateForces(system);
+            if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER) {
+                calculateNHLM_now(system); // get Lagrange multiplier for initial state
+                calculateNH_Q(system); // get Q parameter for thermostat
+            }
         } else if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
             integrate(system);
         }

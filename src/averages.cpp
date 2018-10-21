@@ -653,6 +653,13 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
                     }
                 }
                 system.stats.vacf[sorbid].value /= (double)localN;
+
+                // on first calc, save the normalizing t=0 VACF
+                if (system.stats.vacf_init[sorbid].value == 0)
+                    system.stats.vacf_init[sorbid].value = system.stats.vacf[sorbid].value;
+
+                // now normalize
+                system.stats.vacf[sorbid].value /= system.stats.vacf_init[sorbid].value; // should be 1 on first step
             }
         }
     } // end don't do D, MSD, and VACF on first step.

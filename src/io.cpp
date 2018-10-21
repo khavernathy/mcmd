@@ -1883,5 +1883,9 @@ void inputValidation(System &system) {
         system.constants.calc_pressure_option=0;
         std::cout << "Turned off calculate-pressure option (only valid for NVT MD)."; printf("\n");
     }
+    if (system.constants.integrator == INTEGRATOR_RK4) {
+        std::cout << "ERROR: RK4 integration is disabled (under development). Use the default velocity verlet by `integrator vv`."; printf("\n");
+        exit(EXIT_FAILURE);
+    }
 }
 // end input validation function

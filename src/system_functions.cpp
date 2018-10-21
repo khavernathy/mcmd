@@ -1524,7 +1524,7 @@ void initialVelMD(System &system, int startupflag) {
             } // end prototype loop z
             }
             // FLEXIBLE MODELING -- "FREE" BONDED ATOMS
-            else if (system.constants.md_mode == MD_FLEXIBLE) {
+            else if (system.constants.md_mode == MD_FLEXIBLE || system.constants.md_mode == MD_ATOMIC) {
                 v_init_AVG=0;
                 int N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
                 unsigned int dof_total=3.*N - 3.0; // - (int)system.constants.uniqueBonds.size();

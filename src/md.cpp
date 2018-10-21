@@ -12,7 +12,6 @@
 void integrate(System &system) {
     system.checkpoint("started integrate()");
     int i,j,n;
-
     // DEBUG
     int_fast8_t debug=0;
     if (debug == 1) {
@@ -25,38 +24,61 @@ void integrate(System &system) {
     }
     // END IF DEBUG
 
-    // 1) GET NEW ACCELERATION AND VELOCITY FOR ALL PARTICLES FROM FORCES: VERLET 1/2 STEP
-    acceleration_velocity(system); 
-    system.checkpoint("Done with a,v integration. Starting heat bath (if nvt/uvt)");
+    // Remember, on step 0 the force is pre-calculated, before the integration happens.
 
-    // 2) apply heat bath in constant-temp ensembles
-    NVT_thermostat(system);
-    system.checkpoint("Done with heatbath if NVT/uVT.");
+    /* ------------- NVE --------------- */
+    // NVE velocity verlet
+    if (system.constants.ensemble == ENSEMBLE_NVE && system.constants.integrator == INTEGRATOR_VV) {
+        acceleration_velocity_verlet(system); // 1/2 step init
+        position_verlet(system);
+        doPBCcheck(system);
+        calculateForces(system);
+        acceleration_velocity_verlet(system); // 1/2 step final
+    }
+    // NVE RK4
+    else if (system.constants.ensemble == ENSEMBLE_NVE && system.constants.integrator== INTEGRATOR_RK4) {
+       acceleration_velocity_RK4(system); 
+       position_RK4(system); 
+       doPBCcheck(system);
+       calculateForces(system);
+    }
 
-    // 3) MOVE ATOMS FROM RESPECTIVE VELOCITIES
-    system.checkpoint("moving particles");
-    position(system);
-    system.checkpoint("done moving particles. Checking PBC for all particles");
+    /* ------------- NVT --------------- */
+    // NVT velocity verlet, andersen
+    else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_ANDERSEN && system.constants.integrator == INTEGRATOR_VV) {
+        acceleration_velocity_verlet(system); // 1/2 step init
+        NVT_thermostat_andersen(system);
+        position_verlet(system);
+        doPBCcheck(system);
+        calculateForces(system);
+        acceleration_velocity_verlet(system); // 1/2 step final
+    }
+    // NVT velocity verlet, nose hoover
+    else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER && system.constants.integrator == INTEGRATOR_VV) {
+        // https://www2.ph.ed.ac.uk/~dmarendu/MVP/MVP03.pdf
+        position_VV_NH(system); 
+        acceleration_velocity_verlet(system);
+        calculateForces(system);
+        updateLM(system,0); // first 1/2 step, using v(t)
+        updateLM(system,1); // last 1/2 step, using v(t+dt/2)
+        velocity_VV_NH_final(system);
+    }     
+    // NVT RK4, andersen
+    else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_ANDERSEN && system.constants.integrator == INTEGRATOR_RK4) {
+        acceleration_velocity_RK4(system);
+        NVT_thermostat_andersen(system); // apply stochastic boltzmann velocities
+        position_RK4(system);
+        doPBCcheck(system);
+        calculateForces(system);
+    }
+    // NVT RK4, nose hoover 
+    else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER && system.constants.integrator == INTEGRATOR_RK4) {
+        acceleration_velocity_RK4(system); // will pick up NH flag in integrator
+        calculateNHLM_now(system); // calculate the friction term
+        position_RK4(system);
+        doPBCcheck(system);
+        calculateForces(system);
+    }
 
-    // 4) CHECK P.B.C. (move the molecule/atom back in the box if needed)
-    if (system.constants.md_pbc && system.constants.md_translations) {
-        for (j=0; j<system.molecules.size(); j++) {
-            if (!system.molecules[j].frozen) {
-                checkInTheBox(system,j); // also computes COM
-            } // end if movable
-	    } // end loop j molecules
-    } // end if PBC
-
-    // 5) GET NEW FORCES (AND TORQUES) BASED ON NEW POSITIONS
-	system.checkpoint("done checking PBC. Starting calculateForces()");
-    calculateForces(system);
-    system.checkpoint("Done with calculateForces(). Starting integrator (for a&v)");
-
-    // 6) NEXT VERLET 1/2 STEP
-    if (system.constants.integrator == INTEGRATOR_VV)
-        acceleration_velocity(system); 
-
-
-
-system.checkpoint("Done with integrate() function.");
+    system.checkpoint("Done with integrate() function.");
 }// end integrate() function

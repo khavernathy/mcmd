@@ -99,6 +99,7 @@ class Constants {
         const double eV = 6.242e18; // 1J = eV electron volts
         const double cM = 1.0; // this is now one to keep default mass in amu. 
         const double amu2kg = 1.660539040427164e-27; // amu times this -> kg/particle
+        const double reduced2K = amu2kg*1e10/kb; // amu*A^2/fs^2 times this -> K. Energy converter
         const double cA = 1.0e-10; // 1 angstroem = cA meters
         const double cJ = 6.94786e-21; // 1 kcal/mol = cJ Joules
         const double NA = 6.022140857e23; //  particles per mol
@@ -245,9 +246,11 @@ class Constants {
         int md_external_force = 0; // option for constant external force in MD
         int md_external_force_freq = 1; // apply external force every N steps
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
-        double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat.
+        double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat. Units 1/fs
+        double NH_Q = 0; // used for Nose-Hoover also. Units K*fs^2
         int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
         int frame = 0; // frame for writing trajectory
+        double DOF = 0; // total degrees of freedom in system
 
 
         map <string,double> charge_override;
@@ -712,7 +715,7 @@ class Stats {
         vector<obs_t> diffusion = vector<obs_t>(max_sorbs);
         vector<obs_t> msd = vector<obs_t>(max_sorbs);
         vector<obs_t> vacf = vector<obs_t>(max_sorbs);
-
+        vector<obs_t> vacf_init = vector<obs_t>(max_sorbs); // VACF at t=0 for normalizing
 };
 
 Stats::Stats() {}
@@ -786,7 +789,8 @@ class Atom {
 		//double prevpos[3] = {0,0,0};
         double force[3] = {0,0,0};
         double vel[3] = {0,0,0};
-        double original_vel[3]= {0,0,0};
+        double ov[3] = {0,0,0};
+        double original_vel[3] = {0,0,0};
         double torque[3] = {0,0,0};
         double dip[3] = {0,0,0};
         double newdip[3] = {0,0,0};
@@ -807,14 +811,39 @@ class Atom {
         void calc_vel_verlet(double dt, int nh, double lm) {
             double a;
             for (int n=0; n<3; n++) {
+                if (nh) ov[n] = vel[n]; // NH only
+                a = force[n]*KA2AFS2/mass;
+                if (nh) a -= lm*vel[n];
+                vel[n] += 0.5*dt*a; // that's where VV comes into play. 1/2 * (a - prev_a)
+            }
+        }
+
+        // normal, for RK4
+        void calc_vel(double dt, int nh, double lm) {
+            double a;
+            for (int n=0;n<3;n++) {
                 a = force[n]*KA2AFS2/mass;
                 if (nh) a += lm*vel[n];
-                vel[n] += 0.5*dt*a; // that's where VV comes into play. 1/2 * (a - prev_a)
+                vel[n] += a*dt;
+            }
+        }
+
+        void calc_vel_VV_NH_final(double dt, double lm) {
+            for (int n=0;n<3;n++) {
+                vel[n] = (vel[n] + 0.5*dt*force[n]*KA2AFS2/mass)/(1.0 + 0.5*dt*lm);
             }
         }
 
         void calc_pos(double dt) { // by velocity verlet
             for (int n=0; n<3; n++) pos[n] +=  vel[n]*dt; // + 0.5*acc[n] * dt * dt;
+        }
+
+        void calc_pos_VV_NH(double dt, double lm) {
+            double a;
+                for (int n=0;n<3;n++) {
+                    a = force[n]*KA2AFS2/mass;
+                    pos[n] += vel[n]*dt + 0.5*(a - lm*vel[n])*dt*dt;
+                }
         }
 
         /* for debugging */
@@ -841,6 +870,7 @@ class Molecule {
         double diffusion_corr[3] = {0,0,0}; // for diffusion calc (accounts for PBC)
         double original_vel[3] = {0,0,0}; // for VACF
         double vel[3] = {0,0,0};
+        double ov[3] = {0,0,0};
         double ang_vel[3] = {0,0,0};
         double ang_acc[3] = {0,0,0};
         double old_ang_acc[3] = {0,0,0};
@@ -927,12 +957,18 @@ class Molecule {
         void calc_vel_verlet(double dt, int nh, double lm) {
             double a;
             for (int n=0; n<3; n++) {
+                if (nh) ov[n] = vel[n]; // only for Nose-Hoover thermostat
                 a = force[n]*KA2AFS2/mass;
-                if (nh) a += lm*vel[n];
+                if (nh) a -= lm*vel[n];
                 vel[n] += 0.5*dt*a; // in A/fs. vel. verlet
             }
         }
         
+        void calc_vel_VV_NH_final(double dt, double lm) {
+            for (int n=0;n<3;n++) {
+                vel[n] = (vel[n] + 0.5*dt*force[n]*KA2AFS2/mass)/(1.0 + 0.5*dt*lm);
+            }
+        }
 
         // angular position // in rad
         void calc_ang_pos(double dt) {
@@ -945,6 +981,17 @@ class Molecule {
         void calc_pos(double dt) {
             for (int i=0; i<atoms.size(); i++) {
               for (int n=0; n<3; n++) atoms[i].pos[n] += vel[n]*dt; // + 0.5*acc[n] * dt * dt;
+            }
+        }
+
+        // linear position, VV, Nose-Hoover
+        void calc_pos_VV_NH(double dt, double lm) {
+            double a;
+            for (int i=0;i<atoms.size();i++) {
+                for (int n=0;n<3;n++) {
+                    a = force[n]*KA2AFS2/mass;
+                    atoms[i].pos[n] += vel[n]*dt + 0.5*(a - lm*vel[n])*dt*dt;
+                }
             }
         }
 
