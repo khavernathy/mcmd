@@ -80,5 +80,20 @@ void integrate(System &system) {
         calculateForces(system);
     }
 
+    /* ------------- uVT --------------- */
+    // uVT velocity verlet, andersen
+    else if (system.constants.ensemble == ENSEMBLE_UVT && system.constants.thermostat_type == THERMOSTAT_ANDERSEN && system.constants.integrator == INTEGRATOR_VV) {
+        acceleration_velocity_verlet(system); // 1/2 step init
+        NVT_thermostat_andersen(system);
+        position_verlet(system);
+        doPBCcheck(system);
+        calculateForces(system);
+        acceleration_velocity_verlet(system); // 1/2 step final
+    }
+    else if (system.constants.ensemble == ENSEMBLE_UVT) {
+        printf("ERROR: uVT molecular dynamics only available with Andersen thermostat and velocity verlet integrator. Use `thermostat andersen` and `integrator vv`.\n");
+        exit(EXIT_FAILURE);
+    }
+
     system.checkpoint("Done with integrate() function.");
 }// end integrate() function
