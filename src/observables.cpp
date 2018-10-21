@@ -88,6 +88,7 @@ double calcDOF(System &system) {
     // molecular/rigid
     if (system.constants.md_mode == MD_MOLECULAR) {
         for (i=0;i<system.molecules.size();i++) {
+            if (system.molecules[i].frozen) continue;
             dof += system.molecules[i].dof;
         }
         if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER)

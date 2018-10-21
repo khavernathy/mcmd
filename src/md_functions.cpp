@@ -353,7 +353,8 @@ void calculateNH_Q(System &system) {
     double dof = system.constants.DOF; // computed in main()
     double tau = 20.0*dt; // a minimum to pick is 20dt
     double Q = dof*system.constants.temp*tau*tau;  // units Kfs^2. http://www.courses.physics.helsinki.fi/fys/moldyn/lectures/L5.pdf
-    system.constants.NH_Q = Q;
+    system.constants.NH_Q = Q * system.constants.NH_Q_scale;
+    printf("Calculated Nose-Hoover Q parameter = %f K fs^2 with scale factor = %f\n.",system.constants.NH_Q,system.constants.NH_Q_scale);
 }
 
 void position_RK4(System &system) {
@@ -566,15 +567,13 @@ void doPBCcheck(System &system) {
 }
 
 void updateLM(System &system, int s) {
+    unsigned int i,j;
     double dt=system.constants.md_dt;
     double dof = system.constants.DOF; // computed in main()
     double Q = system.constants.NH_Q;  // units Kfs^2. http://www.courses.physics.helsinki.fi/fys/moldyn/lectures/L5.pdf
-//    printf("Q = %e\n", Q);
-    //double chunk = 0.5*(3.0*(double)system.constants.total_atoms + 1.0)*system.constants.kb*system.stats.temperature.value; // units J
-    double chunk = 0.5*(dof)*system.constants.temp; // units K
+    double chunk = 0.5*dof*system.constants.temp; // in K. 1/2 per DOF
     double dto2q = 0.5*dt/Q; // units 1/(K*fs)
     double mv2sum=0;
-    unsigned int i,j;
     if (s==0) { // first half step (i.e. use the original v(t))
         if (system.constants.md_mode==MD_MOLECULAR) { // rigid molecules
             for (i=0;i<system.molecules.size();i++) {

@@ -1409,7 +1409,14 @@ void readInput(System &system, char* filename) {
                 else if (lc[1] == "nose-hoover")
                     system.constants.thermostat_type = THERMOSTAT_NOSEHOOVER;
                 std::cout << "Got Thermostat type = " << lc[1].c_str(); printf("\n");
-
+            } else if (!strcasecmp(lc[0].c_str(), "nh_q")) {
+                system.constants.NH_Q = atof(lc[1].c_str());
+                system.constants.user_Q = 1; // flag so we don't calculate a default Q later
+                std::cout << "Got Nose Hoover Q parameter = " << lc[1].c_str() << " K fs^2"; printf("\n");
+            } else if (!strcasecmp(lc[0].c_str(), "nh_q_scale")) {
+                system.constants.NH_Q_scale = atof(lc[1].c_str());
+                std::cout << "Got Nose Hoover Q scale parameter = " << lc[1].c_str(); printf("\n");
+            
             } else if (!strcasecmp(lc[0].c_str(), "sig_override")) {
 				system.constants.sig_override[lc[1]] = atof(lc[2].c_str());
 				std::cout << "Got LJ sigma override for " << lc[1].c_str() << " = " << lc[2].c_str() << " A."; printf("\n");

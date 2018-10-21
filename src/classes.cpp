@@ -248,7 +248,9 @@ class Constants {
         double external_force_vector[3] = {0,0,0}; // Fx,Fy,Fz stored in K/A.
         double lagrange_multiplier = 0; // used for Nose-Hoover NVT thermostat. Units 1/fs
         double NH_Q = 0; // used for Nose-Hoover also. Units K*fs^2
+        double NH_Q_scale = 1.0; // multiplier for changing the default Q by user
         int thermostat_type = THERMOSTAT_NOSEHOOVER; // thermostat type for NVT temperature fixture.
+        int user_Q = 0; // flag for user defined Q parameter (absolute Q, not scaled from default)
         int frame = 0; // frame for writing trajectory
         double DOF = 0; // total degrees of freedom in system
 

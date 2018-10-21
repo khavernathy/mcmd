@@ -1611,4 +1611,15 @@ int calcAtomPairs(System &system, int unique) {
     return pairs;
 }
 
-
+void updateMolecularDOFs(System &system) {
+    unsigned int i,z;
+    // updates the DOF of each molecule in the system
+    // based on its prototype name info
+    for (z=0;z<system.proto.size();z++) {
+        for (i=0;i<system.molecules.size();i++) {
+            if (system.proto[z].name == system.molecules[i].name) {
+                system.molecules[i].dof = system.proto[z].dof;
+            }
+        }
+    }
+}

@@ -322,6 +322,7 @@ int main(int argc, char **argv) {
         system.constants.ewald_num_k = count_ks;
     } // end MD Ewald k-space setup.
 
+    updateMolecularDOFs(system); // input molecules are defaulted to DOF=3 but may need update
     calcDOF(system); // used only for NVT Nose-Hoover thermostat (other functions calculate it on-the-fly)
 
     #ifdef OMP
@@ -435,8 +436,9 @@ int main(int argc, char **argv) {
 	else if (system.constants.mode == "md") {
 
         system.constants.frame = 1; 
-
         initialVelMD(system, 1);
+        if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER && system.constants.user_Q==0)
+            calculateNH_Q(system); // Q param for Nose Hoover thermostat
 
         if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
           printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
@@ -470,7 +472,6 @@ int main(int argc, char **argv) {
             calculateForces(system);
             if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER) {
                 calculateNHLM_now(system); // get Lagrange multiplier for initial state
-                calculateNH_Q(system); // get Q parameter for thermostat
             }
         } else if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
             integrate(system);
