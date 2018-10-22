@@ -1,0 +1,5 @@
+
+velocity verlet for NVT NoseHoover   https://www2.ph.ed.ac.uk/~dmarendu/MVP/MVP03.pdf
+Q large, thermostat ineffective; Q small, oscillations too big http://www.wag.caltech.edu/home/jsu/UsersGuide/node18.html
+Q->inf goes to NVE http://www2.mpip-mainz.mpg.de/~andrienk/journal_club/thermostats.pdf
+suggestion for Q http://www.courses.physics.helsinki.fi/fys/moldyn/lectures/L5.pdf
