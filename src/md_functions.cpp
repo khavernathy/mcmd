@@ -234,60 +234,59 @@ void NVT_thermostat_andersen(System &system) {
         // loop through all molecules and adjust velocities by Anderson Thermostat method
         // this process makes the NVT MD simulation stochastic/ Markov / MC-like,
         // which is usually good for obtaining equilibrium quantities.
-        double probab = system.constants.md_thermostat_probab;
-        double ranf;
-        double sigma;
-        if (system.constants.md_mode == MD_MOLECULAR && system.constants.md_translations) {
-        for (i=0; i<system.molecules.size(); i++) {
-            if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue; // skip frozens
-            ranf = getrand(); // 0 -> 1
-            if (ranf < probab) {
-                for (int z=0; z<system.proto.size(); z++) {
-                    if (system.proto[z].name == system.molecules[i].name) {
-                        sigma = system.proto[z].md_velx_goal;
-                        break;
+            double probab = system.constants.md_thermostat_probab;
+            double ranf;
+            double sigma;
+            if (system.constants.md_mode == MD_MOLECULAR && system.constants.md_translations) {
+            for (i=0; i<system.molecules.size(); i++) {
+                if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue; // skip frozens
+                ranf = getrand(); // 0 -> 1
+                if (ranf < probab) {
+                    for (int z=0; z<system.proto.size(); z++) {
+                        if (system.proto[z].name == system.molecules[i].name) {
+                            sigma = system.proto[z].md_velx_goal;
+                            break;
+                        }
+                    }
+                    // adjust the velocity components of the molecule.
+                    for (n=0; n<3; n++) {
+                        system.molecules[i].vel[n] = gaussian(sigma);
                     }
                 }
-                // adjust the velocity components of the molecule.
-                for (n=0; n<3; n++) {
-                    system.molecules[i].vel[n] = gaussian(sigma);
-                }
             }
-        }
-        } else if (system.constants.md_mode == MD_ATOMIC) {
-            for (i =0; i<system.molecules.size(); i++) {
-                for (j=0; j<system.molecules[i].atoms.size(); j++) {
-                    if (system.molecules[i].atoms[j].frozen && !system.constants.flexible_frozen) continue; // skip frozen atoms
-                    ranf = getrand(); // 0 -> 1
-                    if (ranf <probab) {
-                        for (int z=0; z<system.proto.size(); z++) {
-                            if (system.proto[z].name == system.molecules[i].name) {
-                                sigma = system.proto[z].md_velx_goal;
-                                break;
+            } else if (system.constants.md_mode == MD_ATOMIC) {
+                for (i =0; i<system.molecules.size(); i++) {
+                    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                        if (system.molecules[i].atoms[j].frozen && !system.constants.flexible_frozen) continue; // skip frozen atoms
+                        ranf = getrand(); // 0 -> 1
+                        if (ranf <probab) {
+                            for (int z=0; z<system.proto.size(); z++) {
+                                if (system.proto[z].name == system.molecules[i].name) {
+                                    sigma = system.proto[z].md_velx_goal;
+                                    break;
+                                }
+                            }
+                            for (n=0; n<3; n++) {
+                                system.molecules[i].vel[n] = gaussian(sigma);
                             }
                         }
-                        for (n=0; n<3; n++) {
-                            system.molecules[i].vel[n] = gaussian(sigma);
+                    }
+                }
+            // end if atomic mode
+            } else if (system.constants.md_mode == MD_FLEXIBLE) {
+                for (i=0; i<system.molecules.size(); i++) {
+                    if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
+                    for (j=0; j<system.molecules[i].atoms.size();j++) {
+                        ranf = getrand(); // 0 -> 1
+                        if (ranf < probab) {
+                            sigma = system.molecules[i].atoms[j].md_velx_goal;
+                            for (n=0;n<3;n++) {
+                                system.molecules[i].atoms[j].vel[n] = gaussian(sigma);
+                            }
                         }
                     }
-                }
-            }
-        // end if atomic mode
-        } else if (system.constants.md_mode == MD_FLEXIBLE) {
-            for (i=0; i<system.molecules.size(); i++) {
-                if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
-                for (j=0; j<system.molecules[i].atoms.size();j++) {
-                    ranf = getrand(); // 0 -> 1
-                    if (ranf < probab) {
-                        sigma = system.molecules[i].atoms[j].md_velx_goal;
-                        break;
-                    } 
-                    for (n=0;n<3;n++) {
-                        system.molecules[i].atoms[j].vel[n] = gaussian(sigma);
-                    }
-                }
-            } 
-        }
+                } 
+            } // end if flexible
         } // end Andersen thermostat
     } // end if uVT or NVT (thermostat)
 }
