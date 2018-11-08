@@ -672,5 +672,6 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         }
         system.constants.md_NVE_err = fabs((K_total+V_total)-system.constants.md_initial_energy_NVE)*system.constants.K2KJMOL; // K to kJ/mol
     }
+
     return;
 }

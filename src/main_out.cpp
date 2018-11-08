@@ -76,6 +76,7 @@ void md_main_output(System &system) {
                 double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
                 double mgg = mmolg * (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
+                double cm3cm3 = cm3gSTP*system.stats.frozenmass.value*1000*system.constants.NA/(system.stats.volume.value*1e-24);
                 string flspacing = "";
                 if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
                 else flspacing="            "; // stuff like H2, O2 (2 chars)
@@ -86,7 +87,7 @@ void md_main_output(System &system) {
                 if (system.stats.count_frozens > 0) {
                     printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
                     system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
-                    printf("      avg N/f.u. =         %.5f +- %.5f\n", system.stats.Nmov[i].average / (double)system.constants.num_fu, system.stats.Nmov[i].sd / (double)system.constants.num_fu);
+                    printf("      avg N/f.u. =         %.5f +- %.5f;   %.5f cm^3/cm^3 (STP)\n", system.stats.Nmov[i].average / (double)system.constants.num_fu, system.stats.Nmov[i].sd / (double)system.constants.num_fu, cm3cm3);
                 } else {
                     printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
@@ -209,6 +210,8 @@ void mc_main_output(System &system) {
                 double mmolg = system.stats.wtpME[i].average * 10 / (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 double cm3gSTP = mmolg*22.4;
                 double mgg = mmolg * (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
+                double cm3cm3 = cm3gSTP*system.stats.frozenmass.value*1000*system.constants.NA/(system.stats.volume.value*1e-24);
+                    printf("cm3gSTP %e frozenmass %e vol %e\n", cm3gSTP, system.stats.frozenmass.value, system.stats.volume.value);
                 string flspacing = "";
                 if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
                 else flspacing="            "; // stuff like H2, O2 (2 chars)
@@ -219,7 +222,7 @@ void mc_main_output(System &system) {
                 if (system.stats.count_frozens > 0) {
                     printf("      N_movables =         %.5f +- %.5f;   %.5f mg/g\n",
                     system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
-                    printf("      avg N/f.u. =         %.5f +- %.5f\n", system.stats.Nmov[i].average / (double)system.constants.num_fu, system.stats.Nmov[i].sd / (double)system.constants.num_fu);
+                    printf("      avg N/f.u. =         %.5f +- %.5f;   %.5f cm^3/cm^3 (STP)\n", system.stats.Nmov[i].average / (double)system.constants.num_fu, system.stats.Nmov[i].sd / (double)system.constants.num_fu, cm3cm3);
                 } else {
                     printf("-> %s N_movables = %.5f +- %.5f;   %.5f mg/g\n",
                     system.proto[i].name.c_str(),system.stats.Nmov[i].average, system.stats.Nmov[i].sd, mgg);
