@@ -211,7 +211,6 @@ void mc_main_output(System &system) {
                 double cm3gSTP = mmolg*22.4;
                 double mgg = mmolg * (system.proto[i].mass*system.constants.amu2kg*1000*system.constants.NA);
                 double cm3cm3 = cm3gSTP*system.stats.frozenmass.value*1000*system.constants.NA/(system.stats.volume.value*1e-24);
-                    printf("cm3gSTP %e frozenmass %e vol %e\n", cm3gSTP, system.stats.frozenmass.value, system.stats.volume.value);
                 string flspacing = "";
                 if (system.proto[i].name.length() == 3) flspacing="           ";// e.g. CO2
                 else flspacing="            "; // stuff like H2, O2 (2 chars)
