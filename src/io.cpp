@@ -1616,7 +1616,10 @@ void readInput(System &system, char* filename) {
                 }
                 std::cout << "Got flexible frozen molecule option = " << lc[1].c_str(); printf("\n");
 
-            } else { std::cout << "WARNING: INPUT '" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");}
+            } else { 
+                std::cout << "ERROR: INPUT COMMAND'" << lc[0].c_str() << "' UNRECOGNIZED."; printf("\n");
+                exit(EXIT_FAILURE);
+            }
 		} // end while reading lines
     printf("Done reading input parameters.\n\n");
 } // end read input function
