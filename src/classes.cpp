@@ -1479,7 +1479,8 @@ eps["Lr"] = 0.011/kbk;
     polars["SS"] = 2.474; // S SAPT
 	polars["Cl"] = 2.40028;//*cV/ke;
     polars["ArS"] = 1.63922; // Ar SAPT
-	polars["Co"] = 3.26440; // from Kay/Shannelle.
+	polars["Ca"] = 3.361; // from bnn-1-Ca-beta; CP2K periodic DFT for isotropic polarizability
+    polars["Co"] = 3.26440; // from Kay/Shannelle.
     polars["Ni"] = 2.94650; // from Tony, from SIFSIX Ni compounds
     polars["Cu"] = 2.19630;//*cV/ke;
     polars["Cd"] = 0.953; // from Adam, KIKDOZ MOF fragments.
@@ -1487,7 +1488,10 @@ eps["Lr"] = 0.011/kbk;
 	polars["Br"] = 3.49300; // used in MPM-1-Br work
 	polars["Ru"] = 5.191; // I calculated this by Adam's fitting method.
 	polars["Pd"] = 5.25926;//*cV/ke;
-	polars["Pt"] = 8.56281;//*cV/ke;
+	polars["Eu"] = 4.461; // EuCl3, orca isotropic polarizability calculation 
+    polars["Ho"] = 4.43760; // Pham, Forrest et al.
+    polars["Pt"] = 8.56281;//*cV/ke;
+    
 
 	// He-PHAST2
     // NEEDS FIXIN
