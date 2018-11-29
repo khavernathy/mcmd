@@ -1848,7 +1848,11 @@ void inputValidation(System &system) {
         std::cout << "ERROR: MD rotations were turned on but there are no movable molecules with >1 atom in input. Turn md_rotations off.";
         exit(EXIT_FAILURE);
     }
-    if (system.constants.crystalbuild && ((system.constants.crystalbuild_x == 1 && system.constants.crystalbuild_y ==1 && system.constants.crystalbuild_z == 1) || (system.constants.crystalbuild_x < 1 || system.constants.crystalbuild_y < 1 || system.constants.crystalbuild_z < 1) )) {
+    if (system.constants.crystalbuild && (
+        (system.constants.crystalbuild_x == 1 && system.constants.crystalbuild_y ==1 && system.constants.crystalbuild_z == 1) || (
+            fabs(system.constants.crystalbuild_x) < 1 || fabs(system.constants.crystalbuild_y) < 1 || fabs(system.constants.crystalbuild_z) < 1)
+        ) 
+        ) {
         std::cout << "ERROR: You turned the crystal-builder on but did not specify a (correct) dimension to duplicate. e.g., `crystalbuild_y 2` is acceptable but `crystalbuild_y 0` is not. Leave the option off if you don't want to use it. (i.e. x y z are set to 1 by default).";
         exit(EXIT_FAILURE);
     }

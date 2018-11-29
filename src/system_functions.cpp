@@ -1332,8 +1332,8 @@ void setupCrystalBuild(System &system) {
         printf(" --> using xlen = %f; ylen = %f; zlen = %f;\n", xlen,ylen,zlen);
 
         // DUPLICATE IN X
-        if (xdim > 1) {
-            for (int iter=0; iter < xdim-1; iter++) {
+        if (fabs(xdim) > 1) {
+            for (int iter=0; iter < fabs(xdim)-1; iter++) {
             system.pbc.a += origa;
             system.pbc.calcNormalBasis(); 
             setupBox(system);
@@ -1343,9 +1343,13 @@ void setupCrystalBuild(System &system) {
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
                         
-                        for (int n=0;n<3;n++)
-                            newatom.pos[n] += orig_basis[0][n]*(iter+1);
-
+                        for (int n=0;n<3;n++) {
+                            if (xdim>0)
+                                newatom.pos[n] += orig_basis[0][n]*(iter+1);
+                            else
+                                newatom.pos[n] -= orig_basis[0][n]*(iter+1);
+                        }
+                        
                         system.molecules[i].mass += newatom.mass;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1355,8 +1359,12 @@ void setupCrystalBuild(System &system) {
                     Molecule newmolecule = system.molecules[i];
                     for (j=0; j<newmolecule.atoms.size(); j++) {
                         system.constants.total_atoms++;
-                        for (int n=0;n<3;n++)
-                            newmolecule.atoms[j].pos[n] += orig_basis[0][n]*(iter+1);
+                        for (int n=0;n<3;n++) {
+                            if (xdim>0) 
+                                newmolecule.atoms[j].pos[n] += orig_basis[0][n]*(iter+1);
+                            else
+                                newmolecule.atoms[j].pos[n] -= orig_basis[0][n]*(iter+1);
+                        }
                     }
                     system.stats.count_movables++;
                     system.molecules.push_back(newmolecule);
@@ -1376,8 +1384,8 @@ void setupCrystalBuild(System &system) {
 
         }
         // DUPLICATE IN Y
-        if (ydim > 1) {
-            for (int iter=0; iter < ydim-1; iter++) {
+        if (fabs(ydim) > 1) {
+            for (int iter=0; iter < fabs(ydim)-1; iter++) {
             system.pbc.b += origb;
             system.pbc.calcNormalBasis();
             setupBox(system);
@@ -1386,9 +1394,13 @@ void setupCrystalBuild(System &system) {
                 if (system.molecules[i].frozen) {
                     for (j=0; j< asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        for (int n=0;n<3;n++)
-                            newatom.pos[n] += orig_basis[1][n]*(iter+1);                    
-    
+                        for (int n=0;n<3;n++) {
+                            if (ydim>0)
+                                newatom.pos[n] += orig_basis[1][n]*(iter+1);                    
+                            else 
+                                newatom.pos[n] -= orig_basis[1][n]*(iter+1);
+                        }
+                        
                         system.molecules[i].mass += newatom.mass;                     
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1398,8 +1410,12 @@ void setupCrystalBuild(System &system) {
                     Molecule newmolecule = system.molecules[i];
                     for (j=0; j<newmolecule.atoms.size(); j++) {
                         system.constants.total_atoms++;
-                        for (int n=0;n<3;n++)
-                            newmolecule.atoms[j].pos[n] += orig_basis[1][n]*(iter+1);
+                        for (int n=0;n<3;n++) {
+                            if (ydim>0)
+                                newmolecule.atoms[j].pos[n] += orig_basis[1][n]*(iter+1);
+                            else
+                                newmolecule.atoms[j].pos[n] -= orig_basis[1][n]*(iter+1);
+                        }
                     }
                     system.stats.count_movables++;
                     system.molecules.push_back(newmolecule);
@@ -1418,8 +1434,8 @@ void setupCrystalBuild(System &system) {
         }
         }
         // DUPLICATE IN Z
-        if (zdim > 1) {
-            for (int iter=0; iter < zdim-1; iter++) {
+        if (fabs(zdim) > 1) {
+        for (int iter=0; iter < fabs(zdim)-1; iter++) {
             system.pbc.c += origc;
             system.pbc.calcNormalBasis();
             setupBox(system);
@@ -1428,9 +1444,13 @@ void setupCrystalBuild(System &system) {
                 if (system.molecules[i].frozen) {
                     for (j=0; j<asize; j++) {
                         Atom newatom = system.molecules[i].atoms[j];
-                        for (int n=0;n<3;n++)
-                            newatom.pos[n] += orig_basis[2][n]*(iter+1);                
-        
+                        for (int n=0;n<3;n++) {
+                            if (zdim>0)
+                                newatom.pos[n] += orig_basis[2][n]*(iter+1);                
+                            else
+                                newatom.pos[n] -= orig_basis[2][n]*(iter+1);        
+
+                        }
                         system.molecules[i].mass += newatom.mass;
                         system.molecules[i].atoms.push_back(newatom);
                         system.constants.total_atoms++;
@@ -1440,8 +1460,12 @@ void setupCrystalBuild(System &system) {
                     Molecule newmolecule = system.molecules[i];
                     for (j=0; j<newmolecule.atoms.size(); j++) {
                         system.constants.total_atoms++;
-                        for (int n=0;n<3;n++)
-                            newmolecule.atoms[j].pos[n] += orig_basis[2][n]*(iter+1);
+                        for (int n=0;n<3;n++) {
+                            if (zdim>0)
+                                newmolecule.atoms[j].pos[n] += orig_basis[2][n]*(iter+1);
+                            else
+                                newmolecule.atoms[j].pos[n] -= orig_basis[2][n]*(iter+1);
+                        }
                     }
                     system.stats.count_movables++;
                     system.molecules.push_back(newmolecule);
