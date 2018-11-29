@@ -468,6 +468,17 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "CO2" ;
                 system.proto[i].dof = 5;
             }
+            else if (sorbmodel == "co2_phastq*" || sorbmodel == "co2_phastqp") {
+                addAtomToProto(system, i, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.66134, 1.22810, 26.89402, 3.18054);
+                addAtomToProto(system, i, "COE", "CO2", "M", 1.162, 0.0, 0.0, 15.9994, -0.33067, 0.73950, 0.0, 0.0);
+                addAtomToProto(system, i, "COE", "CO2", "M", -1.162, 0.0, 0.0, 15.9994, -0.33067, 0.73950, 0.0, 0.0);
+                addAtomToProto(system, i, "CON", "CO2", "M", 1.187, 0.0, 0.0, 0.0, 0.0, 0.0, 70.24356, 2.75458);
+                addAtomToProto(system, i,"CON", "CO2", "M", -1.187, 0.0, 0.0, 0.0, 0.0, 0.0, 70.24356, 2.75458);
+                system.proto[i].name = "CO2" ;
+                system.proto[i].dof = 5;
+
+
+            }
             else if (sorbmodel == "co2_trappe") {
                 addAtomToProto(system,i, "COG", "CO2", "M", 0.0, 0.0, 0.0, 12.01, 0.7, 0.0, 27.0, 2.80);
                 addAtomToProto(system,i, "COE", "CO2", "M", 1.160, 0.0, 0.0, 16.0, -0.35, 0.0, 79.0, 3.05);
@@ -1039,8 +1050,10 @@ void setupFugacity(System &system) {
     if (system.constants.co2_fit_fugacity) {
         printf("Using Laratelli CO2 fugacity fits with pressure = %f atm.\n",system.constants.pres);
         for (int i=0; i<system.constants.sorbate_name.size();i++) {
-            if (system.constants.sorbate_name[i] == "co2_phast*") {
+            if (system.constants.sorbate_name[i] == "co2_phast*" || system.constants.sorbate_name[i]=="co2_phastp") {
                 system.proto[i].fugacity = phast_star(system.constants.pres);
+            } else if (system.constants.sorbate_name[i] == "co2_phastq*" || system.constants.sorbate_name[i]=="co2_phastqp") {
+                system.proto[i].fugacity = phast_q_star(system.constants.pres);
             } else if (system.constants.sorbate_name[i] == "co2_trappe") {
                 system.proto[i].fugacity = trappe(system.constants.pres);
             }
