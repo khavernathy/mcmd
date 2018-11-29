@@ -176,6 +176,7 @@ class Constants {
         double free_volume=0; // for excess adsorption calculation, A^3. must be user-input
         int fugacity_single=0; // set for single-sorbate fugacity calculation at startup.
         string fugacity_single_sorbate; // the sorbate molecule to get fugacity of. h2/n2/co2/ch4
+        int co2_fit_fugacity = 0; // option to use Luci's fitting method for self-consistent CO2 f-fit
 
         int_fast8_t feynman_hibbs = 0;
         int fh_order = 4;

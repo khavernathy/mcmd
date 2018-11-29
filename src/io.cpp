@@ -990,6 +990,11 @@ void readInput(System &system, char* filename) {
                 } else {
                     std::cout << "Got fugacity_single sorbate selection = " << lc[1].c_str(); printf("\n");
                 }
+            } else if (!strcasecmp(lc[0].c_str(), "co2_fit_fugacity")) {
+                if (!strcasecmp(lc[1].c_str(), "on")) {
+                    system.constants.co2_fit_fugacity = 1;
+                }
+                std::cout << "Got co2_fit_fugacity = " << lc[1].c_str(); printf("\n");
 
             } else if (!strcasecmp(lc[0].c_str(), "input_atoms_xyz")) {
                 if (lc.size() > 1) {

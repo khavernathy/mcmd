@@ -28,6 +28,37 @@ void output(string msg) {
 #define BACK_MAX_M	9
 #define BACK_MAX_N	4
 
+
+//custom fugacity functions for fugacity paper
+//experimental data
+// Luciano Laratelli
+double phast_q_star(double pressure)
+{
+  double square= 8.2e-05 * pressure * pressure;
+  double linear= 0.003089 * pressure;
+  double constant = 1.005018;
+  return(pressure * (square + linear + constant));
+}
+double phast_star(double pressure)
+{
+  double square= 8.6e-05 * pressure * pressure;
+  double linear= .000735 * pressure;
+  double constant = 1.012135;
+  return(pressure * (square + linear + constant));
+}
+double trappe(double pressure)
+{
+  double square= .000129 * pressure * pressure;
+  double linear= .002365 * pressure;
+  double constant = 1.010909;
+  cout << "******************************************" << endl;
+  cout << (pressure * (square + linear + constant)) << endl;
+  cout << "******************************************" << endl;
+  return(pressure * (square + linear + constant));
+}
+
+
+
 double h2_comp_back(double temperature, double pressure) {
 
 	double alpha, y;				/* repulsive part of the compressibility factor */
