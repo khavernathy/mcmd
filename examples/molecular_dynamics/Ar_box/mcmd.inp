@@ -1,0 +1,36 @@
+# Douglas Franz
+# Space group, USF, 2018
+# NVE MD: a box of liquid Ar
+# 0.844 = rho* (density in LJ reduced units)
+# 1.5 = T* (temperature reduced units)
+
+
+mode md
+md_mode molecular
+md_rotations off  # important for monatomic gas
+md_dt  1
+md_ft  100 ns
+md_corrtime 1 !   # output/traj writes every step 
+
+auto_center on
+
+ensemble nvt
+#md_init_vel 0.00000
+temperature 80  # will produce boltzmann-distribution of velocities at startup.
+thermostat nose-hoover
+nh_q_scale 1.5   # tighten the nose-hoover thermostat
+
+# omp 8  # can use this to parallelize with OpenMP, if compiled with that feature
+
+input_atoms input.pdb
+
+sorbate_name Ar_hogan
+
+radial_dist on
+radial_centroid Ar
+radial_counterpart Ar
+radial_max_dist 8.5125
+
+
+carbasis 17 17 17 90 90 90
+
