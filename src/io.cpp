@@ -1906,5 +1906,9 @@ void inputValidation(System &system) {
         std::cout << "ERROR: RK4 integration is disabled (under development). Use the default velocity verlet by `integrator vv`."; printf("\n");
         exit(EXIT_FAILURE);
     }
+    if (system.constants.md_rotations && system.constants.md_mode==MD_FLEXIBLE) {
+        std::cout << "WARNING: Can't use `md_rotations on` with `md_mode flexible`. Disabling MD rotations now."; printf("\n");
+        system.constants.md_rotations=0;
+    }
 }
 // end input validation function

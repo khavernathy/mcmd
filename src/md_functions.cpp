@@ -353,7 +353,7 @@ void calculateNH_Q(System &system) {
     double tau = 20.0*dt; // a minimum to pick is 20dt
     double Q = dof*system.constants.temp*tau*tau;  // units Kfs^2. http://www.courses.physics.helsinki.fi/fys/moldyn/lectures/L5.pdf
     system.constants.NH_Q = Q * system.constants.NH_Q_scale;
-    printf("Calculated Nose-Hoover Q parameter = %f K fs^2 with scale factor = %f\n.",system.constants.NH_Q,system.constants.NH_Q_scale);
+    printf("Calculated Nose-Hoover Q parameter = %f K fs^2 with scale factor = %f.\n",system.constants.NH_Q,system.constants.NH_Q_scale);
 }
 
 void position_RK4(System &system) {

@@ -57,6 +57,7 @@ void integrate(System &system) {
     else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER && system.constants.integrator == INTEGRATOR_VV) {
         // https://www2.ph.ed.ac.uk/~dmarendu/MVP/MVP03.pdf
         position_VV_NH(system); 
+        doPBCcheck(system);
         acceleration_velocity_verlet(system);
         calculateForces(system);
         updateLM(system,0); // first 1/2 step, using v(t)
