@@ -208,7 +208,7 @@ class Constants {
         double pres=1.0; // in atm
         double volume_change=0.25; // a factor used in volume change BF, mpmc default 0.25
         double vcp_factor=1.0; // a factor used in probability for volume change. this / num_sorbates is good per Frenkel
-        double displace_factor=2.5; // up to +- this number in A
+        double displace_factor=1.0; // up to +- this number in A
         double insert_factor=0.5; // probability to do insert or delete (instead of displace/rotate) in uvt
 // DEPRECATED double rotate_prob=0.5; // prob to rotate instead of displace when displace/rotate is selected
 
