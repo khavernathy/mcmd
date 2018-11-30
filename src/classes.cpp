@@ -715,10 +715,11 @@ class Stats {
         vector<obs_t> density = vector<obs_t>(max_sorbs);
         vector<obs_t> selectivity = vector<obs_t>(max_sorbs);
         vector<obs_t> excess = vector<obs_t>(max_sorbs);
-        vector<obs_t> diffusion = vector<obs_t>(max_sorbs);
+        vector<obs_t> diffusion = vector<obs_t>(max_sorbs);  // from MSD
         vector<obs_t> msd = vector<obs_t>(max_sorbs);
         vector<obs_t> vacf = vector<obs_t>(max_sorbs);
-        vector<obs_t> vacf_init = vector<obs_t>(max_sorbs); // VACF at t=0 for normalizing
+        vector<obs_t> diffusion_vacf = vector<obs_t>(max_sorbs); // from VACF
+        //vector<obs_t> vacf_init = vector<obs_t>(max_sorbs); // VACF at t=0 for normalizing
 };
 
 Stats::Stats() {}

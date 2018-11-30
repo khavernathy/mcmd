@@ -641,25 +641,45 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
 
         // VELOCITY AUTOCORRELATION FUNCTION VACF
         if (system.constants.md_mode == MD_MOLECULAR) {
+            double mag1=0,mag2=0;
+            double norm1[3]={0,0,0}; double norm2[3]={0,0,0};
+            double D_vacf_sum=0;
+            const double dt = system.constants.md_dt;
+
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                 int localN = getNlocal(system, sorbid);
+                
                 if (localN<1) continue;
                 system.stats.vacf[sorbid].value = 0;
                 for (i=0;i<system.molecules.size();i++) {
                     if (system.molecules[i].name==system.proto[sorbid].name) {
+
+                        D_vacf_sum += dddotprod(system.molecules[i].original_vel, system.molecules[i].vel);
+
+                        mag1 = sqrt(dddotprod(system.molecules[i].original_vel,system.molecules[i].original_vel));
+                        mag2 = sqrt(dddotprod(system.molecules[i].vel         ,system.molecules[i].vel         ));    
+                    
                         for (n=0;n<3;n++) {
-                            system.stats.vacf[sorbid].value += dddotprod(system.molecules[i].original_vel, system.molecules[i].vel);
+                            norm1[n] = system.molecules[i].original_vel[n] / mag1;
+                            norm2[n] = system.molecules[i].vel[n] / mag2;
                         }
+                        system.stats.vacf[sorbid].value += dddotprod(norm1,norm2);
                     }
                 }
                 system.stats.vacf[sorbid].value /= (double)localN;
+                system.stats.vacf[sorbid].calcNewStats();
 
+                // not using D from VACF.
+                //system.stats.diffusion_vacf[sorbid].value += dt/3.0/(double)localN * D_vacf_sum * 0.1;// convert to cm^2/s
+                //printf("VACF D = %.5e cm^2/s\n", system.stats.diffusion_vacf[sorbid].value);
+                /*
                 // on first calc, save the normalizing t=0 VACF
                 if (system.stats.vacf_init[sorbid].value == 0)
                     system.stats.vacf_init[sorbid].value = system.stats.vacf[sorbid].value;
 
                 // now normalize
                 system.stats.vacf[sorbid].value /= system.stats.vacf_init[sorbid].value; // should be 1 on first step
+                */
             }
         }
     } // end don't do D, MSD, and VACF on first step.

@@ -66,7 +66,7 @@ void md_main_output(System &system) {
                 for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                     printf("    %s D_s  = %.5e cm^2/s\n", system.proto[sorbid].name.c_str(), system.stats.diffusion[sorbid].value);
                     printf("    %s MSD  = %.5e A^2\n", system.proto[sorbid].name.c_str(), system.stats.msd[sorbid].value);
-		            printf("    %s VACF = %.5e\n", system.proto[sorbid].name.c_str(), system.stats.vacf[sorbid].value);
+		            printf("    %s VACF = %.5e\n", system.proto[sorbid].name.c_str(), system.stats.vacf[sorbid].average);
                 }
             }
             //if (system.stats.Q.value > 0) printf("Q (partition function) = %.5e\n", system.stats.Q.value);
