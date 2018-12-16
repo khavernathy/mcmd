@@ -460,15 +460,17 @@ int main(int argc, char **argv) {
 	// begin timing for steps
 	system.constants.begin_steps = std::chrono::steady_clock::now();
 
-
+    system.checkpoint("Computing initial values for MD.");
     computeInitialValues(system);
     // Main MD time loop
 	for (double t=0; t <= tf; t=t+dt) {
+        system.checkpoint("Started timestep.");
         system.stats.MDtime = t;
         system.stats.MDstep = count_md_steps;
 
         // MD integration. the workload is here. First step is unique. Just get F
         if (t==0) {
+            system.checkpoint("t=0; calculating forces.");
             calculateForces(system);
             if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER) {
                 calculateNHLM_now(system); // get Lagrange multiplier for initial state
@@ -487,7 +489,7 @@ int main(int argc, char **argv) {
             }
         }
 
-
+        system.checkpoint("check uVT MD.");
         if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
             // try a MC uVT insert/delete
             getTotalPotential(system); // this is needed on-the-spot because of

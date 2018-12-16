@@ -30,7 +30,7 @@ void calculateForces(System &system) {
   double dt = system.constants.md_dt;
   int_fast8_t model = system.constants.potential_form;
 
-    //system.checkpoint("Calculating forces.");
+    system.checkpoint("Calculating forces.");
     // loop through all atoms
 	for (int i=0; i <system.molecules.size(); i++) {
 	for (int j = 0; j < system.molecules[i].atoms.size(); j++) {
@@ -57,6 +57,7 @@ void calculateForces(System &system) {
         // pbc
         else {
             /* REPULSION -- DISPERSION */
+            system.checkpoint("Computing RD force.");
             if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR) {
                 #ifdef OMP
                 if (system.constants.openmp_threads > 0)
@@ -70,6 +71,7 @@ void calculateForces(System &system) {
                 tt_forces(system);
 
             /* ELECTROSTATICS */
+            system.checkpoint("Computing ES force.");
             if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
                 #ifdef OMP
                 if (system.constants.openmp_threads > 0)
@@ -82,6 +84,7 @@ void calculateForces(System &system) {
             }
 
             /* POLARIZATION */    
+            system.checkpoint("Computing Polarization force.");
             if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_TTESPOLAR)
                 #ifdef OMP
                 if (system.constants.openmp_threads > 0)
@@ -93,6 +96,7 @@ void calculateForces(System &system) {
                 #endif
 
             /* BONDING */
+            system.checkpoint("Computing bonded forces.");
             if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
                   if (system.constants.opt_bonds)
                     morse_gradient(system);
@@ -139,7 +143,7 @@ void calculateForces(System &system) {
                 }
                 }
             }
-        } else if (system.constants.md_mode == MD_ATOMIC) {
+        } else if (system.constants.md_mode == MD_ATOMIC || system.constants.md_mode == MD_FLEXIBLE) {
             for (int i=0; i<system.molecules.size(); i++) {
                 for (int j=0; j<system.molecules[i].atoms.size(); j++) {
                     if (!system.molecules[i].atoms[j].frozen) {
@@ -150,7 +154,7 @@ void calculateForces(System &system) {
             }
         } // end if molecular else atomic
     } // end if EXTERNAL force
-    //system.checkpoint("Done calculating forces.");
+    system.checkpoint("Done calculating forces.");
 } // end force function.
 
 
