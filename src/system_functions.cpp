@@ -646,6 +646,20 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "ETH";
                 system.proto[i].dof = 5;
             }
+            // PROPENE C3H6 -- Franz made w copt dft aug-cc-pvtz chelpg charge fit to ESP. 
+            else if (sorbmodel == "c3h6" || sorbmodel == "propene" || sorbmodel == "propylene") {
+                addAtomToProto(system,i,"C","PRO","M", -0.316,   1.089,   0.071, 12.01100, -0.63057, 1.288599, 52.837986, 3.430851);
+                addAtomToProto(system,i,"C","PRO","M",0.332,  -0.079,   0.154, 12.01100, 0.16400, 1.288599, 52.837986, 3.430851);
+                addAtomToProto(system,i,"H","PRO","M",0.213 ,  2.028 ,  0.200, 1.00790, 0.20492, 0.413835, 22.141632, 2.571134);
+                addAtomToProto(system,i,"H","PRO","M",-1.382 ,  1.137,  -0.127, 1.00790, 0.22965, 0.413835, 22.141632, 2.571134);
+                addAtomToProto(system,i,"C","PRO","M",-0.319,  -1.413,  -0.008, 12.01100, -0.40470, 1.288599, 52.837986, 3.430851);
+                addAtomToProto(system,i,"H","PRO","M",1.402,  -0.078,   0.353, 1.00790, 0.06821, 0.413835, 22.141632, 2.571134);
+                addAtomToProto(system,i,"H","PRO","M",-1.402,  -1.330,  -0.145, 1.00790, 0.13160, 0.413835, 22.141632 ,2.571134);
+                addAtomToProto(system,i,"H","PRO","M",-0.135 , -2.028  , 0.878, 1.00790, 0.11707, 0.413835, 22.141632, 2.571134);
+                addAtomToProto(system,i,"H","PRO","M",0.099 , -1.929,  -0.878, 1.00790, 0.11983, 0.413835, 22.141632, 2.571134);
+                system.proto[i].name = "PRO";
+                system.proto[i].dof = 6;
+            }
             // WATER H2O (TIP3P)
             else if (sorbmodel == "h2o" || sorbmodel == "water" || sorbmodel == "tip3p" || sorbmodel == "h2o_tip3p") {
                 addAtomToProto(system,i, "OXY", "H2O", "M", 0.0, 0.0, 0.0, 16.0, -0.834, 0.0, 76.42, 3.151);
