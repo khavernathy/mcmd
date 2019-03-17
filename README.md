@@ -19,6 +19,7 @@ Using a terminal,<br />
 `cd src` <br />
 `bash compile.sh   [ options ]` <br />
 `cd ..` <br />
+`export PATH=$PATH:/path/to/mcmd/`<br />
 
 3. Run: <br />
 `./mcmd mcmd.inp`<br /><br />  
