@@ -253,6 +253,8 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         // + other weird geometries...
     } else if (name == "Cl") {
         return "Cl";
+    } else if (name == "Ca") {
+        return "Ca6+2";
     } else if (name == "Sc") {
         return "Sc6+3"; // UFF4MOF
     } else if (name == "Ti") {
