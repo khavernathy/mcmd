@@ -28,7 +28,7 @@
 # bash compile.sh gpu circe     (CUDA GPU on circe HPC)
 # bash compile.sh gpu windows   (CUDA GPU on Windows machine)
 
-# bash compile.sh omp           (for OpenMP implementation, not yet functional)
+# bash compile.sh omp           (for OpenMP implementation)
 # bash compile.sh omp linux     (same, optimized for Linux)
 
 # bash compile.sh mpi           (for MPI implementation, not yet functional)
