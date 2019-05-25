@@ -1289,7 +1289,7 @@ void findBonds(System &system) {
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
     for (mol=0; mol<molecule_limit; mol++) {
         if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
-        if (!system.constants.flexible_frozen && system.molecules[mol].frozen) continue; // skip frozen molecules if flexible_frozen is not on.
+        if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt") continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
         // all pairs inside the molecule
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
@@ -1449,9 +1449,13 @@ double totalBondedEnergy(System &system) {
         total += angle_bend_energy(system);
     if (system.constants.opt_dihedrals)
         total += torsions_energy(system);
-    if (system.constants.opt_LJ)
-        LJ_intramolec_energy(system); // dont add this to bonded energy
-    if (system.constants.opt_ES)
-        ES_intramolec_energy(system); // dont add this to bonded energy
+    if (system.constants.opt_LJ) {
+        double lj = LJ_intramolec_energy(system); // dont add this to bonded energy unless opt-mode
+        if (system.constants.mode=="opt") total += lj;
+    } 
+    if (system.constants.opt_ES) {
+        double es = ES_intramolec_energy(system); // dont add this to bonded energy unless opt-mode
+        if (system.constants.mode=="opt") total += es;
+    }
     return total; // this is in K
 }

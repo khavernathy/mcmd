@@ -226,7 +226,7 @@ void optimize(System &system) {
                 angle_bend_gradient(system);
             if (system.constants.opt_dihedrals)
                 torsions_gradient(system);
-            if (system.constants.opt_LJ)
+            if (system.constants.opt_LJ) 
                 LJ_intramolec_gradient(system);
             if (system.constants.opt_ES)
                 ES_intramolec_gradient(system);
