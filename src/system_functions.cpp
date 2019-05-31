@@ -83,9 +83,9 @@ void centerCoordinates(System &system) {
 
 	for (int i=0; i<system.molecules.size(); i++) {
 	for (int j=0; j<system.molecules[i].atoms.size(); j++) {
-		system.molecules[i].atoms[j].pos[0] = system.molecules[i].atoms[j].pos[0] - (xmin + (xmax - xmin)/2.0);
-		system.molecules[i].atoms[j].pos[1] = system.molecules[i].atoms[j].pos[1] - (ymin + (ymax - ymin)/2.0);
-		system.molecules[i].atoms[j].pos[2] = system.molecules[i].atoms[j].pos[2] - (zmin + (zmax - zmin)/2.0);
+		if (system.constants.ac_x) system.molecules[i].atoms[j].pos[0] = system.molecules[i].atoms[j].pos[0] - (xmin + (xmax - xmin)/2.0);
+		if (system.constants.ac_y) system.molecules[i].atoms[j].pos[1] = system.molecules[i].atoms[j].pos[1] - (ymin + (ymax - ymin)/2.0);
+		if (system.constants.ac_z) system.molecules[i].atoms[j].pos[2] = system.molecules[i].atoms[j].pos[2] - (zmin + (zmax - zmin)/2.0);
 	}
 	}
     printf("Done centering coordinates.\n\n");
