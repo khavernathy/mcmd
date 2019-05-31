@@ -813,7 +813,8 @@ void writeLAMMPSfiles(System &system) {
     fprintf(f2, "%i atoms\n", system.constants.total_atoms);
     fprintf(f2, "%i atom types\n\n", (int)atomlabels.size());
     // we'll use the box vertices calculed in MCMD to get hi and lo params for the LAMMPS box.
-    double xlo=1e40, xhi=-1e40, ylo=1e40, yhi=-1e40, zlo=1e40, zhi=-1e40; // big numbers to start
+    //double xlo=1e40, xhi=-1e40, ylo=1e40, yhi=-1e40, zlo=1e40, zhi=-1e40; // big numbers to start
+    /*
     for (int v=0; v<8; v++) {
         if (system.pbc.box_vertices[v][0] < xlo) xlo = system.pbc.box_vertices[v][0];
         if (system.pbc.box_vertices[v][0] > xhi) xhi = system.pbc.box_vertices[v][0];
@@ -821,10 +822,36 @@ void writeLAMMPSfiles(System &system) {
         if (system.pbc.box_vertices[v][1] > yhi) yhi = system.pbc.box_vertices[v][1];
         if (system.pbc.box_vertices[v][2] < zlo) zlo = system.pbc.box_vertices[v][2];
         if (system.pbc.box_vertices[v][2] > zhi) zhi = system.pbc.box_vertices[v][2];
-    }
+    }*/
+    double xlo = -system.pbc.x_length/2.;
+    double xhi = system.pbc.x_length/2.;
+    double ylo = -system.pbc.y_length/2.;
+    double yhi = system.pbc.y_length/2.;
+    double zlo = -system.pbc.z_length/2.;
+    double zhi = system.pbc.z_length/2.;
+
+    double a=system.pbc.a;
+    double b=system.pbc.b;
+    double c=system.pbc.c;
+    double alpha=system.pbc.alpha*M_PI/180.;
+    double beta=system.pbc.beta*M_PI/180.;
+    double gamma=system.pbc.gamma*M_PI/180.; 
+
+    double lx=a;
+    double xy = b*cos(gamma);
+    double xz = c*cos(beta);
+    double ly = sqrt(b*b - xy*xy);
+    double yz = (b*c*cos(alpha) - xy*xz)/ly;
+    double lz = sqrt(c*c - xz*xz - yz*yz);
+
+    if (fabs(xy) < 1e-6) xy=0;
+    if (fabs(xz) < 1e-6) xz=0;
+    if (fabs(yz) < 1e-6) yz=0;
+
     fprintf(f2, "%.6f %.6f xlo xhi\n",xlo,xhi);
     fprintf(f2, "%.6f %.6f ylo yhi\n",ylo,yhi);
-    fprintf(f2, "%.6f %.6f zlo zhi\n\n",zlo,zhi);
+    fprintf(f2, "%.6f %.6f zlo zhi\n",zlo,zhi);
+    fprintf(f2, "%.6f %.6f %.6f xy xz yz\n\n", xy, xz, yz);
 
     fprintf(f2, "Atoms\n\n");
     // now the atom list in LAMMPS style input
