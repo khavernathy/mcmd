@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
     if (system.stats.count_frozens > 0) printf("%s\n",getFormulaUnit(system).c_str());
     initialize(system); // these are just system name sets, nothing more
     printf("SORBATE COUNT: %i\n", (int)system.proto.size());
-    printf("VERSION NUMBER: %i\n", 1127); // i.e. github commit
+    printf("VERSION NUMBER: %i\n", 1152); // i.e. github commit
     inputValidation(system);
     printf("...input options validated.\n");
     system.checkpoint("...input options validated. Done with system setup functions.");
