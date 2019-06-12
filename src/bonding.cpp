@@ -1161,9 +1161,11 @@ void findBonds(System &system) {
     unsigned int molecule_limit = 1;
     if (system.constants.md_mode == MD_FLEXIBLE) molecule_limit = system.molecules.size();
 
+    unsigned int c=1;
     for (i=0; i<molecule_limit; i++) {
         if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue;
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
+            printf("\r atom %i / %i ( %3.2f %% complete )", c, system.constants.total_atoms, (float)c/system.constants.total_atoms*100.0); 
             local_bonds = 0;
             // for each atom, we find its bonded neighbors by a distance search
             // (by only searching atoms on this same molecule)
@@ -1266,7 +1268,7 @@ void findBonds(System &system) {
 
                } // end if r < bond-length
             } // end pair (i,j) -- (i,l)
-
+            c++;
         } // end j
     } // end i
 
