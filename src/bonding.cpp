@@ -1271,7 +1271,7 @@ void findBonds(System &system) {
             c++;
         } // end j
     } // end i
-
+    printf("\n");
     
     // get UFF atom labels for all atoms
     for (i=0;i<molecule_limit;i++) {
