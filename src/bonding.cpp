@@ -1151,7 +1151,7 @@ double ES_intramolec_gradient(System &system) {
 
 // function to find all bonds (and angles) for all atoms.
 void findBonds(System &system) {
-
+    printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
     unsigned int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
     double r, ra, rh; // bond r, angle bond ra, dihedral bond rh
     unsigned int local_bonds=0;
@@ -1271,7 +1271,7 @@ void findBonds(System &system) {
             c++;
         } // end j
     } // end i
-    printf("\n");
+    printf("\nGetting UFF atom labels, unique LJ/ES qualified bonds...\n");
     
     // get UFF atom labels for all atoms
     for (i=0;i<molecule_limit;i++) {
