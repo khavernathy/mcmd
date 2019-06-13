@@ -271,7 +271,9 @@ void writeXYZ(System &system, string filename, int frame, int step, double realt
       		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[1];
       		myfile <<  "   ";
       		myfile << std::setprecision(9) << system.molecules[j].atoms[i].pos[2];
-      		myfile << "\n";
+            myfile <<  "   ";
+            myfile << std::setprecision(9) << system.molecules[j].atoms[i].C / system.constants.E2REDUCED; // write charge too
+            myfile << "\n";
 		    }
     }
 	}
