@@ -1151,7 +1151,7 @@ double ES_intramolec_gradient(System &system) {
 
 // function to find all bonds (and angles) for all atoms.
 void findBonds(System &system) {
-    printf("Finding bonds/angles/dihedrals/non-bond pairs...\n");
+    printf("Finding bonds/angles/dihedrals... (this might take a while)\n");
     unsigned int i,j,l,m,p; // i=mol, j,l,m,p are atoms (conventionally IJKL)
     double r, ra, rh; // bond r, angle bond ra, dihedral bond rh
     unsigned int local_bonds=0;
@@ -1165,7 +1165,6 @@ void findBonds(System &system) {
     for (i=0; i<molecule_limit; i++) {
         if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue;
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
-            printf("\r atom %i / %i ( %3.2f %% complete )", c, system.constants.total_atoms, (float)c/system.constants.total_atoms*100.0); 
             local_bonds = 0;
             // for each atom, we find its bonded neighbors by a distance search
             // (by only searching atoms on this same molecule)
@@ -1271,7 +1270,7 @@ void findBonds(System &system) {
             c++;
         } // end j
     } // end i
-    printf("\nGetting UFF atom labels, unique LJ/ES qualified bonds...\n");
+    printf("Getting UFF atom labels...\n");
     
     // get UFF atom labels for all atoms
     for (i=0;i<molecule_limit;i++) {
@@ -1283,12 +1282,16 @@ void findBonds(System &system) {
         }
     }
 
+    printf("Removing unphysical H-H bonds...\n");
     check_H_multi_bonds(system); // kill unrealistic H bonds
 
+    printf("Getting unique LJ/ES non-bond interactions...\n");
     // get unique qualified LJ/ES non-bond pairs (beyond 1,3)
     unsigned int mol,qualified, y,z;
     double rlj;
     const double r_c = (system.pbc.cutoff==0) ? 12.0 : (system.pbc.cutoff); // default 12A if non-periodic
+
+    c=0;
     for (mol=0; mol<molecule_limit; mol++) {
         if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
         if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt") continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
@@ -1331,6 +1334,7 @@ void findBonds(System &system) {
                 if (rlj > r_c) qualified=0;
 
                 if (qualified) {
+                    c++;
                     Constants::UniqueLJNonBond tmp;
                     tmp.mol = mol; tmp.atom1=i; tmp.atom2=j;
                     tmp.sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
@@ -1347,6 +1351,37 @@ void findBonds(System &system) {
         } // end atom loop i
     } // end molecule loop mol
 
+    printf("Getting impropers...\n");
+    for (mol=0; mol<molecule_limit; mol++) {
+        if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
+        if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt") continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
+        for (i=0; i<system.molecules[mol].atoms.size(); i++) {
+            if ((int)system.molecules[mol].atoms[i].bonds.size() == 3) {
+               
+                string ele = convertElement(system, system.molecules[mol].atoms[i].name).c_str();
+                if (ele == "C" || ele == "N" || ele == "P" || ele == "As" || ele == "Sb" || ele == "Bi") {
+                    //if (ele == "C" && ( system.molecules[mol].atoms[i].UFFlabel.c_str() != "C_2" && system.molecules[mol].atoms[i].UFFlabel.c_str() != "C_R")) continue; // skip C if not C_R or C_2 
+                    //printf(" %s <-- uff\n", system.molecules[mol].atoms[i].UFFlabel.c_str());
+                    if (ele != "C" || (system.molecules[mol].atoms[i].UFFlabel == "C_R" || system.molecules[mol].atoms[i].UFFlabel == "C_2")) {
+                    Constants::UniqueImproper tmp;
+                    tmp.mol = mol;
+                    tmp.atom1 = i; 
+                    tmp.atom2 = system.molecules[mol].atoms[i].bonds[0];
+                    tmp.atom3 = system.molecules[mol].atoms[i].bonds[1];
+                    tmp.atom4 = system.molecules[mol].atoms[i].bonds[2];
+                    tmp.C0 = 1; tmp.C1 = -1; tmp.C2 = 0;
+                    tmp.k_ijkl = 6.0; // kcal/mol default for C
+
+                    tmp.value = 0;
+
+                    system.constants.uniqueImpropers.push_back(tmp);
+                    }
+                }
+            }
+        } 
+    } // end mol
+
+    printf("Done obtaining bond/non-bond parameters via UFF/UFF4MOF.\n\n");
 }
 
 

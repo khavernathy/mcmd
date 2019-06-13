@@ -355,6 +355,12 @@ class Constants {
             double phi_ijkl, vjk, n;
         };
         vector<UniqueDihedral> uniqueDihedrals; // holds all unique 4-atom dihedrals.
+        struct UniqueImproper {
+            int mol, atom1, atom2, atom3, atom4;
+            double C0, C1, C2, k_ijkl, value; 
+        };
+        vector <UniqueImproper> uniqueImpropers;
+
         struct UniqueLJNonBond {
             int mol, atom1, atom2;
             double sig, eps;

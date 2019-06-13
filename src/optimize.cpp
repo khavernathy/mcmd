@@ -115,6 +115,31 @@ void printBondParameters(System &system) {
           value*180./M_PI, phi_ijkl);
   }
 
+  // and Impropers
+  printf("================================================================================\n");
+  printf("Dynamically-found Impropers Summary:\n");
+  printf("================================================================================\n");
+  printf("improper-id :: mol-id :: atom1 :: atom2 :: atom3 :: atom4 ::       elements      :: angle \n");
+  for (int n=0; n<system.constants.uniqueImpropers.size();n++) {
+      int mol = system.constants.uniqueImpropers[n].mol;
+      int atom1 = system.constants.uniqueImpropers[n].atom1;
+      int atom2 = system.constants.uniqueImpropers[n].atom2;
+      int atom3 = system.constants.uniqueImpropers[n].atom3;
+      int atom4 = system.constants.uniqueImpropers[n].atom4;
+      double value = system.constants.uniqueImpropers[n].value;
+      printf("%11i :: %6i :: %5i :: %5i :: %5i :: %5i :: %4s%1s%4s%1s%4s%1s%4s :: %3.5f \n", n,
+          mol, atom1,atom2,atom3,atom4,
+          system.molecules[mol].atoms[atom1].name.c_str(),
+          "-",
+          system.molecules[mol].atoms[atom2].name.c_str(),
+          "-",
+          system.molecules[mol].atoms[atom3].name.c_str(),
+          "-",
+          system.molecules[mol].atoms[atom4].name.c_str(),
+          value*180./M_PI);
+  }
+
+
   printf("================================================================================\n");
   printf("Dynamically-found UFF atom-types:\n");
   printf("================================================================================\n");
@@ -133,6 +158,7 @@ void printBondParameters(System &system) {
   }
   printf("================================================================================\n");
 
+  printf("There are:\n %i atoms\n %i bonds\n %i angles\n %i dihedrals\n %i impropers\n %i LJ/ES qualified pairs.\n\n", system.constants.total_atoms, system.constants.uniqueBonds.size(), system.constants.uniqueAngles.size(), system.constants.uniqueDihedrals.size(), system.constants.uniqueImpropers.size(), system.constants.uniqueLJNonBonds.size());
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
