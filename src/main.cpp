@@ -180,9 +180,12 @@ int main(int argc, char **argv) {
         scaleCharges(system);
 
     moleculePrintout(system); // this will confirm the sorbate to the user in the output. Also checks for system.constants.model_name and overrides the prototype sorbate accordingly.
-    if (system.constants.write_lammps)
+    if (system.constants.write_lammps) {
+        findBonds(system);
+        setBondingParameters(system);
+        printBondParameters(system);
         writeLAMMPSfiles(system);
-
+    }
 
     if (system.constants.crystalbuild) {
         setupCrystalBuild(system);
@@ -441,9 +444,11 @@ int main(int argc, char **argv) {
             calculateNH_Q(system); // Q param for Nose Hoover thermostat
 
         if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
-          findBonds(system);
-          setBondingParameters(system);
-          printBondParameters(system);
+          if (!system.constants.write_lammps) {
+            findBonds(system);
+            setBondingParameters(system);
+            printBondParameters(system);
+          }
         }
 
 	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
@@ -569,8 +574,10 @@ int main(int argc, char **argv) {
             system.constants.all_pbc=0; // force no PBC if no box given
             system.pbc.cutoff = 25.0; // default cutoff
         }
-        findBonds(system);
-        setBondingParameters(system);
+        if (!system.constants.write_lammps) {
+            findBonds(system);
+            setBondingParameters(system);
+        }
         optimize(system);
     } // end optimization mode
 

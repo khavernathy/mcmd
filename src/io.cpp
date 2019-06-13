@@ -813,7 +813,17 @@ void writeLAMMPSfiles(System &system) {
     FILE *f2 = fopen("lammps.data", "w");  //FILE*
     fprintf(f2, "%s\n\n", system.constants.jobname.c_str());
     fprintf(f2, "%i atoms\n", system.constants.total_atoms);
-    fprintf(f2, "%i atom types\n\n", (int)atomlabels.size());
+    fprintf(f2, "%i bonds\n", system.constants.uniqueBonds.size());
+    fprintf(f2, "%i angles\n", system.constants.uniqueAngles.size());
+    fprintf(f2, "%i dihedrals\n", system.constants.uniqueDihedrals.size());
+    fprintf(f2, "%i impropers\n\n", system.constants.uniqueImpropers.size());
+    
+    fprintf(f2, "%i atom types\n", (int)atomlabels.size());
+    fprintf(f2, "%i bond types\n", system.constants.uniqueBonds.size());
+    fprintf(f2, "%i angle types\n", system.constants.uniqueAngles.size());
+    fprintf(f2, "%i dihedral types\n", system.constants.uniqueDihedrals.size());
+    fprintf(f2, "%i improper types\n\n", system.constants.uniqueImpropers.size());
+
     // we'll use the box vertices calculed in MCMD to get hi and lo params for the LAMMPS box.
     //double xlo=1e40, xhi=-1e40, ylo=1e40, yhi=-1e40, zlo=1e40, zhi=-1e40; // big numbers to start
     /*
@@ -878,6 +888,46 @@ void writeLAMMPSfiles(System &system) {
         } // end j atoms in mol
     } // end i molecules loop
 
+    if (system.constants.uniqueBonds.size() > 0) {
+        fprintf(f2, "\nBonds\n\n");
+        for (int z=0; z< system.constants.uniqueBonds.size(); z++) {
+            int i = system.constants.uniqueBonds[z].atom1 + 1;
+            int j = system.constants.uniqueBonds[z].atom2 + 1;
+            fprintf(f2, "%i %i %i %i\n", z+1, z+1, i, j);
+        }
+    }
+
+    if (system.constants.uniqueAngles.size() > 0) {
+        fprintf(f2, "\nAngles\n\n");
+        for (int z=0; z<system.constants.uniqueAngles.size(); z++) {
+            int i = system.constants.uniqueAngles[z].atom1 + 1;
+            int j = system.constants.uniqueAngles[z].atom2 + 1;
+            int k = system.constants.uniqueAngles[z].atom3 + 1;
+            fprintf(f2, "%i %i %i %i %i\n", z+1, z+1, i, j, k );
+        }
+    }
+
+    if (system.constants.uniqueDihedrals.size() > 0) {
+        fprintf(f2, "\nDihedrals\n\n");
+        for (int z=0; z<system.constants.uniqueDihedrals.size(); z++) {
+            int i = system.constants.uniqueDihedrals[z].atom1 + 1;
+            int j = system.constants.uniqueDihedrals[z].atom2 + 1;
+            int k = system.constants.uniqueDihedrals[z].atom3 + 1;
+            int l = system.constants.uniqueDihedrals[z].atom4 + 1;
+            fprintf(f2, "%i %i %i %i %i %i\n", z+1, z+1, i,j,k,l);
+        }
+    }
+
+    if (system.constants.uniqueImpropers.size() > 0) {
+        fprintf(f2, "\nImpropers\n\n");
+        for (int z=0; z<system.constants.uniqueImpropers.size();z++) {
+            int i = system.constants.uniqueImpropers[z].atom1 + 1;
+            int j = system.constants.uniqueImpropers[z].atom2 + 1;
+            int k = system.constants.uniqueImpropers[z].atom3 + 1;
+            int l = system.constants.uniqueImpropers[z].atom4 + 1;
+            fprintf(f2, "%i %i %i %i %i %i\n", z+1, z+1, i,j,k,l);
+        }
+    }
 
     fclose(f2);
 

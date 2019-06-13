@@ -1163,7 +1163,7 @@ void findBonds(System &system) {
 
     unsigned int c=1;
     for (i=0; i<molecule_limit; i++) {
-        if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue;
+        if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen && !system.constants.write_lammps) continue;
         for (j=0; j<system.molecules[i].atoms.size(); j++) {
             local_bonds = 0;
             // for each atom, we find its bonded neighbors by a distance search
@@ -1274,7 +1274,7 @@ void findBonds(System &system) {
     
     // get UFF atom labels for all atoms
     for (i=0;i<molecule_limit;i++) {
-        if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen) continue;
+        if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen && !system.constants.write_lammps) continue;
         for (j=0;j<system.molecules[i].atoms.size();j++) {
             // based on the total number of bonds to this atom,
             // determine the atom-type from UFF.
@@ -1294,7 +1294,7 @@ void findBonds(System &system) {
     c=0;
     for (mol=0; mol<molecule_limit; mol++) {
         if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
-        if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt") continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
+        if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt" && !system.constants.write_lammps) continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
         // all pairs inside the molecule
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
@@ -1354,7 +1354,7 @@ void findBonds(System &system) {
     printf("Getting impropers...\n");
     for (mol=0; mol<molecule_limit; mol++) {
         if (system.constants.mode == "md" && system.constants.md_mode == MD_MOLECULAR && !system.molecules[mol].frozen) continue; // skip rigid-rotating movable molecules
-        if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt") continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
+        if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt" && !system.constants.write_lammps) continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             if ((int)system.molecules[mol].atoms[i].bonds.size() == 3) {
                
