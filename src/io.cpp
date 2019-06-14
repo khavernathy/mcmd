@@ -813,16 +813,16 @@ void writeLAMMPSfiles(System &system) {
     FILE *f2 = fopen("lammps.data", "w");  //FILE*
     fprintf(f2, "%s\n\n", system.constants.jobname.c_str());
     fprintf(f2, "%i atoms\n", system.constants.total_atoms);
-    fprintf(f2, "%i bonds\n", system.constants.uniqueBonds.size());
-    fprintf(f2, "%i angles\n", system.constants.uniqueAngles.size());
-    fprintf(f2, "%i dihedrals\n", system.constants.uniqueDihedrals.size());
-    fprintf(f2, "%i impropers\n\n", system.constants.uniqueImpropers.size());
+    fprintf(f2, "%i bonds\n", (int)system.constants.uniqueBonds.size());
+    fprintf(f2, "%i angles\n", (int)system.constants.uniqueAngles.size());
+    fprintf(f2, "%i dihedrals\n", (int)system.constants.uniqueDihedrals.size());
+    fprintf(f2, "%i impropers\n\n", (int)system.constants.uniqueImpropers.size());
     
     fprintf(f2, "%i atom types\n", (int)atomlabels.size());
-    fprintf(f2, "%i bond types\n", system.constants.uniqueBonds.size());
-    fprintf(f2, "%i angle types\n", system.constants.uniqueAngles.size());
-    fprintf(f2, "%i dihedral types\n", system.constants.uniqueDihedrals.size());
-    fprintf(f2, "%i improper types\n\n", system.constants.uniqueImpropers.size());
+    fprintf(f2, "%i bond types\n", (int)system.constants.uniqueBonds.size());
+    fprintf(f2, "%i angle types\n", (int)system.constants.uniqueAngles.size());
+    fprintf(f2, "%i dihedral types\n", (int)system.constants.uniqueDihedrals.size());
+    fprintf(f2, "%i improper types\n\n", (int)system.constants.uniqueImpropers.size());
 
     // we'll use the box vertices calculed in MCMD to get hi and lo params for the LAMMPS box.
     //double xlo=1e40, xhi=-1e40, ylo=1e40, yhi=-1e40, zlo=1e40, zhi=-1e40; // big numbers to start

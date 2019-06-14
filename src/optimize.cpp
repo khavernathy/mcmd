@@ -158,7 +158,7 @@ void printBondParameters(System &system) {
   }
   printf("================================================================================\n");
 
-  printf("There are:\n %i atoms\n %i bonds\n %i angles\n %i dihedrals\n %i impropers\n %i LJ/ES qualified pairs.\n\n", system.constants.total_atoms, system.constants.uniqueBonds.size(), system.constants.uniqueAngles.size(), system.constants.uniqueDihedrals.size(), system.constants.uniqueImpropers.size(), system.constants.uniqueLJNonBonds.size());
+  printf("There are:\n %i atoms\n %i bonds\n %i angles\n %i dihedrals\n %i impropers\n %i LJ/ES qualified pairs.\n\n", system.constants.total_atoms, (int)system.constants.uniqueBonds.size(), (int)system.constants.uniqueAngles.size(), (int)system.constants.uniqueDihedrals.size(), (int)system.constants.uniqueImpropers.size(), (int)system.constants.uniqueLJNonBonds.size());
 }
 
 // Optimize the molecule (ID=0) via MM forcefield(s)
