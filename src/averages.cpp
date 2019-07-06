@@ -378,7 +378,6 @@ void computeAveragesMDuVT(System &system) {
         system.stats.volume.calcNewStats();
 
 	// DENSITY
-    printf("density\n");
     for (i=0; i<system.proto.size(); i++) {
 	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
         system.stats.density[i].calcNewStats();
