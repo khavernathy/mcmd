@@ -378,8 +378,9 @@ void computeAveragesMDuVT(System &system) {
         system.stats.volume.calcNewStats();
 
 	// DENSITY
+    printf("density\n");
     for (i=0; i<system.proto.size(); i++) {
-	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24); // that's mass in g /mL
+	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
         system.stats.density[i].calcNewStats();
     }
 
@@ -507,17 +508,14 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     } // end if > 0 movers
     // flexible "frozen" MOF
     if (system.constants.flexible_frozen) {
-       // printf("hi\n");
       // ASSUME ONLY 1 FROZEN MOLECULE with ID 0
       double vsq_tmp = 0;
       for (j=0;j<system.molecules[0].atoms.size();j++) {
         vsq_tmp = 0;
         for (n=0;n<3;n++) vsq_tmp += system.molecules[0].atoms[j].vel[n] * system.molecules[0].atoms[j].vel[n];
-    //    printf("atom %i : vsq = %f m = %e\n", j, vsq_tmp, system.molecules[0].atoms[j].m);
         energy_holder = 0.5*system.molecules[0].atoms[j].mass*system.constants.amu2kg * vsq_tmp;
         K_total += energy_holder;
         Klin += energy_holder;
-     //   printf("K tot = %e klin = %e \n", K_total,Klin);
       }
     } // end if flexible frozen.
 
@@ -530,7 +528,6 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
 
 
     // fix units
-    //printf("k total = %f\n",K_total);
     K_total = K_total/system.constants.kb * 1e10; // convert to K
     system.stats.kinetic.value = K_total;
     system.stats.kinetic.calcNewStats();
@@ -584,7 +581,6 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
     if (T>0) {
         tmp = -(K_total+V_total)/T; // K/K = unitless
         if (tmp < 10) system.stats.Q.value += exp(tmp);
-        //printf("Q += exp(-(%f+%f)/%f) = %e\n", K_total,V_total,T,exp(-(K_total+V_total)/T));
     }
 
     // PRESSURE (my pathetic nRT/V method)
