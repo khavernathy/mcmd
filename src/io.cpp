@@ -748,6 +748,35 @@ void writeLAMMPSfiles(System &system) {
         fprintf(f, "pair_coeff %i %i %.6f %.6f %.6f\n", x+1, x+1, eps, sig, sigcut);
     } // end unique atom (atom type) loop
 
+    fprintf(f, "\nbond_style morse");
+    fprintf(f, "\nangle_style fourier");
+    fprintf(f, "\ndihedral_style fourier");
+    fprintf(f, "\n#improper_style cvff\n");
+    for (int i=0; i < (int)system.constants.uniqueBonds.size(); i++) {
+        fprintf(f, "bond_coeff %i %f %f %f\n", i+1, system.constants.uniqueBonds[i].Dij, system.constants.uniqueBonds[i].alpha, system.constants.uniqueBonds[i].rij );
+    }
+    for (int it=0; it< (int)system.constants.uniqueAngles.size(); it++) {
+        int i = system.constants.uniqueAngles[it].mol;
+        int j = system.constants.uniqueAngles[it].atom1;
+        int l = system.constants.uniqueAngles[it].atom2;
+        int m = system.constants.uniqueAngles[it].atom3;
+        double rij = system.constants.uniqueAngles[it].rij; // in Angstroms
+        double rjk = system.constants.uniqueAngles[it].rjk;
+        double t1 = system.constants.uniqueAngles[it].t1;
+        double t2 = system.constants.uniqueAngles[it].t2;
+        double t3 = system.constants.uniqueAngles[it].t3;
+        double C2 = system.constants.uniqueAngles[it].C2; // 1/rad^2
+        double C1 = system.constants.uniqueAngles[it].C1; // 1/rad
+        double C0 = system.constants.uniqueAngles[it].C0; // 1
+        double angle = get_angle(system, i, j, l, m);
+        double rik = get_rik(system, rij, rjk, t3, angle);
+        fprintf(f, "angle_coeff %i %f %f %f %f\n", it+1, get_Kijk(system, rik, t1, t2, t3), C0, C1, C2);
+    }
+    for (int it=0; it<(int)system.constants.uniqueDihedrals.size(); it++) {
+       fprintf(f, "dihedral_coeff %i %i %f %i %f\n", it+1, 1, 0.5*system.constants.uniqueDihedrals[it].vjk, system.constants.uniqueDihedrals[it].n, system.constants.uniqueDihedrals[it].phi_ijkl); 
+    }
+    
+
     fprintf(f, "\n# Apply LB mixing rules.\n");
     fprintf(f, "pair_modify mix arithmetic\n");
 
@@ -778,7 +807,6 @@ void writeLAMMPSfiles(System &system) {
     } // end unique atom names loop
     fprintf(f, "group show type %s\n", showAtoms.c_str());
     fprintf(f, "group hide type %s\n", hideAtoms.c_str());
-
 
     fprintf(f, "\n# exclusions\n");
     fprintf(f, "neigh_modify exclude molecule/intra frozen\n");
