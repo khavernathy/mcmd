@@ -84,6 +84,10 @@ MCMD works out-of-the-box on <br />
 # Visualization
 We recommend Visual Molecular Dynamics (VMD) for data visualization, but the output is compatible with most other software, e.g. Avogadro, Molden, Ovito, etc.<br />
 
+# Cite MCMD
+
+<a href="https://onlinelibrary.wiley.com/doi/full/10.1002/adts.201900113">Franz, D. M. et al. MPMC and MCMD: Free High‐Performance Simulation Software for Atomistic Systems. Adv. Theory Sim., 2019. DOI: 10.1002/adts.201900113</a>
+
 # Publications
 Below is a list of scientific publications/presentations that have been facilitated by this software.
 
@@ -100,6 +104,12 @@ Below is a list of scientific publications/presentations that have been facilita
 6. Franz, D. M.; Djulbegovic, M.; Pham, T.; Space, B. Theoretical study of the effect of halogen substitution in molecular porous materials for CO2 and C2H2 sorption. AIMS Materials Science. 2017.
 
 7. Forrest, K. A.; Franz, D. M.; Pham, T. ; Space, B. Investigating C2H2 sorption in a-[M3(O2CH)6] (M = Mg, Mn) Through Theoretical Studies. Cryst. Growth Des. 2018. DOI: 10.1021/acs.cgd.8b00770
+
+8. Franz, D. M. et al. MPMC and MCMD: Free High‐Performance Simulation Software for Atomistic Systems. Adv. Theory Sim., 2019. DOI: 10.1002/adts.201900113
+
+9. A Microporous Co-MOF for Highly Selective CO2 Sorption in High Loadings Involving Aryl C–H...O=C=O Interactions: Combined Simulation and Breakthrough Studies" ACS Inorganic Chem., 2019. DOI:10.1021/acs.inorgchem.9b01402
+
+10. Mukherjee, S. et al. Trace CO2 Capture by an Ultramicroporous Physisorbent with Low Water Affinity. Science Advances, 2019. DOI: TBD.
 
 <!--
 pending...
