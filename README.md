@@ -22,7 +22,7 @@ Using a terminal,<br />
 `export PATH=$PATH:/path/to/mcmd/`<br />
 
 3. Run: <br />
-`./mcmd mcmd.inp`<br /><br />  
+`mcmd mcmd.inp`<br /><br />  
   
 # Update
 `cd mcmd` <br />
