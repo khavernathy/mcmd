@@ -3,7 +3,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
-#if __CUDA_ARCH__ < 500
+#if __CUDA_ARCH__ < 200
 /* this is an explicit definition for atomicAdd, to be safe */
 __device__ double atomicAdd(double* address, double val)
 {
