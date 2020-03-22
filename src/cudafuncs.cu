@@ -3,6 +3,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
+#if __CUDA_ARCH__ < 500
 /* this is an explicit definition for atomicAdd, to be safe */
 __device__ double atomicAdd(double* address, double val)
 {
@@ -14,7 +15,7 @@ __device__ double atomicAdd(double* address, double val)
   while (assumed != old);
   return __longlong_as_double(old);
 }
-
+#endif
 
 // minimal data to send to GPU. this is all that's needed to calc forces.
 typedef struct atom_t {
