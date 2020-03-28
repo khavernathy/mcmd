@@ -3,9 +3,8 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
-#if __CUDA_ARCH__ < 200
 /* this is an explicit definition for atomicAdd, to be safe */
-__device__ double atomicAdd(double* address, double val)
+__device__ double atomicAdd2(double* address, double val)
 {
  unsigned long long int* address_as_ull = (unsigned long long int*)address;
   unsigned long long int old = *address_as_ull, assumed;
@@ -15,7 +14,6 @@ __device__ double atomicAdd(double* address, double val)
   while (assumed != old);
   return __longlong_as_double(old);
 }
-#endif
 
 // minimal data to send to GPU. this is all that's needed to calc forces.
 typedef struct atom_t {
@@ -109,7 +107,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
         
                 for (n=0;n<3;n++) {
                     holder = 24.0*dimg[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-                    atomicAdd(&(atom_list[j].f[n]), -holder); 
+                    atomicAdd2(&(atom_list[j].f[n]), -holder); 
                     af[n] += holder;      
                 }
             }
@@ -117,7 +115,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
         
         // finally add the accumulated forces (stored on register) to the anchor atom
         for (n=0;n<3;n++)
-            atomicAdd(&(atom_list[i].f[n]), af[n]);
+            atomicAdd2(&(atom_list[i].f[n]), af[n]);
         
         } // end if LJ
         // ==============================================================================
@@ -176,7 +174,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
                 for (n=0;n<3;n++) {
                     holder = -((-2.0*chargeprod*alpha*exp(-alpha*alpha*rsq))/(sqrtPI*rimg) - (chargeprod*erfc(alpha*rimg)/rsq))*u[n];
                     af[n] += holder;
-                    atomicAdd(&(atom_list[j].f[n]), -holder);                
+                    atomicAdd2(&(atom_list[j].f[n]), -holder);                
                 }
             }
             // k-space
@@ -202,7 +200,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
                         sin(k[0]*dimg[0] + k[1]*dimg[1] + k[2]*dimg[2])/k_sq * 2; // times 2 b/c half-Ewald sphere
 
                         af[n] += holder;
-                        atomicAdd(&(atom_list[j].f[n]), -holder);
+                        atomicAdd2(&(atom_list[j].f[n]), -holder);
 
                     } // end for l[2], n
                     } // end for l[1], m
@@ -213,7 +211,7 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
             } // end pair loop j 
 
             // finally add ES contribution to anchor-atom
-            for (n=0;n<3;n++) atomicAdd(&(atom_list[i].f[n]), af[n]);
+            for (n=0;n<3;n++) atomicAdd2(&(atom_list[i].f[n]), af[n]);
         } // end ES component
         // ============================================================
         // Polarization
@@ -323,8 +321,8 @@ void calculateForceKernel(cuda_atom * atom_list, int N, double cutoffD, double *
 
                 // apply Newton for pair.
                 for (n=0;n<3;n++) {
-                    atomicAdd(&(atom_list[i].f[n]), af[n]);
-                    atomicAdd(&(atom_list[j].f[n]), -af[n]);    
+                    atomicAdd2(&(atom_list[i].f[n]), af[n]);
+                    atomicAdd2(&(atom_list[j].f[n]), -af[n]);    
                 }
 
 		    } // end pair loop with atoms j
@@ -382,7 +380,7 @@ void calculateForceNopbcKernel(cuda_atom * atom_list, int N, int pformD) {
         
                     for (n=0;n<3;n++) {
                         holder = 24.0*d[n]*eps*(2*(s6*s6)/(r6*r6*r2) - s6/(r6*r2));
-                        atomicAdd(&(atom_list[j].f[n]), -holder); 
+                        atomicAdd2(&(atom_list[j].f[n]), -holder); 
                         af[n] += holder;      
                     }
                 }
@@ -391,7 +389,7 @@ void calculateForceNopbcKernel(cuda_atom * atom_list, int N, int pformD) {
         
         // finally add the accumulated forces (stored on register) to the anchor atom
         for (n=0;n<3;n++)
-            atomicAdd(&(atom_list[i].f[n]), af[n]);
+            atomicAdd2(&(atom_list[i].f[n]), af[n]);
         
         } // end if LJ
         // ==============================================================================
@@ -417,14 +415,14 @@ void calculateForceNopbcKernel(cuda_atom * atom_list, int N, int pformD) {
                 for (n=0;n<3;n++) {
                     holder = chargeprod/r2 * u[n];
                     af[n] += holder;
-                    atomicAdd(&(atom_list[j].f[n]), -holder);                
+                    atomicAdd2(&(atom_list[j].f[n]), -holder);                
                 }
             }
 
             } // end pair loop j 
 
             // finally add ES contribution to anchor-atom
-            for (n=0;n<3;n++) atomicAdd(&(atom_list[i].f[n]), af[n]);
+            for (n=0;n<3;n++) atomicAdd2(&(atom_list[i].f[n]), af[n]);
         } // end ES component
 
     } // end if i<n (all threads)
