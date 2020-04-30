@@ -88,28 +88,30 @@ We recommend Visual Molecular Dynamics (VMD) for data visualization, but the out
 
 <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/adts.201900113">Franz, D. M. et al. MPMC and MCMD: Free High‐Performance Simulation Software for Atomistic Systems. Adv. Theory Sim., 2019. DOI: 10.1002/adts.201900113</a>
 
-# Publications
+# Selected Publications
 Below is a list of scientific publications/presentations that have been facilitated by this software.
 
-1. Franz, D. M., Forrest, K. A., Pham, T., & Space, B. (2016). Accurate H2 Sorption Modeling in the rht-MOF NOTT-112 Using Explicit Polarization. Crystal Growth & Design, 16(10), 6024-6032.
+1. Mukherjee, S. et al. Trace CO2 Capture by an Ultramicroporous Physisorbent with Low Water Affinity. Science Advances, 2019. DOI:10.1126/sciadv.aax9171
 
-2. Luna, I. B., Franz, D. M. & Space, B. (2017). Theoretical Investigation of Hydrogen Sorption in Metal-organic Framework NOTT-101. 2017 REU-RET Poster Symposium, University of South Florida, Tampa, FL.
+2. Franz, D. M., Forrest, K. A., Pham, T., & Space, B. (2016). Accurate H2 Sorption Modeling in the rht-MOF NOTT-112 Using Explicit Polarization. Crystal Growth & Design, 16(10), 6024-6032. DOI:10.1021/acs.cgd.6b01058
 
-3. Pham, T., Forrest, K. A., Franz, D. M., Guo, Z., Chen, B., & Space, B. (2017). Predictive models of gas sorption in a metal–organic framework with open-metal sites and small pore sizes. Physical Chemistry Chemical Physics, 19(28), 18587-18602.
+3. Mukherjee et al. Halogen‐C2H2 Binding in Ultramicroporous MOFs for Benchmark C2H2/CO2 Separation Selectivity. Chem. Eur. J. 2020. DOI:10.1002/chem.202000008 
 
-4. Pham, T., Forrest, K. A., Franz, D. M., & Space, B. (2017). Experimental and theoretical investigations of the gas adsorption sites in rht-metal-organic frameworks. CrystEngComm, 19, 4646-4665.
+4. Pham, T., Forrest, K. A., Franz, D. M., Guo, Z., Chen, B., & Space, B. (2017). Predictive models of gas sorption in a metal–organic framework with open-metal sites and small pore sizes. Physical Chemistry Chemical Physics, 19(28), 18587-18602. DOI:10.1039/C7CP02767B
 
-5. Franz, D. M.; Dyott, Z.; Forrest, K. A.; Hogan, A.; Pham, T.; Space, B. Simulations of hydrogen, carbon dioxide, and small hydrocarbon sorption in a nitrogen-rich rht-metal–organic framework. Phys. Chem. Chem. Phys. 2017.
+5. Pham, T., Forrest, K. A., Franz, D. M., & Space, B. (2017). Experimental and theoretical investigations of the gas adsorption sites in rht-metal-organic frameworks. CrystEngComm, 19, 4646-4665. DOI:10.1039/C7CE01032J
 
-6. Franz, D. M.; Djulbegovic, M.; Pham, T.; Space, B. Theoretical study of the effect of halogen substitution in molecular porous materials for CO2 and C2H2 sorption. AIMS Materials Science. 2017.
+6. Franz, D. M.; Dyott, Z.; Forrest, K. A.; Hogan, A.; Pham, T.; Space, B. Simulations of hydrogen, carbon dioxide, and small hydrocarbon sorption in a nitrogen-rich rht-metal–organic framework. Phys. Chem. Chem. Phys. 2017. DOI:10.1039/C7CP06885A
 
-7. Forrest, K. A.; Franz, D. M.; Pham, T. ; Space, B. Investigating C2H2 sorption in a-[M3(O2CH)6] (M = Mg, Mn) Through Theoretical Studies. Cryst. Growth Des. 2018. DOI: 10.1021/acs.cgd.8b00770
+7. Franz, D. M.; Djulbegovic, M.; Pham, T.; Space, B. Theoretical study of the effect of halogen substitution in molecular porous materials for CO2 and C2H2 sorption. AIMS Materials Science. 2017. DOI:10.3934/matersci.2018.2.226
 
-8. Franz, D. M. et al. MPMC and MCMD: Free High‐Performance Simulation Software for Atomistic Systems. Adv. Theory Sim., 2019. DOI: 10.1002/adts.201900113
+8. Forrest, K. A.; Franz, D. M.; Pham, T. ; Space, B. Investigating C2H2 sorption in a-[M3(O2CH)6] (M = Mg, Mn) Through Theoretical Studies. Cryst. Growth Des. 2018. DOI:10.1021/acs.cgd.8b00770
 
-9. A Microporous Co-MOF for Highly Selective CO2 Sorption in High Loadings Involving Aryl C–H...O=C=O Interactions: Combined Simulation and Breakthrough Studies" ACS Inorganic Chem., 2019. DOI:10.1021/acs.inorgchem.9b01402
+9. Yu et al. Enhanced Gas Uptake in a Microporous Metal–Organic Framework via a Sorbate Induced-Fit Mechanism. J. Amer. Chem. Soc. 2019. DOI:10.1021/jacs.9b07807
 
-10. Mukherjee, S. et al. Trace CO2 Capture by an Ultramicroporous Physisorbent with Low Water Affinity. Science Advances, 2019. DOI: TBD.
+10. Pal et al. A Microporous Co-MOF for Highly Selective CO2 Sorption in High Loadings Involving Aryl C–H...O=C=O Interactions: Combined Simulation and Breakthrough Studies" ACS Inorganic Chem., 2019. DOI:10.1021/acs.inorgchem.9b01402
+
+
 
 <!--
 pending...
