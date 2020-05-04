@@ -773,7 +773,7 @@ void writeLAMMPSfiles(System &system) {
         fprintf(f, "angle_coeff %i %f %f %f %f\n", it+1, get_Kijk(system, rik, t1, t2, t3), C0, C1, C2);
     }
     for (int it=0; it<(int)system.constants.uniqueDihedrals.size(); it++) {
-       fprintf(f, "dihedral_coeff %i %i %f %i %f\n", it+1, 1, 0.5*system.constants.uniqueDihedrals[it].vjk, system.constants.uniqueDihedrals[it].n, system.constants.uniqueDihedrals[it].phi_ijkl); 
+       fprintf(f, "dihedral_coeff %i %i %f %f %f\n", it+1, 1, 0.5*system.constants.uniqueDihedrals[it].vjk, system.constants.uniqueDihedrals[it].n, system.constants.uniqueDihedrals[it].phi_ijkl); 
     }
     
 
