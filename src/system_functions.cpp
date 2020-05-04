@@ -569,9 +569,9 @@ void moleculePrintout(System &system) {
             // NITRIC OXIDE
             // from Meuwly et al. 2002. https://doi.org/10.1016/S0301-4622(02)00093-5
             else if (sorbmodel == "no_3site") {
-                addAtomToProto(system, i,"N", "NOG", "M", 0.0000, 0.0000, -0.6154, 14.007, -0.250, 0.000, 80.4839, 3.57);
-                addAtomToProto(system, i,"O", "NOG", "M", 0.0000, 0.0000,  0.5356, 15.999, -0.345, 0.000, 100.6049, 3.66);
-                addAtomToProto(system, i,"CoM", "NOG", "M", 0.0001, 0.0017, -0.0309, 0.0000,  0.595, 0.000, 0.00000, 0.000);
+                addAtomToProto(system, i,"N", "NO", "M", 0.0000, 0.0000, -0.6154, 14.007, -0.250, 0.000, 80.4839, 3.57);
+                addAtomToProto(system, i,"O", "NO", "M", 0.0000, 0.0000,  0.5356, 15.999, -0.345, 0.000, 100.6049, 3.66);
+                addAtomToProto(system, i,"CoM", "NO", "M", 0.0001, 0.0017, -0.0309, 0.0000,  0.595, 0.000, 0.00000, 0.000);
                 system.proto[i].name = "NO";
                 system.proto[i].dof = 5;
             }
@@ -579,9 +579,9 @@ void moleculePrintout(System &system) {
             // CARBON MONOXIDE
             // from Straub et al. 1991.  https://doi.org/10.1016/0301-0104(91)87068-7
              else if (sorbmodel == "co_3site") {
-                addAtomToProto(system, i,"C", "COG", "M", -1.8980, -0.2855, 0.0000, 12.011, -0.750, 0.000, 13.1709, 3.830);
-                addAtomToProto(system, i,"O", "COG", "M", -0.7735, -0.1963, 0.0000, 15.999, -0.850, 0.000, 80.0312, 3.120);
-                addAtomToProto(system, i,"CoM", "COG", "M", -1.3488, -0.2402, 0.0000, 0.0000,  1.600, 0.000, 0.00000, 0.000);
+                addAtomToProto(system, i,"C", "CO", "M", -1.8980, -0.2855, 0.0000, 12.011, -0.750, 0.000, 13.1709, 3.830);
+                addAtomToProto(system, i,"O", "CO", "M", -0.7735, -0.1963, 0.0000, 15.999, -0.850, 0.000, 80.0312, 3.120);
+                addAtomToProto(system, i,"CoM", "CO", "M", -1.3488, -0.2402, 0.0000, 0.0000,  1.600, 0.000, 0.00000, 0.000);
                 system.proto[i].name = "CO";
                 system.proto[i].dof = 5;
             }
