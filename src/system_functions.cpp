@@ -667,6 +667,19 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "ETH";
                 system.proto[i].dof = 5;
             }
+            // PROPYNE C3H4 -- Hogan made. See SI of https://doi.org/10.1002/anie.201904312
+            else if (sorbmodel == "c3h4" || sorbmodel == "propyne") {
+                addAtomToProto(system,i,"C","PRO","M",-0.496283, -0.087396, 0.018611, 12.011, 0.27794, 1.28860, 59.44730, 3.37409);
+                addAtomToProto(system,i,"C","PRO","M",-1.688096, -0.299038, 0.060781, 12.011, -0.68447, 1.28860, 59.44730, 3.37409);
+                addAtomToProto(system,i,"C","PRO","M",0.946631, 0.167831, -0.033934, 12.011, -0.46702, 1.28860, 59.44730, 3.37409);
+                double hsig = 2.62802; double heps = 1.68278; double halp = 0.4138;
+                addAtomToProto(system,i,"H","PRO","M", -2.734565, -0.485212, 0.097659, 1.008, 0.38484, halp, heps, hsig);
+                addAtomToProto(system,i,"H","PRO","M",1.457545, -0.349203, 0.780465, 1.008, 0.16274, halp, heps, hsig);
+                addAtomToProto(system,i,"H","PRO","M", 1.150775, 1.236404, 0.055917, 1.008, 0.16290, halp, heps, hsig);
+                addAtomToProto(system,i,"H","PRO","M", 1.363972, -0.183395, -0.979511, 1.008, 0.16307, halp, heps, hsig);
+                system.proto[i].name = "PRO";
+                system.proto[i].dof = 6;
+            }
             // PROPENE C3H6 -- Franz made w copt dft aug-cc-pvtz chelpg charge fit to ESP. 
             else if (sorbmodel == "c3h6" || sorbmodel == "propene" || sorbmodel == "propylene") {
                 addAtomToProto(system,i,"C","PRO","M", -0.316,   1.089,   0.071, 12.01100, -0.63057, 1.288599, 52.837986, 3.430851);
@@ -681,6 +694,24 @@ void moleculePrintout(System &system) {
                 system.proto[i].name = "PRO";
                 system.proto[i].dof = 6;
             }
+            // PROPANE C3H8 -- TraPPE model. http://trappe.oit.umn.edu/ 
+            else if (sorbmodel == "c3h8" || sorbmodel == "propane") {
+                double cmass = 12.011; double hmass = 1.008;
+                addAtomToProto(system,i,"C","PRO","M",0.0, 0.5863, 0.0, cmass, 0.0, 0.0, 46.0, 3.95);
+                addAtomToProto(system,i,"C","PRO","M",-1.2681,   -0.2626, 0.0000, cmass, 0.0, 0.0, 98.0, 3.75);
+                addAtomToProto(system,i,"C","PRO","M",1.2681,    -0.2626, -0.0000, cmass, 0.0, 0.0, 98.0, 3.75);
+                // H are just ghosties for LJ TraPPE C3H8.
+                addAtomToProto(system,i,"H","PRO","M", 0.0000,   1.2449,  0.8760, 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", -0.0003,  1.2453,  -0.8758, 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", -2.1576,  0.3742,  0.0000 , 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", 2.1576,   0.3743,  -0.0000, 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", -1.3271,  -0.9014, 0.8800, 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", -1.3271,  -0.9014, -0.8800, 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", 1.3271,   -0.9014, -0.8800, 1.008, 0.0, 0.0, 0.0, 0.0);
+                addAtomToProto(system,i,"H","PRO","M", 1.3272,   -0.9014, 0.8800, 1.008, 0.0, 0.0, 0.0, 0.0);
+                system.proto[i].name = "PRO";
+                system.proto[i].dof = 6;
+            } 
             // WATER H2O (TIP3P)
             else if (sorbmodel == "h2o" || sorbmodel == "water" || sorbmodel == "tip3p" || sorbmodel == "h2o_tip3p") {
                 addAtomToProto(system,i, "OXY", "H2O", "M", 0.0, 0.0, 0.0, 16.0, -0.834, 0.0, 76.42, 3.151);
