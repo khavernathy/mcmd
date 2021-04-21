@@ -1,3 +1,7 @@
+.idea
+Testing
+build
+CTestTestfile.cmake
 *.obj
 *.i
 #md_test

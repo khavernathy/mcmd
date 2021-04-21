@@ -588,8 +588,6 @@ int main(int argc, char **argv) {
         optimize(system);
     } // end optimization mode
 
-
-
     // Final timing stats.
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     system.constants.time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
