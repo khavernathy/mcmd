@@ -37,10 +37,10 @@ void integrate(System &system) {
     }
     // NVE RK4
     else if (system.constants.ensemble == ENSEMBLE_NVE && system.constants.integrator== INTEGRATOR_RK4) {
-       acceleration_velocity_RK4(system); 
-       position_RK4(system); 
-       doPBCcheck(system);
-       calculateForces(system);
+        acceleration_velocity_RK4(system);
+        position_RK4(system);
+        doPBCcheck(system);
+        calculateForces(system);
     }
 
     /* ------------- NVT --------------- */
@@ -56,14 +56,14 @@ void integrate(System &system) {
     // NVT velocity verlet, nose hoover
     else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER && system.constants.integrator == INTEGRATOR_VV) {
         // https://www2.ph.ed.ac.uk/~dmarendu/MVP/MVP03.pdf
-        position_VV_NH(system); 
+        position_VV_NH(system);
         doPBCcheck(system);
         acceleration_velocity_verlet(system);
         calculateForces(system);
         updateLM(system,0); // first 1/2 step, using v(t)
         updateLM(system,1); // last 1/2 step, using v(t+dt/2)
         velocity_VV_NH_final(system);
-    }     
+    }
     // NVT RK4, andersen
     else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_ANDERSEN && system.constants.integrator == INTEGRATOR_RK4) {
         acceleration_velocity_RK4(system);
@@ -72,7 +72,7 @@ void integrate(System &system) {
         doPBCcheck(system);
         calculateForces(system);
     }
-    // NVT RK4, nose hoover 
+    // NVT RK4, nose hoover
     else if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type == THERMOSTAT_NOSEHOOVER && system.constants.integrator == INTEGRATOR_RK4) {
         acceleration_velocity_RK4(system); // will pick up NH flag in integrator
         calculateNHLM_now(system); // calculate the friction term

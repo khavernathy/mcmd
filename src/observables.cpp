@@ -38,9 +38,9 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
         double v2=0;
         unsigned int dof=0;
         double N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
-        for (unsigned int i=0;i<system.molecules.size();i++) {
+        for (unsigned int i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen && !system.constants.flexible_frozen) continue;
-            for (unsigned int j=0;j<system.molecules[i].atoms.size();j++) {
+            for (unsigned int j=0; j<system.molecules[i].atoms.size(); j++) {
                 v2 = dddotprod(system.molecules[i].atoms[j].vel, system.molecules[i].atoms[j].vel);
                 mv2_sum += system.molecules[i].atoms[j].mass*system.constants.amu2kg*v2;
             }
@@ -71,7 +71,7 @@ double calcTemperature(System &system, int * N_local, double * v2_sum) {
 double calcPressureNVT(System &system) {
     double P=0;
     system.stats.fdotr_sum.value = system.constants.fdotr_sum;
-    system.stats.fdotr_sum.calcNewStats(); 
+    system.stats.fdotr_sum.calcNewStats();
     double V = system.stats.volume.value;
     int N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
     double rho = N/V;
@@ -79,7 +79,7 @@ double calcPressureNVT(System &system) {
 
     P = rho*T + 1./(3.0*V)*system.stats.fdotr_sum.average;  // in K/A^3
     P *= system.constants.KA32ATM; // to atm
-    return P;    
+    return P;
 }
 
 double calcDOF(System &system) {
@@ -87,13 +87,13 @@ double calcDOF(System &system) {
     double dof=0;
     // molecular/rigid
     if (system.constants.md_mode == MD_MOLECULAR) {
-        for (i=0;i<system.molecules.size();i++) {
+        for (i=0; i<system.molecules.size(); i++) {
             if (system.molecules[i].frozen) continue;
             dof += system.molecules[i].dof;
         }
         if (system.constants.ensemble == ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER)
             dof += 1.0;
-    // atomic/flexible
+        // atomic/flexible
     } else {
         double N = (system.constants.flexible_frozen ? system.constants.total_atoms : system.constants.total_atoms - system.stats.count_frozens);
         dof = 3.0*N - 3.0;

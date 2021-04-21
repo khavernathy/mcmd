@@ -24,7 +24,7 @@ double * crossprod( double * a, double * b) {
 // custom erf^-1(x)
 // http://stackoverflow.com/questions/27229371/inverse-error-function-in-c
 double erfInverse(double x) {
-    
+
     double tt1, tt2, lnx, sgn;
     sgn = (x < 0) ? -1.0 : 1.0;
 
@@ -38,9 +38,9 @@ double erfInverse(double x) {
 }
 
 double factorial(double f) {
-	if ( f==0 )
-		return 1.0;
-	return(f * factorial(f - 1));
+    if ( f==0 )
+        return 1.0;
+    return(f * factorial(f - 1));
 }
 
 

@@ -23,10 +23,10 @@ void singlePointEnergy(System &system) {
     double multipole1[3] = {0,0,0}; // dipole moment
     double dipole_magnitude = 0;
     double multipole2[6] = {0,0,0,0,0,0}; // quadrupole moment
-        // 0: xx; 1: yy: 2: zz; 3: xy; 4: xz; 5: yz
+    // 0: xx; 1: yy: 2: zz; 3: xy; 4: xz; 5: yz
     double o[18] = {0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0}; // octapole moment, writing as "o" b/c it's faster.
-        // 0: xxx; 1: xyy; 2: xzz; 3: yxx; 4: yyy; 5: yzz; 6: zxx; 7: zyy; 8: zzz  (trace)
-        // 9: xxy; 10: xxz; 11: xyz; 12: yxy; 13: yxz; 14: yyz; 15: zxy; 16: zxz; 17: zyz
+    // 0: xxx; 1: xyy; 2: xzz; 3: yxx; 4: yyy; 5: yzz; 6: zxx; 7: zyy; 8: zzz  (trace)
+    // 9: xxy; 10: xxz; 11: xyz; 12: yxy; 13: yxz; 14: yyz; 15: zxy; 16: zxz; 17: zyz
 
     printf("Input atoms: %s\n=============================================\n\n", system.constants.atom_file.c_str());
 
@@ -45,15 +45,17 @@ void singlePointEnergy(System &system) {
         comy = system.molecules[0].com[1];
         comz = system.molecules[0].com[2];
 
-        ax = x-comx; ay = y-comy; az=z-comz;
+        ax = x-comx;
+        ay = y-comy;
+        az=z-comz;
         a2 = ax*ax + ay*ay + az*az;
 
-        // dipole 
-        
+        // dipole
+
         multipole1[0] += q*ax;
         multipole1[1] += q*ay;
         multipole1[2] += q*az;
-        /*    
+        /*
         multipole1[0] += q*x;
         multipole1[1] += q*y;
         multipole1[2] += q*z;
@@ -66,9 +68,9 @@ void singlePointEnergy(System &system) {
         multipole2[3] += q*1.5*ax*ay;
         multipole2[4] += q*1.5*ax*az;
         multipole2[5] += q*1.5*ay*az;
-    
+
         // octapole                        d_yz   d_xz   d_xy   // delta f'ns
-        o[0]  += q*(2.5*ax*ax*ax - 0.5*a2*(ax*1 + ax*1 + ax*1)); 
+        o[0]  += q*(2.5*ax*ax*ax - 0.5*a2*(ax*1 + ax*1 + ax*1));
         o[1]  += q*(2.5*ax*ay*ay - 0.5*a2*(ax*1 + ay*0 + ay*0));
         o[2]  += q*(2.5*ax*az*az - 0.5*a2*(ax*1 + az*0 + az*0));
         o[3]  += q*(2.5*ay*ax*ax - 0.5*a2*(ay*1 + ax*0 + ax*0));
@@ -87,7 +89,7 @@ void singlePointEnergy(System &system) {
         o[16] += q*(2.5*az*ax*az - 0.5*a2*(az*0 + ax*1 + az*0));
         o[17] += q*(2.5*az*ay*az - 0.5*a2*(az*0 + ay*1 + az*0));
 
-    }   
+    }
 
     for (n=0; n<3; n++)
         multipole1[n] *= system.constants.eA2D;
@@ -108,7 +110,7 @@ void singlePointEnergy(System &system) {
     printf("Multipole 1 (dipole moment), Debye\n");
     printf("{ %9.5f %9.5f %9.5f   } \n", multipole1[0], multipole1[1], multipole1[2]);
     printf("(dipole magnitude)  = { %9.5f   } \n\n", dipole_magnitude);
-    
+
     printf("Multipole 2 (quadrupole moment), Debye A\n");
     printf("{ %9.5f %9.5f %9.5f   } \n", multipole2[0], multipole2[3], multipole2[4]);
     printf("{ %9.5f %9.5f %9.5f   } \n", multipole2[3], multipole2[1], multipole2[5]);
@@ -128,7 +130,7 @@ void singlePointEnergy(System &system) {
 
     double r, potential=0, sig, eps, sr6;
     double lj=0,es=0;
-    
+
     // Repulsion-Dispersion from long-range (non-bonded)
     // LJ RD
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
@@ -162,7 +164,7 @@ void singlePointEnergy(System &system) {
                 es += chargeprod/r;
             }
         }
-    } 
+    }
 
     // Nuclear repulsions
     double nucrepul=0;
@@ -171,7 +173,7 @@ void singlePointEnergy(System &system) {
         for (j=i+1; j<system.molecules[0].atoms.size(); j++) {
             Zi = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[i].name];
             Zj = system.constants.E2REDUCED*system.constants.elements[system.molecules[0].atoms[j].name];
-            
+
             double* distances = getDistanceXYZ(system,0,i,0,j);
             r = distances[3];
 
@@ -209,7 +211,9 @@ void singlePointEnergy(System &system) {
         }
     }
 
-    double elecrepul=0; double Ni; double Ninteracts;
+    double elecrepul=0;
+    double Ni;
+    double Ninteracts;
     // each atom's electrons repel their local neighbors (on the same atom)
     // THIS ASSUMES NEUTRALITY OF THE MOLECULE
     for (i=0; i<system.molecules[0].atoms.size(); i++) {
@@ -225,19 +229,19 @@ void singlePointEnergy(System &system) {
             double* distances = getDistanceXYZ(system, 0,i,0,j);
             r = distances[3];
             elecrepul += Zi*Zj/r;
-        
+
         }
-    }    
+    }
 
 
     double toh = system.constants.K2Eh;
     potential = lj + es + nucrepul + elec + elecrepul;
-   
-    printf("========================================================================================\n"); 
+
+    printf("========================================================================================\n");
     printf("The below is a very crude, pseudo-quantum mechanical approximation to the molecular energy:\n\n");
-    
+
     printf("LJ RD (>= %f)  = %f Eh;\nES                   = %f Eh\nNuc. Repul.          = %f Eh\nElectronic Disp.     = %f Eh\nElectronic Repul.    = %f Eh\n\n", system.pbc.mincutoff, lj*toh, es*toh, nucrepul*toh, elec*toh, elecrepul*toh);
-    
+
     printf("Total Energy         = %9.5f Eh\n                     = %9.5f K\n                     = %9.5f kJ/mol\n", potential*system.constants.K2Eh, potential, potential*system.constants.K2KJMOL);
 
     return;
