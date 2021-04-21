@@ -60,5 +60,5 @@ endif()
 
 enable_testing()
 add_test(NAME test1 CONFIGURATIONS Release
-        WORKING_DIRECTORY examples/optimization/RuBpy
+        WORKING_DIRECTORY ../examples/optimization/RuBpy
         COMMAND mcmd mcmd.inp)
