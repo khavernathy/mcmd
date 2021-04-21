@@ -11,12 +11,12 @@
 #include <ctime>
 #include <string>
 #ifdef WINDOWS
-       #include <string.h>
-	#ifndef S_ISDIR
-	#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
-	#endif
+#include <string.h>
+#ifndef S_ISDIR
+#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#endif
 #else
-       #include <strings.h>
+#include <strings.h>
 #endif
 #include <sstream>
 #include <algorithm>
@@ -41,10 +41,10 @@
 // c++ code files of this software
 // ORDER MATTERS HERE !!!!!!!!!!!!!
 #ifdef MPI
-    #include <mpi.h>
+#include <mpi.h>
 #endif
 #ifdef OMP
-    #include "omp.h"
+#include "omp.h"
 #endif
 #include "usefulmath.cpp"
 #include "classes.cpp"
@@ -55,7 +55,7 @@
 #include "bonding.cpp"
 #include "mc.cpp" // this will include potential.cpp, which includes lj, coulombic, polar
 #ifdef CUDA
-    #include "cudafuncs.cu"  // CUDA STUFF
+#include "cudafuncs.cu"  // CUDA STUFF
 #endif
 #include "md_functions.cpp"
 #include "md.cpp"
@@ -72,32 +72,32 @@ using namespace std;
 
 int main(int argc, char **argv) {
 
-        /*
-        // MPI is on hold for now.
-        // set the default MPI params
-        int rank=0, size=1;
+    /*
+    // MPI is on hold for now.
+    // set the default MPI params
+    int rank=0, size=1;
 
-       // MPI setup
-        #ifdef MPI
-         MPI_Init(&argc, &argv);
-         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-         MPI_Comm_size(MPI_COMM_WORLD, &size);
-         char processor_name[MPI_MAX_PROCESSOR_NAME];
-         int name_len;
-         MPI_Get_processor_name(processor_name, &name_len);
-         // Print off a hello world message
-         printf("Hello world from processor %s, rank %d"
-                " out of %d processors\n",
-                processor_name, rank, size);
-        #endif
-         // suffix for filenames for each core running (if MPI)
-         string rankstring = to_string(rank);
-        // suffix is, e.g. -00004 for 5th core; -01000 for 1001st core
-        std::string corenum = std::string(5 - rankstring.length(), '0') + rankstring;
-        char suffix[7] = "-";
-        std::strcat(suffix,corenum.c_str());
-        //printf("suffix: %s\n", suffix);
-         */
+    // MPI setup
+    #ifdef MPI
+     MPI_Init(&argc, &argv);
+     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+     MPI_Comm_size(MPI_COMM_WORLD, &size);
+     char processor_name[MPI_MAX_PROCESSOR_NAME];
+     int name_len;
+     MPI_Get_processor_name(processor_name, &name_len);
+     // Print off a hello world message
+     printf("Hello world from processor %s, rank %d"
+            " out of %d processors\n",
+            processor_name, rank, size);
+    #endif
+     // suffix for filenames for each core running (if MPI)
+     string rankstring = to_string(rank);
+    // suffix is, e.g. -00004 for 5th core; -01000 for 1001st core
+    std::string corenum = std::string(5 - rankstring.length(), '0') + rankstring;
+    char suffix[7] = "-";
+    std::strcat(suffix,corenum.c_str());
+    //printf("suffix: %s\n", suffix);
+     */
 
     //output current date/time
     time_t rawtime;
@@ -119,31 +119,31 @@ int main(int argc, char **argv) {
         string cpucom="cat /proc/cpuinfo  | tail -25 | grep -i 'model name'";
         zzz=std::system(cpucom.c_str());
         zzz=std::system("echo $(mem=$(grep MemTotal /proc/meminfo | awk '{print $2}'); echo $mem | awk {'print $1/1024/1024'})' GB memory available on this node (Linux).'");
-    // mac
+        // mac
     } else {
         string cpumac="sysctl -n machdep.cpu.brand_string";
         zzz=std::system(cpumac.c_str());
         zzz=std::system("echo $(mem=$(sysctl hw.memsize | awk {'print $2'}); echo $mem | awk {'print $1/1024/1024/1024.0'})' GB memory available on this node (Mac).'");
     }
 #else
-	printf("??? GB memory available on this node (Windows).\n");
+    printf("??? GB memory available on this node (Windows).\n");
 #endif
-   	// start timing for checkpoints
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    // start timing for checkpoints
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-  	#ifndef WINDOWS
-		srand48((unsigned)time(NULL)); // initiate drand48 48-bit integer random seed.
-	#else
-		srand((unsigned)time(NULL)); // initiate random seed, old version
-	#endif
-	// disable output buffering (print everything immediately to output)
-	setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.
+#ifndef WINDOWS
+    srand48((unsigned)time(NULL)); // initiate drand48 48-bit integer random seed.
+#else
+    srand((unsigned)time(NULL)); // initiate random seed, old version
+#endif
+    // disable output buffering (print everything immediately to output)
+    setbuf(stdout, NULL); // makes sure runlog output is fluid on SLURM etc.
 
     // SET UP THE SYSTEM
     System system;
-	system.checkpoint("setting up system with main functions...");
+    system.checkpoint("setting up system with main functions...");
     readInput(system, argv[1]); // executable takes the input file as only argument.
-	system.constants.inputfile = argv[1];
+    system.constants.inputfile = argv[1];
     if (system.constants.restart_mode) {
         // restarting an old job. Make a new saved_data folder e.g. "saved_data4" then overwrite the input file.
         int save_folder_number=1;
@@ -166,8 +166,8 @@ int main(int argc, char **argv) {
             if (!system.molecules[i].frozen)
                 system.stats.movids.push_back(i);
     }
-	paramOverrideCheck(system);
-	if (system.constants.autocenter)
+    paramOverrideCheck(system);
+    if (system.constants.autocenter)
         centerCoordinates(system);
     setupBox(system);
     if (system.constants.manual_cutoff) system.pbc.cutoff = system.constants.manual_cutoff_val; // override the cutoff if user-defined.
@@ -229,17 +229,21 @@ int main(int argc, char **argv) {
     for (int i=0; i<system.molecules.size(); i++) {
         system.molecules[i].calc_center_of_mass();
         if (system.molecules[i].atoms.size() > 1) system.molecules[i].calc_inertia();
-        for (int n=0;n<3;n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
+        for (int n=0; n<3; n++) system.molecules[i].original_com[n] = system.molecules[i].com[n]; // save original molecule COMs for diffusion calculation in MD.
     }
 
 
-	// *** clobber files
-	remove( system.constants.output_traj.c_str() ); remove( system.constants.thermo_output.c_str() );
-	remove( system.constants.restart_pdb.c_str() ); remove ( system.constants.output_traj_pdb.c_str() );
-	remove( system.constants.output_histogram.c_str() );
-	remove( system.constants.dipole_output.c_str() ); remove( system.constants.frozen_pdb.c_str() );
+    // *** clobber files
+    remove( system.constants.output_traj.c_str() );
+    remove( system.constants.thermo_output.c_str() );
+    remove( system.constants.restart_pdb.c_str() );
+    remove ( system.constants.output_traj_pdb.c_str() );
+    remove( system.constants.output_histogram.c_str() );
+    remove( system.constants.dipole_output.c_str() );
+    remove( system.constants.frozen_pdb.c_str() );
     remove( system.constants.molec_dipole_output.c_str() );
-    remove( system.constants.restart_mov_pdb.c_str() ); remove( system.constants.output_traj_movers_pdb.c_str() );
+    remove( system.constants.restart_mov_pdb.c_str() );
+    remove( system.constants.output_traj_movers_pdb.c_str() );
     // *** done clobbering files.
 
     // INITIAL WRITEOUTS
@@ -259,9 +263,9 @@ int main(int argc, char **argv) {
             fclose(g);
         }
     }
-		// Prep histogram if needed
-		if (system.constants.histogram_option)
-			system.file_pointers.fp_histogram = fopen(system.constants.output_histogram.c_str(), "w");
+    // Prep histogram if needed
+    if (system.constants.histogram_option)
+        system.file_pointers.fp_histogram = fopen(system.constants.output_histogram.c_str(), "w");
     // frozen .pdb (just the MOF, usually)
     if (system.stats.count_frozens > 0) {
         writePDBfrozens(system, system.constants.frozen_pdb.c_str());
@@ -272,8 +276,8 @@ int main(int argc, char **argv) {
 
     // RESIZE A MATRIX IF POLAR IS ACTIVE (and initialize the dipole file)
     if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR || system.constants.potential_form == POTENTIAL_COMMYESPOLAR) {
-		FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
-		fclose(fp);
+        FILE * fp = fopen(system.constants.dipole_output.c_str(), "w");
+        fclose(fp);
 
         FILE * fp2 = fopen(system.constants.molec_dipole_output.c_str(), "w");
         fclose(fp2);
@@ -293,17 +297,17 @@ int main(int argc, char **argv) {
                 if (inc%3==0) blocksize+=3;
             }
             memreqA = (double)sizeof(double)*((N*N - N)/2.0)/(double)1e6;
-        // full matrix
+            // full matrix
         } else {
             system.constants.A_matrix_full = (double **) calloc(N, sizeof(double*));
-            for (int i=0;i<N;i++) {
+            for (int i=0; i<N; i++) {
                 system.constants.A_matrix_full[i] = (double *) malloc(N * sizeof(double));
             }
             memreqA = (double)sizeof(double)* ( N*N )/(double)1e6;
         }
         printf("The polarization Thole A-Matrix will require %.2f MB = %.4f GB.\n", memreqA, memreqA/1000.);
 
-}
+    }
 
     // SET UP Ewald k-space if needed
     if (system.constants.mode == "md" && (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJES || system.constants.potential_form == POTENTIAL_COMMYES || system.constants.potential_form == POTENTIAL_COMMYESPOLAR)) {
@@ -328,231 +332,234 @@ int main(int argc, char **argv) {
     updateMolecularDOFs(system); // input molecules are defaulted to DOF=3 but may need update
     calcDOF(system); // used only for NVT Nose-Hoover thermostat (other functions calculate it on-the-fly)
 
-    #ifdef OMP
-        if (system.constants.openmp_threads > 0)
-            printf("Running MCMD with OpenMP using %i threads.\n", system.constants.openmp_threads);
-    #endif
-    
+#ifdef OMP
+    if (system.constants.openmp_threads > 0)
+        printf("Running MCMD with OpenMP using %i threads.\n", system.constants.openmp_threads);
+#endif
+
 
     // BEGIN MC OR MD ===========================================================
-	// =========================== MONTE CARLO ===================================
-	if (system.constants.mode == "mc") {
-	printf("\n| ================================== |\n");
-	printf("|  BEGINNING MONTE CARLO SIMULATION  |\n");
-	printf("| ================================== |\n\n");
+    // =========================== MONTE CARLO ===================================
+    if (system.constants.mode == "mc") {
+        printf("\n| ================================== |\n");
+        printf("|  BEGINNING MONTE CARLO SIMULATION  |\n");
+        printf("| ================================== |\n\n");
 
-    //outputCorrtime(system, 0); // do initial output before starting mc
-    system.constants.frame = 1;
-    int stepsize = system.constants.stepsize;
-    long int finalstep = system.constants.finalstep;
-    int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
+        //outputCorrtime(system, 0); // do initial output before starting mc
+        system.constants.frame = 1;
+        int stepsize = system.constants.stepsize;
+        long int finalstep = system.constants.finalstep;
+        int corrtime = system.constants.mc_corrtime; // print output every corrtime steps
 
-    // begin timing for steps "begin_steps"
-	system.constants.begin_steps = std::chrono::steady_clock::now();
+        // begin timing for steps "begin_steps"
+        system.constants.begin_steps = std::chrono::steady_clock::now();
 
-	// MAIN MC STEP LOOP
-	int corrtime_iter=1;
-	for (int t=0; t <= (finalstep-system.constants.step_offset); t+=stepsize) { // 0 is initial step
-		system.checkpoint("New MC step starting."); //printf("Step %i\n",t);
-        system.stats.MCstep = t;
-        system.stats.MCcorrtime_iter = corrtime_iter;
+        // MAIN MC STEP LOOP
+        int corrtime_iter=1;
+        for (int t=0; t <= (finalstep-system.constants.step_offset); t+=stepsize) { // 0 is initial step
+            system.checkpoint("New MC step starting."); //printf("Step %i\n",t);
+            system.stats.MCstep = t;
+            system.stats.MCcorrtime_iter = corrtime_iter;
 
-				// DO MC STEP
-                if (t!=0) {
-                    setCheckpoint(system); // save all the relevant values in case we need to revert something.
-                    //make_pairs(system); // establish pair quantities
-                    //computeDistances(system);
-                    runMonteCarloStep(system);
-                    system.checkpoint("...finished runMonteCarloStep");
+            // DO MC STEP
+            if (t!=0) {
+                setCheckpoint(system); // save all the relevant values in case we need to revert something.
+                //make_pairs(system); // establish pair quantities
+                //computeDistances(system);
+                runMonteCarloStep(system);
+                system.checkpoint("...finished runMonteCarloStep");
 
-                    if (system.stats.MCmoveAccepted == false)
-                        revertToCheckpoint(system);
-                    else if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
-                        system.constants.temp =
-                            system.constants.sa_target +
-                            (system.constants.temp - system.constants.sa_target) *
-                            system.constants.sa_schedule;
-                    }
-
-                    //computeAverages(system);
-                } else {
-                    computeInitialValues(system);
+                if (system.stats.MCmoveAccepted == false)
+                    revertToCheckpoint(system);
+                else if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
+                    system.constants.temp =
+                        system.constants.sa_target +
+                        (system.constants.temp - system.constants.sa_target) *
+                        system.constants.sa_schedule;
                 }
 
-        // CHECK FOR CORRTIME
-        if (t==0 || t % corrtime == 0 || t == finalstep) { /// output every x steps
-
-			// get all observable averages
-            if (t>0 || (t==0 && system.stats.count_movables>0)) computeAverages(system);
-
-			// prep histogram for writing.
-			if (system.constants.histogram_option) {
-			    zero_grid(system.grids.histogram->grid,system);
-                population_histogram(system);
-                if (t != 0) update_root_histogram(system);
+                //computeAverages(system);
+            } else {
+                computeInitialValues(system);
             }
-            /* -------------------------------- */
-			// [[[[ PRINT OUTPUT VALUES ]]]]
-			/* -------------------------------- */
-            mc_main_output(system);
-                    
-            // count the corrtime occurences.
-            corrtime_iter++;
 
-		} // END IF CORRTIME
-	} // END MC STEPS LOOP.
+            // CHECK FOR CORRTIME
+            if (t==0 || t % corrtime == 0 || t == finalstep) { /// output every x steps
 
-	// FINAL EXIT OUTPUT
-    if (system.constants.ensemble == ENSEMBLE_NPT) {
-	    printf("Final basis parameters: \n");
-        system.pbc.printBasis();
-    }
-	printf("Insert accepts:        %i\n", system.stats.insert_accepts);
-	printf("Remove accepts:        %i\n", system.stats.remove_accepts);
-	printf("Displace accepts:      %i\n", system.stats.displace_accepts);
-	printf("Volume change accepts: %i\n", system.stats.volume_change_accepts);
-    printf("Auto-rejects (r <= %.5f A): %i\n", system.constants.auto_reject_r, system.constants.rejects);
-    if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
-        printf("Freeing data structures... ");
-        // 1/2 matrix
-        if (!system.constants.full_A_matrix_option) {
-            for (int i=0; i< 3* system.constants.total_atoms; i++) {
-                free(system.constants.A_matrix[i]);
-            }
-            free(system.constants.A_matrix); system.constants.A_matrix = NULL;
-        // full matrix
-        } else {
-            for (int i=0; i<3*system.constants.total_atoms; i++) {
-                free(system.constants.A_matrix_full[i]);
-            }
-            free(system.constants.A_matrix_full); system.constants.A_matrix_full = NULL;
+                // get all observable averages
+                if (t>0 || (t==0 && system.stats.count_movables>0)) computeAverages(system);
+
+                // prep histogram for writing.
+                if (system.constants.histogram_option) {
+                    zero_grid(system.grids.histogram->grid,system);
+                    population_histogram(system);
+                    if (t != 0) update_root_histogram(system);
+                }
+                /* -------------------------------- */
+                // [[[[ PRINT OUTPUT VALUES ]]]]
+                /* -------------------------------- */
+                mc_main_output(system);
+
+                // count the corrtime occurences.
+                corrtime_iter++;
+
+            } // END IF CORRTIME
+        } // END MC STEPS LOOP.
+
+        // FINAL EXIT OUTPUT
+        if (system.constants.ensemble == ENSEMBLE_NPT) {
+            printf("Final basis parameters: \n");
+            system.pbc.printBasis();
         }
+        printf("Insert accepts:        %i\n", system.stats.insert_accepts);
+        printf("Remove accepts:        %i\n", system.stats.remove_accepts);
+        printf("Displace accepts:      %i\n", system.stats.displace_accepts);
+        printf("Volume change accepts: %i\n", system.stats.volume_change_accepts);
+        printf("Auto-rejects (r <= %.5f A): %i\n", system.constants.auto_reject_r, system.constants.rejects);
+        if (system.constants.potential_form == POTENTIAL_LJESPOLAR || system.constants.potential_form == POTENTIAL_LJPOLAR) {
+            printf("Freeing data structures... ");
+            // 1/2 matrix
+            if (!system.constants.full_A_matrix_option) {
+                for (int i=0; i< 3* system.constants.total_atoms; i++) {
+                    free(system.constants.A_matrix[i]);
+                }
+                free(system.constants.A_matrix);
+                system.constants.A_matrix = NULL;
+                // full matrix
+            } else {
+                for (int i=0; i<3*system.constants.total_atoms; i++) {
+                    free(system.constants.A_matrix_full[i]);
+                }
+                free(system.constants.A_matrix_full);
+                system.constants.A_matrix_full = NULL;
+            }
+        }
+        printf("done.\n");
+        printf("MC steps completed. Exiting program.\n");
+        std::exit(0);
     }
-    printf("done.\n");
-	printf("MC steps completed. Exiting program.\n"); std::exit(0);
-	}
-	// ===================== END MONTE CARLO ================================================
+    // ===================== END MONTE CARLO ================================================
 
 
 
-	// ===================== MOLECULAR DYNAMICS ==============================================
-	else if (system.constants.mode == "md") {
+    // ===================== MOLECULAR DYNAMICS ==============================================
+    else if (system.constants.mode == "md") {
 
-        system.constants.frame = 1; 
+        system.constants.frame = 1;
         initialVelMD(system, 1);
         if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER && system.constants.user_Q==0)
             calculateNH_Q(system); // Q param for Nose Hoover thermostat
 
         if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
-          if (!system.constants.write_lammps) {
-            findBonds(system);
-            setBondingParameters(system);
-            printBondParameters(system);
-          }
+            if (!system.constants.write_lammps) {
+                findBonds(system);
+                setBondingParameters(system);
+                printBondParameters(system);
+            }
         }
 
-	double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
-	double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
-	double thing = floor(tf/dt);
-    long int total_steps = (long int)thing;
-	int count_md_steps = 0;
-    int i,j,n;
+        double dt = system.constants.md_dt; // * 1e-15; //0.1e-15; // 1e-15 is one femptosecond.
+        double tf = system.constants.md_ft; // * 1e-15; //100e-15; // 100,000e-15 would be 1e-9 seconds, or 1 nanosecond.
+        double thing = floor(tf/dt);
+        long int total_steps = (long int)thing;
+        int count_md_steps = 0;
+        int i,j,n;
         printf("\n| ========================================= |\n");
         printf("|  BEGINNING MOLECULAR DYNAMICS SIMULATION  |\n");
         printf("| ========================================= |\n\n");
 
-	// begin timing for steps
-	system.constants.begin_steps = std::chrono::steady_clock::now();
+        // begin timing for steps
+        system.constants.begin_steps = std::chrono::steady_clock::now();
 
-    system.checkpoint("Computing initial values for MD.");
-    computeInitialValues(system);
-    // Main MD time loop
-	for (double t=0; t <= tf; t=t+dt) {
-        system.checkpoint("Started timestep.");
-        system.stats.MDtime = t;
-        system.stats.MDstep = count_md_steps;
+        system.checkpoint("Computing initial values for MD.");
+        computeInitialValues(system);
+        // Main MD time loop
+        for (double t=0; t <= tf; t=t+dt) {
+            system.checkpoint("Started timestep.");
+            system.stats.MDtime = t;
+            system.stats.MDstep = count_md_steps;
 
-        // MD integration. the workload is here. First step is unique. Just get F
-        if (t==0) {
-            system.checkpoint("t=0; calculating forces.");
-            calculateForces(system);
-            if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER) {
-                calculateNHLM_now(system); // get Lagrange multiplier for initial state
+            // MD integration. the workload is here. First step is unique. Just get F
+            if (t==0) {
+                system.checkpoint("t=0; calculating forces.");
+                calculateForces(system);
+                if (system.constants.ensemble==ENSEMBLE_NVT && system.constants.thermostat_type==THERMOSTAT_NOSEHOOVER) {
+                    calculateNHLM_now(system); // get Lagrange multiplier for initial state
+                }
+            } else if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
+                integrate(system);
             }
-        } else if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
-            integrate(system);
-        }
 
-        // first step: update VACF original velocities according to step 1 if the orig's were all 0
-        if (t==dt && system.constants.zero_init_vel_flag) {
-            for (i=0;i<system.molecules.size();i++) {
-                for (n=0;n<3;n++) system.molecules[i].original_vel[n] = system.molecules[i].vel[n];
-                for (j=0;j<system.molecules[i].atoms.size();j++) {
-                    for (n=0;n<3;n++) system.molecules[i].atoms[j].original_vel[n] = system.molecules[i].atoms[j].vel[n];
+            // first step: update VACF original velocities according to step 1 if the orig's were all 0
+            if (t==dt && system.constants.zero_init_vel_flag) {
+                for (i=0; i<system.molecules.size(); i++) {
+                    for (n=0; n<3; n++) system.molecules[i].original_vel[n] = system.molecules[i].vel[n];
+                    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                        for (n=0; n<3; n++) system.molecules[i].atoms[j].original_vel[n] = system.molecules[i].atoms[j].vel[n];
+                    }
                 }
             }
-        }
 
-        system.checkpoint("check uVT MD.");
-        if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
-            // try a MC uVT insert/delete
-            getTotalPotential(system); // this is needed on-the-spot because of
-                                       // time-evolution of the system. Otherwise,
-                                       // potential is only re-calculated at corrtime.
-            double ranf2 = getrand(); // 0->1
-            // ADD A MOLECULE
-            if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.
-                system.checkpoint("doing molecule add move.");
-                addMolecule(system);
-                system.checkpoint("done with molecule add move.");
-            } // end add
-            else { // REMOVE MOLECULE
-                system.checkpoint("doing molecule delete move.");
-                removeMolecule(system);
-                system.checkpoint("done with molecule delete move.");
-            } // end add vs. remove
-        }
-
-        if (count_md_steps % system.constants.md_corrtime == 0 || t==0 || t==tf) {  // print every x steps and first and last.
-
-            if (system.constants.ensemble == ENSEMBLE_UVT) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
-            if (system.constants.histogram_option) {
-				zero_grid(system.grids.histogram->grid,system);
-                population_histogram(system);
-                if (t != dt) update_root_histogram(system);
+            system.checkpoint("check uVT MD.");
+            if (system.constants.ensemble == ENSEMBLE_UVT && count_md_steps % system.constants.md_insert_attempt == 0) {
+                // try a MC uVT insert/delete
+                getTotalPotential(system); // this is needed on-the-spot because of
+                // time-evolution of the system. Otherwise,
+                // potential is only re-calculated at corrtime.
+                double ranf2 = getrand(); // 0->1
+                // ADD A MOLECULE
+                if (ranf2 < 0.5 || system.constants.bias_uptake_switcher) { // this will force insertions and never removes if the bias loading is activated.
+                    system.checkpoint("doing molecule add move.");
+                    addMolecule(system);
+                    system.checkpoint("done with molecule add move.");
+                } // end add
+                else { // REMOVE MOLECULE
+                    system.checkpoint("doing molecule delete move.");
+                    removeMolecule(system);
+                    system.checkpoint("done with molecule delete move.");
+                } // end add vs. remove
             }
 
-            if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
+            if (count_md_steps % system.constants.md_corrtime == 0 || t==0 || t==tf) {  // print every x steps and first and last.
 
-                if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
-                    system.constants.temp =
-                        system.constants.sa_target +
-                        (system.constants.temp - system.constants.sa_target) *
-                        system.constants.sa_schedule;
-
-                    initialVelMD(system, 0); // reset system temperature by velocities
+                if (system.constants.ensemble == ENSEMBLE_UVT) computeAveragesMDuVT(system); // get averages (uptake etc.) every corrtime. (for uVT MD only)
+                if (system.constants.histogram_option) {
+                    zero_grid(system.grids.histogram->grid,system);
+                    population_histogram(system);
+                    if (t != dt) update_root_histogram(system);
                 }
 
-                /* ========================== */
-                calculateObservablesMD(system);
-                /* ========================== */
+                if (system.stats.count_movables > 0 || system.constants.flexible_frozen) {
 
-            } // end if N>0 (stats calculation)
-		
-            // MAIN OUTPUT
-            md_main_output(system);
-        } // end if corrtime
-		count_md_steps++;
-	} // end MD timestep loop
-	} // end if MD
+                    if (system.constants.simulated_annealing) { // S.A. only goes when move is accepted.
+                        system.constants.temp =
+                            system.constants.sa_target +
+                            (system.constants.temp - system.constants.sa_target) *
+                            system.constants.sa_schedule;
+
+                        initialVelMD(system, 0); // reset system temperature by velocities
+                    }
+
+                    /* ========================== */
+                    calculateObservablesMD(system);
+                    /* ========================== */
+
+                } // end if N>0 (stats calculation)
+
+                // MAIN OUTPUT
+                md_main_output(system);
+            } // end if corrtime
+            count_md_steps++;
+        } // end MD timestep loop
+    } // end if MD
 // ============================= END MOLECULAR DYNAMICS =======================================
 
 
 // ============================= SINGLE POINT ENERGY ==========================================
     else if (system.constants.mode == "sp") {
         printf("\n| ==================================== |\n");
-	    printf("|  BEGINNING SINGLE POINT CALCULATION  |\n");
-	    printf("| ==================================== |\n\n");
+        printf("|  BEGINNING SINGLE POINT CALCULATION  |\n");
+        printf("| ==================================== |\n\n");
 
         if (system.pbc.a==0 && system.pbc.b==0 && system.pbc.c==0 && system.pbc.alpha==0 && system.pbc.beta==0 && system.pbc.gamma==0)
             system.constants.all_pbc=0; // force no PBC if no box given
@@ -581,12 +588,13 @@ int main(int argc, char **argv) {
         optimize(system);
     } // end optimization mode
 
-
-
     // Final timing stats.
-	std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     system.constants.time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
-	printf("Total wall time = %f s\n",system.constants.time_elapsed);
+    printf("Total wall time = %f s\n",system.constants.time_elapsed);
+
+    // return error-free
+    exit(0);
 
 
 } // end main()

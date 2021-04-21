@@ -24,59 +24,59 @@ double getTotalPotential(System &system) {
 
     // initializers
     double total_potential=0;
-    double total_rd=0.0; 
-    double total_es = 0.0; 
+    double total_rd=0.0;
+    double total_es = 0.0;
     double total_polar=0.0;
     double total_bonded=0.0;
 
     system.constants.auto_reject=0;
 
 // =========================================================================
-if (system.molecules.size() > 0) { // don't bother with 0 molecules!
+    if (system.molecules.size() > 0) { // don't bother with 0 molecules!
 
-    // REPULSION DISPERSION.
-    if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR) {
-        total_rd = lj(system);
-    } else if (model == POTENTIAL_COMMY || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
-        total_rd = commy(system);
-    } else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
-        total_rd = tt(system);
-    }
-    
-    // ELECTROSTATIC
-    if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
-
-        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if MD, or if no bad contact was discovered in MC
-            if (system.constants.ewald_es)
-                total_es = coulombic_ewald(system); // using ewald method for es
-            else
-                total_es = coulombic(system); // plain old coloumb
+        // REPULSION DISPERSION.
+        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR) {
+            total_rd = lj(system);
+        } else if (model == POTENTIAL_COMMY || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR) {
+            total_rd = commy(system);
+        } else if (model == POTENTIAL_TT || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
+            total_rd = tt(system);
         }
-    }
-    
-    // POLARIZATION
-    if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTESPOLAR) {
 
-        if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if MD, or no bad contact was discovered in MC
+        // ELECTROSTATIC
+        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR) {
+
+            if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if MD, or if no bad contact was discovered in MC
+                if (system.constants.ewald_es)
+                    total_es = coulombic_ewald(system); // using ewald method for es
+                else
+                    total_es = coulombic(system); // plain old coloumb
+            }
+        }
+
+        // POLARIZATION
+        if (model == POTENTIAL_LJESPOLAR || model == POTENTIAL_LJPOLAR || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTESPOLAR) {
+
+            if (system.constants.mode=="md" || (!system.constants.auto_reject_option || !system.constants.auto_reject)) { // these only run if MD, or no bad contact was discovered in MC
 
                 total_polar = polarization(system);
+            }
+
+        }
+
+        // BONDED TERMS
+        if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
+            // bond stretches, angle-bends, torsion
+            total_bonded = totalBondedEnergy(system); // in K
+            // LJ intramolecular
+            if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR)
+                total_rd += system.stats.UintraLJ.value; // in K
+            // Coulombic intramolecular
+            if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
+                total_es += system.stats.UintraES.value; // in K
         }
 
     }
-
-    // BONDED TERMS
-    if (system.constants.flexible_frozen || system.constants.md_mode == MD_FLEXIBLE) {
-        // bond stretches, angle-bends, torsion
-        total_bonded = totalBondedEnergy(system); // in K  
-        // LJ intramolecular
-        if (model == POTENTIAL_LJ || model == POTENTIAL_LJES || model == POTENTIAL_LJPOLAR || model == POTENTIAL_LJESPOLAR)
-            total_rd += system.stats.UintraLJ.value; // in K 
-        // Coulombic intramolecular
-        if (model == POTENTIAL_LJES || model == POTENTIAL_LJESPOLAR || model == POTENTIAL_COMMYES || model == POTENTIAL_COMMYESPOLAR || model == POTENTIAL_TTES || model == POTENTIAL_TTESPOLAR)
-            total_es += system.stats.UintraES.value; // in K
-    } 
-
-}
 // ==========================================================================
 
     total_potential = total_rd + total_es + total_polar + total_bonded;
@@ -90,5 +90,5 @@ if (system.molecules.size() > 0) { // don't bother with 0 molecules!
     system.stats.potential_sq.value = total_potential*total_potential;
 
     system.checkpoint("ended getTotalPotential()");
-	return total_potential;
+    return total_potential;
 }

@@ -31,11 +31,11 @@ void make_pairs(System &system) {
             for (k=i; k<molsize; k++) {
                 for (l=0; l<system.molecules[k].atoms.size(); l++) {
                     if (i==k && j==l) continue; // always skip self-atom distance
-                    if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // I don't think I ever use frozen-pair distances.    
+                    if (system.molecules[i].frozen && system.molecules[k].frozen) continue; // I don't think I ever use frozen-pair distances.
                     double *distances = getDistanceXYZ(system, i,j,k,l);
                     double r = distances[3];
                     system.pairs[i][j][k][l].r = r;
-                    for (p=0; p<3; p++) system.pairs[i][j][k][l].d[p] = distances[p];                    
+                    for (p=0; p<3; p++) system.pairs[i][j][k][l].d[p] = distances[p];
 
                     if (r != system.pairs[i][j][k][l].prev_r) {
                         // mark for recalculate
@@ -43,7 +43,7 @@ void make_pairs(System &system) {
                     } else {
                         system.pairs[i][j][k][l].recalculate = 0;
                         system.pairs[i][j][k][l].prev_r = r;
-                        for (p=0;p<3;p++) system.pairs[i][j][k][l].prev_d[p] = distances[p];
+                        for (p=0; p<3; p++) system.pairs[i][j][k][l].prev_d[p] = distances[p];
                     }
 
 

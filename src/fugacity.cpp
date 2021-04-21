@@ -34,73 +34,100 @@ void output(string msg) {
 // Luciano Laratelli
 double phast_q_star(double pressure)
 {
-  double square= 8.2e-05 * pressure * pressure;
-  double linear= 0.003089 * pressure;
-  double constant = 1.005018;
-  return(pressure * (square + linear + constant));
+    double square= 8.2e-05 * pressure * pressure;
+    double linear= 0.003089 * pressure;
+    double constant = 1.005018;
+    return(pressure * (square + linear + constant));
 }
 double phast_star(double pressure)
 {
-  double square= 8.6e-05 * pressure * pressure;
-  double linear= .000735 * pressure;
-  double constant = 1.012135;
-  return(pressure * (square + linear + constant));
+    double square= 8.6e-05 * pressure * pressure;
+    double linear= .000735 * pressure;
+    double constant = 1.012135;
+    return(pressure * (square + linear + constant));
 }
 double trappe(double pressure)
 {
-  double square= .000129 * pressure * pressure;
-  double linear= .002365 * pressure;
-  double constant = 1.010909;
-  cout << "******************************************" << endl;
-  cout << (pressure * (square + linear + constant)) << endl;
-  cout << "******************************************" << endl;
-  return(pressure * (square + linear + constant));
+    double square= .000129 * pressure * pressure;
+    double linear= .002365 * pressure;
+    double constant = 1.010909;
+    cout << "******************************************" << endl;
+    cout << (pressure * (square + linear + constant)) << endl;
+    cout << "******************************************" << endl;
+    return(pressure * (square + linear + constant));
 }
 
 
 
 double h2_comp_back(double temperature, double pressure) {
 
-	double alpha, y;				/* repulsive part of the compressibility factor */
-	double V, V0, u, D[BACK_MAX_M][BACK_MAX_N];	/* attractive part */
-	int n, m;					/* indices for double sum of attractive part */
-	double comp_factor;
-	double comp_factor_repulsive;
-	double comp_factor_attractive;
-	// double fugacity;  (unused variable)
+    double alpha, y;				/* repulsive part of the compressibility factor */
+    double V, V0, u, D[BACK_MAX_M][BACK_MAX_N];	/* attractive part */
+    int n, m;					/* indices for double sum of attractive part */
+    double comp_factor;
+    double comp_factor_repulsive;
+    double comp_factor_attractive;
+    // double fugacity;  (unused variable)
 
 
-	/* setup the BACK universal D constants */
-	D[0][0] = -8.8043;	D[0][1] = 2.9396;	D[0][2] = -2.8225;	D[0][3] = 0.34;
-	D[1][0] = 4.164627;	D[1][1] = -6.0865383;	D[1][2] = 4.7600148;	D[1][3] = -3.1875014;
-	D[2][0] = -48.203555;	D[2][1] = 40.137956;	D[2][2] = 11.257177;	D[2][3] = 12.231796;
-	D[3][0] = 140.4362;	D[3][1] = -76.230797;	D[3][2] = -66.382743;	D[3][3] = -12.110681;
-	D[4][0] = -195.23339;	D[4][1] = -133.70055;	D[4][2] = 69.248785;	D[4][3] = 0.0;
-	D[5][0] = 113.515;	D[5][1] = 860.25349;	D[5][2] = 0.0;		D[5][3] = 0.0;
-	D[6][0] = 0.0;		D[6][1] = -1535.3224;	D[6][2] = 0.0;		D[6][3] = 0.0;
-	D[7][0] = 0.0;		D[7][1] = 1221.4261;	D[7][2] = 0.0;		D[7][3] = 0.0;
-	D[8][0] = 0.0;		D[8][1] = -409.10539;	D[8][2] = 0.0;		D[8][3] = 0.0;
+    /* setup the BACK universal D constants */
+    D[0][0] = -8.8043;
+    D[0][1] = 2.9396;
+    D[0][2] = -2.8225;
+    D[0][3] = 0.34;
+    D[1][0] = 4.164627;
+    D[1][1] = -6.0865383;
+    D[1][2] = 4.7600148;
+    D[1][3] = -3.1875014;
+    D[2][0] = -48.203555;
+    D[2][1] = 40.137956;
+    D[2][2] = 11.257177;
+    D[2][3] = 12.231796;
+    D[3][0] = 140.4362;
+    D[3][1] = -76.230797;
+    D[3][2] = -66.382743;
+    D[3][3] = -12.110681;
+    D[4][0] = -195.23339;
+    D[4][1] = -133.70055;
+    D[4][2] = 69.248785;
+    D[4][3] = 0.0;
+    D[5][0] = 113.515;
+    D[5][1] = 860.25349;
+    D[5][2] = 0.0;
+    D[5][3] = 0.0;
+    D[6][0] = 0.0;
+    D[6][1] = -1535.3224;
+    D[6][2] = 0.0;
+    D[6][3] = 0.0;
+    D[7][0] = 0.0;
+    D[7][1] = 1221.4261;
+    D[7][2] = 0.0;
+    D[7][3] = 0.0;
+    D[8][0] = 0.0;
+    D[8][1] = -409.10539;
+    D[8][2] = 0.0;
+    D[8][3] = 0.0;
 
-	/* calculate attractive part */
-	V0 = BACK_H2_V00*(1.0 - BACK_C*exp(-3.0*BACK_H2_U0/temperature));
-	V = NA_MPMC*KB_MPMC*temperature/(pressure*ATM2PASCALS*1.0e-6);
-	u = BACK_H2_U0*(1.0 + BACK_H2_N/temperature);
+    /* calculate attractive part */
+    V0 = BACK_H2_V00*(1.0 - BACK_C*exp(-3.0*BACK_H2_U0/temperature));
+    V = NA_MPMC*KB_MPMC*temperature/(pressure*ATM2PASCALS*1.0e-6);
+    u = BACK_H2_U0*(1.0 + BACK_H2_N/temperature);
 
-	comp_factor_attractive = 0;
-	for(n = 0; n < BACK_MAX_N; n++)
-		for(m = 0; m < BACK_MAX_M; m++)
-			comp_factor_attractive += ((double)(m+1))*D[m][n]*pow(u/temperature, ((double)(n+1)))*pow(V0/V, ((double)(m+1)));
+    comp_factor_attractive = 0;
+    for(n = 0; n < BACK_MAX_N; n++)
+        for(m = 0; m < BACK_MAX_M; m++)
+            comp_factor_attractive += ((double)(m+1))*D[m][n]*pow(u/temperature, ((double)(n+1)))*pow(V0/V, ((double)(m+1)));
 
-	/* calculate repulsive part */
-	alpha = BACK_H2_ALPHA;
-	y = (M_PI*sqrt(2.0)/6.0)*(pressure*ATM2PASCALS*1.0e-6)/(NA_MPMC*KB_MPMC*temperature)*V0;
-	comp_factor_repulsive = 1.0 + (3.0*alpha - 2.0)*y;
-	comp_factor_repulsive += (3.0*pow(alpha, 2) - 3.0*alpha + 1.0)*pow(y, 2);
-	comp_factor_repulsive -= pow(alpha, 2)*pow(y, 3);
-	comp_factor_repulsive /= pow((1.0 - y), 3);
+    /* calculate repulsive part */
+    alpha = BACK_H2_ALPHA;
+    y = (M_PI*sqrt(2.0)/6.0)*(pressure*ATM2PASCALS*1.0e-6)/(NA_MPMC*KB_MPMC*temperature)*V0;
+    comp_factor_repulsive = 1.0 + (3.0*alpha - 2.0)*y;
+    comp_factor_repulsive += (3.0*pow(alpha, 2) - 3.0*alpha + 1.0)*pow(y, 2);
+    comp_factor_repulsive -= pow(alpha, 2)*pow(y, 3);
+    comp_factor_repulsive /= pow((1.0 - y), 3);
 
-	comp_factor = comp_factor_repulsive + comp_factor_attractive;
-	return(comp_factor);
+    comp_factor = comp_factor_repulsive + comp_factor_attractive;
+    return(comp_factor);
 
 }
 
@@ -111,27 +138,27 @@ double h2_comp_back(double temperature, double pressure) {
 
 double h2_fugacity_back(double temperature, double pressure) {
 
-	double fugacity_coefficient, fugacity;
-	double comp_factor;
-	double P, dP;
-	char linebuf[MAXLINE];
+    double fugacity_coefficient, fugacity;
+    double comp_factor;
+    double P, dP;
+    char linebuf[MAXLINE];
 
-	/* integrate (z-1)/P from 0 to P */
-	fugacity_coefficient = 0;
-	for(P = 0.001, dP = 0.001; P <= pressure; P += dP) {
+    /* integrate (z-1)/P from 0 to P */
+    fugacity_coefficient = 0;
+    for(P = 0.001, dP = 0.001; P <= pressure; P += dP) {
 
-		comp_factor = h2_comp_back(temperature, P);
-		fugacity_coefficient += dP*(comp_factor - 1.0)/P;
+        comp_factor = h2_comp_back(temperature, P);
+        fugacity_coefficient += dP*(comp_factor - 1.0)/P;
 
-	}
-	fugacity_coefficient = exp(fugacity_coefficient);
+    }
+    fugacity_coefficient = exp(fugacity_coefficient);
 
-	comp_factor = h2_comp_back(temperature, pressure);
-	sprintf(linebuf, "INPUT: BACK compressibility factor at %.3f atm is %.3f\n", pressure, comp_factor);
-	output(linebuf);
+    comp_factor = h2_comp_back(temperature, pressure);
+    sprintf(linebuf, "INPUT: BACK compressibility factor at %.3f atm is %.3f\n", pressure, comp_factor);
+    output(linebuf);
 
-	fugacity = pressure*fugacity_coefficient;
-	return(fugacity);
+    fugacity = pressure*fugacity_coefficient;
+    return(fugacity);
 
 }
 
@@ -142,24 +169,24 @@ double h2_fugacity_back(double temperature, double pressure) {
 /* H.R. Shaw, D.F. Wones, American Journal of Science, 262, 918-929 (1964) */
 double h2_fugacity_shaw(double temperature, double pressure) {
 
-	double C1, C2, C3;
-	double fugacity, fugacity_coefficient;
+    double C1, C2, C3;
+    double fugacity, fugacity_coefficient;
 
-	C1 = -3.8402*pow(temperature, 1.0/8.0) + 0.5410;
-	C1 = exp(C1);
+    C1 = -3.8402*pow(temperature, 1.0/8.0) + 0.5410;
+    C1 = exp(C1);
 
-	C2 = -0.1263*pow(temperature, 1.0/2.0) - 15.980;
-	C2 = exp(C2);
+    C2 = -0.1263*pow(temperature, 1.0/2.0) - 15.980;
+    C2 = exp(C2);
 
-	C3 = -0.11901*temperature - 5.941;
-	C3 = exp(C3);
-	C3 *= 300.0;
+    C3 = -0.11901*temperature - 5.941;
+    C3 = exp(C3);
+    C3 *= 300.0;
 
-	fugacity_coefficient = C1*pressure - C2*pow(pressure, 2) + C3*exp(-pressure/300.0 - 1.0);
-	fugacity_coefficient = exp(fugacity_coefficient);
-	fugacity = fugacity_coefficient*pressure;
+    fugacity_coefficient = C1*pressure - C2*pow(pressure, 2) + C3*exp(-pressure/300.0 - 1.0);
+    fugacity_coefficient = exp(fugacity_coefficient);
+    fugacity = fugacity_coefficient*pressure;
 
-	return(fugacity);
+    return(fugacity);
 
 }
 
@@ -167,22 +194,22 @@ double h2_fugacity_shaw(double temperature, double pressure) {
 /* Zhou, Zhou, Int. J. Hydrogen Energy, 26, 597-601 (2001) */
 double h2_fugacity_zhou(double temperature, double pressure) {
 
-	double fugacity, fugacity_coefficient;
+    double fugacity, fugacity_coefficient;
 
-	pressure *= ATM2PSI;
+    pressure *= ATM2PSI;
 
-	fugacity_coefficient = -1.38130e-4*pressure;
-	fugacity_coefficient += 4.67096e-8*pow(pressure, 2)/2;
-	fugacity_coefficient += 5.93690e-12*pow(pressure, 3)/3;
-	fugacity_coefficient += -3.24527e-15*pow(pressure, 4)/4;
-	fugacity_coefficient += 3.54211e-19*pow(pressure, 5)/5;
+    fugacity_coefficient = -1.38130e-4*pressure;
+    fugacity_coefficient += 4.67096e-8*pow(pressure, 2)/2;
+    fugacity_coefficient += 5.93690e-12*pow(pressure, 3)/3;
+    fugacity_coefficient += -3.24527e-15*pow(pressure, 4)/4;
+    fugacity_coefficient += 3.54211e-19*pow(pressure, 5)/5;
 
-	pressure /= ATM2PSI;
+    pressure /= ATM2PSI;
 
-	fugacity_coefficient = exp(fugacity_coefficient);
-	fugacity = pressure*fugacity_coefficient;
+    fugacity_coefficient = exp(fugacity_coefficient);
+    fugacity = pressure*fugacity_coefficient;
 
-	return(fugacity);
+    return(fugacity);
 
 }
 
@@ -190,24 +217,24 @@ double h2_fugacity_zhou(double temperature, double pressure) {
 
 double h2_fugacity(double temperature, double pressure) {
 
-	if((temperature == 77.0) && (pressure <= 200.0)) {
+    if((temperature == 77.0) && (pressure <= 200.0)) {
 
-		output("INPUT: fugacity calculation using Zhou function\n");
-		return(h2_fugacity_zhou(temperature, pressure));
+        output("INPUT: fugacity calculation using Zhou function\n");
+        return(h2_fugacity_zhou(temperature, pressure));
 
-	}  else if(temperature >= 273.15) {
+    }  else if(temperature >= 273.15) {
 
-		output("INPUT: fugacity calculation using Shaw function\n");
-		return(h2_fugacity_shaw(temperature, pressure));
+        output("INPUT: fugacity calculation using Shaw function\n");
+        return(h2_fugacity_shaw(temperature, pressure));
 
-	} else {
+    } else {
 
-		output("INPUT: fugacity calculation using BACK EoS\n");
-		return(h2_fugacity_back(temperature, pressure));
+        output("INPUT: fugacity calculation using BACK EoS\n");
+        return(h2_fugacity_back(temperature, pressure));
 
-	}
+    }
 
-	//return(0); /* NOT REACHED */
+    //return(0); /* NOT REACHED */
 
 }
 
@@ -224,210 +251,237 @@ double h2_fugacity(double temperature, double pressure) {
 
 double ch4_comp_back(double temperature, double pressure) {
 
-	double alpha, y;                                /* repulsive part of the compressibility factor */
-	double V, V0, u, D[BACK_MAX_M][BACK_MAX_N];     /* attractive part */
-	int n, m;                                       /* indices for double sum of attractive part */
-	double comp_factor;
-	double comp_factor_repulsive;
-	double comp_factor_attractive;
-	// double fugacity;  (unused variable)
-	
-	/* setup the BACK universal D constants */
-	D[0][0] = -8.8043;      D[0][1] = 2.9396;       D[0][2] = -2.8225;      D[0][3] = 0.34;
-	D[1][0] = 4.164627;     D[1][1] = -6.0865383;   D[1][2] = 4.7600148;    D[1][3] = -3.1875014;
-	D[2][0] = -48.203555;   D[2][1] = 40.137956;    D[2][2] = 11.257177;    D[2][3] = 12.231796;
-	D[3][0] = 140.4362;     D[3][1] = -76.230797;   D[3][2] = -66.382743;   D[3][3] = -12.110681;
-	D[4][0] = -195.23339;   D[4][1] = -133.70055;   D[4][2] = 69.248785;    D[4][3] = 0.0;
-	D[5][0] = 113.515;      D[5][1] = 860.25349;    D[5][2] = 0.0;          D[5][3] = 0.0;
-	D[6][0] = 0.0;          D[6][1] = -1535.3224;   D[6][2] = 0.0;          D[6][3] = 0.0;
-	D[7][0] = 0.0;          D[7][1] = 1221.4261;    D[7][2] = 0.0;          D[7][3] = 0.0;
-	D[8][0] = 0.0;          D[8][1] = -409.10539;   D[8][2] = 0.0;          D[8][3] = 0.0;
-	
-	/* calculate attractive part */
-	V0 = BACK_CH4_V00*(1.0 - BACK_C*exp(-3.0*BACK_CH4_U0/temperature));
-	V = NA_MPMC*KB_MPMC*temperature/(pressure*ATM2PASCALS*1.0e-6);
-	u = BACK_CH4_U0*(1.0 + BACK_CH4_N/temperature);
-	
-	comp_factor_attractive = 0;
-	for(n = 0; n < BACK_MAX_N; n++)
-		for(m = 0; m < BACK_MAX_M; m++)
-			comp_factor_attractive += ((double)(m+1))*D[m][n]*pow(u/temperature, ((double)(n+1)))*pow(V0/V, ((double)(m+1)));
-	
-	/* calculate repulsive part */
-	alpha = BACK_CH4_ALPHA;
-	y = (M_PI*sqrt(2.0)/6.0)*(pressure*ATM2PASCALS*1.0e-6)/(NA_MPMC*KB_MPMC*temperature)*V0;
-	comp_factor_repulsive = 1.0 + (3.0*alpha - 2.0)*y;
-	comp_factor_repulsive += (3.0*pow(alpha, 2) - 3.0*alpha + 1.0)*pow(y, 2);
-	comp_factor_repulsive -= pow(alpha, 2)*pow(y, 3);
-	comp_factor_repulsive /= pow((1.0 - y), 3);
-	
-	comp_factor = comp_factor_repulsive + comp_factor_attractive;
-	return(comp_factor);
+    double alpha, y;                                /* repulsive part of the compressibility factor */
+    double V, V0, u, D[BACK_MAX_M][BACK_MAX_N];     /* attractive part */
+    int n, m;                                       /* indices for double sum of attractive part */
+    double comp_factor;
+    double comp_factor_repulsive;
+    double comp_factor_attractive;
+    // double fugacity;  (unused variable)
+
+    /* setup the BACK universal D constants */
+    D[0][0] = -8.8043;
+    D[0][1] = 2.9396;
+    D[0][2] = -2.8225;
+    D[0][3] = 0.34;
+    D[1][0] = 4.164627;
+    D[1][1] = -6.0865383;
+    D[1][2] = 4.7600148;
+    D[1][3] = -3.1875014;
+    D[2][0] = -48.203555;
+    D[2][1] = 40.137956;
+    D[2][2] = 11.257177;
+    D[2][3] = 12.231796;
+    D[3][0] = 140.4362;
+    D[3][1] = -76.230797;
+    D[3][2] = -66.382743;
+    D[3][3] = -12.110681;
+    D[4][0] = -195.23339;
+    D[4][1] = -133.70055;
+    D[4][2] = 69.248785;
+    D[4][3] = 0.0;
+    D[5][0] = 113.515;
+    D[5][1] = 860.25349;
+    D[5][2] = 0.0;
+    D[5][3] = 0.0;
+    D[6][0] = 0.0;
+    D[6][1] = -1535.3224;
+    D[6][2] = 0.0;
+    D[6][3] = 0.0;
+    D[7][0] = 0.0;
+    D[7][1] = 1221.4261;
+    D[7][2] = 0.0;
+    D[7][3] = 0.0;
+    D[8][0] = 0.0;
+    D[8][1] = -409.10539;
+    D[8][2] = 0.0;
+    D[8][3] = 0.0;
+
+    /* calculate attractive part */
+    V0 = BACK_CH4_V00*(1.0 - BACK_C*exp(-3.0*BACK_CH4_U0/temperature));
+    V = NA_MPMC*KB_MPMC*temperature/(pressure*ATM2PASCALS*1.0e-6);
+    u = BACK_CH4_U0*(1.0 + BACK_CH4_N/temperature);
+
+    comp_factor_attractive = 0;
+    for(n = 0; n < BACK_MAX_N; n++)
+        for(m = 0; m < BACK_MAX_M; m++)
+            comp_factor_attractive += ((double)(m+1))*D[m][n]*pow(u/temperature, ((double)(n+1)))*pow(V0/V, ((double)(m+1)));
+
+    /* calculate repulsive part */
+    alpha = BACK_CH4_ALPHA;
+    y = (M_PI*sqrt(2.0)/6.0)*(pressure*ATM2PASCALS*1.0e-6)/(NA_MPMC*KB_MPMC*temperature)*V0;
+    comp_factor_repulsive = 1.0 + (3.0*alpha - 2.0)*y;
+    comp_factor_repulsive += (3.0*pow(alpha, 2) - 3.0*alpha + 1.0)*pow(y, 2);
+    comp_factor_repulsive -= pow(alpha, 2)*pow(y, 3);
+    comp_factor_repulsive /= pow((1.0 - y), 3);
+
+    comp_factor = comp_factor_repulsive + comp_factor_attractive;
+    return(comp_factor);
 
 }
 
 
 double ch4_fugacity_NIST(double temperature, double pressure) {
-        
+
     // doug
     // a fitted polynomial 5th-order (in x and y) function from NIST
-    // data scraped by Luci's thing 
+    // data scraped by Luci's thing
     // the actual paper
-        double p00 = 86.68 ;
-        double p10 = -1.994 ;
-        double p01 = -2.599 ;
-        double p20 = 0.01733 ;
-        double p11 = 0.0334 ;
-        double p02 = -6.624e-05 ;
-        double p30 = -7.144e-05 ;
-        double p21 = -0.0001066 ;
-        double p12 = 1.329e-06 ;
-        double p03 = -4.921e-06 ;
-        double p40 = 1.405e-07 ;
-        double p31 = 1.24e-07 ;
-        double p22 = -4.097e-09 ;
-        double p13 = -1.381e-08 ;
-        double p04 = 2.854e-07 ;
-        double p50 = -1.06e-10 ;
-        double p41 = -2.587e-11 ;
-        double p32 = 4.766e-12 ;
-        double p23 = 4.47e-12 ;
-        double p14 = 1.695e-10 ;
-        double p05 = -4.594e-09 ;
-        double x = temperature;
-        double y = pressure;
-        double fug = p00 + p10*x + p01*y + p20*x*x + p11*x*y + p02*y*y + p30*x*x*x
-                    + p21*x*x*y + p12*x*y*y + p03*y*y*y + p40*x*x*x*x + p31*x*x*x*y
-                    + p22*x*x*y*y + p13*x*y*y*y + p04*y*y*y*y + p50*x*x*x*x*x + p41*x*x*x*x*y
-                    + p32*x*x*x*y*y + p23*x*x*y*y*y + p14*x*y*y*y*y + p05*y*y*y*y*y;
+    double p00 = 86.68 ;
+    double p10 = -1.994 ;
+    double p01 = -2.599 ;
+    double p20 = 0.01733 ;
+    double p11 = 0.0334 ;
+    double p02 = -6.624e-05 ;
+    double p30 = -7.144e-05 ;
+    double p21 = -0.0001066 ;
+    double p12 = 1.329e-06 ;
+    double p03 = -4.921e-06 ;
+    double p40 = 1.405e-07 ;
+    double p31 = 1.24e-07 ;
+    double p22 = -4.097e-09 ;
+    double p13 = -1.381e-08 ;
+    double p04 = 2.854e-07 ;
+    double p50 = -1.06e-10 ;
+    double p41 = -2.587e-11 ;
+    double p32 = 4.766e-12 ;
+    double p23 = 4.47e-12 ;
+    double p14 = 1.695e-10 ;
+    double p05 = -4.594e-09 ;
+    double x = temperature;
+    double y = pressure;
+    double fug = p00 + p10*x + p01*y + p20*x*x + p11*x*y + p02*y*y + p30*x*x*x
+                 + p21*x*x*y + p12*x*y*y + p03*y*y*y + p40*x*x*x*x + p31*x*x*x*y
+                 + p22*x*x*y*y + p13*x*y*y*y + p04*y*y*y*y + p50*x*x*x*x*x + p41*x*x*x*x*y
+                 + p32*x*x*x*y*y + p23*x*x*y*y*y + p14*x*y*y*y*y + p05*y*y*y*y*y;
 
-         return fug;
+    return fug;
 }
 
 
 /* Incorporate BACK EOS */
 double ch4_fugacity_back(double temperature, double pressure) {
 
-        double fugacity_coefficient, fugacity;
-        double comp_factor;
-        double P, dP;
-        char linebuf[MAXLINE];
+    double fugacity_coefficient, fugacity;
+    double comp_factor;
+    double P, dP;
+    char linebuf[MAXLINE];
 
-        /* integrate (z-1)/P from 0 to P */
-        fugacity_coefficient = 0;
-        for(P = 0.001, dP = 0.001; P <= pressure; P += dP) {
+    /* integrate (z-1)/P from 0 to P */
+    fugacity_coefficient = 0;
+    for(P = 0.001, dP = 0.001; P <= pressure; P += dP) {
 
-                comp_factor = ch4_comp_back(temperature, P);
-                fugacity_coefficient += dP*(comp_factor - 1.0)/P;
+        comp_factor = ch4_comp_back(temperature, P);
+        fugacity_coefficient += dP*(comp_factor - 1.0)/P;
 
-        }
-        fugacity_coefficient = exp(fugacity_coefficient);
+    }
+    fugacity_coefficient = exp(fugacity_coefficient);
 
-        comp_factor = ch4_comp_back(temperature, pressure);
-        sprintf(linebuf, "INPUT: CH4 BACK compressibility factor at %.3f atm is %.3f\n", pressure, comp_factor);
-        output(linebuf);
+    comp_factor = ch4_comp_back(temperature, pressure);
+    sprintf(linebuf, "INPUT: CH4 BACK compressibility factor at %.3f atm is %.3f\n", pressure, comp_factor);
+    output(linebuf);
 
-        fugacity = pressure*fugacity_coefficient;
-        return(fugacity);
+    fugacity = pressure*fugacity_coefficient;
+    return(fugacity);
 }
 /* Apply the Peng-Robinson EoS to methane */
 double ch4_fugacity_PR(double temperature, double pressure) {
 
-	double Z, A, B, aa, bb, TcCH4, PcCH4, Tr;
-	double alpha, alpha2, wCH4, R, Q, X, j, k, l;
-	double theta, Q3;
-	double uu, U, V, root1, root2, root3, stuff1, stuff2, stuff3; //, answer; (unused variable)
-	double f1, f2, f3, f4, fugacity, lnfoverp;
-	double pi=acos(-1.0);
+    double Z, A, B, aa, bb, TcCH4, PcCH4, Tr;
+    double alpha, alpha2, wCH4, R, Q, X, j, k, l;
+    double theta, Q3;
+    double uu, U, V, root1, root2, root3, stuff1, stuff2, stuff3; //, answer; (unused variable)
+    double f1, f2, f3, f4, fugacity, lnfoverp;
+    double pi=acos(-1.0);
 
-	/*Peng Robinson variables and equations for CH4 units K,atm, L, mole*/
-	TcCH4 = 190.564;    /* K */
-	PcCH4 = 45.391;    /* atm */
-	wCH4  = 0.01142;
-	R     = 0.08206;   /* gas constant atmL/moleK */
-	
-	aa = (0.45724*R*R*TcCH4*TcCH4) / PcCH4;
-	bb = (0.07780*R*TcCH4) / PcCH4;
-	Tr = temperature / TcCH4;
-	stuff1 = 0.37464 + 1.54226*wCH4 - 0.26992*wCH4*wCH4;
-	stuff2=1.0-sqrt(Tr);
-	alpha=1.0+stuff1*stuff2;
-	alpha2=alpha*alpha;
-	A=alpha2*aa*pressure/(R*R*temperature*temperature);
-	B=bb*pressure/(R*temperature);
-	
-	/* solving a cubic equation part */
-	j=-1.0*(1-B);
-	k=A-3.0*B*B-2.0*B;
-	l= -1*(A*B- B*B -B*B*B);
-	Q=(j*j-3.0*k)/9.0;
-	X=(2.0*j*j*j -9.0*j*k+27.0*l)/54.0;
-	Q3=Q*Q*Q;
+    /*Peng Robinson variables and equations for CH4 units K,atm, L, mole*/
+    TcCH4 = 190.564;    /* K */
+    PcCH4 = 45.391;    /* atm */
+    wCH4  = 0.01142;
+    R     = 0.08206;   /* gas constant atmL/moleK */
 
-	/* Need to check X^2 < Q^3 */
-	if((X*X)<(Q*Q*Q)){    /* THREE REAL ROOTS  */
-		theta=acos((X/sqrt(Q3)));
-		root1=-2.0*sqrt(Q)*cos(theta/3.0)-j/3.0;
-		root2=-2.0*sqrt(Q)*cos((theta+2.0*pi)/3.0)-j/3.0;
-		root3=-2.0*sqrt(Q)*cos((theta-2.0*pi)/3.0)-j/3.0;
+    aa = (0.45724*R*R*TcCH4*TcCH4) / PcCH4;
+    bb = (0.07780*R*TcCH4) / PcCH4;
+    Tr = temperature / TcCH4;
+    stuff1 = 0.37464 + 1.54226*wCH4 - 0.26992*wCH4*wCH4;
+    stuff2=1.0-sqrt(Tr);
+    alpha=1.0+stuff1*stuff2;
+    alpha2=alpha*alpha;
+    A=alpha2*aa*pressure/(R*R*temperature*temperature);
+    B=bb*pressure/(R*temperature);
 
-		/*Choose the root closest to 1, which is "ideal gas law" */
-		if((1.0-root1)<(1.0-root2) && (1.0-root1)<(1.0-root3))
-			Z=root1;
-		else if((1.0-root2)<(1.0-root3) && (1.0-root2)<(1.0-root1))
-			Z=root2;
-		else
-			Z=root3;
-	}
-	else {   /* ONLY ONE real root */
-		stuff3= X*X-Q*Q*Q;
-		uu=X-sqrt(stuff3);
-		/*Power function must have uu a positive number*/
-		if(uu<0.0)
-			uu=-1.0*uu;
-		U=pow(uu,(1.0/3.0));
-		V=Q/U;
-		root1=U+V-j/3.0;
-		Z=root1;
-	}
+    /* solving a cubic equation part */
+    j=-1.0*(1-B);
+    k=A-3.0*B*B-2.0*B;
+    l= -1*(A*B- B*B -B*B*B);
+    Q=(j*j-3.0*k)/9.0;
+    X=(2.0*j*j*j -9.0*j*k+27.0*l)/54.0;
+    Q3=Q*Q*Q;
 
-	/* using Z calculate the fugacity */
-	f1=(Z-1.0)-log(Z-B);
-	f2=A/(2.0*sqrt(2.0)*B);
-	f3=Z+(1.0+sqrt(2.0))*B;
-	f4=Z+(1.0-sqrt(2.0))*B;
-	lnfoverp=f1-f2*log(f3/f4);
-	fugacity=exp(lnfoverp)*pressure;
+    /* Need to check X^2 < Q^3 */
+    if((X*X)<(Q*Q*Q)) {   /* THREE REAL ROOTS  */
+        theta=acos((X/sqrt(Q3)));
+        root1=-2.0*sqrt(Q)*cos(theta/3.0)-j/3.0;
+        root2=-2.0*sqrt(Q)*cos((theta+2.0*pi)/3.0)-j/3.0;
+        root3=-2.0*sqrt(Q)*cos((theta-2.0*pi)/3.0)-j/3.0;
 
-	return(fugacity);
+        /*Choose the root closest to 1, which is "ideal gas law" */
+        if((1.0-root1)<(1.0-root2) && (1.0-root1)<(1.0-root3))
+            Z=root1;
+        else if((1.0-root2)<(1.0-root3) && (1.0-root2)<(1.0-root1))
+            Z=root2;
+        else
+            Z=root3;
+    }
+    else {   /* ONLY ONE real root */
+        stuff3= X*X-Q*Q*Q;
+        uu=X-sqrt(stuff3);
+        /*Power function must have uu a positive number*/
+        if(uu<0.0)
+            uu=-1.0*uu;
+        U=pow(uu,(1.0/3.0));
+        V=Q/U;
+        root1=U+V-j/3.0;
+        Z=root1;
+    }
+
+    /* using Z calculate the fugacity */
+    f1=(Z-1.0)-log(Z-B);
+    f2=A/(2.0*sqrt(2.0)*B);
+    f3=Z+(1.0+sqrt(2.0))*B;
+    f4=Z+(1.0-sqrt(2.0))*B;
+    lnfoverp=f1-f2*log(f3/f4);
+    fugacity=exp(lnfoverp)*pressure;
+
+    return(fugacity);
 }
 
 
 /* ***************************** CH4 EQUATION OF STATE *************************************** */
 double ch4_fugacity(System &system, double temperature, double pressure) {
 
-        if (system.constants.methane_nist_fugacity) {
-                output("INPUT: CH4 fugacity calculation using NIST fitted function\n");
-                return(ch4_fugacity_NIST(temperature,pressure));
+    if (system.constants.methane_nist_fugacity) {
+        output("INPUT: CH4 fugacity calculation using NIST fitted function\n");
+        return(ch4_fugacity_NIST(temperature,pressure));
 
-        } else if((temperature >= 298.0) && (temperature <= 300.0) && (pressure <= 500.0)) {
+    } else if((temperature >= 298.0) && (temperature <= 300.0) && (pressure <= 500.0)) {
 
-                output("INPUT: CH4 fugacity calculation using BACK EoS\n");
-                return(ch4_fugacity_back(temperature, pressure));
+        output("INPUT: CH4 fugacity calculation using BACK EoS\n");
+        return(ch4_fugacity_back(temperature, pressure));
 
-        } else if((temperature == 150.0) && (pressure <= 200.0)) {
+    } else if((temperature == 150.0) && (pressure <= 200.0)) {
 
-                output("INPUT: CH4 fugacity calculation using Peng-Robinson EoS\n");
-                return(ch4_fugacity_PR(temperature, pressure));
+        output("INPUT: CH4 fugacity calculation using Peng-Robinson EoS\n");
+        return(ch4_fugacity_PR(temperature, pressure));
 
-        } else {
+    } else {
 
-                output("INPUT: Unknown if CH4 fugacity will be correct at the requested temperature & pressure...defaulting to use the BACK EoS.\n");
-                return(ch4_fugacity_back(temperature, pressure));
+        output("INPUT: Unknown if CH4 fugacity will be correct at the requested temperature & pressure...defaulting to use the BACK EoS.\n");
+        return(ch4_fugacity_back(temperature, pressure));
 
-        }
+    }
 
-        //return(0); /* NOT REACHED */
+    //return(0); /* NOT REACHED */
 
 }
 
@@ -454,46 +508,73 @@ double ch4_fugacity(System &system, double temperature, double pressure) {
 
 double n2_comp_back(double temperature, double pressure) {
 
-	double alpha, y;                                /* repulsive part of the compressibility factor */
-	double V, V0, u, D[BACK_MAX_M][BACK_MAX_N];     /* attractive part */
-	int n, m;                                       /* indices for double sum of attractive part */
-	double comp_factor;
-	double comp_factor_repulsive;
-	double comp_factor_attractive;
-	// double fugacity;  (unused variable)
-	
-	
-	/* setup the BACK universal D constants */
-	D[0][0] = -8.8043;      D[0][1] = 2.9396;       D[0][2] = -2.8225;      D[0][3] = 0.34;
-	D[1][0] = 4.164627;     D[1][1] = -6.0865383;   D[1][2] = 4.7600148;    D[1][3] = -3.1875014;
-	D[2][0] = -48.203555;   D[2][1] = 40.137956;    D[2][2] = 11.257177;    D[2][3] = 12.231796;
-	D[3][0] = 140.4362;     D[3][1] = -76.230797;   D[3][2] = -66.382743;   D[3][3] = -12.110681;
-	D[4][0] = -195.23339;   D[4][1] = -133.70055;   D[4][2] = 69.248785;    D[4][3] = 0.0;
-	D[5][0] = 113.515;      D[5][1] = 860.25349;    D[5][2] = 0.0;          D[5][3] = 0.0;
-	D[6][0] = 0.0;          D[6][1] = -1535.3224;   D[6][2] = 0.0;          D[6][3] = 0.0;
-	D[7][0] = 0.0;          D[7][1] = 1221.4261;    D[7][2] = 0.0;          D[7][3] = 0.0;
-	D[8][0] = 0.0;          D[8][1] = -409.10539;   D[8][2] = 0.0;          D[8][3] = 0.0;
-	
-	/* calculate attractive part */
-	V0 = BACK_N2_V00*(1.0 - BACK_C*exp(-3.0*BACK_N2_U0/temperature));
-	V = NA_MPMC*KB_MPMC*temperature/(pressure*ATM2PASCALS*1.0e-6);
-	u = BACK_N2_U0*(1.0 + BACK_N2_N/temperature);
+    double alpha, y;                                /* repulsive part of the compressibility factor */
+    double V, V0, u, D[BACK_MAX_M][BACK_MAX_N];     /* attractive part */
+    int n, m;                                       /* indices for double sum of attractive part */
+    double comp_factor;
+    double comp_factor_repulsive;
+    double comp_factor_attractive;
+    // double fugacity;  (unused variable)
 
-	comp_factor_attractive = 0;
-	for(n = 0; n < BACK_MAX_N; n++)
-		for(m = 0; m < BACK_MAX_M; m++)
-			comp_factor_attractive += ((double)(m+1))*D[m][n]*pow(u/temperature, ((double)(n+1)))*pow(V0/V, ((double)(m+1)));
-	
-	/* calculate repulsive part */
-	alpha = BACK_N2_ALPHA;
-	y = (M_PI*sqrt(2.0)/6.0)*(pressure*ATM2PASCALS*1.0e-6)/(NA_MPMC*KB_MPMC*temperature)*V0;
-	comp_factor_repulsive = 1.0 + (3.0*alpha - 2.0)*y;
-	comp_factor_repulsive += (3.0*pow(alpha, 2) - 3.0*alpha + 1.0)*pow(y, 2);
-	comp_factor_repulsive -= pow(alpha, 2)*pow(y, 3);
-	comp_factor_repulsive /= pow((1.0 - y), 3);
-	
-	comp_factor = comp_factor_repulsive + comp_factor_attractive;
-	return(comp_factor);
+
+    /* setup the BACK universal D constants */
+    D[0][0] = -8.8043;
+    D[0][1] = 2.9396;
+    D[0][2] = -2.8225;
+    D[0][3] = 0.34;
+    D[1][0] = 4.164627;
+    D[1][1] = -6.0865383;
+    D[1][2] = 4.7600148;
+    D[1][3] = -3.1875014;
+    D[2][0] = -48.203555;
+    D[2][1] = 40.137956;
+    D[2][2] = 11.257177;
+    D[2][3] = 12.231796;
+    D[3][0] = 140.4362;
+    D[3][1] = -76.230797;
+    D[3][2] = -66.382743;
+    D[3][3] = -12.110681;
+    D[4][0] = -195.23339;
+    D[4][1] = -133.70055;
+    D[4][2] = 69.248785;
+    D[4][3] = 0.0;
+    D[5][0] = 113.515;
+    D[5][1] = 860.25349;
+    D[5][2] = 0.0;
+    D[5][3] = 0.0;
+    D[6][0] = 0.0;
+    D[6][1] = -1535.3224;
+    D[6][2] = 0.0;
+    D[6][3] = 0.0;
+    D[7][0] = 0.0;
+    D[7][1] = 1221.4261;
+    D[7][2] = 0.0;
+    D[7][3] = 0.0;
+    D[8][0] = 0.0;
+    D[8][1] = -409.10539;
+    D[8][2] = 0.0;
+    D[8][3] = 0.0;
+
+    /* calculate attractive part */
+    V0 = BACK_N2_V00*(1.0 - BACK_C*exp(-3.0*BACK_N2_U0/temperature));
+    V = NA_MPMC*KB_MPMC*temperature/(pressure*ATM2PASCALS*1.0e-6);
+    u = BACK_N2_U0*(1.0 + BACK_N2_N/temperature);
+
+    comp_factor_attractive = 0;
+    for(n = 0; n < BACK_MAX_N; n++)
+        for(m = 0; m < BACK_MAX_M; m++)
+            comp_factor_attractive += ((double)(m+1))*D[m][n]*pow(u/temperature, ((double)(n+1)))*pow(V0/V, ((double)(m+1)));
+
+    /* calculate repulsive part */
+    alpha = BACK_N2_ALPHA;
+    y = (M_PI*sqrt(2.0)/6.0)*(pressure*ATM2PASCALS*1.0e-6)/(NA_MPMC*KB_MPMC*temperature)*V0;
+    comp_factor_repulsive = 1.0 + (3.0*alpha - 2.0)*y;
+    comp_factor_repulsive += (3.0*pow(alpha, 2) - 3.0*alpha + 1.0)*pow(y, 2);
+    comp_factor_repulsive -= pow(alpha, 2)*pow(y, 3);
+    comp_factor_repulsive /= pow((1.0 - y), 3);
+
+    comp_factor = comp_factor_repulsive + comp_factor_attractive;
+    return(comp_factor);
 }
 
 
@@ -502,160 +583,160 @@ double n2_comp_back(double temperature, double pressure) {
 /* Incorporate BACK EOS */
 double n2_fugacity_back(double temperature, double pressure) {
 
-	double fugacity_coefficient, fugacity;
-	double comp_factor;
-	double P, dP;
-	char linebuf[MAXLINE];
-	
-	/* integrate (z-1)/P from 0 to P */
-	fugacity_coefficient = 0;
-	for(P = 0.001, dP = 0.001; P <= pressure; P += dP) {
-	
-		comp_factor = n2_comp_back(temperature, P);
-		fugacity_coefficient += dP*(comp_factor - 1.0)/P;
-	
-	}
-	fugacity_coefficient = exp(fugacity_coefficient);
-	
-	comp_factor = n2_comp_back(temperature, pressure);
-	sprintf(linebuf, "INPUT: BACK compressibility factor at %.3f atm is %.3f\n", pressure, comp_factor);
-	output(linebuf);
-	
-	fugacity = pressure*fugacity_coefficient;
-	return(fugacity);
+    double fugacity_coefficient, fugacity;
+    double comp_factor;
+    double P, dP;
+    char linebuf[MAXLINE];
+
+    /* integrate (z-1)/P from 0 to P */
+    fugacity_coefficient = 0;
+    for(P = 0.001, dP = 0.001; P <= pressure; P += dP) {
+
+        comp_factor = n2_comp_back(temperature, P);
+        fugacity_coefficient += dP*(comp_factor - 1.0)/P;
+
+    }
+    fugacity_coefficient = exp(fugacity_coefficient);
+
+    comp_factor = n2_comp_back(temperature, pressure);
+    sprintf(linebuf, "INPUT: BACK compressibility factor at %.3f atm is %.3f\n", pressure, comp_factor);
+    output(linebuf);
+
+    fugacity = pressure*fugacity_coefficient;
+    return(fugacity);
 
 }
 /* Apply the Peng-Robinson EoS to N2 */
 double n2_fugacity_PR(double temperature, double pressure) {
 
-	double Z, A, B, aa, bb, TcN2, PcN2, Tr;
-	double alpha, alpha2, wN2, R, Q, X, j, k, l;
-	double theta, Q3;
-	double uu, U, V, root1, root2, root3, stuff1, stuff2, stuff3; //, answer;  (unused variable)
-	double f1, f2, f3, f4, fugacity, lnfoverp;
-	double pi=acos(-1.0);
-	
-	/*Peng Robinson variables and equations for N2 units K,atm, L, mole*/
-	TcN2 = 126.192;   /* K */
-	PcN2 = 33.514;    /* atm */
-	wN2  = 0.037;
-	R    = 0.08206;   /* gas constant atmL/moleK */
-	
-	aa = (0.45724*R*R*TcN2*TcN2) / PcN2;
-	bb = (0.07780*R*TcN2) / PcN2;
-	Tr = temperature / TcN2;
-	stuff1 = 0.37464 + 1.54226*wN2 - 0.26992*wN2*wN2;
-	stuff2=1.0-sqrt(Tr);
-	alpha=1.0+stuff1*stuff2;
-	alpha2=alpha*alpha;
-	A=alpha2*aa*pressure/(R*R*temperature*temperature);
-	B=bb*pressure/(R*temperature);
-	
-	/* solving a cubic equation part */
-	j=-1.0*(1-B);
-	k=A-3.0*B*B-2.0*B;
-	l= -1*(A*B- B*B -B*B*B);
-	Q=(j*j-3.0*k)/9.0;
-	X=(2.0*j*j*j -9.0*j*k+27.0*l)/54.0;
-	Q3=Q*Q*Q;
-	
-	/* Need to check X^2 < Q^3 */
-	if((X*X)<(Q*Q*Q)){    /* THREE REAL ROOTS  */
-		theta=acos((X/sqrt(Q3)));
-		root1=-2.0*sqrt(Q)*cos(theta/3.0)-j/3.0;
-		root2=-2.0*sqrt(Q)*cos((theta+2.0*pi)/3.0)-j/3.0;
-		root3=-2.0*sqrt(Q)*cos((theta-2.0*pi)/3.0)-j/3.0;
+    double Z, A, B, aa, bb, TcN2, PcN2, Tr;
+    double alpha, alpha2, wN2, R, Q, X, j, k, l;
+    double theta, Q3;
+    double uu, U, V, root1, root2, root3, stuff1, stuff2, stuff3; //, answer;  (unused variable)
+    double f1, f2, f3, f4, fugacity, lnfoverp;
+    double pi=acos(-1.0);
 
-		/*Choose the root closest to 1, which is "ideal gas law" */
-		if((1.0-root1)<(1.0-root2) && (1.0-root1)<(1.0-root3))
-			Z=root1;
-		else if((1.0-root2)<(1.0-root3) && (1.0-root2)<(1.0-root1))
-			Z=root2;
-		else
-			Z=root3;
-			
-	} else {   /* ONLY ONE real root */
-		
-		stuff3= X*X-Q*Q*Q;
-		uu=X-sqrt(stuff3);
-		/*Power function must have uu a positive number*/
-		if(uu<0.0)
-			uu=-1.0*uu;
-		U=pow(uu,(1.0/3.0));
-		V=Q/U;
-		root1=U+V-j/3.0;
-		Z=root1;
-	}
+    /*Peng Robinson variables and equations for N2 units K,atm, L, mole*/
+    TcN2 = 126.192;   /* K */
+    PcN2 = 33.514;    /* atm */
+    wN2  = 0.037;
+    R    = 0.08206;   /* gas constant atmL/moleK */
 
-	/* using Z calculate the fugacity */
-	f1=(Z-1.0)-log(Z-B);
-	f2=A/(2.0*sqrt(2.0)*B);
-	f3=Z+(1.0+sqrt(2.0))*B;
-	f4=Z+(1.0-sqrt(2.0))*B;
-	lnfoverp=f1-f2*log(f3/f4);
-	fugacity=exp(lnfoverp)*pressure;
+    aa = (0.45724*R*R*TcN2*TcN2) / PcN2;
+    bb = (0.07780*R*TcN2) / PcN2;
+    Tr = temperature / TcN2;
+    stuff1 = 0.37464 + 1.54226*wN2 - 0.26992*wN2*wN2;
+    stuff2=1.0-sqrt(Tr);
+    alpha=1.0+stuff1*stuff2;
+    alpha2=alpha*alpha;
+    A=alpha2*aa*pressure/(R*R*temperature*temperature);
+    B=bb*pressure/(R*temperature);
 
-	return(fugacity);
+    /* solving a cubic equation part */
+    j=-1.0*(1-B);
+    k=A-3.0*B*B-2.0*B;
+    l= -1*(A*B- B*B -B*B*B);
+    Q=(j*j-3.0*k)/9.0;
+    X=(2.0*j*j*j -9.0*j*k+27.0*l)/54.0;
+    Q3=Q*Q*Q;
+
+    /* Need to check X^2 < Q^3 */
+    if((X*X)<(Q*Q*Q)) {   /* THREE REAL ROOTS  */
+        theta=acos((X/sqrt(Q3)));
+        root1=-2.0*sqrt(Q)*cos(theta/3.0)-j/3.0;
+        root2=-2.0*sqrt(Q)*cos((theta+2.0*pi)/3.0)-j/3.0;
+        root3=-2.0*sqrt(Q)*cos((theta-2.0*pi)/3.0)-j/3.0;
+
+        /*Choose the root closest to 1, which is "ideal gas law" */
+        if((1.0-root1)<(1.0-root2) && (1.0-root1)<(1.0-root3))
+            Z=root1;
+        else if((1.0-root2)<(1.0-root3) && (1.0-root2)<(1.0-root1))
+            Z=root2;
+        else
+            Z=root3;
+
+    } else {   /* ONLY ONE real root */
+
+        stuff3= X*X-Q*Q*Q;
+        uu=X-sqrt(stuff3);
+        /*Power function must have uu a positive number*/
+        if(uu<0.0)
+            uu=-1.0*uu;
+        U=pow(uu,(1.0/3.0));
+        V=Q/U;
+        root1=U+V-j/3.0;
+        Z=root1;
+    }
+
+    /* using Z calculate the fugacity */
+    f1=(Z-1.0)-log(Z-B);
+    f2=A/(2.0*sqrt(2.0)*B);
+    f3=Z+(1.0+sqrt(2.0))*B;
+    f4=Z+(1.0-sqrt(2.0))*B;
+    lnfoverp=f1-f2*log(f3/f4);
+    fugacity=exp(lnfoverp)*pressure;
+
+    return(fugacity);
 }
 
 /* Apply the Zhou function to N2 */
 double n2_fugacity_zhou(double temperature, double pressure) {
 
-	double fugacity_coefficient, fugacity;
-	
-	output("INPUT: N2 fugacity calculation using Zhou function\n");
-	
-	pressure *= ATM2PSI;
-	
-	fugacity_coefficient = -1.38130e-4*pressure;
-	fugacity_coefficient += 4.67096e-8*pow(pressure, 2)/2;
-	fugacity_coefficient += 5.93690e-12*pow(pressure, 3)/3;
-	fugacity_coefficient += -3.24527e-15*pow(pressure, 4)/4;
-	fugacity_coefficient += 3.54211e-19*pow(pressure, 5)/5;
-	
-	pressure /= ATM2PSI;
-	
-	fugacity_coefficient = exp(fugacity_coefficient);
-	fugacity = pressure*fugacity_coefficient;
-	
-	return(fugacity);
+    double fugacity_coefficient, fugacity;
+
+    output("INPUT: N2 fugacity calculation using Zhou function\n");
+
+    pressure *= ATM2PSI;
+
+    fugacity_coefficient = -1.38130e-4*pressure;
+    fugacity_coefficient += 4.67096e-8*pow(pressure, 2)/2;
+    fugacity_coefficient += 5.93690e-12*pow(pressure, 3)/3;
+    fugacity_coefficient += -3.24527e-15*pow(pressure, 4)/4;
+    fugacity_coefficient += 3.54211e-19*pow(pressure, 5)/5;
+
+    pressure /= ATM2PSI;
+
+    fugacity_coefficient = exp(fugacity_coefficient);
+    fugacity = pressure*fugacity_coefficient;
+
+    return(fugacity);
 }
 
 
 double n2_fugacity(double temperature, double pressure) {
 
-	if((temperature == 78.0) && (pressure <= 1.0)) {
-	
-		output("INPUT: N2 fugacity calculation using Zhou\n");
-		return(n2_fugacity_zhou(temperature, pressure));
-	
-	} else if((temperature == 78.0) && (pressure >= 10.0) && (pressure <= 300.0)) {
-	
-		output("INPUT: N2 fugacity calculation using Peng-Robinson EoS\n");
-		return(n2_fugacity_PR(temperature, pressure));
-	
-	} else if((temperature == 150.0) && (pressure < 175.0)) {
-	
-		output("INPUT: N2 fugacity calculation using Peng-Robinson EoS\n");
-		return(n2_fugacity_PR(temperature, pressure));
-	
-	} else if((temperature == 150.0) && (pressure >= 175.0) && (pressure <= 325.0)) {
-	
-		output("INPUT: N2 fugacity calculation using BACK EoS\n");
-		return(n2_fugacity_back(temperature, pressure));
-	
-	} else if((temperature >= 298.0) && (temperature <= 300.0) && (pressure <= 350.0)) {
-	
-		output("INPUT: N2 fugacity calculation using Peng-Robinson EoS\n");
-		return(n2_fugacity_PR(temperature, pressure));
-	
-	} else {
-		output("INPUT: Unknown if N2 fugacity will be correct at the requested temperature & pressure...defaulting to use the PR EoS.\n");
-		return(n2_fugacity_PR(temperature, pressure));
-	
-	}
-	
-	//return(0); /* NOT REACHED */
+    if((temperature == 78.0) && (pressure <= 1.0)) {
+
+        output("INPUT: N2 fugacity calculation using Zhou\n");
+        return(n2_fugacity_zhou(temperature, pressure));
+
+    } else if((temperature == 78.0) && (pressure >= 10.0) && (pressure <= 300.0)) {
+
+        output("INPUT: N2 fugacity calculation using Peng-Robinson EoS\n");
+        return(n2_fugacity_PR(temperature, pressure));
+
+    } else if((temperature == 150.0) && (pressure < 175.0)) {
+
+        output("INPUT: N2 fugacity calculation using Peng-Robinson EoS\n");
+        return(n2_fugacity_PR(temperature, pressure));
+
+    } else if((temperature == 150.0) && (pressure >= 175.0) && (pressure <= 325.0)) {
+
+        output("INPUT: N2 fugacity calculation using BACK EoS\n");
+        return(n2_fugacity_back(temperature, pressure));
+
+    } else if((temperature >= 298.0) && (temperature <= 300.0) && (pressure <= 350.0)) {
+
+        output("INPUT: N2 fugacity calculation using Peng-Robinson EoS\n");
+        return(n2_fugacity_PR(temperature, pressure));
+
+    } else {
+        output("INPUT: Unknown if N2 fugacity will be correct at the requested temperature & pressure...defaulting to use the PR EoS.\n");
+        return(n2_fugacity_PR(temperature, pressure));
+
+    }
+
+    //return(0); /* NOT REACHED */
 
 }
 
@@ -671,74 +752,74 @@ double n2_fugacity(double temperature, double pressure) {
 
 double co2_fugacity(double temperature, double pressure) {
 
-	double Z, A, B, aa, bb, Tc, Pc, Tr;
-	double alpha,alpha2, w, R, Q, X, j,k,l;
-	double theta,  Q3;
-	double uu,U,V,root1,root2,root3, stuff1, stuff2, stuff3; //, answer;  (unused variable)
-	double f1, f2, f3, f4, fugacity, lnfoverp;
-	double pi=acos(-1.0);
+    double Z, A, B, aa, bb, Tc, Pc, Tr;
+    double alpha,alpha2, w, R, Q, X, j,k,l;
+    double theta,  Q3;
+    double uu,U,V,root1,root2,root3, stuff1, stuff2, stuff3; //, answer;  (unused variable)
+    double f1, f2, f3, f4, fugacity, lnfoverp;
+    double pi=acos(-1.0);
 
-	/*Peng Robinson variables and equations for CO2 units K,atm, L, mole*/
-	Tc=304.12;   /*K  */
-	Pc=73.74/1.01325;    /*bar to atm*/
-	w=0.225;
-	R=0.08206;   /* gas constant atmL/moleK */
-	
-	aa=0.45724*R*R*Tc*Tc/Pc;
-	bb=0.07780*R*Tc/Pc;
-	Tr=temperature/Tc;
-	stuff1=0.37464+1.54226*w -0.26992*w*w;
-	stuff2=1.0-sqrt(Tr);
-	alpha=1.0+stuff1*stuff2;
-	alpha2=alpha*alpha;
-	A=alpha2*aa*pressure/(R*R*temperature*temperature);
-	B=bb*pressure/(R*temperature);
+    /*Peng Robinson variables and equations for CO2 units K,atm, L, mole*/
+    Tc=304.12;   /*K  */
+    Pc=73.74/1.01325;    /*bar to atm*/
+    w=0.225;
+    R=0.08206;   /* gas constant atmL/moleK */
 
-	/* solving a cubic equation part */
-	j=-1.0*(1-B);
-	k=A-3.0*B*B-2.0*B;
-	l= -1*(A*B- B*B -B*B*B);
-	Q=(j*j-3.0*k)/9.0;
-	X=(2.0*j*j*j -9.0*j*k+27.0*l)/54.0;
-	Q3=Q*Q*Q;
+    aa=0.45724*R*R*Tc*Tc/Pc;
+    bb=0.07780*R*Tc/Pc;
+    Tr=temperature/Tc;
+    stuff1=0.37464+1.54226*w -0.26992*w*w;
+    stuff2=1.0-sqrt(Tr);
+    alpha=1.0+stuff1*stuff2;
+    alpha2=alpha*alpha;
+    A=alpha2*aa*pressure/(R*R*temperature*temperature);
+    B=bb*pressure/(R*temperature);
 
-	/* Need to check X^2 < Q^3 */
-	if((X*X)<(Q*Q*Q)){    /* THREE REAL ROOTS  */
-		theta=acos((X/sqrt(Q3)));
-		root1=-2.0*sqrt(Q)*cos(theta/3.0)-j/3.0;
-		root2=-2.0*sqrt(Q)*cos((theta+2.0*pi)/3.0)-j/3.0;
-		root3=-2.0*sqrt(Q)*cos((theta-2.0*pi)/3.0)-j/3.0;
+    /* solving a cubic equation part */
+    j=-1.0*(1-B);
+    k=A-3.0*B*B-2.0*B;
+    l= -1*(A*B- B*B -B*B*B);
+    Q=(j*j-3.0*k)/9.0;
+    X=(2.0*j*j*j -9.0*j*k+27.0*l)/54.0;
+    Q3=Q*Q*Q;
 
-		/*Choose the root closest to 1, which is "ideal gas law" */
-		if((1.0-root1)<(1.0-root2) && (1.0-root1)<(1.0-root3))
-			Z=root1;
-		else if((1.0-root2)<(1.0-root3) && (1.0-root2)<(1.0-root1))
-			Z=root2;
-		else
-			Z=root3;
-			
-	} else {   /* ONLY ONE real root */
-		
-		stuff3= X*X-Q*Q*Q;
-		uu=X-sqrt(stuff3);
-		/*Power function must have uu a positive number*/
-		if(uu<0.0)
-			uu=-1.0*uu;
-		U=pow(uu,(1.0/3.0));
-		V=Q/U;
-		root1=U+V-j/3.0;
-		Z=root1;
-	}
+    /* Need to check X^2 < Q^3 */
+    if((X*X)<(Q*Q*Q)) {   /* THREE REAL ROOTS  */
+        theta=acos((X/sqrt(Q3)));
+        root1=-2.0*sqrt(Q)*cos(theta/3.0)-j/3.0;
+        root2=-2.0*sqrt(Q)*cos((theta+2.0*pi)/3.0)-j/3.0;
+        root3=-2.0*sqrt(Q)*cos((theta-2.0*pi)/3.0)-j/3.0;
 
-	/* using Z calculate the fugacity */
-	f1=(Z-1.0)-log(Z-B);
-	f2=A/(2.0*sqrt(2.0)*B);
-	f3=Z+(1.0+sqrt(2.0))*B;
-	f4=Z+(1.0-sqrt(2.0))*B;
-	lnfoverp=f1-f2*log(f3/f4);
-	fugacity=exp(lnfoverp)*pressure;
-	
-	return(fugacity);
+        /*Choose the root closest to 1, which is "ideal gas law" */
+        if((1.0-root1)<(1.0-root2) && (1.0-root1)<(1.0-root3))
+            Z=root1;
+        else if((1.0-root2)<(1.0-root3) && (1.0-root2)<(1.0-root1))
+            Z=root2;
+        else
+            Z=root3;
+
+    } else {   /* ONLY ONE real root */
+
+        stuff3= X*X-Q*Q*Q;
+        uu=X-sqrt(stuff3);
+        /*Power function must have uu a positive number*/
+        if(uu<0.0)
+            uu=-1.0*uu;
+        U=pow(uu,(1.0/3.0));
+        V=Q/U;
+        root1=U+V-j/3.0;
+        Z=root1;
+    }
+
+    /* using Z calculate the fugacity */
+    f1=(Z-1.0)-log(Z-B);
+    f2=A/(2.0*sqrt(2.0)*B);
+    f3=Z+(1.0+sqrt(2.0))*B;
+    f4=Z+(1.0-sqrt(2.0))*B;
+    lnfoverp=f1-f2*log(f3/f4);
+    fugacity=exp(lnfoverp)*pressure;
+
+    return(fugacity);
 
 }
 

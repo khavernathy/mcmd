@@ -25,25 +25,25 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
             //fugacity *= 3; // big, but not too big, for biased insertions
             system.constants.bias_uptake_switcher=0; // done biasing if we exceed the bias-N
             printf("Loading bias deactivated! (Desired N reached).\n");
-        }       
+        }
     }
 
     if (system.constants.ensemble == ENSEMBLE_UVT) {
         if (movetype == MOVETYPE_INSERT) {
-            bf = system.pbc.volume * fugacity * 
-            system.constants.ATM2REDUCED/(system.constants.temp * 
-            (double)(system.stats.count_movables)) *
-                exp(-energy_delta/system.constants.temp) *
-                (double)system.proto.size(); // bias for multisorbate (thus no change for single)
+            bf = system.pbc.volume * fugacity *
+                 system.constants.ATM2REDUCED/(system.constants.temp *
+                                               (double)(system.stats.count_movables)) *
+                 exp(-energy_delta/system.constants.temp) *
+                 (double)system.proto.size(); // bias for multisorbate (thus no change for single)
             if (bf < MAXVALUE) system.stats.insert_bf_sum += bf;
             else system.stats.insert_bf_sum += MAXVALUE;
-        } 
+        }
         else if (movetype == MOVETYPE_REMOVE) {
-            bf = system.constants.temp * 
-            ((double)(system.stats.count_movables) + 1.0)/
-            (system.pbc.volume* fugacity *system.constants.ATM2REDUCED) *
-                exp(-energy_delta/system.constants.temp) /
-                (double)system.proto.size(); // bias for multisorbate (thus no change for single)
+            bf = system.constants.temp *
+                 ((double)(system.stats.count_movables) + 1.0)/
+                 (system.pbc.volume* fugacity *system.constants.ATM2REDUCED) *
+                 exp(-energy_delta/system.constants.temp) /
+                 (double)system.proto.size(); // bias for multisorbate (thus no change for single)
             if (bf < MAXVALUE) system.stats.remove_bf_sum += bf;
             else system.stats.remove_bf_sum += MAXVALUE;
         }
@@ -64,11 +64,11 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
         if (movetype == MOVETYPE_VOLUME) {
             // Frenkel Smit p118
             bf= exp(-( (energy_delta)
-            + system.constants.pres * system.constants.ATM2REDUCED * 
-            (system.pbc.volume - system.pbc.old_volume)
-            - (system.stats.count_movables + 1) * system.constants.temp * 
-                log(system.pbc.volume/system.pbc.old_volume))/system.constants.temp);
-            
+                       + system.constants.pres * system.constants.ATM2REDUCED *
+                       (system.pbc.volume - system.pbc.old_volume)
+                       - (system.stats.count_movables + 1) * system.constants.temp *
+                       log(system.pbc.volume/system.pbc.old_volume))/system.constants.temp);
+
             if (bf < MAXVALUE) system.stats.volume_change_bf_sum += bf;
             else system.stats.volume_change_bf_sum += MAXVALUE;
         }
@@ -82,17 +82,17 @@ double get_boltzmann_factor(System &system, double e_i, double e_f, int_fast8_t 
         if (movetype == MOVETYPE_DISPLACE) {
             double exponent = 3.0*system.stats.count_movables/2.0;
             bf = pow(
-            (system.constants.total_energy - e_f) , exponent) / 
-                pow(
-                    (system.constants.total_energy - e_i) , exponent);
+                     (system.constants.total_energy - e_f), exponent) /
+                 pow(
+                     (system.constants.total_energy - e_i), exponent);
             if (bf < MAXVALUE) system.stats.displace_bf_sum += bf;
             else system.stats.displace_bf_sum += MAXVALUE;
         }
     }
- 
+
     if (bf > MAXVALUE) {
         bf = MAXVALUE;
-    } 
+    }
     else if (std::isinf(bf)) {
         printf("GOT INF! bf = %f\n", bf);
     }

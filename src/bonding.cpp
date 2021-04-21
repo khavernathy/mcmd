@@ -15,19 +15,19 @@ string convertElement(System &system, string label) {
     string my_sub_string;
 
     for(int n=0; n<10; n++) {
-            string my_sub_string = to_string(n);
+        string my_sub_string = to_string(n);
 
-            std::size_t found = mystring.find(my_sub_string);
+        std::size_t found = mystring.find(my_sub_string);
 
-            if(found != std::string::npos) {
-                    mystring = mystring.substr(0,(int)found);
-            }
+        if(found != std::string::npos) {
+            mystring = mystring.substr(0,(int)found);
+        }
     }
     if((int)(mystring.length()) == 2) {
-            string first = mystring.substr(0,1);
-            string second = mystring.substr(1,1);
-            std::transform(second.begin(), second.end(), second.begin(), ::tolower);
-            mystring = first + second;
+        string first = mystring.substr(0,1);
+        string second = mystring.substr(1,1);
+        std::transform(second.begin(), second.end(), second.begin(), ::tolower);
+        mystring = first + second;
     }
     return mystring;
 }
@@ -47,8 +47,8 @@ string getFormulaUnit(System &system) {
                 std::map<string,int>::iterator it = atomlist[g].find(ele.c_str());
 
                 if (it != atomlist[g].end()) {
-                        checkinmap = true;
-                        atomlist[g].find(ele.c_str())->second++;
+                    checkinmap = true;
+                    atomlist[g].find(ele.c_str())->second++;
                 }
             }
             if (!checkinmap) {
@@ -110,16 +110,16 @@ bool find_cycle(System &system, unsigned int mol, unsigned int i) {
         for (b2=0; b2<system.molecules[mol].atoms[a2].bonds.size(); b2++) {
             a3 = system.molecules[mol].atoms[a2].bonds[b2];
             if (a3 == i) continue; // don't go backwards..
-            for (b3=0; b3<system.molecules[mol].atoms[a3].bonds.size();b3++) {
+            for (b3=0; b3<system.molecules[mol].atoms[a3].bonds.size(); b3++) {
                 a4 = system.molecules[mol].atoms[a3].bonds[b3];
                 if (a4 == a2) continue;
-                for (b4=0; b4<system.molecules[mol].atoms[a4].bonds.size();b4++) {
+                for (b4=0; b4<system.molecules[mol].atoms[a4].bonds.size(); b4++) {
                     a5 = system.molecules[mol].atoms[a4].bonds[b4];
                     if (a5 == a3) continue;
-                    for (b5=0; b5<system.molecules[mol].atoms[a5].bonds.size();b5++) {
+                    for (b5=0; b5<system.molecules[mol].atoms[a5].bonds.size(); b5++) {
                         a6 = system.molecules[mol].atoms[a5].bonds[b5];
                         if (a6 == a4) continue;
-                        for (b6=0; b6<system.molecules[mol].atoms[a6].bonds.size();b6++) {
+                        for (b6=0; b6<system.molecules[mol].atoms[a6].bonds.size(); b6++) {
                             a7 = system.molecules[mol].atoms[a6].bonds[b6];
                             if (a7 == a5) continue;
                             if (a7 == i)
@@ -145,16 +145,16 @@ void check_H_multi_bonds(System &system) {
     double smallest_r; // bond length
     double smallest_bi; // corresponding index
     int smallest_l; // index for atom
-    for (i=0;i<system.molecules.size();i++) {
-        for (j=0;j<system.molecules[i].atoms.size();j++) {
+    for (i=0; i<system.molecules.size(); i++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
             ul = system.molecules[i].atoms[j].UFFlabel;
-            bonds = (int)system.molecules[i].atoms[j].bonds.size();   
+            bonds = (int)system.molecules[i].atoms[j].bonds.size();
             // check for unrealistic H bonds and reduce to one bond
             // based on shortest one
             if (ul == "H_" && bonds > 1) {
                 smallest_r=1e40; // big number to start
                 // loop through this H atom's bonds
-                for (bi=0; bi<system.molecules[i].atoms[j].bonds.size();bi++) {
+                for (bi=0; bi<system.molecules[i].atoms[j].bonds.size(); bi++) {
                     l = system.molecules[i].atoms[j].bonds[bi];
                     double* distances = getDistanceXYZ(system,i,j,i,l);
                     r = distances[3];
@@ -170,28 +170,28 @@ void check_H_multi_bonds(System &system) {
                 system.molecules[i].atoms[j].bonds.clear();
                 system.molecules[i].atoms[j].bonds.push_back(smallest_l);
 
-/*
-                for (bi = 0; bi<system.molecules[i].atoms[j].bonds.size();bi++) {
-                    l = system.molecules[i].atoms[j].bonds[bi];
-                    if (bi != smallest_bi) {
-                        system.molecules[i].atoms[j].bonds.erase(system.molecules[i].atoms[j].bonds.begin() + bi);
-                        int w;
-                        for (w=0;w<system.molecules[i].atoms[l].bonds.size();w++){
-                            if (system.molecules[i].atoms[l].bonds[w] == j)
-                                system.molecules[i].atoms[l].bonds.erase(system.molecules[i].atoms[l].bonds.begin() + w);
-                        }
-                    }
+                /*
+                                for (bi = 0; bi<system.molecules[i].atoms[j].bonds.size();bi++) {
+                                    l = system.molecules[i].atoms[j].bonds[bi];
+                                    if (bi != smallest_bi) {
+                                        system.molecules[i].atoms[j].bonds.erase(system.molecules[i].atoms[j].bonds.begin() + bi);
+                                        int w;
+                                        for (w=0;w<system.molecules[i].atoms[l].bonds.size();w++){
+                                            if (system.molecules[i].atoms[l].bonds[w] == j)
+                                                system.molecules[i].atoms[l].bonds.erase(system.molecules[i].atoms[l].bonds.begin() + w);
+                                        }
+                                    }
 
-                }
-*/
+                                }
+                */
                 // delete the other ones in master list
                 l = smallest_l; // bonded atom id
                 int a;
                 for (a=0; a<system.constants.uniqueBonds.size(); a++) {
-                   if (system.constants.uniqueBonds[a].mol == i && system.constants.uniqueBonds[a].atom1 == j) {
+                    if (system.constants.uniqueBonds[a].mol == i && system.constants.uniqueBonds[a].atom1 == j) {
                         if (system.constants.uniqueBonds[a].atom2 != l)
                             system.constants.uniqueBonds.erase( system.constants.uniqueBonds.begin()+a  );
-                    } 
+                    }
                     else if (system.constants.uniqueBonds[a].mol == i && system.constants.uniqueBonds[a].atom1 == l) {
                         if (system.constants.uniqueBonds[a].atom2 != j)
                             system.constants.uniqueBonds.erase( system.constants.uniqueBonds.begin()+a  );
@@ -199,8 +199,8 @@ void check_H_multi_bonds(System &system) {
                 }
             } // end if H_ and bonds > 1
         } // end atom j
-    } // end molecule i   
-      
+    } // end molecule i
+
 }
 
 
@@ -273,7 +273,7 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
         //return "Zn4+2"; // UFF4MOF paddlewheel type
         return "Zn3f2"; // this is the MOF-5 type of Zn
     } else if (name == "Zr") {
-        return "Zr3+4";  
+        return "Zr3+4";
     } else if (name == "Br") {
         return "Br";
     } else if (name == "I") {
@@ -290,7 +290,7 @@ string getUFFlabel(System &system, string name, int num_bonds, int mol, int i) {
     printf("Molecule %i atom %i\n", mol, i);
     exit(EXIT_FAILURE);
     return "NOTFOUND";
-    
+
 }
 
 
@@ -356,18 +356,18 @@ double get_kij(System &system, unsigned int i, unsigned int j, unsigned int k, u
 
 double get_BO(string a1, string a2) {
     if ((a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos)
-     || (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos)
-     || (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos))
-       return 1.5; // resonant, carboxyl, etc.
+            || (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos)
+            || (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos))
+        return 1.5; // resonant, carboxyl, etc.
     else if (a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos)
         return 2.0; // sp2
     else if (a1.find("_1") != std::string::npos && a2.find("_1") != std::string::npos)
         return 3.0; // sp
     else if ((a1.find("O_") != std::string::npos && a2.find("Zn") != std::string::npos)
-         || (a1.find("Zn") != std::string::npos && a2.find("O_") != std::string::npos))
+             || (a1.find("Zn") != std::string::npos && a2.find("O_") != std::string::npos))
         return 0.5; // Zn--O cluster
     else if ((a1.find("Cu") != std::string::npos && a2.find("O_") != std::string::npos)
-         ||  (a1.find("O_") != std::string::npos && a2.find("Cu") != std::string::npos))
+             ||  (a1.find("O_") != std::string::npos && a2.find("Cu") != std::string::npos))
         return 0.5; // Cu--O paddlewheel
     else if (a1.find("Cu") != std::string::npos && a2.find("Cu") != std::string::npos)
         return 0.25; // Cu paddlewheel
@@ -397,7 +397,7 @@ double stretch_energy(System &system) {
         //kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
 //          printf("rij = %f; kij = %f\n", rij, kij);
 
-    //    BO = system.constants.uniqueBonds[it].BO;
+        //    BO = system.constants.uniqueBonds[it].BO;
         Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
         alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
 
@@ -426,11 +426,11 @@ double get_angle(System &system, unsigned int i, unsigned int A, unsigned int B,
     double BC[3] = {0,0,0};
 
     double* ABdistances = getDistanceXYZ(system, i, A, i, B);
-    for (unsigned int n=0;n<3;n++) {
+    for (unsigned int n=0; n<3; n++) {
         AB[n] = ABdistances[n];
     }
     double* BCdistances = getDistanceXYZ(system, i, C, i, B);
-    for (unsigned int n=0;n<3;n++) {
+    for (unsigned int n=0; n<3; n++) {
         BC[n] = BCdistances[n];
     }
 
@@ -509,35 +509,35 @@ double get_dihedral_angle(System &system, unsigned int mol, unsigned int i, unsi
     double v2a[3], v2b[3]; // for plane 2
     double norm1[3], norm2[3];
 
-	/*
+    /*
     double xi,xj,xk,xl;
     double yi,yj,yk,yl;
     double zi,zj,zk,zl;
-	*/
+    */
 
     double* distancesJI = getDistanceXYZ(system,mol,j,mol,i);
     for (int n=0; n<3; n++)
         v1a[n] = distancesJI[n];
 
     double* distancesKI = getDistanceXYZ(system,mol,k,mol,i);
-    for (int n=0;n<3;n++)
+    for (int n=0; n<3; n++)
         v1b[n] = distancesKI[n];
 
     double* distancesKJ = getDistanceXYZ(system,mol,k,mol,j);
-    for (int n=0;n<3;n++)
+    for (int n=0; n<3; n++)
         v2a[n] = distancesKJ[n];
 
     double* distancesLJ = getDistanceXYZ(system,mol,l,mol,j);
-    for (int n=0;n<3;n++)
+    for (int n=0; n<3; n++)
         v2b[n] = distancesLJ[n];
 
-/*
-        v1a[n] = system.molecules[mol].atoms[j].pos[n] - system.molecules[mol].atoms[i].pos[n];
-        v1b[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[i].pos[n];
+    /*
+            v1a[n] = system.molecules[mol].atoms[j].pos[n] - system.molecules[mol].atoms[i].pos[n];
+            v1b[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[i].pos[n];
 
-        v2a[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[j].pos[n];
-        v2b[n] = system.molecules[mol].atoms[l].pos[n] - system.molecules[mol].atoms[j].pos[n];
-    */
+            v2a[n] = system.molecules[mol].atoms[k].pos[n] - system.molecules[mol].atoms[j].pos[n];
+            v2b[n] = system.molecules[mol].atoms[l].pos[n] - system.molecules[mol].atoms[j].pos[n];
+        */
 
     norm1[0] = v1a[1]*v1b[2] - v1a[2]*v1b[1];
     norm1[1] = v1a[2]*v1b[0] - v1a[0]*v1b[2];
@@ -547,7 +547,7 @@ double get_dihedral_angle(System &system, unsigned int mol, unsigned int i, unsi
     norm2[1] = v2a[2]*v2b[0] - v2a[0]*v2b[2];
     norm2[2] = v2a[0]*v2b[1] - v2a[1]*v2b[0];
 
-    for (int n=0;n<3;n++) {
+    for (int n=0; n<3; n++) {
         Plane1[n] = norm1[n];
         Plane2[n] = norm2[n];
     }
@@ -579,10 +579,10 @@ double * get_torsion_params(System &system, string a1, string a2) {
             o[2] = 2;
         }
         else if (a1.find("O") != std::string::npos &&
-            (a2.find("S_") != std::string::npos ||
-             a2.find("Se") != std::string::npos ||
-             a2.find("Te") != std::string::npos ||
-             a2.find("Po") != std::string::npos)  )
+                 (a2.find("S_") != std::string::npos ||
+                  a2.find("Se") != std::string::npos ||
+                  a2.find("Te") != std::string::npos ||
+                  a2.find("Po") != std::string::npos)  )
         {
             o[0] = 90;
             o[1] = sqrt(2.0 * 6.8);
@@ -590,10 +590,10 @@ double * get_torsion_params(System &system, string a1, string a2) {
 
         }
         else if (a2.find("O") != std::string::npos &&
-            (a1.find("S_") != std::string::npos ||
-             a1.find("Se") != std::string::npos ||
-             a1.find("Te") != std::string::npos ||
-             a1.find("Po") != std::string::npos)  )
+                 (a1.find("S_") != std::string::npos ||
+                  a1.find("Se") != std::string::npos ||
+                  a1.find("Te") != std::string::npos ||
+                  a1.find("Po") != std::string::npos)  )
         {
             o[0] = 90;
             o[1] = 6.8; // sqrt(6.8*6.8)
@@ -607,18 +607,18 @@ double * get_torsion_params(System &system, string a1, string a2) {
     }
     // sp3--sp2
     else if ((a1.find("_3") != std::string::npos && a2.find("_2") != std::string::npos) ||
-            (a1.find("_2") != std::string::npos && a2.find("_3") != std::string::npos) ||
-            (a1.find("_R") != std::string::npos && a2.find("_3") != std::string::npos) ||
-            (a1.find("_3") != std::string::npos && a2.find("_R") != std::string::npos)     ) {
+             (a1.find("_2") != std::string::npos && a2.find("_3") != std::string::npos) ||
+             (a1.find("_R") != std::string::npos && a2.find("_3") != std::string::npos) ||
+             (a1.find("_3") != std::string::npos && a2.find("_R") != std::string::npos)     ) {
         o[0]=0;
         o[1]=1.0;
         o[2] = 6;
     }
     // sp2--sp2
     else if ((a1.find("_2") != std::string::npos && a2.find("_2") != std::string::npos) ||
-            (a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos) ||
-            (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos) ||
-            (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos) ) {
+             (a1.find("_R") != std::string::npos && a2.find("_R") != std::string::npos) ||
+             (a1.find("_2") != std::string::npos && a2.find("_R") != std::string::npos) ||
+             (a1.find("_R") != std::string::npos && a2.find("_2") != std::string::npos) ) {
         o[0]=180; // "or 60"
         const double BO = 1.5; // assume resonance bond order..
         double Uj=1.25,Uk=1.25; // assume second period...
@@ -684,52 +684,52 @@ double morse_gradient(System &system) {
     //double BO;
     /* ============================ */
     double prefactor,grad,delta;
-        // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
+    // typical gradient elements (e.g. dE/dx_i) are ~10^2 in these units.
 
 
-            for (unsigned int it=0; it<system.constants.uniqueBonds.size(); it++) {
+    for (unsigned int it=0; it<system.constants.uniqueBonds.size(); it++) {
 
-                i = system.constants.uniqueBonds[it].mol;
-                j = system.constants.uniqueBonds[it].atom1;
-                l = system.constants.uniqueBonds[it].atom2;
+        i = system.constants.uniqueBonds[it].mol;
+        j = system.constants.uniqueBonds[it].atom1;
+        l = system.constants.uniqueBonds[it].atom2;
 
-                rij = system.constants.uniqueBonds[it].rij; // in A
-                //kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
+        rij = system.constants.uniqueBonds[it].rij; // in A
+        //kij = system.constants.uniqueBonds[it].kij; // in kcal/molA^2
 //          printf("rij = %f; kij = %f\n", rij, kij);
 
-                //BO = system.constants.uniqueBonds[it].BO;
-                Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
-                alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
+        //BO = system.constants.uniqueBonds[it].BO;
+        Dij = system.constants.uniqueBonds[it].Dij;// in kcal/mol
+        alpha = system.constants.uniqueBonds[it].alpha; // in 1/A
 
 
-                double* distances = getDistanceXYZ(system, i,j,i,l);
-                r = distances[3];
+        double* distances = getDistanceXYZ(system, i,j,i,l);
+        r = distances[3];
 
-                // gradient for a single bond is 6D (3D on each atom, 1 for each D.O.F.)
-                prefactor = 2*alpha*Dij*exp(alpha*(rij-r))/r;
-                if (prefactor==0) continue; // skip 0-contributions
-                for (int n=0;n<3;n++) {
-                    delta = distances[n]; //system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
-                    grad = prefactor * delta;
-                    grad *= (1 - exp(alpha*(rij-r)));
-                        system.molecules[i].atoms[j].force[n] -= grad / system.constants.kbk;
-                        system.molecules[i].atoms[l].force[n] += grad / system.constants.kbk;
-                }
-                // xj, yj, zj
-                // since gradient of the other atom is just minus the other, we apply a Newton-pair style thing above
-                // instead of recomputing.
-                /*
-                    for (int n=0;n<3;n++) {
-                    delta = system.molecules[i].atoms[l].pos[n] - system.molecules[i].atoms[j].pos[n];
-                    grad = prefactor * delta;
-                    grad *= (1 - exp(alpha*(rij-r)));
-                    printf("%f\n", grad);
-                    // move the atom position element in direction of energy minimum
-                    system.molecules[i].atoms[l].pos[n] += grad*move_factor;
-                }
-                */
+        // gradient for a single bond is 6D (3D on each atom, 1 for each D.O.F.)
+        prefactor = 2*alpha*Dij*exp(alpha*(rij-r))/r;
+        if (prefactor==0) continue; // skip 0-contributions
+        for (int n=0; n<3; n++) {
+            delta = distances[n]; //system.molecules[i].atoms[j].pos[n] - system.molecules[i].atoms[l].pos[n];
+            grad = prefactor * delta;
+            grad *= (1 - exp(alpha*(rij-r)));
+            system.molecules[i].atoms[j].force[n] -= grad / system.constants.kbk;
+            system.molecules[i].atoms[l].force[n] += grad / system.constants.kbk;
+        }
+        // xj, yj, zj
+        // since gradient of the other atom is just minus the other, we apply a Newton-pair style thing above
+        // instead of recomputing.
+        /*
+            for (int n=0;n<3;n++) {
+            delta = system.molecules[i].atoms[l].pos[n] - system.molecules[i].atoms[j].pos[n];
+            grad = prefactor * delta;
+            grad *= (1 - exp(alpha*(rij-r)));
+            printf("%f\n", grad);
+            // move the atom position element in direction of energy minimum
+            system.molecules[i].atoms[l].pos[n] += grad*move_factor;
+        }
+        */
 
-            }
+    }
 
     return 0; //.5*potential; // in kcal/mol
 }
@@ -748,7 +748,7 @@ double angle_bend_gradient(System &system) {
     double grad;
     double xi, yi, zi, xj, yj, zj, xk, yk, zk;
     double t1,t2,t3;
-        // cos-derivative terms in the gradient, + other terms.
+    // cos-derivative terms in the gradient, + other terms.
 
 
     for (unsigned int it=0; it<system.constants.uniqueAngles.size(); it++) {
@@ -806,7 +806,7 @@ double angle_bend_gradient(System &system) {
         cos2 = 2*(((xk-xj)/(djk*dij)) - (( (xi-xj)*(B + (xk-xj)*(xi-xj)))/(djk*dij*dij*dij))) * sin(2*acos((B + (xk-xj)*(xi-xj))/(djk*dij))) / sqrt(1 - pow((B + (xk-xj)*(xi-xj)),2)/(djk*djk*dij*dij));
 
         grad = K_ijk*(C1*cos1 + C2*cos2);
-  */
+        */
         // MATLAB GENERATED PARTIALS...
         // recall J,L,M are i,j,k
         double ij2sum = (xi-xj)*(xi-xj) + (yi-yj)*(yi-yj) + (zi-zj)*(zi-zj);
@@ -820,95 +820,95 @@ double angle_bend_gradient(System &system) {
         else if (arg<-1.0) arg=-1.0;
 
         if (thing > 0) {
-        // x_i
-        grad =
-        K_ijk*(C2*sin(acos(arg)*2.0)*
-        ((xj-xk)*1.0/rootij*1.0/rootjk-(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5)*
-        1.0/sqrt(thing)*2.0-
-        C1*(xj-xk)*1.0/rootij*1.0/rootjk+
-        C1*(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5);
-         system.molecules[i].atoms[j].force[0] -= grad / system.constants.kbk;
+            // x_i
+            grad =
+                K_ijk*(C2*sin(acos(arg)*2.0)*
+                       ((xj-xk)*1.0/rootij*1.0/rootjk-(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5)*
+                       1.0/sqrt(thing)*2.0-
+                       C1*(xj-xk)*1.0/rootij*1.0/rootjk+
+                       C1*(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5);
+            system.molecules[i].atoms[j].force[0] -= grad / system.constants.kbk;
 
-        // y_i
-        grad =
-        K_ijk*(C2*sin(acos(arg)*2.0)*
-        ((yj-yk)*1.0/rootij*1.0/rootjk-(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5)*
-        1.0/sqrt(thing)*2.0-
-        C1*(yj-yk)*1.0/rootij*1.0/rootjk+
-        C1*(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5);
-         system.molecules[i].atoms[j].force[1] -= grad / system.constants.kbk;
+            // y_i
+            grad =
+                K_ijk*(C2*sin(acos(arg)*2.0)*
+                       ((yj-yk)*1.0/rootij*1.0/rootjk-(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5)*
+                       1.0/sqrt(thing)*2.0-
+                       C1*(yj-yk)*1.0/rootij*1.0/rootjk+
+                       C1*(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5);
+            system.molecules[i].atoms[j].force[1] -= grad / system.constants.kbk;
 
-        // z_i
-        grad =
-        K_ijk*(C2*sin(acos(arg)*2.0)*
-        ((zj-zk)*1.0/rootij*1.0/rootjk-(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5)*
-        1.0/sqrt(thing)*2.0-
-        C1*(zj-zk)*1.0/rootij*1.0/rootjk+
-        C1*(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5);
-         system.molecules[i].atoms[j].force[2] -= grad / system.constants.kbk;
+            // z_i
+            grad =
+                K_ijk*(C2*sin(acos(arg)*2.0)*
+                       ((zj-zk)*1.0/rootij*1.0/rootjk-(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5)*
+                       1.0/sqrt(thing)*2.0-
+                       C1*(zj-zk)*1.0/rootij*1.0/rootjk+
+                       C1*(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5);
+            system.molecules[i].atoms[j].force[2] -= grad / system.constants.kbk;
 
-        // x_j
-        grad =
-        K_ijk*(C2*sin(acos(arg)*2.0)*
-        1.0/sqrt(thing)*((xi-xj*2.0+xk)*1.0/rootij*
-        1.0/rootjk+(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5-(xj*2.0-xk*2.0)*
-        1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*2.0-
-        C1*(xi-xj*2.0+xk)*1.0/rootij*1.0/rootjk-
-        C1*(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5+
-        C1*(xj*2.0-xk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
-         system.molecules[i].atoms[l].force[0] -= grad / system.constants.kbk;
+            // x_j
+            grad =
+                K_ijk*(C2*sin(acos(arg)*2.0)*
+                       1.0/sqrt(thing)*((xi-xj*2.0+xk)*1.0/rootij*
+                                        1.0/rootjk+(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5-(xj*2.0-xk*2.0)*
+                                        1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*2.0-
+                       C1*(xi-xj*2.0+xk)*1.0/rootij*1.0/rootjk-
+                       C1*(xi*2.0-xj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5+
+                       C1*(xj*2.0-xk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
+            system.molecules[i].atoms[l].force[0] -= grad / system.constants.kbk;
 
-        // y_j
-        grad =
-        K_ijk*(C2*sin(acos(arg)*2.0)*
-        1.0/sqrt(thing)*((yi-yj*2.0+yk)*1.0/rootij*
-        1.0/rootjk+(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5-(yj*2.0-yk*2.0)*
-        1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*2.0-
-        C1*(yi-yj*2.0+yk)*1.0/rootij*1.0/rootjk-
-        C1*(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5+
-        C1*(yj*2.0-yk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
-         system.molecules[i].atoms[l].force[1] -= grad / system.constants.kbk;
+            // y_j
+            grad =
+                K_ijk*(C2*sin(acos(arg)*2.0)*
+                       1.0/sqrt(thing)*((yi-yj*2.0+yk)*1.0/rootij*
+                                        1.0/rootjk+(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5-(yj*2.0-yk*2.0)*
+                                        1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*2.0-
+                       C1*(yi-yj*2.0+yk)*1.0/rootij*1.0/rootjk-
+                       C1*(yi*2.0-yj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5+
+                       C1*(yj*2.0-yk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
+            system.molecules[i].atoms[l].force[1] -= grad / system.constants.kbk;
 
-        // z_j
-        grad =
-        K_ijk*(C2*sin(acos(arg)*2.0)*
-        1.0/sqrt(thing)*((zi-zj*2.0+zk)*1.0/rootij*
-        1.0/rootjk+(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5-(zj*2.0-zk*2.0)*
-        1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*2.0-
-        C1*(zi-zj*2.0+zk)*1.0/rootij*1.0/rootjk-
-        C1*(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5+
-        C1*(zj*2.0-zk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
-         system.molecules[i].atoms[l].force[2] -= grad / system.constants.kbk;
+            // z_j
+            grad =
+                K_ijk*(C2*sin(acos(arg)*2.0)*
+                       1.0/sqrt(thing)*((zi-zj*2.0+zk)*1.0/rootij*
+                                        1.0/rootjk+(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5-(zj*2.0-zk*2.0)*
+                                        1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*2.0-
+                       C1*(zi-zj*2.0+zk)*1.0/rootij*1.0/rootjk-
+                       C1*(zi*2.0-zj*2.0)*1.0/pow(ij2sum,3.0/2.0)*1.0/rootjk*mixer*0.5+
+                       C1*(zj*2.0-zk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
+            system.molecules[i].atoms[l].force[2] -= grad / system.constants.kbk;
 
-        // x_k
-        grad =
-        -K_ijk*(C2*sin(acos(arg)*2.0)*
-        ((xi-xj)*1.0/rootij*1.0/rootjk-(xj*2.0-xk*2.0)*1.0/rootij*
-        1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*1.0/sqrt(thing)*2.0-
-        C1*(xi-xj)*1.0/rootij*1.0/rootjk+
-        C1*(xj*2.0-xk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
-         system.molecules[i].atoms[m].force[0] -= grad / system.constants.kbk;
+            // x_k
+            grad =
+                -K_ijk*(C2*sin(acos(arg)*2.0)*
+                        ((xi-xj)*1.0/rootij*1.0/rootjk-(xj*2.0-xk*2.0)*1.0/rootij*
+                         1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*1.0/sqrt(thing)*2.0-
+                        C1*(xi-xj)*1.0/rootij*1.0/rootjk+
+                        C1*(xj*2.0-xk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
+            system.molecules[i].atoms[m].force[0] -= grad / system.constants.kbk;
 
-        // y_k
-        grad =
-        -K_ijk*(C2*sin(acos(arg)*2.0)*
-        ((yi-yj)*1.0/rootij*1.0/rootjk-(yj*2.0-yk*2.0)*1.0/rootij*
-        1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*1.0/sqrt(thing)*2.0-
-        C1*(yi-yj)*1.0/rootij*1.0/rootjk+
-        C1*(yj*2.0-yk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
-         system.molecules[i].atoms[m].force[1] -= grad / system.constants.kbk;
+            // y_k
+            grad =
+                -K_ijk*(C2*sin(acos(arg)*2.0)*
+                        ((yi-yj)*1.0/rootij*1.0/rootjk-(yj*2.0-yk*2.0)*1.0/rootij*
+                         1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*1.0/sqrt(thing)*2.0-
+                        C1*(yi-yj)*1.0/rootij*1.0/rootjk+
+                        C1*(yj*2.0-yk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
+            system.molecules[i].atoms[m].force[1] -= grad / system.constants.kbk;
 
-        // z_k
-        grad =
-        -K_ijk*(C2*sin(acos(arg)*2.0)*
-        ((zi-zj)*1.0/rootij*1.0/rootjk-(zj*2.0-zk*2.0)*1.0/rootij*
-        1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*1.0/sqrt(thing)*2.0-
-        C1*(zi-zj)*1.0/rootij*1.0/rootjk+
-        C1*(zj*2.0-zk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
-         system.molecules[i].atoms[m].force[2] -= grad / system.constants.kbk;
+            // z_k
+            grad =
+                -K_ijk*(C2*sin(acos(arg)*2.0)*
+                        ((zi-zj)*1.0/rootij*1.0/rootjk-(zj*2.0-zk*2.0)*1.0/rootij*
+                         1.0/pow(jk2sum,3.0/2.0)*mixer*0.5)*1.0/sqrt(thing)*2.0-
+                        C1*(zi-zj)*1.0/rootij*1.0/rootjk+
+                        C1*(zj*2.0-zk*2.0)*1.0/rootij*1.0/pow(jk2sum,3.0/2.0)*mixer*0.5);
+            system.molecules[i].atoms[m].force[2] -= grad / system.constants.kbk;
 
 
-       } // end if sqrt argument is > 0 (to avoid nan)
+        } // end if sqrt argument is > 0 (to avoid nan)
         //double POT=K_ijk*(C0 + C1*cos(angle) + C2*cos(2.0*angle)); // in kcal/mol
 
     }
@@ -967,69 +967,69 @@ double torsions_gradient(System &system) {
         dih_thing1 = -pow(((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)),2.0)/((pow((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj),2.0)+pow((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj),2.0)+pow((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj),2.0))*(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0)))+1.0;
 
         if (dih_thing1 > 0.0) { // prevent NAN and INF
-          dih_thing2 = sqrt(pow((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj),2.0)+pow((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj),2.0)+pow((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj),2.0));
-          dih_thing3 = sqrt(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0));
-          dih_thing4 = pow(pow((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj),2.0)+pow((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj),2.0)+pow((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj),2.0),3.0/2.0);
-          dih_thing5 = (((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)));
+            dih_thing2 = sqrt(pow((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj),2.0)+pow((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj),2.0)+pow((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj),2.0));
+            dih_thing3 = sqrt(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0));
+            dih_thing4 = pow(pow((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj),2.0)+pow((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj),2.0)+pow((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj),2.0),3.0/2.0);
+            dih_thing5 = (((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)));
 
-          arg = 1.0/dih_thing2*1.0/dih_thing3*dih_thing5;
-          if (arg>1.0) arg=1.0;
-          else if (arg<-1.0) arg=-1.0;
+            arg = 1.0/dih_thing2*1.0/dih_thing3*dih_thing5;
+            if (arg>1.0) arg=1.0;
+            else if (arg<-1.0) arg=-1.0;
 
-          // xi
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*
-          1.0/sqrt(dih_thing1)*(((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))*
-          1.0/dih_thing2*
-          1.0/dih_thing3-((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*
-          1.0/dih_thing3*dih_thing5*(1.0/2.0))*(-1.0/2.0);
-           system.molecules[i].atoms[j].force[0] -= grad / system.constants.kbk;
+            // xi
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*
+                   1.0/sqrt(dih_thing1)*(((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))*
+                                         1.0/dih_thing2*
+                                         1.0/dih_thing3-((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*
+                                         1.0/dih_thing3*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+            system.molecules[i].atoms[j].force[0] -= grad / system.constants.kbk;
 
-          // yi
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[j].force[1] -= grad / system.constants.kbk;
+            // yi
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[j].force[1] -= grad / system.constants.kbk;
 
-          // zi
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[j].force[2] -= grad / system.constants.kbk;
+            // zi
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[j].force[2] -= grad / system.constants.kbk;
 
-          // xj
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yk-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zk-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yk-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zk-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
-           system.molecules[i].atoms[l].force[0] -= grad / system.constants.kbk;
+            // xj
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yk-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zk-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yk-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zk-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+            system.molecules[i].atoms[l].force[0] -= grad / system.constants.kbk;
 
-          // yj
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zk-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zk-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[l].force[1] -= grad / system.constants.kbk;
+            // yj
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zk-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zk-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[l].force[1] -= grad / system.constants.kbk;
 
-          // zj
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yk-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yk-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[l].force[2] -= grad / system.constants.kbk;
+            // zj
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xk-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yk-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xk-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yk-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[l].force[2] -= grad / system.constants.kbk;
 
-          // xk
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yj-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yj-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[m].force[0] -= grad / system.constants.kbk;
+            // xk
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((yj-yl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(yi-yj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))+(zj-zl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(zi-zj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk)))+((yi-yj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0+(zi-zj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((yj-yl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[m].force[0] -= grad / system.constants.kbk;
 
-          // yk
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
-           system.molecules[i].atoms[m].force[1] -= grad / system.constants.kbk;
+            // yk
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(xi-xj)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))-(zj-zl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))+(zi-zj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))*2.0-(zi-zj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+            system.molecules[i].atoms[m].force[1] -= grad / system.constants.kbk;
 
-          // zk
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
-           system.molecules[i].atoms[m].force[2] -= grad / system.constants.kbk;
+            // zk
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(1.0/dih_thing2*1.0/dih_thing3*((xj-xl)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))-(xi-xj)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))+(yj-yl)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))-(yi-yj)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk)))+((xi-xj)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))*2.0+(yi-yj)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj))*2.0)*1.0/dih_thing4*1.0/dih_thing3*dih_thing5*(1.0/2.0)-((xj-xl)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yl)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+            system.molecules[i].atoms[m].force[2] -= grad / system.constants.kbk;
 
-          // xl
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
-           system.molecules[i].atoms[p].force[0] -= grad / system.constants.kbk;
+            // xl
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((yj-yk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))+(zj-zk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((yj-yk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0+(zj-zk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(-1.0/2.0);
+            system.molecules[i].atoms[p].force[0] -= grad / system.constants.kbk;
 
-          // yl
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[p].force[1] -= grad / system.constants.kbk;
+            // yl
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(yi-yk)-(xi-xk)*(yi-yj))-(zj-zk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk))*2.0-(zj-zk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[p].force[1] -= grad / system.constants.kbk;
 
-          // zl
-          grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
-           system.molecules[i].atoms[p].force[2] -= grad / system.constants.kbk;
+            // zl
+            grad = n*vjk*cos(n*phi_ijkl)*sin(n*acos(arg))*1.0/sqrt(dih_thing1)*(((xj-xk)*((xi-xj)*(zi-zk)-(xi-xk)*(zi-zj))+(yj-yk)*((yi-yj)*(zi-zk)-(yi-yk)*(zi-zj)))*1.0/dih_thing2*1.0/dih_thing3-((xj-xk)*((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk))*2.0+(yj-yk)*((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk))*2.0)*1.0/dih_thing2*1.0/pow(pow((xj-xk)*(yj-yl)-(xj-xl)*(yj-yk),2.0)+pow((xj-xk)*(zj-zl)-(xj-xl)*(zj-zk),2.0)+pow((yj-yk)*(zj-zl)-(yj-yl)*(zj-zk),2.0),3.0/2.0)*dih_thing5*(1.0/2.0))*(1.0/2.0);
+            system.molecules[i].atoms[p].force[2] -= grad / system.constants.kbk;
 
-          //potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
-      } // end if dih_thing1 > 0 (prevent NAN/INF)
+            //potential += 0.5*vjk*(1.0 - cos(n*phi_ijkl)*cos(n*dihedral));//0.5*vjk;
+        } // end if dih_thing1 > 0 (prevent NAN/INF)
     }
     return 0;
 }
@@ -1050,15 +1050,15 @@ double LJ_intramolec_energy(System &system) {
         sig = system.constants.uniqueLJNonBonds[it].sig;
         if (eps==0 || sig==0) continue; // skip 0-energy
 
-                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
-                    r = distances[3];
-                    if (r > system.pbc.cutoff) continue;
-                    //printf("pair %i %i LJ\n",i,j);
-                    sr6 = sig/r;
-                    sr6 *= sr6;
-                    sr6 *= sr6*sr6;
-                    potential += 4.0*eps*(sr6*sr6 - sr6);
-                        //printf("LJ %i %i = %f\n", i,j, 4.0*eps*(sr6*sr6 - sr6));
+        double* distances = getDistanceXYZ(system, mol,i,mol,j);
+        r = distances[3];
+        if (r > system.pbc.cutoff) continue;
+        //printf("pair %i %i LJ\n",i,j);
+        sr6 = sig/r;
+        sr6 *= sr6;
+        sr6 *= sr6*sr6;
+        potential += 4.0*eps*(sr6*sr6 - sr6);
+        //printf("LJ %i %i = %f\n", i,j, 4.0*eps*(sr6*sr6 - sr6));
     }
 
     system.stats.UintraLJ.value = potential;
@@ -1080,22 +1080,22 @@ double LJ_intramolec_gradient(System &system) {
         eps = system.constants.uniqueLJNonBonds[it].eps;
         sig = system.constants.uniqueLJNonBonds[it].sig;
         if (eps==0 || sig==0) continue; // skip 0-contributions
-                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
-                    r = distances[3];
-                    if (r > system.pbc.cutoff) continue;
-                    rsq= r*r;
-                    r6 = rsq*rsq*rsq;
-                    s6 = sig*sig;
-                    s6 *= s6*s6;
+        double* distances = getDistanceXYZ(system, mol,i,mol,j);
+        r = distances[3];
+        if (r > system.pbc.cutoff) continue;
+        rsq= r*r;
+        r6 = rsq*rsq*rsq;
+        s6 = sig*sig;
+        s6 *= s6*s6;
 
-                    // 6 gradients (xyz for 2 atoms)
-                    for (int n=0;n<3;n++) {
-                        grad = -24.0*distances[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
-                        system.molecules[mol].atoms[i].force[n] -= grad;
-                        system.molecules[mol].atoms[j].force[n] += grad;
+        // 6 gradients (xyz for 2 atoms)
+        for (int n=0; n<3; n++) {
+            grad = -24.0*distances[n]*eps*(2*(s6*s6)/(r6*r6*rsq) - s6/(r6*rsq));
+            system.molecules[mol].atoms[i].force[n] -= grad;
+            system.molecules[mol].atoms[j].force[n] += grad;
 
 
-                    }
+        }
     }
 
     return 0;
@@ -1114,10 +1114,10 @@ double ES_intramolec_energy(System &system) {
 
         if (qq==0) continue; // skip 0-energy
 
-                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
-                    r = distances[3];
-                    if (r > system.pbc.cutoff) continue;
-                        potential += qq/r;
+        double* distances = getDistanceXYZ(system, mol,i,mol,j);
+        r = distances[3];
+        if (r > system.pbc.cutoff) continue;
+        potential += qq/r;
     }
 
     system.stats.UintraES.value = potential;
@@ -1136,13 +1136,13 @@ double ES_intramolec_gradient(System &system) {
 
         if (qq==0) continue; // skip 0-force
 
-                    double* distances = getDistanceXYZ(system, mol,i,mol,j);
-                    r = distances[3];
-                    if (r > system.pbc.cutoff) continue;
-                    for (int n=0;n<3;n++) {
-                        system.molecules[mol].atoms[i].force[n] += distances[n]*qq/(r*r*r);
-                        system.molecules[mol].atoms[j].force[n] -= distances[n]*qq/(r*r*r);
-                    }
+        double* distances = getDistanceXYZ(system, mol,i,mol,j);
+        r = distances[3];
+        if (r > system.pbc.cutoff) continue;
+        for (int n=0; n<3; n++) {
+            system.molecules[mol].atoms[i].force[n] += distances[n]*qq/(r*r*r);
+            system.molecules[mol].atoms[j].force[n] -= distances[n]*qq/(r*r*r);
+        }
     }
 
     return 0; //potential*system.constants.kbk; // to kcal/mol
@@ -1169,28 +1169,32 @@ void findBonds(System &system) {
             // for each atom, we find its bonded neighbors by a distance search
             // (by only searching atoms on this same molecule)
             for (l=0; l<system.molecules[i].atoms.size(); l++) {
-               if (j==l) continue; // don't do self-atom
-               double* distances = getDistanceXYZ(system, i,j,i,l);
-               r = distances[3];
+                if (j==l) continue; // don't do self-atom
+                double* distances = getDistanceXYZ(system, i,j,i,l);
+                r = distances[3];
 
-               if (qualify_bond(system, r, i, j, l)) {
+                if (qualify_bond(system, r, i, j, l)) {
                     local_bonds++;
 
                     system.molecules[i].atoms[j].bonds.push_back(l);
 
                     // check for duplicate bond.
                     duplicateFlag=0;
-                    for (unsigned int n=0;n<system.constants.uniqueBonds.size();n++) {
+                    for (unsigned int n=0; n<system.constants.uniqueBonds.size(); n++) {
                         if (system.constants.uniqueBonds[n].mol == i &&
-                            system.constants.uniqueBonds[n].atom1 == l &&
-                            system.constants.uniqueBonds[n].atom2 == j) {
+                                system.constants.uniqueBonds[n].atom1 == l &&
+                                system.constants.uniqueBonds[n].atom2 == j) {
 
-                            duplicateFlag=1; break;
+                            duplicateFlag=1;
+                            break;
                         }
                     }
                     if (!duplicateFlag) {
                         // this bond is unique
-                        Constants::UniqueBond tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l;
+                        Constants::UniqueBond tmp;
+                        tmp.mol=i;
+                        tmp.atom1=j;
+                        tmp.atom2=l;
                         tmp.value = r;
                         system.constants.uniqueBonds.push_back(tmp);
                     }
@@ -1206,19 +1210,24 @@ void findBonds(System &system) {
 
                             // check for duplicate angles
                             duplicateAngleFlag = 0;
-                            for (unsigned int n=0;n<system.constants.uniqueAngles.size();n++) {
+                            for (unsigned int n=0; n<system.constants.uniqueAngles.size(); n++) {
                                 if (system.constants.uniqueAngles[n].mol == i &&
-                                    system.constants.uniqueAngles[n].atom1 == m &&
-                                    system.constants.uniqueAngles[n].atom2 == l &&
-                                    system.constants.uniqueAngles[n].atom3 == j) {
+                                        system.constants.uniqueAngles[n].atom1 == m &&
+                                        system.constants.uniqueAngles[n].atom2 == l &&
+                                        system.constants.uniqueAngles[n].atom3 == j) {
 
-                                    duplicateAngleFlag=1; break;
+                                    duplicateAngleFlag=1;
+                                    break;
 
                                 }
                             }
                             if (!duplicateAngleFlag) {
                                 // this angle is unique
-                                Constants::UniqueAngle tmp; tmp.mol=i; tmp.atom1=j; tmp.atom2=l; tmp.atom3=m;
+                                Constants::UniqueAngle tmp;
+                                tmp.mol=i;
+                                tmp.atom1=j;
+                                tmp.atom2=l;
+                                tmp.atom3=m;
                                 tmp.value = get_angle(system, i, j,l,m);
                                 system.constants.uniqueAngles.push_back(tmp);
                             }
@@ -1237,25 +1246,30 @@ void findBonds(System &system) {
                                 if (qualify_bond(system, rh, i, m, p)) {
                                     // check duplicate dihedral
                                     duplicateDihFlag = 0;
-                                    for (unsigned int n=0;n<system.constants.uniqueDihedrals.size();n++) {
+                                    for (unsigned int n=0; n<system.constants.uniqueDihedrals.size(); n++) {
                                         if ((system.constants.uniqueDihedrals[n].mol==i &&
-                                            system.constants.uniqueDihedrals[n].atom1==p &&
-                                            system.constants.uniqueDihedrals[n].atom2==m &&
-                                            system.constants.uniqueDihedrals[n].atom3==l &&
-                                            system.constants.uniqueDihedrals[n].atom4==j) ||
-                                            (system.constants.uniqueDihedrals[n].mol==i &&
-                                            system.constants.uniqueDihedrals[n].atom1==p &&
-                                            system.constants.uniqueDihedrals[n].atom2==m &&
-                                            system.constants.uniqueDihedrals[n].atom3==l &&
-                                            system.constants.uniqueDihedrals[n].atom4==j )) {
+                                                system.constants.uniqueDihedrals[n].atom1==p &&
+                                                system.constants.uniqueDihedrals[n].atom2==m &&
+                                                system.constants.uniqueDihedrals[n].atom3==l &&
+                                                system.constants.uniqueDihedrals[n].atom4==j) ||
+                                                (system.constants.uniqueDihedrals[n].mol==i &&
+                                                 system.constants.uniqueDihedrals[n].atom1==p &&
+                                                 system.constants.uniqueDihedrals[n].atom2==m &&
+                                                 system.constants.uniqueDihedrals[n].atom3==l &&
+                                                 system.constants.uniqueDihedrals[n].atom4==j )) {
 
-                                                duplicateDihFlag = 1;break;
+                                            duplicateDihFlag = 1;
+                                            break;
                                         }
                                     }
                                     // this dihedral is unique
                                     if (!duplicateDihFlag) {
-                                        Constants::UniqueDihedral tmp; tmp.mol=i; tmp.atom1=j;
-                                        tmp.atom2=l; tmp.atom3=m; tmp.atom4=p;
+                                        Constants::UniqueDihedral tmp;
+                                        tmp.mol=i;
+                                        tmp.atom1=j;
+                                        tmp.atom2=l;
+                                        tmp.atom3=m;
+                                        tmp.atom4=p;
                                         tmp.value = get_dihedral_angle(system, i, j,l,m,p);
                                         system.constants.uniqueDihedrals.push_back(tmp);
                                     }
@@ -1265,17 +1279,17 @@ void findBonds(System &system) {
                         }
                     }
 
-               } // end if r < bond-length
+                } // end if r < bond-length
             } // end pair (i,j) -- (i,l)
             c++;
         } // end j
     } // end i
     printf("Getting UFF atom labels...\n");
-    
+
     // get UFF atom labels for all atoms
-    for (i=0;i<molecule_limit;i++) {
+    for (i=0; i<molecule_limit; i++) {
         if (system.molecules[i].frozen && system.constants.mode != "opt" && !system.constants.flexible_frozen && !system.constants.write_lammps) continue;
-        for (j=0;j<system.molecules[i].atoms.size();j++) {
+        for (j=0; j<system.molecules[i].atoms.size(); j++) {
             // based on the total number of bonds to this atom,
             // determine the atom-type from UFF.
             system.molecules[i].atoms[j].UFFlabel = getUFFlabel(system, system.molecules[i].atoms[j].name, system.molecules[i].atoms[j].bonds.size(), i,j);
@@ -1300,30 +1314,32 @@ void findBonds(System &system) {
             for (j=i+1; j<system.molecules[mol].atoms.size(); j++) {
                 // need to check if beyond 2 bonds -- i.e. no 1-2 or 1-3 interactions.
                 qualified = 1;
-                for (y=0; y<system.constants.uniqueBonds.size();y++) {
+                for (y=0; y<system.constants.uniqueBonds.size(); y++) {
                     if (system.constants.uniqueBonds[y].mol==mol &&
-                        ((
-                        system.constants.uniqueBonds[y].atom1==i &&
-                        system.constants.uniqueBonds[y].atom2==j
-                        ) ||
-                        (
-                        system.constants.uniqueBonds[y].atom1==j &&
-                        system.constants.uniqueBonds[y].atom2==i
-                        ))) {
-                        qualified=0;  break;
+                            ((
+                                 system.constants.uniqueBonds[y].atom1==i &&
+                                 system.constants.uniqueBonds[y].atom2==j
+                             ) ||
+                             (
+                                 system.constants.uniqueBonds[y].atom1==j &&
+                                 system.constants.uniqueBonds[y].atom2==i
+                             ))) {
+                        qualified=0;
+                        break;
                     } // end if bonded therefore unqualified
                 } // end bonds loop
-                for (z=0; z<system.constants.uniqueAngles.size();z++) {
+                for (z=0; z<system.constants.uniqueAngles.size(); z++) {
                     if (system.constants.uniqueAngles[z].mol==mol &&
-                       ((
-                        system.constants.uniqueAngles[z].atom1==i &&
-                        system.constants.uniqueAngles[z].atom3==j
-                       ) ||
-                       (
-                        system.constants.uniqueAngles[z].atom3==i &&
-                        system.constants.uniqueAngles[z].atom1==j
-                       ))) {
-                       qualified=0; break;
+                            ((
+                                 system.constants.uniqueAngles[z].atom1==i &&
+                                 system.constants.uniqueAngles[z].atom3==j
+                             ) ||
+                             (
+                                 system.constants.uniqueAngles[z].atom3==i &&
+                                 system.constants.uniqueAngles[z].atom1==j
+                             ))) {
+                        qualified=0;
+                        break;
                     } // end if 1--3 therefore unqualified
                 }
 
@@ -1336,14 +1352,18 @@ void findBonds(System &system) {
                 if (qualified) {
                     c++;
                     Constants::UniqueLJNonBond tmp;
-                    tmp.mol = mol; tmp.atom1=i; tmp.atom2=j;
+                    tmp.mol = mol;
+                    tmp.atom1=i;
+                    tmp.atom2=j;
                     tmp.sig = 0.5*(system.molecules[mol].atoms[i].sig + system.molecules[mol].atoms[j].sig);
                     tmp.eps = sqrt(system.molecules[mol].atoms[i].eps * system.molecules[mol].atoms[j].eps);
                     system.constants.uniqueLJNonBonds.push_back(tmp);
 
                     //also coulombic pairs
                     Constants::UniqueChargeNonBond tmp2;
-                    tmp2.mol = mol; tmp2.atom1 = i; tmp2.atom2 = j;
+                    tmp2.mol = mol;
+                    tmp2.atom1 = i;
+                    tmp2.atom2 = j;
                     tmp2.chargeprod = system.molecules[mol].atoms[i].C * system.molecules[mol].atoms[j].C;
                     system.constants.uniqueChargeNonBonds.push_back(tmp2);
                 }
@@ -1357,28 +1377,30 @@ void findBonds(System &system) {
         if (!system.constants.flexible_frozen && system.molecules[mol].frozen && system.constants.mode != "opt" && !system.constants.write_lammps) continue; // skip frozen molecules if flexible_frozen is not on, and not opt mode.
         for (i=0; i<system.molecules[mol].atoms.size(); i++) {
             if ((int)system.molecules[mol].atoms[i].bonds.size() == 3) {
-               
+
                 string ele = convertElement(system, system.molecules[mol].atoms[i].name).c_str();
                 if (ele == "C" || ele == "N" || ele == "P" || ele == "As" || ele == "Sb" || ele == "Bi") {
-                    //if (ele == "C" && ( system.molecules[mol].atoms[i].UFFlabel.c_str() != "C_2" && system.molecules[mol].atoms[i].UFFlabel.c_str() != "C_R")) continue; // skip C if not C_R or C_2 
+                    //if (ele == "C" && ( system.molecules[mol].atoms[i].UFFlabel.c_str() != "C_2" && system.molecules[mol].atoms[i].UFFlabel.c_str() != "C_R")) continue; // skip C if not C_R or C_2
                     //printf(" %s <-- uff\n", system.molecules[mol].atoms[i].UFFlabel.c_str());
                     if (ele != "C" || (system.molecules[mol].atoms[i].UFFlabel == "C_R" || system.molecules[mol].atoms[i].UFFlabel == "C_2")) {
-                    Constants::UniqueImproper tmp;
-                    tmp.mol = mol;
-                    tmp.atom1 = i; 
-                    tmp.atom2 = system.molecules[mol].atoms[i].bonds[0];
-                    tmp.atom3 = system.molecules[mol].atoms[i].bonds[1];
-                    tmp.atom4 = system.molecules[mol].atoms[i].bonds[2];
-                    tmp.C0 = 1; tmp.C1 = -1; tmp.C2 = 0;
-                    tmp.k_ijkl = 6.0; // kcal/mol default for C
+                        Constants::UniqueImproper tmp;
+                        tmp.mol = mol;
+                        tmp.atom1 = i;
+                        tmp.atom2 = system.molecules[mol].atoms[i].bonds[0];
+                        tmp.atom3 = system.molecules[mol].atoms[i].bonds[1];
+                        tmp.atom4 = system.molecules[mol].atoms[i].bonds[2];
+                        tmp.C0 = 1;
+                        tmp.C1 = -1;
+                        tmp.C2 = 0;
+                        tmp.k_ijkl = 6.0; // kcal/mol default for C
 
-                    tmp.value = 0;
+                        tmp.value = 0;
 
-                    system.constants.uniqueImpropers.push_back(tmp);
+                        system.constants.uniqueImpropers.push_back(tmp);
                     }
                 }
             }
-        } 
+        }
     } // end mol
 
     printf("Done obtaining bond/non-bond parameters via UFF/UFF4MOF.\n\n");
@@ -1386,7 +1408,7 @@ void findBonds(System &system) {
 
 
 void setBondingParameters(System &system) {
-    
+
 
     // save all bond/angle/torsion/non-bond parameters to memory
     // (before running optimization)
@@ -1489,7 +1511,7 @@ double totalBondedEnergy(System &system) {
     if (system.constants.opt_LJ) {
         double lj = LJ_intramolec_energy(system); // dont add this to bonded energy unless opt-mode
         if (system.constants.mode=="opt") total += lj;
-    } 
+    }
     if (system.constants.opt_ES) {
         double es = ES_intramolec_energy(system); // dont add this to bonded energy unless opt-mode
         if (system.constants.mode=="opt") total += es;

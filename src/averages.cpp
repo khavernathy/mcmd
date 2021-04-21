@@ -15,15 +15,16 @@ void computeInitialValues(System &system) {
     unsigned int i, c, d, j; // index ints
 
     // MASS OF SYSTEM
-    system.stats.totalmass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    system.stats.totalmass.value = 0.0;
+    system.stats.frozenmass.value = 0.0;
     for (i=0; i<system.proto.size(); i++)
         system.stats.movablemass[i].value = 0.0;
-	for (c=0; c<system.molecules.size();c++) {
+    for (c=0; c<system.molecules.size(); c++) {
         string thismolname = system.molecules[c].name;
-		for (d=0; d<system.molecules[c].atoms.size(); d++) {
+        for (d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
-			system.stats.totalmass.value += thismass; // total mass in g
-		    if (!system.molecules[c].frozen) {
+            system.stats.totalmass.value += thismass; // total mass in g
+            if (!system.molecules[c].frozen) {
                 for (i=0; i<system.proto.size(); i++) {
                     if (system.proto[i].name == thismolname)
                         system.stats.movablemass[i].value += thismass;
@@ -33,7 +34,7 @@ void computeInitialValues(System &system) {
             else if (system.molecules[c].frozen)
                 system.stats.frozenmass.value += thismass;
         }
-	}
+    }
 
     // N_movables (sorbates, usually)
     system.constants.initial_sorbates = system.stats.count_movables;
@@ -53,32 +54,32 @@ void computeInitialValues(System &system) {
         system.stats.dist_within.average = system.stats.dist_within.value;
     }
 
-	// ENERGY
+    // ENERGY
     double placeholder = getTotalPotential(system); // getTotPot sends values to stat vars
-            system.stats.rd.average = system.stats.rd.value;
-                system.stats.lj_lrc.average = system.stats.lj_lrc.value;
-                system.stats.lj_self_lrc.average = system.stats.lj_lrc.value;
-                system.stats.lj.average = system.stats.lj.value;
+    system.stats.rd.average = system.stats.rd.value;
+    system.stats.lj_lrc.average = system.stats.lj_lrc.value;
+    system.stats.lj_self_lrc.average = system.stats.lj_lrc.value;
+    system.stats.lj.average = system.stats.lj.value;
 
-            system.stats.es.average = system.stats.es.value;
-                system.stats.es_self.average = system.stats.es_self.value;
-                system.stats.es_real.average = system.stats.es_real.value;
-                system.stats.es_recip.average = system.stats.es_recip.value;
+    system.stats.es.average = system.stats.es.value;
+    system.stats.es_self.average = system.stats.es_self.value;
+    system.stats.es_real.average = system.stats.es_real.value;
+    system.stats.es_recip.average = system.stats.es_recip.value;
 
-        	system.stats.polar.average = system.stats.polar.value;
+    system.stats.polar.average = system.stats.polar.value;
 
-            system.stats.potential.average = system.stats.potential.value;
-            system.stats.potential_sq.average = system.stats.potential_sq.value;
-            system.constants.initial_energy = system.stats.potential.value;
+    system.stats.potential.average = system.stats.potential.value;
+    system.stats.potential_sq.average = system.stats.potential_sq.value;
+    system.constants.initial_energy = system.stats.potential.value;
 
-	// VOLUME
-	system.stats.volume.average = system.pbc.volume;
+    // VOLUME
+    system.stats.volume.average = system.pbc.volume;
     system.stats.volume.value = system.pbc.volume;
 
-	// DENSITY
+    // DENSITY
     for (i=0; i<system.proto.size(); i++) {
-	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
-		system.stats.density[i].average = system.stats.density[i].value;
+        system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
+        system.stats.density[i].average = system.stats.density[i].value;
     }
 
     // WT %
@@ -90,14 +91,12 @@ void computeInitialValues(System &system) {
 
     }
 
-	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
-	// GOOD FOR HOMOGENOUS GASES ONLY!!
+    // COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
+    // GOOD FOR HOMOGENOUS GASES ONLY!!
     double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*system.constants.amu2kg*1000*system.constants.NA);
-	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
-            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
-		system.stats.z.average = system.stats.z.value;
-
-
+    system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
+                           / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
+    system.stats.z.average = system.stats.z.value;
 }
 
 
@@ -109,16 +108,16 @@ void computeAverages(System &system) {
     unsigned int i,j,c,d; // indices
 
     // MC MOVE ACCEPT STATS
-	system.stats.total_accepts = system.stats.insert_accepts + system.stats.remove_accepts + system.stats.displace_accepts + system.stats.volume_change_accepts;
-	system.stats.total_attempts = system.stats.insert_attempts + system.stats.remove_attempts + system.stats.displace_attempts + system.stats.volume_attempts;
+    system.stats.total_accepts = system.stats.insert_accepts + system.stats.remove_accepts + system.stats.displace_accepts + system.stats.volume_change_accepts;
+    system.stats.total_attempts = system.stats.insert_attempts + system.stats.remove_attempts + system.stats.displace_attempts + system.stats.volume_attempts;
     //printf("total attempts = %i\n",system.stats.total_attempts);
 
     // BOLTZMANN AVERAGES
-	system.stats.bf_avg = (system.stats.insert_bf_sum + system.stats.remove_bf_sum + system.stats.displace_bf_sum + system.stats.volume_change_bf_sum)/4.0/t;
-	system.stats.ibf_avg = system.stats.insert_bf_sum/t;
-	system.stats.rbf_avg = system.stats.remove_bf_sum/t;
-	system.stats.dbf_avg = system.stats.displace_bf_sum/t;
-	system.stats.vbf_avg = system.stats.volume_change_bf_sum/t;
+    system.stats.bf_avg = (system.stats.insert_bf_sum + system.stats.remove_bf_sum + system.stats.displace_bf_sum + system.stats.volume_change_bf_sum)/4.0/t;
+    system.stats.ibf_avg = system.stats.insert_bf_sum/t;
+    system.stats.rbf_avg = system.stats.remove_bf_sum/t;
+    system.stats.dbf_avg = system.stats.displace_bf_sum/t;
+    system.stats.vbf_avg = system.stats.volume_change_bf_sum/t;
     system.checkpoint("got BF averages");
 
     // ACCEPTANCE RATIO AVERAGES
@@ -137,15 +136,16 @@ void computeAverages(System &system) {
 
     system.checkpoint("done with boltzmann stuff.");
     // MASS OF SYSTEM
-    system.stats.totalmass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    system.stats.totalmass.value = 0.0;
+    system.stats.frozenmass.value = 0.0;
     for (i=0; i<system.proto.size(); i++)
         system.stats.movablemass[i].value = 0.0;
-	for (c=0; c<system.molecules.size();c++) {
+    for (c=0; c<system.molecules.size(); c++) {
         string thismolname = system.molecules[c].name;
-		for (d=0; d<system.molecules[c].atoms.size(); d++) {
+        for (d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
-			system.stats.totalmass.value += thismass; // total mass in g
-		    if (!system.molecules[c].frozen) {
+            system.stats.totalmass.value += thismass; // total mass in g
+            if (!system.molecules[c].frozen) {
                 for (i=0; i<system.proto.size(); i++) {
                     if (system.proto[i].name == thismolname)
                         system.stats.movablemass[i].value += thismass;
@@ -155,7 +155,7 @@ void computeAverages(System &system) {
             else if (system.molecules[c].frozen)
                 system.stats.frozenmass.value += thismass;
         }
-	}
+    }
 
     // N_movables (sorbates, usually)
     for (i=0; i<system.proto.size(); i++) system.stats.Nmov[i].value = 0; // initialize b4 counting.
@@ -188,15 +188,15 @@ void computeAverages(System &system) {
         system.stats.selectivity[i].calcNewStats();
     }
 
-	// ENERGY
+    // ENERGY
     system.stats.rd.calcNewStats();
-        system.stats.lj.calcNewStats();
-        system.stats.lj_lrc.calcNewStats();
-        system.stats.lj_self_lrc.calcNewStats();
+    system.stats.lj.calcNewStats();
+    system.stats.lj_lrc.calcNewStats();
+    system.stats.lj_self_lrc.calcNewStats();
     system.stats.es.calcNewStats();
-        system.stats.es_real.calcNewStats();
-        system.stats.es_self.calcNewStats();
-        system.stats.es_recip.calcNewStats();
+    system.stats.es_real.calcNewStats();
+    system.stats.es_self.calcNewStats();
+    system.stats.es_recip.calcNewStats();
     system.stats.polar.calcNewStats();
     system.stats.potential.calcNewStats();
     system.stats.potential_sq.calcNewStats();
@@ -206,7 +206,7 @@ void computeAverages(System &system) {
     if (system.constants.temp>0) tmp = -(system.stats.potential.value)/system.constants.temp; // K/K = unitless
     if (tmp < 10) system.stats.Q.value += exp(tmp);
 
-system.stats.Q.value += exp(-system.stats.potential.value / system.constants.temp); // K/K = unitless
+    system.stats.Q.value += exp(-system.stats.potential.value / system.constants.temp); // K/K = unitless
 
     // QST
     if (system.constants.ensemble == ENSEMBLE_UVT && system.proto.size() == 1) { // T must be fixed for Qst
@@ -220,16 +220,16 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
         system.stats.Nsq.calcNewStats();
 
         // Qst
-            if (0 != system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average) {
+        if (0 != system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average) {
             double qst = -(system.stats.NU.average - system.stats.Nmov[0].average * system.stats.potential.average);
             qst /= (system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average);
             qst += system.constants.temp;
             qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
-                system.stats.qst.value = qst;
-                system.stats.qst.calcNewStats();
+            system.stats.qst.value = qst;
+            system.stats.qst.calcNewStats();
 
             if (0 != system.stats.Nmov[0].average) {
-            double qst_nvt = -system.stats.potential.average * system.constants.NA * system.constants.kb * 1e-3 / system.stats.Nmov[0].average;
+                double qst_nvt = -system.stats.potential.average * system.constants.NA * system.constants.kb * 1e-3 / system.stats.Nmov[0].average;
                 system.stats.qst_nvt.value = qst_nvt;
                 system.stats.qst_nvt.calcNewStats();
             }
@@ -237,13 +237,13 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
         }
     }
 
-	// VOLUME
-	system.stats.volume.value = system.pbc.volume;
-        system.stats.volume.calcNewStats();
+    // VOLUME
+    system.stats.volume.value = system.pbc.volume;
+    system.stats.volume.calcNewStats();
 
-	// DENSITY
+    // DENSITY
     for (i=0; i<system.proto.size(); i++) {
-	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
+        system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
         system.stats.density[i].calcNewStats();
     }
 
@@ -251,24 +251,24 @@ system.stats.Q.value += exp(-system.stats.potential.value / system.constants.tem
     for (i=0; i<system.proto.size(); i++) {
         system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
-            system.stats.wtp[i].calcNewStats();
-            system.stats.wtpME[i].calcNewStats();
+        system.stats.wtp[i].calcNewStats();
+        system.stats.wtpME[i].calcNewStats();
 
-            double mm = system.proto[i].mass; // molar mass
-            double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
-            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /frozmm * system.constants.amu2kg;  // to mg/g
+        double mm = system.proto[i].mass; // molar mass
+        double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
+        system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) /frozmm * system.constants.amu2kg;  // to mg/g
 
         system.stats.excess[i].calcNewStats();
 
     }
 
 
-	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
-	// GOOD FOR HOMOGENOUS GASES ONLY!!
+    // COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
+    // GOOD FOR HOMOGENOUS GASES ONLY!!
     double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*system.constants.amu2kg*1000*system.constants.NA);
-	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
-            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
-        system.stats.z.calcNewStats();
+    system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
+                           / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
+    system.stats.z.calcNewStats();
 
     system.checkpoint("finished computeAverages()");
 
@@ -293,15 +293,16 @@ void computeAveragesMDuVT(System &system) {
     unsigned int i,j,c,d;
 
     // MASS OF SYSTEM
-    system.stats.totalmass.value = 0.0; system.stats.frozenmass.value = 0.0;
+    system.stats.totalmass.value = 0.0;
+    system.stats.frozenmass.value = 0.0;
     for (i=0; i<system.proto.size(); i++)
         system.stats.movablemass[i].value = 0.0;
-	for (c=0; c<system.molecules.size();c++) {
+    for (c=0; c<system.molecules.size(); c++) {
         string thismolname = system.molecules[c].name;
-		for (d=0; d<system.molecules[c].atoms.size(); d++) {
+        for (d=0; d<system.molecules[c].atoms.size(); d++) {
             double thismass = system.molecules[c].atoms[d].mass*system.constants.amu2kg/system.constants.NA;
-			system.stats.totalmass.value += thismass; // total mass in g
-		    if (!system.molecules[c].frozen) {
+            system.stats.totalmass.value += thismass; // total mass in g
+            if (!system.molecules[c].frozen) {
                 for (i=0; i<system.proto.size(); i++) {
                     if (system.proto[i].name == thismolname)
                         system.stats.movablemass[i].value += thismass;
@@ -311,7 +312,7 @@ void computeAveragesMDuVT(System &system) {
             else if (system.molecules[c].frozen)
                 system.stats.frozenmass.value += thismass;
         }
-	}
+    }
 
     // N_movables (sorbates, usually)
     for (i=0; i<system.proto.size(); i++) system.stats.Nmov[i].value = 0; // initialize b4 counting.
@@ -356,16 +357,16 @@ void computeAveragesMDuVT(System &system) {
         system.stats.Nsq.calcNewStats();
 
         // Qst
-            if (0 != system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average) {
+        if (0 != system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average) {
             double qst = -(system.stats.NU.average - system.stats.Nmov[0].average * system.stats.potential.average);
             qst /= (system.stats.Nsq.average - system.stats.Nmov[0].average * system.stats.Nmov[0].average);
             qst += system.constants.temp;
             qst *= system.constants.kb * system.constants.NA * 1e-3; // to kJ/mol
-                system.stats.qst.value = qst;
-                system.stats.qst.calcNewStats();
+            system.stats.qst.value = qst;
+            system.stats.qst.calcNewStats();
 
             if (0 != system.stats.Nmov[0].average) {
-            double qst_nvt = -system.stats.potential.average * system.constants.NA * system.constants.kb * 1e-3 / system.stats.Nmov[0].average;
+                double qst_nvt = -system.stats.potential.average * system.constants.NA * system.constants.kb * 1e-3 / system.stats.Nmov[0].average;
                 system.stats.qst_nvt.value = qst_nvt;
                 system.stats.qst_nvt.calcNewStats();
             }
@@ -373,13 +374,13 @@ void computeAveragesMDuVT(System &system) {
         }
     }
 
-	// VOLUME
-	system.stats.volume.value = system.pbc.volume;
-        system.stats.volume.calcNewStats();
+    // VOLUME
+    system.stats.volume.value = system.pbc.volume;
+    system.stats.volume.calcNewStats();
 
-	// DENSITY
+    // DENSITY
     for (i=0; i<system.proto.size(); i++) {
-	    system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
+        system.stats.density[i].value = system.stats.movablemass[i].value/(system.stats.volume.value*1e-24)/system.constants.amu2kg; // that's mass in g /mL
         system.stats.density[i].calcNewStats();
     }
 
@@ -387,23 +388,23 @@ void computeAveragesMDuVT(System &system) {
     for (i=0; i<system.proto.size(); i++) {
         system.stats.wtp[i].value = (system.stats.movablemass[i].value / system.stats.totalmass.value)*100;
         system.stats.wtpME[i].value = (system.stats.movablemass[i].value / system.stats.frozenmass.value)*100;
-            system.stats.wtp[i].calcNewStats();
-            system.stats.wtpME[i].calcNewStats();
+        system.stats.wtp[i].calcNewStats();
+        system.stats.wtpME[i].calcNewStats();
 
-            double mm = system.proto[i].mass; // molar mass
-            double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
-            system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) / frozmm * system.constants.amu2kg;  // to mg/g
+        double mm = system.proto[i].mass; // molar mass
+        double frozmm = system.stats.frozenmass.value * system.constants.NA;// ""
+        system.stats.excess[i].value = 1e3*(mm*system.stats.Nmov[i].average - (mm * system.constants.free_volume * system.proto[i].fugacity * system.constants.ATM2REDUCED) / system.constants.temp) / frozmm * system.constants.amu2kg;  // to mg/g
 
         system.stats.excess[i].calcNewStats();
 
     }
 
-	// COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
-	// GOOD FOR HOMOGENOUS GASES ONLY!!
+    // COMPRESSIBILITY FACTOR Z = PV/nRT  =  atm*L / (mol * J/molK * K)
+    // GOOD FOR HOMOGENOUS GASES ONLY!!
     double n_moles_sorb = system.stats.movablemass[0].value/(system.proto[0].get_mass()*system.constants.amu2kg*1000*system.constants.NA);
-	system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
-            / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
-        system.stats.z.calcNewStats();
+    system.stats.z.value = (system.constants.pres*(system.stats.volume.value*1e-27) * 101.325 ) // PV
+                           / ( (n_moles_sorb) * system.constants.R  * system.constants.temp )*system.constants.amu2kg; // over nRT
+    system.stats.z.calcNewStats();
 
     system.checkpoint("finished computeAveragesMDuVT()");
 }
@@ -412,14 +413,14 @@ void computeAveragesMDuVT(System &system) {
 
 // =================  MD statistics function to be called at corrtimes =================================
 void calculateObservablesMD(System &system) { // the * is to return an array of doubles as a pointer, not just one double
-	double V_total = 0.0;
+    double V_total = 0.0;
     double K_total = 0.0, Klin=0, Krot=0, Ek=0.0;
 
     double avg_v_ALL=0;
-	double T=0.0;
+    double T=0.0;
     double vsq=0., wsq=0.;
     double energy_holder=0.;
-	unsigned int i,j,n,z;
+    unsigned int i,j,n,z;
 
 #ifndef WINDOWS
     double v_sum[(int)system.proto.size()];
@@ -433,89 +434,90 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
 
     //if (system.stats.count_movables > 0) { // DON'T BOTHER FOR NO MOVERS
     // grab fixed potential energy of system
-        // from PBC (same as Monte Carlo potential)
-        if (system.constants.md_pbc) {
-            V_total = getTotalPotential(system);
+    // from PBC (same as Monte Carlo potential)
+    if (system.constants.md_pbc) {
+        V_total = getTotalPotential(system);
         // from individual atomic contributions (no PBC)
-        } else {
-            for (i=0; i<system.molecules.size(); i++) {
-                for (j=0; j<system.molecules[i].atoms.size(); j++) {
-                    V_total += system.molecules[i].atoms[j].V;
-                }
+    } else {
+        for (i=0; i<system.molecules.size(); i++) {
+            for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                V_total += system.molecules[i].atoms[j].V;
             }
         }
-        system.stats.potential.calcNewStats();
-        system.stats.Ulin.value = system.stats.potential.value;
+    }
+    system.stats.potential.calcNewStats();
+    system.stats.Ulin.value = system.stats.potential.value;
 
     // KINETIC ENERGIES, VELOCITIES, ETC. BY MOLECULE TYPE
     if(system.stats.count_movables > 0) {
-    for (z = 0; z<system.proto.size(); z++) {
-        v2_sum[z] = 0;
-        v_sum[z] = 0;
-        N_local[z] = 0;
-       for (i=0; i<system.molecules.size(); i++) {
-            if (system.proto[z].name == system.molecules[i].name) {
-                N_local[z]++;
-                if (system.constants.md_mode == MD_MOLECULAR) {
-                    vsq=0; wsq=0;
-                    for (n=0; n<3; n++) {
-                        vsq += system.molecules[i].vel[n]*system.molecules[i].vel[n];
-                        wsq += system.molecules[i].ang_vel[n]*system.molecules[i].ang_vel[n];
-                    }
-                    v2_sum[z] += vsq;
-                    v_sum[z] += sqrt(vsq);
-
-                    energy_holder = 0.5 * system.molecules[i].mass*system.constants.amu2kg * vsq;
-                    K_total += energy_holder; // kg A^2/fs^2
-                    Klin += energy_holder;
-
-                    if (system.constants.md_rotations) {
-                        // new tensor method.
-                        system.molecules[i].calc_inertia_tensor();
-                        double wx = system.molecules[i].ang_vel[0];
-                        double wy = system.molecules[i].ang_vel[1];
-                        double wz = system.molecules[i].ang_vel[2];
-
-                        energy_holder = 0.5 * (system.molecules[i].inertia_tensor[0]*wx*wx +
-                            system.molecules[i].inertia_tensor[1]*wy*wy +  // in Kelvin*rad
-                            system.molecules[i].inertia_tensor[2]*wz*wz +
-                            2*system.molecules[i].inertia_tensor[3]*wx*wy +
-                            2*system.molecules[i].inertia_tensor[4]*wy*wz +
-                            2*system.molecules[i].inertia_tensor[5]*wx*wz);
-
-                        energy_holder *= system.constants.kb/1e10;
-
-                        K_total += energy_holder; // rotational: (rad^2)*kg A^2 / fs^2
-                        Krot += energy_holder;
-                    } // end if rotations
-                } // end if molecular motion
-                else if (system.constants.md_mode == MD_ATOMIC || system.constants.md_mode == MD_FLEXIBLE) {
-                    for (j=0; j<system.molecules[i].atoms.size(); j++) {
+        for (z = 0; z<system.proto.size(); z++) {
+            v2_sum[z] = 0;
+            v_sum[z] = 0;
+            N_local[z] = 0;
+            for (i=0; i<system.molecules.size(); i++) {
+                if (system.proto[z].name == system.molecules[i].name) {
+                    N_local[z]++;
+                    if (system.constants.md_mode == MD_MOLECULAR) {
                         vsq=0;
-                        for (n=0; n<3; n++)
-                            vsq += system.molecules[i].atoms[j].vel[n] * system.molecules[i].atoms[j].vel[n];
-                        v_sum[z] += sqrt(vsq); // sum velocities
+                        wsq=0;
+                        for (n=0; n<3; n++) {
+                            vsq += system.molecules[i].vel[n]*system.molecules[i].vel[n];
+                            wsq += system.molecules[i].ang_vel[n]*system.molecules[i].ang_vel[n];
+                        }
                         v2_sum[z] += vsq;
-                        energy_holder = 0.5*system.molecules[i].atoms[j].mass*system.constants.amu2kg * vsq;
-                        K_total += energy_holder;
+                        v_sum[z] += sqrt(vsq);
+
+                        energy_holder = 0.5 * system.molecules[i].mass*system.constants.amu2kg * vsq;
+                        K_total += energy_holder; // kg A^2/fs^2
                         Klin += energy_holder;
-                    } // end for atoms j in molecule i
-                } // end if atomic motion
-            } // end if prototype z
-        } // end molecule loop
-    } // end prototype loop
+
+                        if (system.constants.md_rotations) {
+                            // new tensor method.
+                            system.molecules[i].calc_inertia_tensor();
+                            double wx = system.molecules[i].ang_vel[0];
+                            double wy = system.molecules[i].ang_vel[1];
+                            double wz = system.molecules[i].ang_vel[2];
+
+                            energy_holder = 0.5 * (system.molecules[i].inertia_tensor[0]*wx*wx +
+                                                   system.molecules[i].inertia_tensor[1]*wy*wy +  // in Kelvin*rad
+                                                   system.molecules[i].inertia_tensor[2]*wz*wz +
+                                                   2*system.molecules[i].inertia_tensor[3]*wx*wy +
+                                                   2*system.molecules[i].inertia_tensor[4]*wy*wz +
+                                                   2*system.molecules[i].inertia_tensor[5]*wx*wz);
+
+                            energy_holder *= system.constants.kb/1e10;
+
+                            K_total += energy_holder; // rotational: (rad^2)*kg A^2 / fs^2
+                            Krot += energy_holder;
+                        } // end if rotations
+                    } // end if molecular motion
+                    else if (system.constants.md_mode == MD_ATOMIC || system.constants.md_mode == MD_FLEXIBLE) {
+                        for (j=0; j<system.molecules[i].atoms.size(); j++) {
+                            vsq=0;
+                            for (n=0; n<3; n++)
+                                vsq += system.molecules[i].atoms[j].vel[n] * system.molecules[i].atoms[j].vel[n];
+                            v_sum[z] += sqrt(vsq); // sum velocities
+                            v2_sum[z] += vsq;
+                            energy_holder = 0.5*system.molecules[i].atoms[j].mass*system.constants.amu2kg * vsq;
+                            K_total += energy_holder;
+                            Klin += energy_holder;
+                        } // end for atoms j in molecule i
+                    } // end if atomic motion
+                } // end if prototype z
+            } // end molecule loop
+        } // end prototype loop
     } // end if > 0 movers
     // flexible "frozen" MOF
     if (system.constants.flexible_frozen) {
-      // ASSUME ONLY 1 FROZEN MOLECULE with ID 0
-      double vsq_tmp = 0;
-      for (j=0;j<system.molecules[0].atoms.size();j++) {
-        vsq_tmp = 0;
-        for (n=0;n<3;n++) vsq_tmp += system.molecules[0].atoms[j].vel[n] * system.molecules[0].atoms[j].vel[n];
-        energy_holder = 0.5*system.molecules[0].atoms[j].mass*system.constants.amu2kg * vsq_tmp;
-        K_total += energy_holder;
-        Klin += energy_holder;
-      }
+        // ASSUME ONLY 1 FROZEN MOLECULE with ID 0
+        double vsq_tmp = 0;
+        for (j=0; j<system.molecules[0].atoms.size(); j++) {
+            vsq_tmp = 0;
+            for (n=0; n<3; n++) vsq_tmp += system.molecules[0].atoms[j].vel[n] * system.molecules[0].atoms[j].vel[n];
+            energy_holder = 0.5*system.molecules[0].atoms[j].mass*system.constants.amu2kg * vsq_tmp;
+            K_total += energy_holder;
+            Klin += energy_holder;
+        }
     } // end if flexible frozen.
 
     T = calcTemperature(system, N_local, v2_sum);
@@ -558,7 +560,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         //    (system.constants.kb*system.constants.NA/1000.)*
         //    (system.stats.totalE_sq.average - system.stats.totalE.average*system.stats.totalE.average)/(system.constants.temp*system.constants.temp);
         system.stats.heat_capacity.calcNewStats();
-    // NVE: Frenkel, p85
+        // NVE: Frenkel, p85
     } else if (system.constants.ensemble == ENSEMBLE_NVE && system.proto.size() == 1) {
         double kb=system.constants.kb;
         double T = system.constants.temp;
@@ -566,7 +568,7 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         double K2avg = system.stats.kinetic_sq.average;
         double Kavg2 = system.stats.kinetic.average*system.stats.kinetic.average;
         double N = (double)system.stats.count_movables;
-        
+
         double bottom = -2.0/3.0*(2.0*N/(3.0*kb*kb*T*T)*((K2avg - Kavg2)*kb*kb)+1.0);
         system.stats.heat_capacity.value = kb*NA*1e-3/bottom ; // kJ/molK
         system.stats.heat_capacity.calcNewStats();
@@ -600,17 +602,17 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
 
 
     if (system.stats.MDtime != 0) { // don't do these on first step.
-    // DIFFUSION AND MSD
+        // DIFFUSION AND MSD
         double diffusion_d[3] = {0,0,0};
         double r2_sum = 0;
         double D[(int)system.proto.size()];
 
         for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
-        int localN = getNlocal(system, sorbid);
+            int localN = getNlocal(system, sorbid);
             if (localN < 1) continue; // skip N=0 sorbates
 
             // re-initialize these vars for each sorbate
-            for (int h=0;h<3;h++) diffusion_d[h]=0.;
+            for (int h=0; h<3; h++) diffusion_d[h]=0.;
             r2_sum=0.;
             for (i=0; i<system.molecules.size(); i++) {
                 // only consider molecules of this type (for multi-sorb)
@@ -637,24 +639,25 @@ void calculateObservablesMD(System &system) { // the * is to return an array of 
         // VELOCITY AUTOCORRELATION FUNCTION VACF
         if (system.constants.md_mode == MD_MOLECULAR) {
             double mag1=0,mag2=0;
-            double norm1[3]={0,0,0}; double norm2[3]={0,0,0};
+            double norm1[3]= {0,0,0};
+            double norm2[3]= {0,0,0};
             double D_vacf_sum=0;
             const double dt = system.constants.md_dt;
 
             for (int sorbid=0; sorbid < system.proto.size(); sorbid++) {
                 int localN = getNlocal(system, sorbid);
-                
+
                 if (localN<1) continue;
                 system.stats.vacf[sorbid].value = 0;
-                for (i=0;i<system.molecules.size();i++) {
+                for (i=0; i<system.molecules.size(); i++) {
                     if (system.molecules[i].name==system.proto[sorbid].name) {
 
                         D_vacf_sum += dddotprod(system.molecules[i].original_vel, system.molecules[i].vel);
 
                         mag1 = sqrt(dddotprod(system.molecules[i].original_vel,system.molecules[i].original_vel));
-                        mag2 = sqrt(dddotprod(system.molecules[i].vel         ,system.molecules[i].vel         ));    
-                    
-                        for (n=0;n<3;n++) {
+                        mag2 = sqrt(dddotprod(system.molecules[i].vel,system.molecules[i].vel         ));
+
+                        for (n=0; n<3; n++) {
                             norm1[n] = system.molecules[i].original_vel[n] / mag1;
                             norm2[n] = system.molecules[i].vel[n] / mag2;
                         }

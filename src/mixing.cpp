@@ -14,7 +14,7 @@ using namespace std;
 double lj_lb_eps(double e1, double e2) {
     if (e1 != e2) return sqrt(e1*e2);
     else return e1;
-}        
+}
 double lj_lb_sig(double s1, double s2) {
     if (s1 != s2) return 0.5*(s1 + s2);
     else return s1;
@@ -43,7 +43,7 @@ double lj_wh_eps(double e1, double e2, double s1, double s2) {
     return sqrt(e1*e2) * 2.0*si3*sj3/(si6+sj6);
 }
 
-// Halgren 
+// Halgren
 double lj_h_sig(double s1, double s2) {
     double si2 = s1*s1;
     double sj2 = s2*s2;

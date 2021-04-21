@@ -6,7 +6,7 @@
 // by giving molecule/atom IDs
 double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
     if (system.constants.all_pbc) {
-   // calculate distance between atoms
+        // calculate distance between atoms
         double rimg;
         double d[3],di[3],img[3],dimg[3];
         int p,q;
@@ -31,13 +31,14 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
                 di[p] += system.pbc.basis[q][p]*img[q];
             }
         }
-    
+
         // correct displacement
         for (p=0; p<3; p++)
             di[p] = d[p] - di[p];
 
         // pythagorean terms
-        r2=0; ri2=0;
+        r2=0;
+        ri2=0;
         for (p=0; p<3; p++) {
             r2 += d[p]*d[p];
             ri2 += di[p]*di[p];
@@ -46,7 +47,7 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         ri = sqrt(ri2);
 
         if (ri != ri) {
-        //if (isnan(ri) != 0 ) {
+            //if (isnan(ri) != 0 ) {
             rimg = r;
             for (p=0; p<3; p++)
                 dimg[p] = d[p];
@@ -57,7 +58,7 @@ double * getDistanceXYZ(System &system, int i, int j, int k, int l) {
         }
 
         static double output[4];
-        for (p=0;p<3;p++) output[p] = dimg[p];
+        for (p=0; p<3; p++) output[p] = dimg[p];
         output[3] = rimg;
         return output;
     }
@@ -106,7 +107,8 @@ double * getR(System &system, double * com1, double * com2, int pbcflag) {
             di[p] = d[p] - di[p];
 
         // pythagorean terms
-        r2=0; ri2=0;
+        r2=0;
+        ri2=0;
         for (p=0; p<3; p++) {
             r2 += d[p]*d[p];
             ri2 += di[p]*di[p];
@@ -124,12 +126,12 @@ double * getR(System &system, double * com1, double * com2, int pbcflag) {
                 dimg[p] = di[p];
         }
 
-        
+
         static double output[4];
         for (p=0; p<3; p++) output[p] = dimg[p];
         output[3] = rimg;
         return output;
-        
+
     } else {
         // no pbc
         double d[3];

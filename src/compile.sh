@@ -124,8 +124,8 @@ elif [[ "$option" == "cmake" ]]; then
     # cmake serial compilation
     echo "Using cmake to compile MCMD."
     cd ..
-    cmake -j4 .
-    make
+    cmake . -DCMAKE_BUILD_TYPE=Release
+    make -j12
     cd src
 #######################################################################
 elif [[ "$option" == "mpi" ]]; then
