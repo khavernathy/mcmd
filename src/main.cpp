@@ -595,5 +595,8 @@ int main(int argc, char **argv) {
     system.constants.time_elapsed = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) /1000000.0;
     printf("Total wall time = %f s\n",system.constants.time_elapsed);
 
+    // return error-free
+    exit(0);
+
 
 } // end main()
