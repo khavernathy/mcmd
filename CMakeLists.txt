@@ -14,17 +14,13 @@ configure_file (
 )
 
 set(CMAKE_BUILD_TYPE Release)
-
 set(CMAKE_CXX_FLAGS "-lm -I. -Ofast -foptimize-sibling-calls -finline-limit=10000 -fexpensive-optimizations -flto -frename-registers")
-
 set(CMAKE_CXX_STANDARD 11)
-
 set(INCLUDE src/)
 
 set(SRC 
 src/main.cpp
 )
-
 
 if(MPI)
     message("-- MPI Enabled")
@@ -37,7 +33,6 @@ if(MPI)
 else()
     message("-- MPI Disabled")
 endif()
-
 
 if(OMP)
     message("-- OpenMP Enabled")
@@ -57,14 +52,13 @@ else()
     message("-- CUDA Disabled")
 endif()
 
-
-
-
-# make executable
-
 if(CUDA)
     cuda_add_executable(${PROJECT_NAME} ${SRC})
 else()
     add_executable(${PROJECT_NAME} ${SRC})
 endif()
 
+enable_testing()
+add_test(NAME test1 CONFIGURATIONS Release
+        WORKING_DIRECTORY examples/optimization/RuBpy
+        COMMAND mcmd *inp)
