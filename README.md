@@ -39,7 +39,7 @@ Take a look at mcmd/src/compile.sh for different options in compilation (OS-spec
 You can find details on available options, built-in potentials, etc. on the wiki page: https://github.com/khavernathy/mcmd/wiki
 
 # Contact
-Douglas Franz: dfranz@mail.usf.edu
+Douglas Franz: douglas.m.franz@gmail.com
 University of South Florida
 Dept. of Chemistry
 
