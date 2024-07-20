@@ -1506,6 +1506,8 @@ Constants::Constants() {
     polars["OW"] = 0.852;//*cV/ke; // O in water (my model)
     polars["O_sp3"] = polars["O_sp2"] = 0.852; // O SAPT
     polars["Na"] = 24.11;//*cV/ke; // from paper https://www.researchgate.net/publication/45896756_Absolute_and_ratio_measurements_of_the_polarizability_of_Na_K_and_Rb_with_an_atom_interferometer
+    polars["Rb"] = 47.24; // https://www.researchgate.net/publication/45896756_Absolute_and_ratio_measurements_of_the_polarizability_of_Na_K_and_Rb_with_an_atom_interferometer
+    polars["K"] = 43.06; // https://www.researchgate.net/publication/45896756_Absolute_and_ratio_measurements_of_the_polarizability_of_Na_K_and_Rb_with_an_atom_interferometer
     polars["P"] = 3.35;//*cV/ke;
     polars["SS"] = 2.474; // S SAPT
     polars["Cl"] = 2.40028;//*cV/ke;

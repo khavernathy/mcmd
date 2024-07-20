@@ -389,6 +389,8 @@ void moleculePrintout(System &system) {
 
                 // each call to addAtomToProto takes 12 arguments which correspond to PDB-style input
                 // proto id, atom name, molecule name, x, y, z, m, q, a, eps, sig
+                // For details on the column order and units, see https://github.com/khavernathy/mcmd/wiki/Atoms-Input-formats
+
                 // HYDROGEN H2
                 if (sorbmodel == "h2_buch") {
                     addAtomToProto(system, i, "H2G", "H2", "M", 0.0, 0.0, 0.0, 2.016, 0.0, 0.0, 34.2, 2.96);
@@ -452,6 +454,34 @@ void moleculePrintout(System &system) {
                     system.proto[i].name = "Xe";
                     system.proto[i].dof = 3;
                 }
+
+                // ALKALI METAL IONS  (for use when trying to determine location of guest ions in a MOF, for example.)
+                // When you use these models with electrostatic simulation you need to be careful to make sure the total charge of the system is zero.
+                else if (sorbmodel == "li_ion") {
+                    addAtomToProto(system, i, "Li", "Li", "M", 0, 0, 0, system.constants.masses["Li"], 1.0, system.constants.polars["Li"],
+                     system.constants.eps["Li"], system.constants.sigs["Li"]);
+                     system.proto[i].name = "Li";
+                     system.proto[i].dof = 3;
+                }
+                else if (sorbmodel == "na_ion") {
+                    addAtomToProto(system, i, "Na", "Na", "M", 0, 0, 0, system.constants.masses["Na"], 1.0, system.constants.polars["Na"],
+                     system.constants.eps["Na"], system.constants.sigs["Na"]);
+                     system.proto[i].name = "Na";
+                     system.proto[i].dof = 3;
+                }
+                else if (sorbmodel == "k_ion") {
+                    addAtomToProto(system, i, "K", "K", "M", 0, 0, 0, system.constants.masses["K"], 1.0, system.constants.polars["K"],
+                     system.constants.eps["K"], system.constants.sigs["K"]);
+                     system.proto[i].name = "K";
+                     system.proto[i].dof = 3;
+                }
+                else if (sorbmodel == "rb_ion") {
+                    addAtomToProto(system, i, "Rb", "Rb", "M", 0, 0, 0, system.constants.masses["Rb"], 1.0, system.constants.polars["Rb"],
+                     system.constants.eps["Rb"], system.constants.sigs["Rb"]);
+                     system.proto[i].name = "Rb";
+                     system.proto[i].dof = 3;
+                }
+
                 // CARBON DIOXIDE CO2
                 else if (sorbmodel == "co2_phast") {
                     addAtomToProto(system, i,"COG", "CO2", "M", 0.0, 0.0, 0.0, 12.0107, 0.77106, 0.0, 8.52238, 3.05549);
